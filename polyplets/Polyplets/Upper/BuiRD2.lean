@@ -52,7 +52,7 @@ def KingBuiSystemRD2Holds : Prop := buiRD2.SystemHolds
 `lambda ≤ 10⁶/106251 = 9.41167…`, given the RD=2 system hypothesis. The
 certificate arithmetic is kernel-checked (`buiRD2_valid`); the monotone
 iteration and the `lambda_tendsto` transfer are proved in
-`Upper/Certificate.lean`. Compare the unconditional `lambda_le`
+`Upper/Certificate.lean`. Compare the unconditional `lambda_le_3125_div_256`
 (`λ ≤ 3125/256 ≈ 12.207`): the Bui route sharpens it by 2.8 at the price of
 the named hypothesis. -/
 theorem lambda_le_of_bui_rd2 (h : KingBuiSystemRD2Holds) :

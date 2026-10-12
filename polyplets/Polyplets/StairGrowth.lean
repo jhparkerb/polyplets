@@ -269,7 +269,7 @@ theorem mu_le : mu ≤ 4 := stairFekete.growth_le
 `M_le_mu_pow` turns any banked term into a floor. The largest one this project
 has computed is `M 700`, from `cpp/middle_kingdom_tm.cpp` in `stair` mode
 (`results/mk_stair_terms_n700.txt`, log `results/mk_stair_n700.log`). It enters
-as an explicit hypothesis, in the `lambda_gt_of_banked` style, so the
+as an explicit hypothesis, in the `lambda_gt_of_a_40` style, so the
 computation stays outside the kernel and visible in the statement. -/
 
 set_option linter.style.longLine false in

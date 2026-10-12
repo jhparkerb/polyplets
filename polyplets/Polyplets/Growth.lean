@@ -22,7 +22,7 @@ halves of Fekete's argument:
 * **Klarner supermultiplicativity** (`a_supermul`): `a m * a n ≤ a (m + n)`,
   proved by an explicit injection `concat` that welds two polyplets
   side by side across one king edge, together with the recovery maps
-  (`recLeft`, `recRight`) that undo it;
+  (`leftPart`, `rightPart`) that undo it;
 * **Fekete's lemma**, from Mathlib's `Subadditive.tendsto_lim`, applied to
   `-log (a n)`, which is subadditive by supermultiplicativity and whose
   `-log (a n) / n` is bounded below by the `UpperBound.lean` ceiling. Since
@@ -33,8 +33,8 @@ The payoff:
 
 * `lambda_tendsto` : `a n ^ (1/n) → lambda`;
 * `a_le_lambda_pow` : `a n ≤ lambda ^ n` (Fekete's limit-is-supremum half);
-* `lambda_le` : `lambda ≤ 3125 / 256 = 5⁵/4⁴`;
-* `lambda_gt_of_banked` : `311/50 = 6.22 < lambda`, **conditional** on the
+* `lambda_le_3125_div_256` : `lambda ≤ 3125 / 256 = 5⁵/4⁴`;
+* `lambda_gt_of_a_40` : `311/50 = 6.22 < lambda`, **conditional** on the
   banked hypothesis `a 40 = 56749893611764175164545926946127`.
 
 ## The concatenation injection
@@ -59,7 +59,7 @@ with `|{p ∈ C : p.1 < k}| = m`; on `C = concat A B` it is `w + 1`, because the
 left count is `< m` for every `k ≤ w` (the bridge cell `(w, cTop)` is missed)
 and exactly `m` at `w + 1`. Splitting at the cut and anchoring — in `y` only
 for the left half, in both coordinates for the right — returns `A` and `B`
-(`recLeft_concat`, `recRight_concat`).
+(`leftPart_concat`, `rightPart_concat`).
 -/
 
 namespace Polyplets
@@ -486,35 +486,35 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
   omega
 
 /-- Recovering the left factor: cut, then anchor vertically. -/
-noncomputable def recLeft (C : Finset (ℤ × ℤ)) (m : ℕ) : Finset (ℤ × ℤ) :=
+noncomputable def leftPart (C : Finset (ℤ × ℤ)) (m : ℕ) : Finset (ℤ × ℤ) :=
   translate (0, -(baseY (leftOf C (cutAt C m : ℤ)) : ℤ)) (leftOf C (cutAt C m : ℤ))
 
 /-- Recovering the right factor: cut, then anchor in both coordinates. -/
-noncomputable def recRight (C : Finset (ℤ × ℤ)) (m : ℕ) : Finset (ℤ × ℤ) :=
+noncomputable def rightPart (C : Finset (ℤ × ℤ)) (m : ℕ) : Finset (ℤ × ℤ) :=
   translate (-(baseX (rightOf C (cutAt C m : ℤ)) : ℤ), -(baseY (rightOf C (cutAt C m : ℤ)) : ℤ))
     (rightOf C (cutAt C m : ℤ))
 
-/-- `recLeft` inverts `concat` on the left. -/
-theorem recLeft_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
-    (hB : IsPolyplet n B) : recLeft (concat A B) m = A := by
+/-- `leftPart` inverts `concat` on the left. -/
+theorem leftPart_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) : leftPart (concat A B) m = A := by
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
-  rw [recLeft, cutAt_concat hA hB, hcast, leftOf_concat hA hB,
+  rw [leftPart, cutAt_concat hA hB, hcast, leftOf_concat hA hB,
     baseY_shift hA (liftA_nonneg A B)]
   exact translate_mk_cancel (by ring) (by ring) A
 
-/-- `recRight` inverts `concat` on the right. -/
-theorem recRight_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
-    (hB : IsPolyplet n B) : recRight (concat A B) m = B := by
+/-- `rightPart` inverts `concat` on the right. -/
+theorem rightPart_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) : rightPart (concat A B) m = B := by
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   have hw : (0 : ℤ) ≤ (maxX A : ℤ) + 1 := by
     have := Int.natCast_nonneg (maxX A); omega
-  rw [recRight, cutAt_concat hA hB, hcast, rightOf_concat hA hB,
+  rw [rightPart, cutAt_concat hA hB, hcast, rightOf_concat hA hB,
     baseX_shift hB hw, baseY_shift hB (liftB_nonneg A B)]
   exact translate_mk_cancel (by ring) (by ring) B
 
 /-- **Klarner supermultiplicativity.** `concat` injects pairs of polyplets
 of sizes `m` and `n` into the polyplets of size `m + n`;
-`recLeft`/`recRight` are the left inverse that makes it an injection.
+`leftPart`/`rightPart` are the left inverse that makes it an injection.
 
 Unconditional: at `m = 0` the left side is `a 0 * a n = 0` and the
 inequality degenerates to `0 ≤ a n`. (The outworks brief pinned a `1 ≤ m`,
@@ -535,9 +535,9 @@ theorem a_supermul {m n : ℕ} : a m * a n ≤ a (m + n) := by
     simp only [Set.Finite.mem_toFinset, mem_polyplets] at hz hw
     have hfun : concat z.1 z.2 = concat w.1 w.2 := heq
     have h1 : z.1 = w.1 := by
-      rw [← recLeft_concat hz.1 hz.2, ← recLeft_concat hw.1 hw.2, hfun]
+      rw [← leftPart_concat hz.1 hz.2, ← leftPart_concat hw.1 hw.2, hfun]
     have h2 : z.2 = w.2 := by
-      rw [← recRight_concat hz.1 hz.2, ← recRight_concat hw.1 hw.2, hfun]
+      rw [← rightPart_concat hz.1 hz.2, ← rightPart_concat hw.1 hw.2, hfun]
     exact Prod.ext h1 h2
 
 /-! ## Fekete's ladder
@@ -595,7 +595,7 @@ theorem a_le_lambda_pow {n : ℕ} (hn : 1 ≤ n) : (a n : ℝ) ≤ lambda ^ n :=
 
 /-- **The upper bound `λ ≤ 5⁵/4⁴ = 3125/256`**, from the decision-tree ceiling
 of `UpperBound.lean`. -/
-theorem lambda_le : lambda ≤ 3125 / 256 := polypletFekete.growth_le
+theorem lambda_le_3125_div_256 : lambda ≤ 3125 / 256 := polypletFekete.growth_le
 
 /-! ## The conditional lower bound from the banked final term
 
@@ -619,7 +619,7 @@ The constant is close to sharp for this `n`: `a 40 ^ (1/40) = 6.22084…`, so
 single-source value (the top of the table is kink-engine-only; see
 `polyplets/README.md`'s anchor-provenance discussion), and the bound is still
 weaker than the unformalized strip ladder. -/
-theorem lambda_gt_of_banked (h : a 40 = 56749893611764175164545926946127) :
+theorem lambda_gt_of_a_40 (h : a 40 = 56749893611764175164545926946127) :
     (311 / 50 : ℝ) < lambda := by
   have hle : ((56749893611764175164545926946127 : ℕ) : ℝ) ≤ lambda ^ 40 := by
     have := a_le_lambda_pow (n := 40) (by norm_num)

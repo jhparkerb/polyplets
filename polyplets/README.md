@@ -135,8 +135,8 @@ Symmetry (`Symmetry.lean`): the dihedral group acts by apply-then-anchor;
 Growth (`UpperBound`, `Fekete`, `Growth`): `a_le_choose : a n ≤ C(5n, n)`
 by a decision-tree encoding, supermultiplicativity by concatenation with cut
 recovery, and Fekete's lemma once (`Fekete.lean`, a structure) gives the
-limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
-`lambda_gt_of_banked : 6.22 < λ` given a(40) as a hypothesis.
+limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125/256` and
+`lambda_gt_of_a_40 : 6.22 < λ` given a(40) as a hypothesis.
 
 ## Modules
 

@@ -25,7 +25,7 @@ so that a second sequence costs an instance, not a transcription. `Growth.lean`'
 `lambda` and `StairGrowth.lean`'s `mu` are the two instances.
 
 The public names of the polyplet development (`lambda`, `lambda_tendsto`,
-`a_le_lambda_pow`, `lambda_le`) survive as thin wrappers over
+`a_le_lambda_pow`, `lambda_le_3125_div_256`) survive as thin wrappers over
 `polypletFekete`; `Audit.lean` pins their axiom footprints, so a
 regression here is a build error there.
 

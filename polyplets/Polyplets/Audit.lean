@@ -104,9 +104,9 @@ namespace Polyplets
 #guard_msgs in
 #print axioms isDiagonalPoly_Pk
 
-/-- info: 'Polyplets.lambda_gt_of_banked' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.lambda_gt_of_a_40' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms lambda_gt_of_banked
+#print axioms lambda_gt_of_a_40
 
 /-! ## The L-papers' headline theorems -/
 

@@ -146,7 +146,7 @@ shows its control, gate and second computation.
 | 5 | T(n,n) = 3^(n−1) | 1 | hand derivation; Lean `T_king` | check B, 40 entries |
 | 6 | T(n,n−1) = 5(5n−9)3^(n−4) | 1 | `docs/proofs/T-n-nm1.md` | check B, 37 entries |
 | 7 | T(n,n−2) = ½(625n²−2459n+1134)3^(n−7) | 1 | `docs/proofs/T-n-nm2-and-general.md` | check B, 36 entries |
-| 8 | λ ≥ a(40)^(1/40) = 6.2208413587750324 | 2 | Lean `a_supermul`, `lambda_gt_of_banked`, standard axioms | `lake build`; guarded in `polyplets/Polyplets/Audit.lean` |
+| 8 | λ ≥ a(40)^(1/40) = 6.2208413587750324 | 2 | Lean `a_supermul`, `lambda_gt_of_a_40` (renamed 2026-10-12), standard axioms | `lake build`; guarded in `polyplets/Polyplets/Audit.lean` |
 | 9 | component stratification, C(n,1) = C(n,n) = A001168 | 1 | `results/subclasses.md`, the 45-degree sublattice bijection | brute force n ≤ 14 |
 | 10 | λ = 7.110(1), θ = −1.000(1) | 4 | `results/growth-constant.md` | differential approximants on 40 terms; an estimate |
 | 11a | M_single(n) = ⌊((n−2)²+4)/8⌋, one hole | 1, not ours | Sieben 2008 Theorem 4.1, σ(e) = ⌊e²/8 − e/2 + 1⌋, verbatim; the (I′)/(II′)/moat-cycle chain in `results/subclasses.md` is an independent reproof | `experiments/maxhole_sieben_check.py` (with a control that must fail); `experiments/maxhole_moat_check.py` (3,927 animals); `experiments/maxhole_box_construction.py` (n ≤ 60) |
