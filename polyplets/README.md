@@ -36,9 +36,9 @@ the theorem takes as input rather than proves.
 | T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `T_sub_one` (`Pin`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
 | T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `T_sub_two` (`Grand/PinAll`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
 | P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Grand/PinAll`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 36 cells, below |
-| 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `free_eq` (`Symmetry`) | — |
-| 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `oneSided_eq` (`Symmetry`) | — |
-| 2·bilateral = Hm + Dm | `report_bilateral` | `bilateral_eq` (`Symmetry`) | — |
+| 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `eight_mul_Free` (`Symmetry`) | — |
+| 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `four_mul_OneSided` (`Symmetry`) | — |
+| 2·bilateral = Hm + Dm | `report_bilateral` | `two_mul_Bilateral` (`Symmetry`) | — |
 | a(n)^(1/n) → λ | `report_growth` | `lambda_tendsto` (`Growth`, `Fekete`, `UpperBound`) | — |
 | one-sided → a(n)/4, free → a(n)/8 | `report_symmetryRatio` | `symmetryRatio` (`SymmetryRatio`): each symmetric count is o(a(n)), by encoding a symmetric animal as a connected half of about n/2 cells and comparing with `a_supermul` against the kernel-decided a(3) = 20 | — |
 
@@ -155,7 +155,7 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 | `Grand/MuRec` | `d_staircase` |
 | `Grand/Staircase` | `T_staircase` |
 | `Grand/PinAll` | `IsDiagonalPolyH`, `climb_step`, `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
-| `Symmetry` | dihedral action, Burnside identities, `r90_vanish` |
+| `Symmetry` | dihedral action, Burnside identities, `R90_eq_zero`, `Asym` |
 | `SymmetryRatio` | `symmetryRatio`: the symmetric counts are o(a(n)), so one-sided → a(n)/4 and free → a(n)/8 |
 | `UpperBound` | `a n ≤ C(5n,n)` |
 | `Fekete` | Fekete's lemma as a structure |

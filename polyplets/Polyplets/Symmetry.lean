@@ -22,9 +22,9 @@ them is a Burnside average of fixed-point counts. This file builds that
 apparatus.
 
 The group is Mathlib's `DihedralGroup 4` (`D4` below): `r i` is the rotation
-by `i` quarter turns and `sr i` the mirror in the `x`-axis followed by `r i`.
-It acts on `ℤ × ℤ` through `D4.toFun`, built from one quarter turn and one
-mirror (`rot i = quarter^[i.val]`). Acting on polyplets needs a
+by `i` quarterTurn turns and `sr i` the mirror in the `x`-axis followed by `r i`.
+It acts on `ℤ × ℤ` through `D4.toFun`, built from one quarterTurn turn and one
+mirror (`rot i = quarterTurn^[i.val]`). Acting on polyplets needs a
 anchoring step, because a rotated polyplet is generally no longer
 origin-anchored:
 
@@ -44,10 +44,10 @@ With `fixCount n g = #(fixed points of g)` and the rotation subgroup realized
 as the cyclic group `C4 = Multiplicative (ZMod 4)` acting through
 `rotHom : C4 →* D4`:
 
-* `free_eq` : `8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n`
-* `oneSided_eq` : `4 * OneSided n = a n + 2 * R90 n + R180 n`
-* `bilateral_eq` : `2 * Bilateral n = Hm n + Dm n`
-* `r90_vanish` : `R90 n = 0` unless `n % 4 ∈ {0, 1}`
+* `eight_mul_Free` : `8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n`
+* `four_mul_OneSided` : `4 * OneSided n = a n + 2 * R90 n + R180 n`
+* `two_mul_Bilateral` : `2 * Bilateral n = Hm n + Dm n`
+* `R90_eq_zero` : `R90 n = 0` unless `n % 4 ∈ {0, 1}`
 
 The first two are Mathlib's Burnside lemma
 (`MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group`) over `D4` resp.
@@ -56,7 +56,7 @@ The first two are Mathlib's Burnside lemma
 `fixCount_conj` (conjugation, which pairs the mirror `sr 2` with `sr 0` and
 `sr 1` with `sr 3`).
 
-`bilateral_eq` counts the pairs `(g, x)` with `g` a reflection fixing `x` in
+`two_mul_Bilateral` counts the pairs `(g, x)` with `g` a reflection fixing `x` in
 two ways. Summed over reflections it is `2 * Hm n + 2 * Dm n`; summed over
 points it is `∑_{x achiral} #(reflections in the stabilizer of x)`, and
 `card_stab_eq_two_mul` shows a stabilizer containing a reflection is half
@@ -64,8 +64,8 @@ reflections (translate by a fixed reflection), so this is
 `½ ∑_{x achiral} #(stabilizer of x)` — which Burnside, applied to the
 `D4`-invariant set of achiral animals, evaluates as `½ · 8 · Bilateral n`.
 
-`r90_vanish` is elementary and center-free. A quarter-turn-fixed `S` satisfies
-`S.image σ = S` for the affine map `σ p = ρ p + t` (`ρ` the quarter turn, `t`
+`R90_eq_zero` is elementary and center-free. A quarterTurn-turn-fixed `S` satisfies
+`S.image σ = S` for the affine map `σ p = ρ p + t` (`ρ` the quarterTurn turn, `t`
 the anchoring translation). Since `ρ² = -1`, one has `σ⁴ = id`, and a point
 fixed by `σ²` is already fixed by `σ` (`2 p` is pinned by `t`, and so is
 `2 σ p`). So off the at-most-one `σ`-fixed point (`(1 - ρ)` is injective) the
@@ -83,7 +83,7 @@ the derived free/one-sided/bilateral values match A030222/A030233/A030234
 through `n = 6`. The conventions are pinned by proof: `toFun_mul` says the
 eight maps compose as the group multiplies, `toFun_sr0`, `toFun_sr3` and
 `toFun_r2` say which map each generator is, and nothing published depends on
-which mirror is which: `free_eq` and `bilateral_eq` are symmetric in `Hm`
+which mirror is which: `eight_mul_Free` and `two_mul_Bilateral` are symmetric in `Hm`
 and `Dm`.
 -/
 
@@ -94,32 +94,33 @@ open scoped BigOperators
 /-! ## The dihedral group of the square and its action on the plane -/
 
 /-- The eight symmetries of the square: Mathlib's `DihedralGroup 4`, with `r i`
-the rotation by `i` quarter turns and `sr i` the mirror in the `x`-axis followed
+the rotation by `i` quarterTurn turns and `sr i` the mirror in the `x`-axis followed
 by `r i`. -/
 abbrev D4 := DihedralGroup 4
 
 open DihedralGroup (r sr)
 
-/-- A quarter turn counterclockwise about the origin. -/
-def quarter (p : ℤ × ℤ) : ℤ × ℤ := (-p.2, p.1)
+/-- A quarterTurn turn counterclockwise about the origin. -/
+def quarterTurn (p : ℤ × ℤ) : ℤ × ℤ := (-p.2, p.1)
 
 /-- The mirror in the `x`-axis. -/
 def mirror (p : ℤ × ℤ) : ℤ × ℤ := (p.1, -p.2)
 
-lemma quarter_add (p q : ℤ × ℤ) : quarter (p + q) = quarter p + quarter q := by
-  simp [quarter, add_comm]
+lemma quarterTurn_add (p q : ℤ × ℤ) : quarterTurn (p + q) = quarterTurn p + quarterTurn q := by
+  simp [quarterTurn, add_comm]
 
-lemma quarter_injective : Function.Injective quarter := by
+lemma quarterTurn_injective : Function.Injective quarterTurn := by
   intro p q h
-  simp only [quarter, Prod.mk.injEq, neg_inj] at h
+  simp only [quarterTurn, Prod.mk.injEq, neg_inj] at h
   exact Prod.ext h.2 h.1
 
-/-- The king relation survives a quarter turn: `|Δx|, |Δy| ≤ 1` is symmetric
+/-- The king relation survives a quarterTurn turn: `|Δx|, |Δy| ≤ 1` is symmetric
 under swapping and negating coordinates. -/
-lemma quarter_kingAdj {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj (quarter p) (quarter q) := by
+lemma quarterTurn_kingAdj {p q : ℤ × ℤ} (h : kingAdj p q) :
+    kingAdj (quarterTurn p) (quarterTurn q) := by
   obtain ⟨hne, h1, h2⟩ := h
-  refine ⟨fun hc => hne (quarter_injective hc), ?_, h1⟩
-  simp only [quarter]
+  refine ⟨fun hc => hne (quarterTurn_injective hc), ?_, h1⟩
+  simp only [quarterTurn]
   rw [abs_le] at h2 ⊢
   constructor <;> omega
 
@@ -140,58 +141,58 @@ lemma mirror_kingAdj {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj (mirror p) (
 
 @[simp] lemma mirror_mirror (p : ℤ × ℤ) : mirror (mirror p) = p := by simp [mirror]
 
-lemma quarter_iterate_four : quarter^[4] = id := by
+lemma quarterTurn_iterate_four : quarterTurn^[4] = id := by
   funext p
-  change quarter (quarter (quarter (quarter p))) = p
-  simp [quarter]
+  change quarterTurn (quarterTurn (quarterTurn (quarterTurn p))) = p
+  simp [quarterTurn]
 
-/-- Iterating the quarter turn only matters modulo four. -/
-lemma quarter_iterate_mod (k : ℕ) : quarter^[k] = quarter^[k % 4] := by
+/-- Iterating the quarterTurn turn only matters modulo four. -/
+lemma quarterTurn_iterate_mod (k : ℕ) : quarterTurn^[k] = quarterTurn^[k % 4] := by
   conv_lhs => rw [← Nat.mod_add_div k 4, Function.iterate_add, Function.iterate_mul,
-    quarter_iterate_four, Function.iterate_id, Function.comp_id]
+    quarterTurn_iterate_four, Function.iterate_id, Function.comp_id]
 
-lemma quarter_iterate_add (k : ℕ) (p q : ℤ × ℤ) :
-    quarter^[k] (p + q) = quarter^[k] p + quarter^[k] q := by
+lemma quarterTurn_iterate_add (k : ℕ) (p q : ℤ × ℤ) :
+    quarterTurn^[k] (p + q) = quarterTurn^[k] p + quarterTurn^[k] q := by
   induction k with
   | zero => rfl
-  | succ k ih => simp only [Function.iterate_succ_apply', ih, quarter_add]
+  | succ k ih => simp only [Function.iterate_succ_apply', ih, quarterTurn_add]
 
-lemma quarter_iterate_kingAdj (k : ℕ) {p q : ℤ × ℤ} (h : kingAdj p q) :
-    kingAdj (quarter^[k] p) (quarter^[k] q) := by
+lemma quarterTurn_iterate_kingAdj (k : ℕ) {p q : ℤ × ℤ} (h : kingAdj p q) :
+    kingAdj (quarterTurn^[k] p) (quarterTurn^[k] q) := by
   induction k with
   | zero => exact h
-  | succ k ih => simp only [Function.iterate_succ_apply']; exact quarter_kingAdj ih
+  | succ k ih => simp only [Function.iterate_succ_apply']; exact quarterTurn_kingAdj ih
 
-/-- A mirror image of a quarter turn is three quarter turns of the mirror image. -/
-lemma mirror_quarter (p : ℤ × ℤ) : mirror (quarter p) = quarter^[3] (mirror p) := by
-  change mirror (quarter p) = quarter (quarter (quarter (mirror p)))
-  simp [mirror, quarter]
+/-- A mirror image of a quarterTurn turn is three quarterTurn turns of the mirror image. -/
+lemma mirror_quarterTurn (p : ℤ × ℤ) : mirror (quarterTurn p) = quarterTurn^[3] (mirror p) := by
+  change mirror (quarterTurn p) = quarterTurn (quarterTurn (quarterTurn (mirror p)))
+  simp [mirror, quarterTurn]
 
-lemma mirror_quarter_iterate (k : ℕ) (p : ℤ × ℤ) :
-    mirror (quarter^[k] p) = quarter^[3 * k] (mirror p) := by
+lemma mirror_quarterTurn_iterate (k : ℕ) (p : ℤ × ℤ) :
+    mirror (quarterTurn^[k] p) = quarterTurn^[3 * k] (mirror p) := by
   induction k with
   | zero => rfl
   | succ k ih =>
-    rw [Function.iterate_succ_apply', mirror_quarter, ih, ← Function.iterate_add_apply]
+    rw [Function.iterate_succ_apply', mirror_quarterTurn, ih, ← Function.iterate_add_apply]
     congr 1
     ring
 
-/-- Rotation by `i` quarter turns. -/
-def rot (i : ZMod 4) : ℤ × ℤ → ℤ × ℤ := quarter^[i.val]
+/-- Rotation by `i` quarterTurn turns. -/
+def rot (i : ZMod 4) : ℤ × ℤ → ℤ × ℤ := quarterTurn^[i.val]
 
-lemma rot_one (p : ℤ × ℤ) : rot 1 p = quarter p := rfl
+lemma rot_one (p : ℤ × ℤ) : rot 1 p = quarterTurn p := rfl
 
 lemma rot_add (i j : ZMod 4) : rot (i + j) = rot i ∘ rot j := by
-  rw [rot, rot, rot, ZMod.val_add, ← quarter_iterate_mod, Function.iterate_add]
+  rw [rot, rot, rot, ZMod.val_add, ← quarterTurn_iterate_mod, Function.iterate_add]
 
 lemma mirror_rot (i : ZMod 4) (p : ℤ × ℤ) : mirror (rot i p) = rot (-i) (mirror p) := by
-  rw [rot, rot, mirror_quarter_iterate, show (-i : ZMod 4) = 3 * i by
-    rw [show (3 : ZMod 4) = -1 by decide, neg_one_mul], ZMod.val_mul, ← quarter_iterate_mod]
+  rw [rot, rot, mirror_quarterTurn_iterate, show (-i : ZMod 4) = 3 * i by
+    rw [show (3 : ZMod 4) = -1 by decide, neg_one_mul], ZMod.val_mul, ← quarterTurn_iterate_mod]
   rfl
 
 namespace D4
 
-/-- The action of `D4` on the integer plane: `r i` rotates by `i` quarter turns,
+/-- The action of `D4` on the integer plane: `r i` rotates by `i` quarterTurn turns,
 `sr i` mirrors in the `x`-axis and then rotates. -/
 def toFun : D4 → ℤ × ℤ → ℤ × ℤ
   | .r i => rot i
@@ -220,21 +221,21 @@ lemma toFun_mul (g g' : D4) (p : ℤ × ℤ) : toFun (g * g') p = toFun g (toFun
 anchoring commute with the action. -/
 lemma toFun_add (g : D4) (p q : ℤ × ℤ) : toFun g (p + q) = toFun g p + toFun g q := by
   rcases g with i | i
-  · exact quarter_iterate_add _ p q
+  · exact quarterTurn_iterate_add _ p q
   · change mirror (rot i (p + q)) = mirror (rot i p) + mirror (rot i q)
-    rw [rot, quarter_iterate_add, mirror_add]
+    rw [rot, quarterTurn_iterate_add, mirror_add]
 
 lemma toFun_injective (g : D4) : Function.Injective (toFun g) := by
   rcases g with i | i
-  · exact quarter_injective.iterate _
-  · exact mirror_injective.comp (quarter_injective.iterate _)
+  · exact quarterTurn_injective.iterate _
+  · exact mirror_injective.comp (quarterTurn_injective.iterate _)
 
 /-- The king relation is `D4`-invariant. -/
 lemma toFun_kingAdj (g : D4) {p q : ℤ × ℤ} (hpq : kingAdj p q) :
     kingAdj (toFun g p) (toFun g q) := by
   rcases g with i | i
-  · exact quarter_iterate_kingAdj _ hpq
-  · exact mirror_kingAdj (quarter_iterate_kingAdj _ hpq)
+  · exact quarterTurn_iterate_kingAdj _ hpq
+  · exact mirror_kingAdj (quarterTurn_iterate_kingAdj _ hpq)
 
 /-- The generators as maps: `sr 0` is the `x`-axis mirror, `sr 3` the
 coordinate swap, `r 2` the half turn. -/
@@ -243,12 +244,12 @@ lemma toFun_sr0 : toFun (sr 0) = mirror := rfl
 lemma toFun_sr3 : toFun (sr 3) = fun p => (p.2, p.1) := by
   funext p
   have h3 : (3 : ZMod 4).val = 3 := rfl
-  simp [toFun, rot, h3, quarter, mirror, Function.iterate_succ, Function.comp]
+  simp [toFun, rot, h3, quarterTurn, mirror, Function.iterate_succ, Function.comp]
 
 lemma toFun_r2 : toFun (r 2) = fun p => -p := by
   funext p
   have h2 : (2 : ZMod 4).val = 2 := rfl
-  simp [toFun, rot, h2, quarter, Function.iterate_succ, Function.comp, Prod.ext_iff]
+  simp [toFun, rot, h2, quarterTurn, Function.iterate_succ, Function.comp, Prod.ext_iff]
 
 /-- The four reflections. -/
 def refls : Finset D4 := {sr 0, sr 1, sr 2, sr 3}
@@ -523,15 +524,15 @@ lemma fixCount_conj (n : ℕ) (g c : D4) : fixCount n (c * g * c⁻¹) = fixCoun
   · intro x; ext; simp
   · intro y; ext; simp
 
-/-- The two quarter turns are inverse, hence equinumerously fixed. -/
+/-- The two quarterTurn turns are inverse, hence equinumerously fixed. -/
 lemma fixCount_r3 (n : ℕ) : fixCount n (r 3) = fixCount n (r 1) := by
   rw [show (r 3 : D4) = (r 1)⁻¹ by decide, fixCount_inv]
 
-/-- The two axis-parallel mirrors are conjugate by a quarter turn. -/
+/-- The two axis-parallel mirrors are conjugate by a quarterTurn turn. -/
 lemma fixCount_sr2 (n : ℕ) : fixCount n (sr 2) = fixCount n (sr 0) := by
   rw [show (sr 2 : D4) = r 1 * sr 0 * (r 1)⁻¹ by decide, fixCount_conj]
 
-/-- The two diagonal mirrors are conjugate by a quarter turn. -/
+/-- The two diagonal mirrors are conjugate by a quarterTurn turn. -/
 lemma fixCount_sr1 (n : ℕ) : fixCount n (sr 1) = fixCount n (sr 3) := by
   rw [show (sr 1 : D4) = r 1 * sr 3 * (r 1)⁻¹ by decide, fixCount_conj]
 
@@ -542,7 +543,7 @@ lemma card_fixedBy_eq_fixCount (n : ℕ) (g : D4) :
   (Nat.card_eq_fintype_card).symm
 
 /-- **Burnside's lemma for `D4`.** -/
-theorem free_eq (n : ℕ) :
+theorem eight_mul_Free (n : ℕ) :
     8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := by
   have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group D4 (polyplets n)
   rw [D4.sum_univ (fun g => Fintype.card (MulAction.fixedBy (polyplets n) g)), ZMod.sum_univ_four,
@@ -592,7 +593,7 @@ lemma card_fixedByC4 (n : ℕ) (c : C4) :
   exact Fintype.card_congr' rfl
 
 /-- **Burnside's lemma for the rotation subgroup.** -/
-theorem oneSided_eq (n : ℕ) :
+theorem four_mul_OneSided (n : ℕ) :
     4 * OneSided n = a n + 2 * R90 n + R180 n := by
   have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group C4 (polyplets n)
   rw [C4.sum_univ (fun c => Fintype.card (MulAction.fixedBy (polyplets n) c))] at hb
@@ -679,10 +680,10 @@ lemma card_div_four {σ : ℤ × ℤ → ℤ × ℤ} (hinj : Function.Injective 
           (fun q hq => hfix2 q (Finset.mem_sdiff.mp hq).1)
       omega
 
-/-- **The arithmetic core of `r90_vanish`.** If the affine quarter turn
+/-- **The arithmetic core of `R90_eq_zero`.** If the affine quarterTurn turn
 `σ p = (-p.2 + A, p.1 + B)` carries `S` onto itself then `|S| ≡ 0` or `1`
 mod `4`. -/
-lemma quarter_turn_card_mod (n : ℕ) (S : Finset (ℤ × ℤ)) (A B : ℤ)
+lemma quarterTurn_card_mod (n : ℕ) (S : Finset (ℤ × ℤ)) (A B : ℤ)
     (hcard : S.card = n)
     (himg : S.image (fun p : ℤ × ℤ => (-p.2 + A, p.1 + B)) = S) :
     n % 4 = 0 ∨ n % 4 = 1 := by
@@ -739,7 +740,7 @@ lemma quarter_turn_card_mod (n : ℕ) (S : Finset (ℤ × ℤ)) (A B : ℤ)
   omega
 
 /-- **Quarter-turn symmetry is impossible unless `n ≡ 0, 1 (mod 4)`.** -/
-theorem r90_vanish (n : ℕ) (h : ¬ (n % 4 = 0 ∨ n % 4 = 1)) : R90 n = 0 := by
+theorem R90_eq_zero (n : ℕ) (h : ¬ (n % 4 = 0 ∨ n % 4 = 1)) : R90 n = 0 := by
   rw [R90, fixCount]
   have hempty : IsEmpty (MulAction.fixedBy (polyplets n) (r 1 : D4)) := by
     constructor
@@ -751,10 +752,10 @@ theorem r90_vanish (n : ℕ) (h : ¬ (n % 4 = 0 ∨ n % 4 = 1)) : R90 n = 0 := b
       rw [anchor, Finset.image_image]
       refine Finset.image_congr ?_
       intro p _
-      simp only [Function.comp_apply, D4.toFun, rot_one, quarter]
+      simp only [Function.comp_apply, D4.toFun, rot_one, quarterTurn]
       refine Prod.ext ?_ ?_ <;> simp [sub_eq_add_neg]
     rw [hveq] at h1
-    exact h (quarter_turn_card_mod n x.1 (-v.1) (-v.2) x.2.1 h1)
+    exact h (quarterTurn_card_mod n x.1 (-v.1) (-v.2) x.2.1 h1)
   exact Nat.card_of_isEmpty
 
 /-! ## Achiral animals and the bilateral count -/
@@ -794,6 +795,10 @@ noncomputable instance instFintypeOrbitsAchiral (n : ℕ) :
 /-- Bilateral polyplets: `D4`-orbits of achiral polyplets (A030234). -/
 noncomputable def Bilateral (n : ℕ) : ℕ :=
   Nat.card (MulAction.orbitRel.Quotient D4 (achiral n))
+
+/-- Asymmetric polyplets: the free polyplets with no reflection symmetry, free
+minus bilateral (A030235). -/
+noncomputable def Asym (n : ℕ) : ℕ := Free n - Bilateral n
 
 /-- Double counting a relation over two finite index sets. -/
 lemma sum_card_filter_comm {α β : Type*}
@@ -905,7 +910,7 @@ lemma card_stab_eq_two_mul (n : ℕ) (y : achiral n) :
   omega
 
 /-- **The bilateral half-sum.** -/
-theorem bilateral_eq (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := by
+theorem two_mul_Bilateral (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := by
   have h1 := sum_stab_achiral n
   have h2 := sum_stab_refl_achiral n
   have h3 : ∑ y : achiral n, (Finset.univ.filter (fun g : D4 => g • y = y)).card

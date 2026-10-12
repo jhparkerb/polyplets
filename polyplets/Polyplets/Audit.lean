@@ -122,9 +122,9 @@ namespace Polyplets
 #guard_msgs in
 #print axioms choose_le_pow
 
-/-- info: 'Polyplets.r90_vanish' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.R90_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms r90_vanish
+#print axioms R90_eq_zero
 
 /-- info: 'Polyplets.Universal.exists_delta' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

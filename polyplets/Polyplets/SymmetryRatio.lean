@@ -42,7 +42,7 @@ at most the count of halves, and a half is a polyplet of about
   covers every orbit (`exists_half`). It has `(n + 1) / 2` cells, since the
   only fixed point is the centre, and the position of the centre is one of
   `(4n + 1)²` offsets.
-* `R90 ≤ R180`: a quarter-turn-symmetric animal is half-turn-symmetric.
+* `R90 ≤ R180`: a quarterTurn-turn-symmetric animal is half-turn-symmetric.
 
 ## The analysis
 
@@ -247,17 +247,17 @@ end Half
 
 /-- A good half of an `σ`-symmetric set: connected, meeting each `σ`-orbit at
 most once. -/
-def GoodHalf (σ : ℤ × ℤ → ℤ × ℤ) (W : Finset (ℤ × ℤ)) : Prop :=
+def IsHalf (σ : ℤ × ℤ → ℤ × ℤ) (W : Finset (ℤ × ℤ)) : Prop :=
   KingConnected W ∧ ∀ p ∈ W, σ p ∈ W → σ p = p
 
 /-- **A maximal good half covers every orbit.** -/
 lemma exists_half {σ : ℤ × ℤ → ℤ × ℤ} (hσσ : ∀ p, σ (σ p) = p)
     (hadj : ∀ p q, kingAdj p q → kingAdj (σ p) (σ q))
     {S : Finset (ℤ × ℤ)} (hS : KingConnected S) (hSσ : S.image σ = S) (hne : S.Nonempty) :
-    ∃ W ⊆ S, GoodHalf σ W ∧ W.Nonempty ∧ W ∪ W.image σ = S := by
+    ∃ W ⊆ S, IsHalf σ W ∧ W.Nonempty ∧ W ∪ W.image σ = S := by
   classical
-  set C := S.powerset.filter (fun W => W.Nonempty ∧ GoodHalf σ W) with hCdef
-  have hmemC : ∀ W, W ∈ C ↔ W ⊆ S ∧ W.Nonempty ∧ GoodHalf σ W := fun W => by
+  set C := S.powerset.filter (fun W => W.Nonempty ∧ IsHalf σ W) with hCdef
+  have hmemC : ∀ W, W ∈ C ↔ W ⊆ S ∧ W.Nonempty ∧ IsHalf σ W := fun W => by
     simp [hCdef, Finset.mem_filter, Finset.mem_powerset]
   obtain ⟨p₀, hp₀⟩ := hne
   have hC : C.Nonempty := by
@@ -275,7 +275,7 @@ lemma exists_half {σ : ℤ × ℤ → ℤ × ℤ} (hσσ : ∀ p, σ (σ p) = p
     intro c hc hcn w hw hwc
     have hcW : c ∉ W := fun h => hcn (Finset.mem_union_left _ h)
     have hcσ : c ∉ W.image σ := fun h => hcn (Finset.mem_union_right _ h)
-    have hgood : GoodHalf σ (insert c W) := by
+    have hgood : IsHalf σ (insert c W) := by
       refine ⟨kingConnected_insert hWgood.1 hw hwc, ?_⟩
       intro p hp hσp
       rw [Finset.mem_insert] at hp hσp
@@ -321,8 +321,8 @@ lemma exists_half {σ : ℤ × ℤ → ℤ × ℤ} (hσσ : ∀ p, σ (σ p) = p
             exact hbig (σ c) hσc hσcn w hw hadj'
     exact hqn (key q (hS w₀ (hWS hw₀) q hq))
 
-lemma card_of_goodHalf {σ : ℤ × ℤ → ℤ × ℤ} (hσσ : ∀ p, σ (σ p) = p)
-    {S W : Finset (ℤ × ℤ)} (hW : GoodHalf σ W) (hWS : W ∪ W.image σ = S) :
+lemma card_of_isHalf {σ : ℤ × ℤ → ℤ × ℤ} (hσσ : ∀ p, σ (σ p) = p)
+    {S W : Finset (ℤ × ℤ)} (hW : IsHalf σ W) (hWS : W ∪ W.image σ = S) :
     S.card + (W.filter fun p => σ p = p).card = 2 * W.card := by
   have h1 := card_add_card_inter_image hσσ hWS
   have h2 : W ∩ W.image σ = W.filter fun p => σ p = p := by
@@ -339,27 +339,28 @@ lemma card_of_goodHalf {σ : ℤ × ℤ → ℤ × ℤ} (hσσ : ∀ p, σ (σ p
 /-! ## The fixed animals as a finset -/
 
 /-- The polyplets of `n` cells, as a finset. -/
-noncomputable def CAfin (n : ℕ) : Finset (Finset (ℤ × ℤ)) := (polyplets_finite n).toFinset
+noncomputable def polypletsFinset (n : ℕ) : Finset (Finset (ℤ × ℤ)) := (polyplets_finite n).toFinset
 
-lemma mem_CAfin {n : ℕ} {S : Finset (ℤ × ℤ)} : S ∈ CAfin n ↔ IsPolyplet n S := by
-  simp [CAfin, polyplets]
+lemma mem_polypletsFinset {n : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ polypletsFinset n ↔ IsPolyplet n S := by
+  simp [polypletsFinset, polyplets]
 
-lemma card_CAfin (n : ℕ) : (CAfin n).card = a n :=
+lemma card_polypletsFinset (n : ℕ) : (polypletsFinset n).card = a n :=
   (Set.ncard_eq_toFinset_card _ (polyplets_finite n)).symm
 
 /-- The polyplets of `n` cells fixed by `g`. -/
-noncomputable def FixF (n : ℕ) (g : D4) : Finset (Finset (ℤ × ℤ)) :=
-  (CAfin n).filter fun S => anchor (S.image (D4.toFun g)) = S
+noncomputable def fixedFinset (n : ℕ) (g : D4) : Finset (Finset (ℤ × ℤ)) :=
+  (polypletsFinset n).filter fun S => anchor (S.image (D4.toFun g)) = S
 
-lemma mem_FixF {n : ℕ} {g : D4} {S : Finset (ℤ × ℤ)} :
-    S ∈ FixF n g ↔ IsPolyplet n S ∧ anchor (S.image (D4.toFun g)) = S := by
-  simp [FixF, mem_CAfin]
+lemma mem_fixedFinset {n : ℕ} {g : D4} {S : Finset (ℤ × ℤ)} :
+    S ∈ fixedFinset n g ↔ IsPolyplet n S ∧ anchor (S.image (D4.toFun g)) = S := by
+  simp [fixedFinset, mem_polypletsFinset]
 
-lemma fixCount_eq_card_FixF (n : ℕ) (g : D4) : fixCount n g = (FixF n g).card := by
+lemma fixCount_eq_card_fixedFinset (n : ℕ) (g : D4) : fixCount n g = (fixedFinset n g).card := by
   have hfin : {S | IsPolyplet n S ∧ anchor (S.image (D4.toFun g)) = S} =
-      ↑(FixF n g) := by
+      ↑(fixedFinset n g) := by
     ext S
-    simp [mem_FixF]
+    simp [mem_fixedFinset]
   rw [fixCount_eq_ncard, hfin, Set.ncard_coe_finset]
 
 /-- A finset counted by an encoding with a left inverse. -/
@@ -386,11 +387,11 @@ lemma card_le_split {α : Type*} (s : Finset α) (f : α → ℕ) {n K : ℕ} (h
 
 /-- The pairs `(animal of `m` cells, offset in {0, 1})` satisfying anything. -/
 lemma card_filter_CAfin_le (m : ℕ) (P : Finset (ℤ × ℤ) × ℤ → Prop) [DecidablePred P] :
-    ((CAfin m ×ˢ ({0, 1} : Finset ℤ)).filter P).card ≤ 2 * a m := by
-  calc ((CAfin m ×ˢ ({0, 1} : Finset ℤ)).filter P).card
-      ≤ (CAfin m ×ˢ ({0, 1} : Finset ℤ)).card := Finset.card_filter_le _ _
+    ((polypletsFinset m ×ˢ ({0, 1} : Finset ℤ)).filter P).card ≤ 2 * a m := by
+  calc ((polypletsFinset m ×ˢ ({0, 1} : Finset ℤ)).filter P).card
+      ≤ (polypletsFinset m ×ˢ ({0, 1} : Finset ℤ)).card := Finset.card_filter_le _ _
     _ = 2 * a m := by
-        rw [Finset.card_product, card_CAfin]
+        rw [Finset.card_product, card_polypletsFinset]
         simp [mul_comm]
 
 /-! ## The box and the crude count -/
@@ -523,9 +524,9 @@ lemma hmin_mem {f : ℤ × ℤ → ℤ} {V : Finset (ℤ × ℤ)} (hV : V.Nonemp
   exact Finset.exists_mem_eq_inf' hV f
 
 /-- The fixed animals are nonempty, and so is any half of them. -/
-lemma FixF_nonempty {n : ℕ} {g : D4} {S : Finset (ℤ × ℤ)} (hS : S ∈ FixF n g) :
+lemma fixedFinset_nonempty {n : ℕ} {g : D4} {S : Finset (ℤ × ℤ)} (hS : S ∈ fixedFinset n g) :
     S.Nonempty :=
-  (mem_FixF.1 hS).1.nonempty
+  (mem_fixedFinset.1 hS).1.nonempty
 
 /-- A symmetry of a nonempty finite set whose square is a translation squares
 to the identity. -/
@@ -539,11 +540,11 @@ lemma translation_eq_zero {σ : ℤ × ℤ → ℤ × ℤ} {w : ℤ × ℤ}
 
 /-- The image of a fixed animal under its symmetry, anchored, is itself:
 in terms of the conjugated map `σ`. -/
-lemma image_eq_of_fix {n : ℕ} {g : D4} {S : Finset (ℤ × ℤ)} (hS : S ∈ FixF n g)
+lemma image_eq_of_fix {n : ℕ} {g : D4} {S : Finset (ℤ × ℤ)} (hS : S ∈ fixedFinset n g)
     (σ : ℤ × ℤ → ℤ × ℤ)
     (hσ : ∀ p, σ p = D4.toFun g p - corner (S.image (D4.toFun g))) :
     S.image σ = S := by
-  have h := (mem_FixF.1 hS).2
+  have h := (mem_fixedFinset.1 hS).2
   rw [anchor, Finset.image_image] at h
   convert h using 2
   funext p
@@ -587,7 +588,7 @@ lemma card_upperHalf_eq {σ : ℤ × ℤ → ℤ × ℤ} {h : ℤ × ℤ → ℤ
 
 /-! ## The axis-parallel mirror `sr 0` -/
 
-namespace HM
+namespace AxisMirror
 
 /-- The translation that anchors the mirrored animal. -/
 noncomputable def t (S : Finset (ℤ × ℤ)) : ℤ × ℤ := corner (S.image mirror)
@@ -600,13 +601,13 @@ def h (t : ℤ × ℤ) (p : ℤ × ℤ) : ℤ := 2 * p.2 + t.2
 
 variable {n : ℕ} {S : Finset (ℤ × ℤ)}
 
-lemma image_σ (hS : S ∈ FixF n (DihedralGroup.sr 0)) : S.image (σ (t S)) = S :=
+lemma image_σ (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : S.image (σ (t S)) = S :=
   image_eq_of_fix hS (σ (t S)) fun p => by simp [σ, t, D4.toFun_sr0, mirror, Prod.ext_iff]
 
-lemma t_fst (hS : S ∈ FixF n (DihedralGroup.sr 0)) : (t S).1 = 0 := by
+lemma t_fst (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : (t S).1 = 0 := by
   have := translation_eq_zero (w := (-2 * (t S).1, 0))
     (fun p => by simp only [σ, Prod.ext_iff, Prod.fst_add, Prod.snd_add]; constructor <;> ring)
-    (image_σ hS) (FixF_nonempty hS)
+    (image_σ hS) (fixedFinset_nonempty hS)
   rw [Prod.ext_iff] at this
   simp only [Prod.fst_zero] at this
   omega
@@ -655,10 +656,10 @@ noncomputable def Φ (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) × ℤ := (
 noncomputable def recon (z : Finset (ℤ × ℤ) × ℤ) : Finset (ℤ × ℤ) :=
   anchor (z.1 ∪ z.1.image fun p => (p.1, -p.2 - z.2))
 
-lemma V_nonempty (hS : S ∈ FixF n (DihedralGroup.sr 0)) : (V S).Nonempty :=
-  upperHalf_nonempty (hσ (t S)) (image_σ hS) (FixF_nonempty hS)
+lemma V_nonempty (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : (V S).Nonempty :=
+  upperHalf_nonempty (hσ (t S)) (image_σ hS) (fixedFinset_nonempty hS)
 
-lemma b_eq (hS : S ∈ FixF n (DihedralGroup.sr 0)) :
+lemma b_eq (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) :
     b S = (t S).2 + 2 * (corner (V S)).2 := by
   have hV := V_nonempty hS
   rw [b, corner_snd_eq_hmin hV]
@@ -666,14 +667,14 @@ lemma b_eq (hS : S ∈ FixF n (DihedralGroup.sr 0)) :
   rw [hmin_two_mul_add hV]
   ring
 
-lemma b_mem (hS : S ∈ FixF n (DihedralGroup.sr 0)) : 0 ≤ b S ∧ b S ≤ 1 :=
-  hmin_upperHalf (hσ (t S)) (image_σ hS) (lip (t S)) (mem_FixF.1 hS).1.conn
-    (FixF_nonempty hS) (V_nonempty hS)
+lemma b_mem (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : 0 ≤ b S ∧ b S ≤ 1 :=
+  hmin_upperHalf (hσ (t S)) (image_σ hS) (lip (t S)) (mem_fixedFinset.1 hS).1.conn
+    (fixedFinset_nonempty hS) (V_nonempty hS)
 
-lemma recon_Φ (hS : S ∈ FixF n (DihedralGroup.sr 0)) : recon (Φ S) = S := by
+lemma recon_Φ (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : recon (Φ S) = S := by
   have ht := t_fst hS
   have hb := b_eq hS
-  have := eq_reanchor_of_union (σ (t S)) (mem_FixF.1 hS).1.anchored
+  have := eq_reanchor_of_union (σ (t S)) (mem_fixedFinset.1 hS).1.anchored
     (upperHalf_union (σσ ht) (hσ (t S)) (image_σ hS))
   rw [recon, Φ]
   conv_rhs => rw [this]
@@ -685,31 +686,31 @@ lemma recon_Φ (hS : S ∈ FixF n (DihedralGroup.sr 0)) : recon (Φ S) = S := by
   rw [hb']
   constructor <;> omega
 
-lemma V_card (hS : S ∈ FixF n (DihedralGroup.sr 0)) : (V S).card = n - u S := by
+lemma V_card (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : (V S).card = n - u S := by
   have := (card_upperHalf_eq (σσ (t_fst hS)) (hσ (t S)) (image_σ hS)).1
-  rwa [(mem_FixF.1 hS).1.card] at this
+  rwa [(mem_fixedFinset.1 hS).1.card] at this
 
-lemma u_le (hS : S ∈ FixF n (DihedralGroup.sr 0)) : u S ≤ n := by
+lemma u_le (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : u S ≤ n := by
   have := (card_upperHalf_eq (σσ (t_fst hS)) (hσ (t S)) (image_σ hS)).2
-  rwa [(mem_FixF.1 hS).1.card] at this
+  rwa [(mem_fixedFinset.1 hS).1.card] at this
 
 /-- The target of the encoding: a anchored animal of `n - u` cells with `u`
 cells off the axis `2y + b = 0`, and the offset `b ∈ {0, 1}`. -/
 noncomputable def A (n u : ℕ) : Finset (Finset (ℤ × ℤ) × ℤ) :=
-  (CAfin (n - u) ×ˢ ({0, 1} : Finset ℤ)).filter fun z =>
+  (polypletsFinset (n - u) ×ˢ ({0, 1} : Finset ℤ)).filter fun z =>
     (z.1.filter fun p => ¬ 2 * p.2 + z.2 = 0).card = u
 
-lemma Φ_mem (hS : S ∈ FixF n (DihedralGroup.sr 0)) : Φ S ∈ A n (u S) := by
+lemma Φ_mem (hS : S ∈ fixedFinset n (DihedralGroup.sr 0)) : Φ S ∈ A n (u S) := by
   have ht := t_fst hS
   have hV := V_nonempty hS
   have hb := b_eq hS
-  rw [A, Finset.mem_filter, Finset.mem_product, mem_CAfin]
+  rw [A, Finset.mem_filter, Finset.mem_product, mem_polypletsFinset]
   refine ⟨⟨⟨?_, ?_, anchor_anchored hV⟩, ?_⟩, ?_⟩
   · rw [Φ, anchor_card]
     exact V_card hS
   · exact kingConnected_anchor
       (upperHalf_connected (hσ (t S)) (image_σ hS) (adj (t S)) (cross ht)
-        (mem_FixF.1 hS).1.conn)
+        (mem_fixedFinset.1 hS).1.conn)
   · have := b_mem hS
     simp only [Φ, Finset.mem_insert, Finset.mem_singleton]
     omega
@@ -722,7 +723,7 @@ lemma Φ_mem (hS : S ∈ FixF n (DihedralGroup.sr 0)) : Φ S ∈ A n (u S) := by
     omega
 
 lemma fiber_le (n u : ℕ) :
-    ((FixF n (DihedralGroup.sr 0)).filter fun S => HM.u S = u).card ≤ (A n u).card :=
+    ((fixedFinset n (DihedralGroup.sr 0)).filter fun S => AxisMirror.u S = u).card ≤ (A n u).card :=
   card_le_of_recon Φ recon
     (fun S hS => by
       rw [Finset.mem_filter] at hS
@@ -740,25 +741,25 @@ lemma A_le_crude (n u : ℕ) : (A n u).card ≤ 2 * 2 ^ n * (n * n) ^ u := by
     (fun z _ w _ e => e)
     (fun k p e => by omega)
     (fun z hz p hp => mem_boxN_of_isPolyplet (Nat.sub_le n u)
-      (mem_CAfin.1 (Finset.mem_product.1 (Finset.mem_filter.1 hz).1).1) hp)
+      (mem_polypletsFinset.1 (Finset.mem_product.1 (Finset.mem_filter.1 hz).1).1) hp)
     (fun z hz => (Finset.mem_filter.1 hz).2)
   simpa using this
 
 theorem Hm_le (n K : ℕ) (hK : K ≤ n) :
     Hm n ≤ (∑ u ∈ Finset.range K, 2 * (2 * n + 1) * 2 ^ n * (n * n) ^ u) +
       ∑ u ∈ Finset.Icc K n, 2 * a (n - u) := by
-  rw [Hm, fixCount_eq_card_FixF]
-  refine card_le_split _ HM.u hK (fun S hS => u_le hS) _ _ (fun u => ?_)
+  rw [Hm, fixCount_eq_card_fixedFinset]
+  refine card_le_split _ AxisMirror.u hK (fun S hS => u_le hS) _ _ (fun u => ?_)
     (fun u => (fiber_le n u).trans (A_le_a n u))
   refine (fiber_le n u).trans ((A_le_crude n u).trans ?_)
   exact Nat.mul_le_mul_right _ (Nat.mul_le_mul_right _ (by omega))
 
-end HM
+end AxisMirror
 
 
 /-! ## The diagonal mirror `sr 3` -/
 
-namespace DM
+namespace DiagMirror
 
 /-- The translation that anchors the transposed animal. -/
 noncomputable def t (S : Finset (ℤ × ℤ)) : ℤ × ℤ :=
@@ -775,13 +776,13 @@ def dg (p : ℤ × ℤ) : ℤ := p.2 - p.1
 
 variable {n : ℕ} {S : Finset (ℤ × ℤ)}
 
-lemma image_σ (hS : S ∈ FixF n (DihedralGroup.sr 3)) : S.image (σ (t S)) = S :=
+lemma image_σ (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : S.image (σ (t S)) = S :=
   image_eq_of_fix hS (σ (t S)) fun p => by simp [σ, t, D4.toFun_sr3, Prod.ext_iff]
 
-lemma t_sum (hS : S ∈ FixF n (DihedralGroup.sr 3)) : (t S).1 + (t S).2 = 0 := by
+lemma t_sum (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : (t S).1 + (t S).2 = 0 := by
   have := translation_eq_zero (w := (-((t S).1 + (t S).2), -((t S).1 + (t S).2)))
     (fun p => by simp only [σ, Prod.ext_iff, Prod.fst_add, Prod.snd_add]; constructor <;> ring)
-    (image_σ hS) (FixF_nonempty hS)
+    (image_σ hS) (fixedFinset_nonempty hS)
   rw [Prod.ext_iff] at this
   simp only [Prod.fst_zero] at this
   omega
@@ -832,10 +833,10 @@ noncomputable def c (z : Finset (ℤ × ℤ) × ℤ) : ℤ := hmin dg z.1 - z.2
 noncomputable def recon (z : Finset (ℤ × ℤ) × ℤ) : Finset (ℤ × ℤ) :=
   anchor (z.1 ∪ z.1.image fun p => (p.2 - c z, p.1 + c z))
 
-lemma V_nonempty (hS : S ∈ FixF n (DihedralGroup.sr 3)) : (V S).Nonempty :=
-  upperHalf_nonempty (hσ (t_sum hS)) (image_σ hS) (FixF_nonempty hS)
+lemma V_nonempty (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : (V S).Nonempty :=
+  upperHalf_nonempty (hσ (t_sum hS)) (image_σ hS) (fixedFinset_nonempty hS)
 
-lemma c_Φ (hS : S ∈ FixF n (DihedralGroup.sr 3)) :
+lemma c_Φ (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) :
     c (Φ S) = (t S).1 + (corner (V S)).1 - (corner (V S)).2 := by
   have hV := V_nonempty hS
   rw [c, Φ, anchor, hmin_image (g := h (t S)) (c := (t S).1 + (corner (V S)).1 -
@@ -843,15 +844,15 @@ lemma c_Φ (hS : S ∈ FixF n (DihedralGroup.sr 3)) :
   rw [b]
   ring
 
-lemma b_mem (hS : S ∈ FixF n (DihedralGroup.sr 3)) : 0 ≤ b S ∧ b S ≤ 1 :=
-  hmin_upperHalf (hσ (t_sum hS)) (image_σ hS) (lip (t S)) (mem_FixF.1 hS).1.conn
-    (FixF_nonempty hS) (V_nonempty hS)
+lemma b_mem (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : 0 ≤ b S ∧ b S ≤ 1 :=
+  hmin_upperHalf (hσ (t_sum hS)) (image_σ hS) (lip (t S)) (mem_fixedFinset.1 hS).1.conn
+    (fixedFinset_nonempty hS) (V_nonempty hS)
 
-lemma recon_Φ (hS : S ∈ FixF n (DihedralGroup.sr 3)) : recon (Φ S) = S := by
+lemma recon_Φ (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : recon (Φ S) = S := by
   have ht := t_sum hS
   have hc : c (Φ S) = (t S).1 + (corner (upperHalf (h (t S)) S)).1 -
     (corner (upperHalf (h (t S)) S)).2 := c_Φ hS
-  have := eq_reanchor_of_union (σ (t S)) (mem_FixF.1 hS).1.anchored
+  have := eq_reanchor_of_union (σ (t S)) (mem_fixedFinset.1 hS).1.anchored
     (upperHalf_union (σσ ht) (hσ ht) (image_σ hS))
   rw [recon, hc]
   conv_rhs => rw [this]
@@ -860,33 +861,33 @@ lemma recon_Φ (hS : S ∈ FixF n (DihedralGroup.sr 3)) : recon (Φ S) = S := by
   simp only [σ, Prod.ext_iff, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub]
   constructor <;> omega
 
-lemma V_card (hS : S ∈ FixF n (DihedralGroup.sr 3)) : (V S).card = n - u S := by
+lemma V_card (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : (V S).card = n - u S := by
   have ht := t_sum hS
   have := (card_upperHalf_eq (σσ ht) (hσ ht) (image_σ hS)).1
-  rwa [(mem_FixF.1 hS).1.card] at this
+  rwa [(mem_fixedFinset.1 hS).1.card] at this
 
-lemma u_le (hS : S ∈ FixF n (DihedralGroup.sr 3)) : u S ≤ n := by
+lemma u_le (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : u S ≤ n := by
   have ht := t_sum hS
   have := (card_upperHalf_eq (σσ ht) (hσ ht) (image_σ hS)).2
-  rwa [(mem_FixF.1 hS).1.card] at this
+  rwa [(mem_fixedFinset.1 hS).1.card] at this
 
 /-- The target of the encoding: a anchored animal of `n - u` cells with `u`
 cells off its axis, and the offset `b ∈ {0, 1}`. -/
 noncomputable def A (n u : ℕ) : Finset (Finset (ℤ × ℤ) × ℤ) :=
-  (CAfin (n - u) ×ˢ ({0, 1} : Finset ℤ)).filter fun z =>
+  (polypletsFinset (n - u) ×ˢ ({0, 1} : Finset ℤ)).filter fun z =>
     (z.1.filter fun p => ¬ dg p = c z).card = u
 
-lemma Φ_mem (hS : S ∈ FixF n (DihedralGroup.sr 3)) : Φ S ∈ A n (u S) := by
+lemma Φ_mem (hS : S ∈ fixedFinset n (DihedralGroup.sr 3)) : Φ S ∈ A n (u S) := by
   have ht := t_sum hS
   have hV := V_nonempty hS
   have hc := c_Φ hS
-  rw [A, Finset.mem_filter, Finset.mem_product, mem_CAfin]
+  rw [A, Finset.mem_filter, Finset.mem_product, mem_polypletsFinset]
   refine ⟨⟨⟨?_, ?_, anchor_anchored hV⟩, ?_⟩, ?_⟩
   · rw [Φ, anchor_card]
     exact V_card hS
   · exact kingConnected_anchor
       (upperHalf_connected (hσ ht) (image_σ hS) (adj (t S)) (cross ht)
-        (mem_FixF.1 hS).1.conn)
+        (mem_fixedFinset.1 hS).1.conn)
   · have := b_mem hS
     simp only [Φ, Finset.mem_insert, Finset.mem_singleton]
     omega
@@ -900,7 +901,7 @@ lemma Φ_mem (hS : S ∈ FixF n (DihedralGroup.sr 3)) : Φ S ∈ A n (u S) := by
     omega
 
 lemma fiber_le (n u : ℕ) :
-    ((FixF n (DihedralGroup.sr 3)).filter fun S => DM.u S = u).card ≤ (A n u).card :=
+    ((fixedFinset n (DihedralGroup.sr 3)).filter fun S => DiagMirror.u S = u).card ≤ (A n u).card :=
   card_le_of_recon Φ recon
     (fun S hS => by
       rw [Finset.mem_filter] at hS
@@ -915,7 +916,7 @@ lemma A_le_crude (n u : ℕ) : (A n u).card ≤ 2 * (2 * n + 1) * 2 ^ n * (n * n
   have hmem : ∀ z ∈ A n u, IsPolyplet (n - u) z.1 ∧ z.2 ∈ ({0, 1} : Finset ℤ) := by
     intro z hz
     have := Finset.mem_product.1 (Finset.mem_filter.1 hz).1
-    exact ⟨mem_CAfin.1 this.1, this.2⟩
+    exact ⟨mem_polypletsFinset.1 this.1, this.2⟩
   have := card_le_crude (A n u) (fun z => (c z, z.2))
     (Finset.Icc (-(n : ℤ)) n ×ˢ ({0, 1} : Finset ℤ))
     (fun k p => dg p = k.1) (fun k x => x + k.1) n u
@@ -941,16 +942,16 @@ lemma A_le_crude (n u : ℕ) : (A n u).card ≤ 2 * (2 * n + 1) * 2 ^ n * (n * n
 theorem Dm_le (n K : ℕ) (hK : K ≤ n) :
     Dm n ≤ (∑ u ∈ Finset.range K, 2 * (2 * n + 1) * 2 ^ n * (n * n) ^ u) +
       ∑ u ∈ Finset.Icc K n, 2 * a (n - u) := by
-  rw [Dm, fixCount_eq_card_FixF]
-  exact card_le_split _ DM.u hK (fun S hS => u_le hS) _ _
+  rw [Dm, fixCount_eq_card_fixedFinset]
+  exact card_le_split _ DiagMirror.u hK (fun S hS => u_le hS) _ _
     (fun u => (fiber_le n u).trans (A_le_crude n u))
     (fun u => (fiber_le n u).trans (A_le_a n u))
 
-end DM
+end DiagMirror
 
 /-! ## The half turn `r 2` -/
 
-namespace HT
+namespace HalfTurn
 
 /-- The translation that anchors the rotated animal. -/
 noncomputable def t (S : Finset (ℤ × ℤ)) : ℤ × ℤ := corner (S.image fun p => -p)
@@ -960,7 +961,7 @@ def σ (t : ℤ × ℤ) (p : ℤ × ℤ) : ℤ × ℤ := -p - t
 
 variable {n : ℕ} {S : Finset (ℤ × ℤ)}
 
-lemma image_σ (hS : S ∈ FixF n (DihedralGroup.r 2)) : S.image (σ (t S)) = S :=
+lemma image_σ (hS : S ∈ fixedFinset n (DihedralGroup.r 2)) : S.image (σ (t S)) = S :=
   image_eq_of_fix hS (σ (t S)) fun p => by simp [σ, t, D4.toFun_r2]
 
 lemma σσ (t p : ℤ × ℤ) : σ t (σ t p) = p := by
@@ -974,14 +975,14 @@ lemma adj (t : ℤ × ℤ) (p q : ℤ × ℤ) (hpq : kingAdj p q) : kingAdj (σ 
 open Classical in
 /-- A good half of the animal, chosen once. -/
 noncomputable def W (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
-  if hex : ∃ W ⊆ S, GoodHalf (σ (t S)) W ∧ W.Nonempty ∧ W ∪ W.image (σ (t S)) = S then
+  if hex : ∃ W ⊆ S, IsHalf (σ (t S)) W ∧ W.Nonempty ∧ W ∪ W.image (σ (t S)) = S then
     Classical.choose hex else ∅
 
-lemma W_spec (hS : S ∈ FixF n (DihedralGroup.r 2)) :
-    W S ⊆ S ∧ GoodHalf (σ (t S)) (W S) ∧ (W S).Nonempty ∧
+lemma W_spec (hS : S ∈ fixedFinset n (DihedralGroup.r 2)) :
+    W S ⊆ S ∧ IsHalf (σ (t S)) (W S) ∧ (W S).Nonempty ∧
       W S ∪ (W S).image (σ (t S)) = S := by
-  have hex := exists_half (σσ (t S)) (adj (t S)) (mem_FixF.1 hS).1.conn (image_σ hS)
-    (FixF_nonempty hS)
+  have hex := exists_half (σσ (t S)) (adj (t S)) (mem_fixedFinset.1 hS).1.conn (image_σ hS)
+    (fixedFinset_nonempty hS)
   rw [W, dif_pos hex]
   exact Classical.choose_spec hex
 
@@ -993,8 +994,8 @@ noncomputable def Φ (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) × (ℤ × 
 noncomputable def recon (z : Finset (ℤ × ℤ) × (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   anchor (z.1 ∪ z.1.image fun p => -p - z.2)
 
-lemma recon_Φ (hS : S ∈ FixF n (DihedralGroup.r 2)) : recon (Φ S) = S := by
-  have := eq_reanchor_of_union (σ (t S)) (mem_FixF.1 hS).1.anchored (W_spec hS).2.2.2
+lemma recon_Φ (hS : S ∈ fixedFinset n (DihedralGroup.r 2)) : recon (Φ S) = S := by
+  have := eq_reanchor_of_union (σ (t S)) (mem_fixedFinset.1 hS).1.anchored (W_spec hS).2.2.2
   rw [recon, Φ]
   conv_rhs => rw [this]
   congr 3
@@ -1003,10 +1004,10 @@ lemma recon_Φ (hS : S ∈ FixF n (DihedralGroup.r 2)) : recon (Φ S) = S := by
     Prod.fst_neg, Prod.snd_neg]
   constructor <;> ring
 
-lemma W_card (hS : S ∈ FixF n (DihedralGroup.r 2)) : (W S).card = (n + 1) / 2 := by
+lemma W_card (hS : S ∈ fixedFinset n (DihedralGroup.r 2)) : (W S).card = (n + 1) / 2 := by
   obtain ⟨-, hgood, -, hunion⟩ := W_spec hS
-  have h1 := card_of_goodHalf (σσ (t S)) hgood hunion
-  rw [(mem_FixF.1 hS).1.card] at h1
+  have h1 := card_of_isHalf (σσ (t S)) hgood hunion
+  rw [(mem_fixedFinset.1 hS).1.card] at h1
   have h2 : ((W S).filter fun p => σ (t S) p = p).card ≤ 1 := by
     rw [Finset.card_le_one]
     intro p hp q hq
@@ -1019,11 +1020,11 @@ lemma W_card (hS : S ∈ FixF n (DihedralGroup.r 2)) : (W S).card = (n + 1) / 2 
   omega
 
 /-- The centre offset is bounded by the box. -/
-lemma Φ_snd_mem (hS : S ∈ FixF n (DihedralGroup.r 2)) :
+lemma Φ_snd_mem (hS : S ∈ fixedFinset n (DihedralGroup.r 2)) :
     (Φ S).2 ∈ Finset.Icc (-(2 * (n : ℤ))) (2 * n) ×ˢ
       Finset.Icc (-(2 * (n : ℤ))) (2 * n) := by
   obtain ⟨hWS, -, hWne, -⟩ := W_spec hS
-  have hcan := (mem_FixF.1 hS).1
+  have hcan := (mem_fixedFinset.1 hS).1
   obtain ⟨w, hw⟩ := hWne
   have hw1 := mem_boxN_of_isPolyplet le_rfl hcan (hWS hw)
   have hw2 := mem_boxN_of_isPolyplet le_rfl hcan (mem_of_image_eq (image_σ hS) (hWS hw))
@@ -1041,24 +1042,24 @@ lemma Φ_snd_mem (hS : S ∈ FixF n (DihedralGroup.r 2)) :
 
 theorem R180_le (n : ℕ) :
     R180 n ≤ a ((n + 1) / 2) * ((4 * n + 1) * (4 * n + 1)) := by
-  rw [R180, fixCount_eq_card_FixF]
-  have hcard : (CAfin ((n + 1) / 2) ×ˢ (Finset.Icc (-(2 * (n : ℤ))) (2 * n) ×ˢ
+  rw [R180, fixCount_eq_card_fixedFinset]
+  have hcard : (polypletsFinset ((n + 1) / 2) ×ˢ (Finset.Icc (-(2 * (n : ℤ))) (2 * n) ×ˢ
       Finset.Icc (-(2 * (n : ℤ))) (2 * n))).card =
       a ((n + 1) / 2) * ((4 * n + 1) * (4 * n + 1)) := by
-    rw [Finset.card_product, Finset.card_product, card_CAfin, Int.card_Icc]
+    rw [Finset.card_product, Finset.card_product, card_polypletsFinset, Int.card_Icc]
     have : (2 * (n : ℤ) + 1 - -(2 * (n : ℤ))).toNat = 4 * n + 1 := by omega
     rw [this]
   rw [← hcard]
   refine card_le_of_recon Φ recon (fun S hS => ?_) (fun S hS => recon_Φ hS)
-  rw [Finset.mem_product, mem_CAfin]
+  rw [Finset.mem_product, mem_polypletsFinset]
   refine ⟨⟨?_, ?_, anchor_anchored (W_spec hS).2.2.1⟩, Φ_snd_mem hS⟩
   · rw [Φ, anchor_card]
     exact W_card hS
   · exact kingConnected_anchor (W_spec hS).2.1.1
 
-end HT
+end HalfTurn
 
-/-- A quarter-turn-symmetric animal is half-turn-symmetric. -/
+/-- A quarterTurn-turn-symmetric animal is half-turn-symmetric. -/
 theorem R90_le_R180 (n : ℕ) : R90 n ≤ R180 n := by
   rw [R90, R180, fixCount, fixCount, Nat.card_coe_set_eq, Nat.card_coe_set_eq]
   refine Set.ncard_le_ncard ?_ (Set.toFinite _)
@@ -1260,10 +1261,10 @@ theorem tendsto_ratio_zero {f : ℕ → ℕ}
       _ ≤ _ := add_le_add (head_le n K hn1) (tail_le n K hn1)
 
 theorem tendsto_Hm : Tendsto (fun n => (Hm n : ℝ) / a n) atTop (𝓝 0) :=
-  tendsto_ratio_zero fun n K hK => HM.Hm_le n K hK
+  tendsto_ratio_zero fun n K hK => AxisMirror.Hm_le n K hK
 
 theorem tendsto_Dm : Tendsto (fun n => (Dm n : ℝ) / a n) atTop (𝓝 0) :=
-  tendsto_ratio_zero fun n K hK => DM.Dm_le n K hK
+  tendsto_ratio_zero fun n K hK => DiagMirror.Dm_le n K hK
 
 theorem tendsto_R180 : Tendsto (fun n => (R180 n : ℝ) / a n) atTop (𝓝 0) := by
   have hg : Tendsto
@@ -1286,7 +1287,7 @@ theorem tendsto_R180 : Tendsto (fun n => (R180 n : ℝ) / a n) atTop (𝓝 0) :=
   have h1' : (a ((n + 1) / 2) : ℝ) * a p ≤ a n := by exact_mod_cast h1
   have h2 : (2 : ℝ) ^ p ≤ 4 * a p := by exact_mod_cast two_pow_le_four_mul_a p hp1
   have h3 : (R180 n : ℝ) ≤ a ((n + 1) / 2) * ((4 * n + 1) * (4 * n + 1)) := by
-    exact_mod_cast HT.R180_le n
+    exact_mod_cast HalfTurn.R180_le n
   have h4 : (4 * (n : ℝ) + 1) ≤ 8 * ((p : ℝ) + 1) := by
     have : n ≤ 2 * p + 1 := by omega
     have : (n : ℝ) ≤ 2 * p + 1 := by exact_mod_cast this
@@ -1328,7 +1329,8 @@ theorem symmetryRatio :
     refine h.congr' ?_
     filter_upwards [eventually_ge_atTop 1] with n hn
     have ha : (a n : ℝ) ≠ 0 := by exact_mod_cast Nat.one_le_iff_ne_zero.1 (one_le_a hn)
-    have e : (4 * OneSided n : ℝ) = a n + 2 * R90 n + R180 n := by exact_mod_cast oneSided_eq n
+    have e : (4 * OneSided n : ℝ) = a n + 2 * R90 n + R180 n := by
+      exact_mod_cast four_mul_OneSided n
     rw [e]
     field_simp
   · have h : Tendsto (fun n => 1 + 2 * ((R90 n : ℝ) / a n) + (R180 n : ℝ) / a n +
@@ -1341,7 +1343,7 @@ theorem symmetryRatio :
     filter_upwards [eventually_ge_atTop 1] with n hn
     have ha : (a n : ℝ) ≠ 0 := by exact_mod_cast Nat.one_le_iff_ne_zero.1 (one_le_a hn)
     have e : (8 * Free n : ℝ) = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := by
-      exact_mod_cast free_eq n
+      exact_mod_cast eight_mul_Free n
     rw [e]
     field_simp
 

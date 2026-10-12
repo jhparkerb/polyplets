@@ -100,12 +100,12 @@ counts. The report defines asymmetric as free minus bilateral, so
 `#bilateral + #asymmetric = #free` is definitional and gets no entry. -/
 
 theorem report_free (n : ℕ) :
-    8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := free_eq n
+    8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := eight_mul_Free n
 
 theorem report_oneSided (n : ℕ) : 4 * OneSided n = a n + 2 * R90 n + R180 n :=
-  oneSided_eq n
+  four_mul_OneSided n
 
-theorem report_bilateral (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := bilateral_eq n
+theorem report_bilateral (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := two_mul_Bilateral n
 
 /-- **One-sided approaches `a(n)/4` and free approaches `a(n)/8`.** -/
 def SymmetryRatioClaim : Prop :=

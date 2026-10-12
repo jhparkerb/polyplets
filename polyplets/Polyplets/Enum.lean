@@ -1593,10 +1593,11 @@ lemma inBox_foldl_lor (f : ℕ → ℕ) : ∀ (l : List ℕ) (a : ℕ), InBox a 
 larger absolute coordinate. -/
 lemma max_abs_toFun (g : D4) (p : ℤ × ℤ) :
     max |(D4.toFun g p).1| |(D4.toFun g p).2| = max |p.1| |p.2| := by
-  have hquarter : ∀ p : ℤ × ℤ, max |(quarter p).1| |(quarter p).2| = max |p.1| |p.2| := by
+  have hquarter : ∀ p : ℤ × ℤ, max |(quarterTurn p).1| |(quarterTurn p).2| = max |p.1| |p.2| := by
     intro p
-    simp only [quarter, abs_neg, max_comm]
-  have hq : ∀ k (p : ℤ × ℤ), max |(quarter^[k] p).1| |(quarter^[k] p).2| = max |p.1| |p.2| := by
+    simp only [quarterTurn, abs_neg, max_comm]
+  have hq : ∀ k (p : ℤ × ℤ),
+      max |(quarterTurn^[k] p).1| |(quarterTurn^[k] p).2| = max |p.1| |p.2| := by
     intro k
     induction k with
     | zero => intro p; rfl

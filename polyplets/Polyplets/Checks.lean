@@ -170,7 +170,7 @@ theorem weights_le_6 :
   decide +kernel
 
 open Enum in
-/-- The symmetry counts for `n ≤ 5` (`results/sym_counts.txt`): quarter turns,
+/-- The symmetry counts for `n ≤ 5` (`results/sym_counts.txt`): quarterTurn turns,
 half turns, the axis mirror and the diagonal mirror. -/
 theorem symmetry_le_5 :
     R90 1 = 1 ∧ R90 2 = 0 ∧ R90 3 = 0 ∧ R90 4 = 2 ∧ R90 5 = 2 ∧
