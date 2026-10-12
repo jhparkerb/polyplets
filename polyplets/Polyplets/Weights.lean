@@ -32,18 +32,12 @@ set containing the origin is bounded by its cell count, `connected_abs_x_le`).
 Downstream bijections (`Peel.lean`) must match against those propositional
 descriptions, never the window encoding.
 
-## Validation
+## The values the proofs consume
 
-The values the kernel can decide (each under 3 GB; the next ones up need
-6–9 GB, measured 2026-10-12), independently cross-checked by a direct
-out-of-Lean enumeration (2026-07-20):
-
-* `V 1 1 = 25`, `Vt 1 1 = 5` — the banked paper enumeration (the `16 + 9`
-  and `4 + 1` gadgets of `docs/proofs/T-n-nm1.md`); `Vt 1 2 = 7`.
-* `d 0 1 = 1`, `d 0 2 = 3` (the free walk chain `3^(H-1)`), `d 1 2 = 5`.
-
-One identity gate against a banked `results/triangle.txt` value: the
-c-identity at the onset `k = 1, H = 2`, `T(3,2) = 10 = 5 + 5·1`.
+`V 1 1 = 25` and `Vt 1 1 = 5`, the paper enumeration (the `16 + 9` and `4 + 1`
+gadgets of `docs/proofs/T-n-nm1.md`), and `d 0 1 = 1`, kernel-decided (each
+under 3 GB; the next values up need 6–9 GB, measured 2026-10-12). More values
+and the identities at their onset are in `Checks.lean`.
 -/
 
 namespace Polyplets
@@ -379,12 +373,10 @@ theorem mem_CFGVt {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
     · rw [hins]
       exact hS
 
-/-! ## Validation against banked and cross-checked values
+/-! ## The values the proofs consume
 
-Weight values the kernel decides, recorded as named theorems. All values
-independently cross-checked by a direct enumeration outside Lean (2026-07-20);
-`V 1 1`/`Vt 1 1` additionally match the paper gadget counts of
-`docs/proofs/T-n-nm1.md`. Larger values (`V 1 2 = 49`, `V 2 2 = 339`,
+Kernel-decided, and independently cross-checked by a direct enumeration
+outside Lean (2026-07-20). Larger values (`V 1 2 = 49`, `V 2 2 = 339`,
 `Vt 2 2 = 66`, `d 0 3 = 9`, `d 1 3 = 40`, `d 2 3 = 136`, `d 2 4 = 1019`,
 `T 5 3 = 248`) were `native_decide` facts until 2026-10-12; the kernel needs
 6–9 GB for them, and nothing in the development consumes them. -/
@@ -395,22 +387,6 @@ theorem V_1_1 : V 1 1 = 25 := by decide +kernel
 /-- `Vt 1 1 = 5`: the paper-enumerated `4 + 1` gadget count. -/
 theorem Vt_1_1 : Vt 1 1 = 5 := by decide +kernel
 
-/-- `Vt 1 2 = 7` (cross-checked enumeration). -/
-theorem Vt_1_2 : Vt 1 2 = 7 := by decide +kernel
-
-/-! `d 0 H = 3^(H-1)` — surplus 0 forces every row to a single cell, a free
-walk chain of offsets. -/
-
+/-- `d 0 1 = 1`: the single cell (`d 0 H = 3^(H-1)`, a free walk chain). -/
 theorem d_0_1 : d 0 1 = 1 := by decide +kernel
-theorem d_0_2 : d 0 2 = 3 := by decide +kernel
-
-/-- `d 1 2 = 5`: of the `T(3,2) = 10` animals, five have a walk top row. -/
-theorem d_1_2 : d 1 2 = 5 := by decide +kernel
-
-/-- **Gate: c-identity at the onset `k = 1, H = k + 1 = 2`.**
-`T(3,2) = 10 = 5 + 5·1`, a numeric instance of `Peel.lean`'s target identity
-from the values above. -/
-theorem c_ident_check_k1_H2 : T 3 2 = d 1 2 + Vt 1 1 * d 0 1 := by
-  norm_num [T_3_2, d_1_2, Vt_1_1, d_0_1]
-
 end Polyplets

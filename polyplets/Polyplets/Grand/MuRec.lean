@@ -32,8 +32,8 @@ the diagonal `s = j + t`, at which point `Mu.mu_bigRange` recognizes the
 coefficient as `μ s − 3·eps s` and the algebra closes.
 
 The statement was verified on banked data at all 170 in-range instances
-(`experiments/staircase_check.py`); the numeric gate below reproduces
-`d 1 3 = 40 = 3·5 + (25/3)·3`.
+(`experiments/staircase_check.py`); `Checks.lean` instantiates it at
+`(k, H) = (1, 2)` and `(2, 3)`.
 -/
 
 namespace Polyplets
@@ -203,26 +203,5 @@ strong induction on `H` from `Peel.d_rec` through the `μ`/`ν` inverse pair. -/
 theorem d_mu_rec : ∀ H k : ℕ, k + 1 ≤ H →
     (d k (H + 1) : ℚ) = ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ) :=
   fun H => Nat.strong_induction_on H d_mu_rec_step
-
-/-! ## Numeric gates -/
-
-/-- **Gate (k, H) = (1, 2).** The recursion smoke test:
-`d 1 3 = μ₀·d 1 2 + μ₁·d 0 2`. -/
-theorem d_mu_rec_check_k1_H2 :
-    (d 1 3 : ℚ) = mu 0 * d 1 2 + mu 1 * d 0 2 := by
-  have h := d_mu_rec 2 1 (by norm_num)
-  simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
-
-/-- The `(1, 2)` gate evaluates: `μ₀·d 1 2 + μ₁·d 0 2 = 3·5 + (25/3)·3 = 40`,
-from the kernel-decided values `d 1 2 = 5`, `d 0 2 = 3`. -/
-theorem d_mu_rec_value_check : mu 0 * (d 1 2 : ℚ) + mu 1 * (d 0 2 : ℚ) = 40 := by
-  rw [mu_zero, mu_one, d_1_2, d_0_2]; norm_num
-
-/-- **Gate (k, H) = (2, 3).** The recursion at `d 2 4`:
-`d 2 4 = μ₀·d 2 3 + μ₁·d 1 3 + μ₂·d 0 3`. -/
-theorem d_mu_rec_check_k2_H3 :
-    (d 2 4 : ℚ) = mu 0 * d 2 3 + mu 1 * d 1 3 + mu 2 * d 0 3 := by
-  have h := d_mu_rec 3 2 (by norm_num)
-  simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
 
 end Polyplets

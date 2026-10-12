@@ -30,9 +30,9 @@ by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
   first anchor `T(3,2) = 6` the kernel decides from the generic enumerator;
   `T(4,3)` needs more than 8 GB in the kernel (measured 2026-10-12), so it
   enters as the hypothesis `hex_P1_pinned` and `hex_P1_closed` carry.
-* `hex_rowSum_3` : the row sum of the computed height triangle at `n = 3`
+* `Checks.lean`: the row sum of the computed height triangle at `n = 3`
   reproduces A001207 (fixed polyhexes) `11` — the same cross-family check as
-  `Universal/Square.lean` runs against A001168.
+  for the square lattice against A001168.
 -/
 
 namespace Polyplets.Universal
@@ -75,11 +75,6 @@ theorem adj_hex {p q : ℤ × ℤ} :
 strict staircases, leaving six of height exactly 2. -/
 theorem T_hex_3_2 : T hexLattice 3 2 = 6 := by
   rw [← Tc_eq_T_of_M_le_one M_hex_le]; decide +kernel
-
-/-! ## Cross-family check: A001207 -/
-
-/-- A001207 at `n = 3`: `1 + 6 + 4 = 11` fixed 3-cell polyhexes. -/
-theorem hex_rowSum_3 : rowSum hexLattice 3 3 = 11 := by decide +kernel
 
 /-! ## Pinning `P₁` -/
 

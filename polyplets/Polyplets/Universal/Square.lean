@@ -28,18 +28,13 @@ counts fixed polyominoes of `n` cells and bounding-box height exactly `H`.
 ## What is pinned here
 
 * `square_P1_pinned` / `square_P1_closed` : `P₁(n) = 4n − 8`, i.e.
-  `T(n, n−1) = 4n − 8` for `n ≥ 3` (paper instance table, density `4 = 2²`).
-  Two anchor cells `T(3,2) = 4`, `T(4,3) = 8` are computed in-Lean by the
-  generic enumerator `Tc` and Lagrange-pinned by `Universal/Compute.lean`'s
-  `pin`. `T(5,4) = 12` is recorded as an out-of-sample corroboration: it is
-  *not* used in the pin, and the pinned law predicts it.
-* `square_rowSum_*` : the cross-family gate — row sums of the computed height
-  triangle reproduce A001168 (fixed polyominoes) `1, 2, 6, 19, 63` at
-  `n = 1..5`.
-
-The anchor cells and the row sums are `native_decide`; the `P₁` pins inherit
-exactly the two anchor-cell leaves (no further `native_decide`), and
-everything else is standard-axioms.
+  `T(n, n−1) = 4n − 8` for `n ≥ 3` (paper instance table, density `4 = 2²`),
+  given the second anchor cell `T(4,3) = 8` as a hypothesis. The first anchor
+  `T(3,2) = 4` the kernel decides from the generic enumerator `Tc`, and
+  `Universal/Compute.lean`'s `pin` does the Lagrange step; `T(4,3)` needs more
+  than 8 GB in the kernel (measured 2026-10-12).
+* `Checks.lean`: the row sum of the computed height triangle at `n = 3`
+  reproduces A001168 (fixed polyominoes) `6`.
 -/
 
 namespace Polyplets.Universal
@@ -88,15 +83,6 @@ The second anchor `T(4,3) = 8` needs more than 8 GB in the kernel (measured
 /-- `T(3,2) = 4`: the four L-trominoes. -/
 theorem T_square_3_2 : T squareLattice 3 2 = 4 := by
   rw [← Tc_eq_T_of_M_le_one M_square_le]; decide +kernel
-
-/-! ## Cross-family check: A001168
-
-The row sum of the computed height triangle at `n = 3` is the fixed-tromino
-count `6` (OEIS A001168), a check of the generic geometry against a family the
-repo has no banked data for. -/
-
-/-- A001168 at `n = 3`: `1 + 4 + 1 = 6` fixed trominoes. -/
-theorem square_rowSum_3 : rowSum squareLattice 3 3 = 6 := by decide +kernel
 
 /-! ## Pinning `P₁` -/
 

@@ -1,4 +1,5 @@
 import Polyplets.Audit
+import Polyplets.Checks
 import Polyplets.Compute
 import Polyplets.Defs
 import Polyplets.Fekete

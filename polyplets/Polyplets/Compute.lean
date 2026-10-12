@@ -24,10 +24,10 @@ argument — the expansion chain is monotone and confined to `S`, so it stalls
 within `S.card` rounds (`stepExpand_reachSet`), and a stalled set absorbs king
 steps, hence contains everything path-reachable.
 
-Validation: kernel `decide` checks `Tc` (and, through `Tc_eq_T`, the
-noncomputable `T` itself) against the smallest banked values of
-`results/triangle.txt`. The kernel's memory grows fast with the cell (6 GB at
-`T 3 3`, past 8 GB at `T 5 4`), so the checks stop at `T 4 3`.
+Kernel `decide` on `Tc` (and, through `Tc_eq_T`, on `T` itself) reaches the
+smallest banked values of `results/triangle.txt`; its memory grows fast with
+the cell (6 GB at `T 3 3`, past 8 GB at `T 5 4`), so the cells stop at
+`T 4 3`. The three the proofs need are here, the rest in `Checks.lean`.
 -/
 
 namespace Polyplets
@@ -224,30 +224,16 @@ theorem Tc_eq_T (n H : ℕ) : Tc n H = T n H := by
       omega
   rw [Tc, hset, T_eq_toFinset_card]
 
-/-! ## Validation against banked values
+/-! ## The cells the development consumes
 
-The right-hand sides are quoted from `results/triangle.txt` (provenance
-`results/ns_a36/PROVENANCE.md`; two-algorithm confirmed range), transported
-to the noncomputable `T` via `Tc_eq_T` and decided by the kernel. -/
-
-/-! Degenerate and impossible shapes count zero, as `T` does. -/
-
-example : Tc 0 0 = 0 := by decide +kernel
-example : Tc 0 3 = 0 := by decide +kernel
-example : Tc 3 0 = 0 := by decide +kernel
-example : Tc 2 3 = 0 := by decide +kernel
+Three banked values (`results/triangle.txt`, provenance
+`results/ns_a36/PROVENANCE.md`, two-algorithm confirmed range), transported to
+the noncomputable `T` via `Tc_eq_T` and decided by the kernel: `T 1 1` seeds
+the shape theorem's `k = 0` pin, `T 3 2` and `T 4 3` pin `P_1`. Further cells
+are checked in `Checks.lean`. -/
 
 /-- `T 1 1 = 1`: the single cell. -/
 theorem T_1_1 : T 1 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
-
-/-- `T 2 1 = 1`: the horizontal king domino. -/
-theorem T_2_1 : T 2 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
-
-/-- `T 2 2 = 3`: vertical domino and the two diagonal king dominoes. -/
-theorem T_2_2 : T 2 2 = 3 := by rw [← Tc_eq_T]; decide +kernel
-
-/-- `T 3 1 = 1`: the horizontal tromino. -/
-theorem T_3_1 : T 3 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 3 2 = 10` (banked, `results/triangle.txt`), the first `P_1` onset
 point. -/
@@ -261,10 +247,8 @@ theorem T_4_3 : T 4 3 = 55 := by rw [← Tc_eq_T]; decide +kernel
 Memory of kernel `decide` on this brute-force `Tc`, measured 2026-10-12
 (`scripts/lean-decide-trials.sh`): the cells above peak at 2.7–3.3 GB;
 `T 3 3` needs 6 GB; `T 5 4` (`C(20,5) = 15504` subsets) passes 8 GB and was
-killed. `T 3 3 = 9` and `T 4 4 = 27` are instead derived from the shape
-theorem (`Shape.lean`, `shape_check_T_3_3`, `shape_check_T_4_4`). Cells
-beyond `P_1`'s onset points enter the development only as hypotheses
-(`Grand/PinAll.lean`, `BankedAnchors`).
+killed. Cells beyond `P_1`'s onset points enter the development only as
+hypotheses (`Grand/PinAll.lean`, `BankedAnchors`).
 -/
 
 end Polyplets

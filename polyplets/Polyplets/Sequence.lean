@@ -35,11 +35,9 @@ The upper height bound is the row analogue of `Finite.lean`'s `canonical_x_le`;
 both are instances of one anchored-projection lemma (`card_bound_of_anchored`).
 
 Finally a computable twin `ac n = ∑ H ∈ Finset.Icc 1 n, Tc n H` with
-`ac_eq_a`, giving the kernel-decided anchors `a 1 = 1`, `a 2 = 4` against the
-banked row sums of `results/triangle.txt` (`a 3 = 20` needs 6 GB in the
-kernel and `a 4` more than 8 GB, measured 2026-10-12; `a 3 … a 6` were
-`native_decide` facts until then), and the paper's §9 strip-capture lower
-bound `strip_sum_le_a`.
+`ac_eq_a` (`Checks.lean` decides `a 1 = 1`, `a 2 = 4` with it; `a 3 = 20`
+needs 6 GB in the kernel and `a 4` more than 8 GB, measured 2026-10-12), and
+the paper's §9 strip-capture lower bound `strip_sum_le_a`.
 -/
 
 namespace Polyplets
@@ -219,7 +217,7 @@ theorem a_eq_sum (n : ℕ) :
     Finset.card_biUnion hdisj]
   exact Finset.sum_congr rfl fun H _ => (T_eq_toFinset_card n H).symm
 
-/-! ## Computable twin and banked anchors -/
+/-! ## Computable twin -/
 
 /-- Computable counterpart of `a`: the row sum of the computable triangle `Tc`.
 Brute force (`Tc` enumerates subsets of the box), so useful only for small `n`. -/
@@ -230,15 +228,6 @@ def ac (n : ℕ) : ℕ := ∑ H ∈ Finset.Icc 1 n, Tc n H
 theorem ac_eq_a (n : ℕ) : ac n = a n := by
   rw [ac, a_eq_sum n]
   exact Finset.sum_congr rfl fun H _ => Tc_eq_T n H
-
-/-! The right-hand sides are the row sums of `results/triangle.txt`
-(provenance `results/ns_a40/PROVENANCE.md`): `a n = 1, 4` for `n = 1, 2`. -/
-
-/-- `a 1 = 1`: the single cell. -/
-theorem a_1 : a 1 = 1 := by rw [← ac_eq_a 1]; decide +kernel
-
-/-- `a 2 = 4`: the horizontal, vertical and two diagonal king dominoes. -/
-theorem a_2 : a 2 = 4 := by rw [← ac_eq_a 2]; decide +kernel
 
 /-! ## The §9 strip-capture lower bound -/
 

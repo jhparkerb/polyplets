@@ -29,8 +29,8 @@ The statement-level diff is checked mechanically, exactly as at GD-1: the four
 Two further cross-checks, parallel to `Universal/{Square,Hex}.lean`:
 
 * the *generic* enumerator `Tc` of `Universal/Compute.lean` — which knows
-  nothing of `kingAdj` — reproduces the banked king cell `T(3,2) = 10` and
-  the row sum `20` of A006770 in the kernel;
+  nothing of `kingAdj` — reproduces the banked king cell `T(3,2) = 10` in
+  the kernel (and, in `Checks.lean`, the row sum `20` of A006770);
 * the generic pin lemma at `k = 1` produces `Pin.lean`'s `P₁ = 25X − 45` on the
   nose (`kingP1_eq_Pp1`) and hence re-proves `P1_pinned` and `P1_closed`
   through the universal machinery.
@@ -95,7 +95,7 @@ lemma M_king_le : kingLattice.M ≤ 1 :=
 
 /-- `T(3,2) = 10`, via the **generic** enumerator (`results/triangle.txt`),
 kernel-decided: the two enumerators (this one and `Compute.lean`'s `Tc`) are
-forced to the same constant. -/
+forced to the same constant. (`Checks.lean` adds the `n = 3` row sum.) -/
 theorem T_king_3_2 : T kingLattice 3 2 = 10 := by
   rw [← Tc_eq_T_of_M_le_one M_king_le]; decide +kernel
 
@@ -104,9 +104,6 @@ definitional bridge `T_king` (the generic enumerator needs more than 8 GB in
 the kernel here, measured 2026-10-12). -/
 theorem T_king_4_3 : T kingLattice 4 3 = 55 := by
   rw [T_king]; exact Polyplets.T_4_3
-
-/-- A006770 at `n = 3`: `1 + 10 + 9 = 20` fixed polyplets. -/
-theorem king_rowSum_3 : rowSum kingLattice 3 3 = 20 := by decide +kernel
 
 /-! ## `P₁` through the generic pin -/
 
@@ -174,6 +171,5 @@ theorem king_P1_closed_via_universal (n : ℕ) (hn : 3 ≤ n) :
   simp only [b_king, kingP1_eval, Nat.cast_ofNat] at h
   rw [h]
   ring_nf
-
 
 end Polyplets.Universal

@@ -27,8 +27,8 @@ passes through unchanged; the `ℓ`-sum rides along inside `j`) — no convoluti
 collapse is needed here, unlike `d_mu_rec`.
 
 The statement was verified on banked data at all 170 in-range instances
-(`experiments/staircase_check.py`); the numeric gate reproduces
-`T 4 3 = 3·T 3 2 + (25/3)·T 2 2 = 55`.
+(`experiments/staircase_check.py`); `Checks.lean` instantiates it at
+`(k, H) = (1, 2)`: `T 4 3 = 3·T 3 2 + (25/3)·T 2 2 = 55`.
 -/
 
 namespace Polyplets
@@ -127,21 +127,5 @@ theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     rw [h1, h2, h3, h4]
   -- Assemble: heads cancel; interiors agree by `hinterior`.
   rw [hLHS, hhead, hint, hRHStot, hinterior]
-
-/-! ## Numeric gate -/
-
-/-- **Gate (k, H) = (1, 2).** The staircase smoke test:
-`T 4 3 = μ₀·T 3 2 + μ₁·T 2 2`, instantiating `T_staircase 1 2`. -/
-theorem T_staircase_check_k1_H2 :
-    (T 4 3 : ℚ) = mu 0 * T 3 2 + mu 1 * T 2 2 := by
-  have h := T_staircase 1 2 (by norm_num)
-  simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
-    Nat.sub_zero, Nat.sub_self] using h
-
-/-- The `(1, 2)` gate evaluates: `55 = 3·10 + (25/3)·3` from `T 3 2 = 10`,
-`T 2 2 = 3`, `μ₀ = 3`, `μ₁ = 25/3` (verified arithmetic). -/
-theorem T_staircase_value_check :
-    mu 0 * (T 3 2 : ℚ) + mu 1 * (T 2 2 : ℚ) = 55 := by
-  rw [mu_zero, mu_one, T_3_2, T_2_2]; norm_num
 
 end Polyplets

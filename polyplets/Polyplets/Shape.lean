@@ -41,10 +41,9 @@ Faulhaber's formula (`sum_range_pow`) through the standalone lemma
 `exists_poly_sum_Icc`. The onset is `k + 1`, not `k + 2`, because the base
 value is absorbed into the constant term of `δ_k`.
 
-Numeric guard: `shape_production` at `k = 0` plus the single onset value
-`T 1 1 = 1` pins `P_0 = 1`, giving `T(n,n) = 3^(n-1)` (`T_diag_pow`), and from
-it the banked `T 3 3 = 9` and `T 4 4 = 27`. This is exactly the
-shape-plus-points pattern `Pin.lean` runs at `k = 1`.
+`shape_production` at `k = 0` plus the single onset value `T 1 1 = 1` pins
+`P_0 = 1`, giving `T(n,n) = 3^(n-1)` (`T_diag_pow`): the shape-plus-points
+pattern `Pin.lean` runs at `k = 1`.
 -/
 
 namespace Polyplets
@@ -478,12 +477,12 @@ theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree �
   rw [hcast]
   exact hz
 
-/-! ## Numeric guard: the `k = 0` pin
+/-! ## The `k = 0` pin
 
 The Pin pattern run at `k = 0`: `shape_production 0` gives a constant `P₀`,
 the single onset value `T 1 1 = 1` (kernel-decided in `Compute.lean`) pins
-it, and the closed form `T(n,n) = 3^(n-1)` follows, with the banked
-`T 3 3 = 9` and `T 4 4 = 27` as instances. -/
+it, and the closed form `T(n,n) = 3^(n-1)` follows (`Checks.lean` reads the
+banked `T 3 3 = 9` and `T 4 4 = 27` off it). -/
 
 /-- The `k = 0` diagonal pinned: `T(n, n) = 3^(n-1)` for `n ≥ 1`. -/
 theorem T_diag_pow (n : ℕ) (hn : 1 ≤ n) : (T n n : ℚ) = (3 : ℚ) ^ ((n : ℤ) - 1) := by
@@ -498,22 +497,5 @@ theorem T_diag_pow (n : ℕ) (hn : 1 ≤ n) : (T n n : ℚ) = (3 : ℚ) ^ ((n : 
   rw [hPC] at h
   simp only [Nat.sub_zero, eval_C, Nat.cast_zero, mul_zero, sub_zero] at h
   rw [h, ← h1, one_mul]
-
-/-- Guard: the shape-derived closed form gives `T 3 3 = 9` (banked; the
-kernel needs 6 GB to decide it directly). -/
-theorem shape_check_T_3_3 : T 3 3 = 9 := by
-  have h := T_diag_pow 3 (by omega)
-  have he : ((3 : ℕ) : ℤ) - 1 = 2 := by omega
-  rw [he] at h
-  norm_num at h
-  exact_mod_cast h
-
-/-- Guard: the shape-derived `T 4 4 = 27`. -/
-theorem shape_check_T_4_4 : T 4 4 = 27 := by
-  have h := T_diag_pow 4 (by omega)
-  have he : ((4 : ℕ) : ℤ) - 1 = 3 := by omega
-  rw [he] at h
-  norm_num at h
-  exact_mod_cast h
 
 end Polyplets

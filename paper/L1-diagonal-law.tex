@@ -924,8 +924,9 @@ is relevant here:
 \item The per-lattice $P_1$ determinations (\texttt{king\_P1\_*},
   \texttt{square\_P1\_closed}, \texttt{hex\_P1\_closed}) rest on two
   triangle cells per lattice: the king cells are kernel-decided, the square and
-  hex $T(4,3)$ is a hypothesis of the theorem. The cross-family row-sum checks
-  are kernel-decided.
+  hex $T(4,3)$ is a hypothesis of the theorem. The $n = 3$ row sums of the
+  three lattices are kernel-decided validation facts in \texttt{Checks.lean},
+  outside the library.
 \item The $k \le 18$ production pinning (\texttt{grand\_all},
   \texttt{Pk\_prod}) is \emph{conditional on enumerated cells}: the 36 onset
   cells, two per level, are the hypothesis \texttt{BankedAnchors} of the Lean
