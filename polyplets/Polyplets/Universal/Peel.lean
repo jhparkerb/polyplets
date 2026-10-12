@@ -53,7 +53,7 @@ enters at exactly **three** places, all inside class A:
   `L.b * d L k (H-1)` — the king `3` is `L.D.card`, nothing else.
 
 Classes B and C mention adjacency only through connectivity lemmas
-(`conn_seg`, `conn_union`, `conn_shift`), which are lattice-agnostic. No
+(`conn_seg`, `conn_union`, `conn_translate`), which are lattice-agnostic. No
 proof needed the reach `L.M`, the shape of `D`, or any arithmetic of `b`.
 -/
 
@@ -61,58 +61,48 @@ namespace Polyplets.Universal
 
 variable {L : RowLocal}
 
-/-! ## Translation toolkit -/
+/-! ## Translation toolkit, in the `(a, b)` coordinates the bijections use
+
+Everything here is `translate` of `Universal/Defs.lean` with the vector split
+into its two coordinates, which is how the peel and glue maps are written. -/
 
 /-- Translate a cell by `(a, b)`. -/
-def shiftCell (a b : ℤ) (c : ℤ × ℤ) : ℤ × ℤ := (c.1 + a, c.2 + b)
+abbrev shiftCell (a b : ℤ) (c : ℤ × ℤ) : ℤ × ℤ := c + (a, b)
 
-lemma shiftCell_injective (a b : ℤ) : Function.Injective (shiftCell a b) := by
-  intro c d h
-  simp only [shiftCell, Prod.mk.injEq] at h
-  exact Prod.ext_iff.mpr ⟨by omega, by omega⟩
+lemma shiftCell_injective (a b : ℤ) : Function.Injective (shiftCell a b) :=
+  add_left_injective _
 
 /-- Translate every cell of `S` by `(a, b)`. -/
-def shift (a b : ℤ) (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := S.image (shiftCell a b)
+abbrev shift (a b : ℤ) (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := translate (a, b) S
 
 lemma mem_shift {a b : ℤ} {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} :
-    c ∈ shift a b S ↔ (c.1 - a, c.2 - b) ∈ S := by
-  simp only [shift, Finset.mem_image]
-  constructor
-  · rintro ⟨x, hx, rfl⟩
-    simpa [shiftCell] using hx
-  · intro h
-    exact ⟨(c.1 - a, c.2 - b), h, by simp [shiftCell]⟩
+    c ∈ shift a b S ↔ (c.1 - a, c.2 - b) ∈ S :=
+  mem_translate
 
 lemma shift_mem {a b : ℤ} {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} (hc : c ∈ S) :
     shiftCell a b c ∈ shift a b S :=
-  Finset.mem_image_of_mem _ hc
+  translate_mem hc
 
 lemma shift_shift (a b a' b' : ℤ) (S : Finset (ℤ × ℤ)) :
     shift a b (shift a' b' S) = shift (a + a') (b + b') S := by
-  rw [shift, shift, shift, Finset.image_image]
-  congr 1
-  funext c
-  simp only [Function.comp_apply, shiftCell, Prod.mk.injEq]
-  constructor <;> ring
+  rw [shift, shift, translate_translate, shift, Prod.mk_add_mk, add_comm a' a, add_comm b' b]
 
-@[simp] lemma shift_zero (S : Finset (ℤ × ℤ)) : shift 0 0 S = S := by
-  have h : shiftCell 0 0 = id := funext fun c => by simp [shiftCell]
-  rw [shift, h, Finset.image_id]
+@[simp] lemma shift_zero (S : Finset (ℤ × ℤ)) : shift 0 0 S = S := translate_zero S
 
-@[simp] lemma card_shift (a b : ℤ) (S : Finset (ℤ × ℤ)) : (shift a b S).card = S.card :=
-  Finset.card_image_of_injective S (shiftCell_injective a b)
+lemma card_shift (a b : ℤ) (S : Finset (ℤ × ℤ)) : (shift a b S).card = S.card :=
+  card_translate _ S
 
 lemma shift_union (a b : ℤ) (A B : Finset (ℤ × ℤ)) :
     shift a b (A ∪ B) = shift a b A ∪ shift a b B :=
-  Finset.image_union _ _
+  translate_union _ A B
 
 lemma shift_insert (a b : ℤ) (c : ℤ × ℤ) (S : Finset (ℤ × ℤ)) :
     shift a b (insert c S) = insert (shiftCell a b c) (shift a b S) :=
-  Finset.image_insert _ _ _
+  translate_insert _ c S
 
 lemma shift_erase (a b : ℤ) (c : ℤ × ℤ) (S : Finset (ℤ × ℤ)) :
     shift a b (S.erase c) = (shift a b S).erase (shiftCell a b c) :=
-  Finset.image_erase (shiftCell_injective a b) _ _
+  translate_erase _ c S
 
 lemma rowSize_shift (a b : ℤ) (S : Finset (ℤ × ℤ)) (y : ℤ) :
     rowSize (shift a b S) y = rowSize S (y - b) := by
@@ -128,41 +118,13 @@ lemma rowSize_shift (a b : ℤ) (S : Finset (ℤ × ℤ)) (y : ℤ) :
       exact ⟨h1, by omega⟩
   rw [h, card_shift]
 
-/-- **Translation invariance of adjacency.** Both the row case and the two
-vertical cases are stated in differences of coordinates, so a common
-translation cancels. -/
 lemma adj_shiftCell {a b : ℤ} {c d : ℤ × ℤ} (h : Adj L c d) :
-    Adj L (shiftCell a b c) (shiftCell a b d) := by
-  obtain ⟨hne, hcase⟩ := h
-  refine ⟨fun heq => hne (shiftCell_injective a b heq), ?_⟩
-  have hx : (shiftCell a b c).1 - (shiftCell a b d).1 = c.1 - d.1 := by
-    change c.1 + a - (d.1 + a) = c.1 - d.1
-    ring
-  have hx' : (shiftCell a b d).1 - (shiftCell a b c).1 = d.1 - c.1 := by
-    change d.1 + a - (c.1 + a) = d.1 - c.1
-    ring
-  have hy0 : (shiftCell a b c).2 = (shiftCell a b d).2 ↔ c.2 = d.2 := by
-    change (c.2 + b = d.2 + b) ↔ _
-    omega
-  have hy : (shiftCell a b c).2 = (shiftCell a b d).2 + 1 ↔ c.2 = d.2 + 1 := by
-    change (c.2 + b = d.2 + b + 1) ↔ _
-    omega
-  have hy' : (shiftCell a b d).2 = (shiftCell a b c).2 + 1 ↔ d.2 = c.2 + 1 := by
-    change (d.2 + b = c.2 + b + 1) ↔ _
-    omega
-  rcases hcase with ⟨hr, hd⟩ | ⟨hr, hd⟩ | ⟨hr, hd⟩
-  · exact Or.inl ⟨hy0.mpr hr, by rw [hx]; exact hd⟩
-  · exact Or.inr (Or.inl ⟨hy'.mpr hr, by rw [hx']; exact hd⟩)
-  · exact Or.inr (Or.inr ⟨hy.mpr hr, by rw [hx]; exact hd⟩)
+    Adj L (shiftCell a b c) (shiftCell a b d) :=
+  adj_add (a, b) h
 
 lemma conn_shift (a b : ℤ) {S : Finset (ℤ × ℤ)} (h : Conn L S) :
-    Conn L (shift a b S) := by
-  intro p hp q hq
-  obtain ⟨p₀, hp₀, rfl⟩ := Finset.mem_image.mp hp
-  obtain ⟨q₀, hq₀, rfl⟩ := Finset.mem_image.mp hq
-  refine Relation.ReflTransGen.lift (shiftCell a b) ?_ (h p₀ hp₀ q₀ hq₀)
-  rintro x y ⟨hx, hy, hadj⟩
-  exact ⟨shift_mem hx, shift_mem hy, adj_shiftCell hadj⟩
+    Conn L (shift a b S) :=
+  conn_translate (a, b) h
 
 lemma seg_shift (a b r r' : ℤ) (S : Finset (ℤ × ℤ)) :
     seg (shift a b S) r r' = shift a b (seg S (r - b) (r' - b)) := by

@@ -54,11 +54,14 @@ Easiest and most depended-on first. One commit per item.
       GD-2/GD-3 scaffolding (`KingShapeD` transcriptions, `kingSystemGeneric`,
       the `king_*_via_universal` re-derivations). The report cone then runs
       through `Universal/`.
-- [ ] A8. Structures with named fields for `IsCanonical`,
+- [x] A8 (2026-10-12). Structures with named fields for `IsCanonical`,
       `IsCanonicalAnimal`, `Anchored`, `IsVConfig`, `IsVtConfig` (after A7,
       so it is done once); replace the ~200 positional projections
       (`hS.2.2.2.2.2.1`) by field names.
-- [ ] A9. One translation toolkit: `shift`/`shiftCell` (`Peel`), `shiftBy`
+- [x] A9 (2026-10-12: `Universal.translate` with `adj_add`, `conn_image`,
+      `conn_translate` in `Universal/Defs`; the king forms in `Defs`; `shift`
+      and `shiftBy` are abbreviations of it, `expShape` is `translate
+      (-anchor S)`). One translation toolkit: `shift`/`shiftCell` (`Peel`), `shiftBy`
       (`Growth`), the `p + t` images of `Symmetry`, the `sub` maps of
       `UpperBound`, with cardinality, membership, adjacency and connectivity
       invariance proved once.
@@ -107,7 +110,8 @@ Easiest and most depended-on first. One commit per item.
       these modules (A1–A4 applied to `Universal/`, `Upper/`, `Stair*`).
 - [x] B4 (2026-10-12, with A7). `Universal/Compute.pin` duplicates `Pin.pin`;
       `Universal/Peel` duplicates `Peel`.
-- [ ] B5. `Upper`: the `RatCert` data files were converted in place
+- [x] B5 (2026-10-12: regenerated RD=3 against the oracle, 0 diff lines; RD=2
+      likewise). `Upper`: the `RatCert` data files were converted in place
       (`scripts/bui_lists_to_trees.py`); `scripts/gen_bui_cert.lean.py` emits
       the same format but has not been rerun against the oracle; regenerate
       and diff.

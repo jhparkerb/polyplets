@@ -154,6 +154,83 @@ def Conn (L : RowLocal) (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ p ∈ S, ∀ q ∈ S,
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q
 
+/-! ## Translation
+
+Every peeling bijection and both re-anchoring arguments move cell sets by a
+vector. Adjacency depends only on coordinate differences, so translation
+preserves it and hence connectivity; this is proved once here, for every
+lattice. -/
+
+/-- Translate every cell of `S` by the vector `v`. -/
+def translate (v : ℤ × ℤ) (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := S.image (· + v)
+
+lemma mem_translate {v : ℤ × ℤ} {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} :
+    c ∈ translate v S ↔ c - v ∈ S := by
+  simp only [translate, Finset.mem_image]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    simpa using hx
+  · intro h
+    exact ⟨c - v, h, by simp⟩
+
+lemma translate_mem {v : ℤ × ℤ} {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} (hc : c ∈ S) :
+    c + v ∈ translate v S :=
+  Finset.mem_image_of_mem _ hc
+
+lemma translate_translate (v w : ℤ × ℤ) (S : Finset (ℤ × ℤ)) :
+    translate v (translate w S) = translate (w + v) S := by
+  rw [translate, translate, translate, Finset.image_image]
+  congr 1
+  funext c
+  simp only [Function.comp_apply, add_assoc]
+
+@[simp] lemma translate_zero (S : Finset (ℤ × ℤ)) : translate 0 S = S := by
+  simp [translate]
+
+@[simp] lemma card_translate (v : ℤ × ℤ) (S : Finset (ℤ × ℤ)) :
+    (translate v S).card = S.card :=
+  Finset.card_image_of_injective S (add_left_injective v)
+
+lemma translate_union (v : ℤ × ℤ) (A B : Finset (ℤ × ℤ)) :
+    translate v (A ∪ B) = translate v A ∪ translate v B :=
+  Finset.image_union _ _
+
+lemma translate_insert (v : ℤ × ℤ) (c : ℤ × ℤ) (S : Finset (ℤ × ℤ)) :
+    translate v (insert c S) = insert (c + v) (translate v S) :=
+  Finset.image_insert _ _ _
+
+lemma translate_erase (v : ℤ × ℤ) (c : ℤ × ℤ) (S : Finset (ℤ × ℤ)) :
+    translate v (S.erase c) = (translate v S).erase (c + v) :=
+  Finset.image_erase (add_left_injective v) _ _
+
+/-- **Adjacency is translation-invariant**: every clause of `Adj` is a
+statement about coordinate differences. -/
+lemma adj_add {L : RowLocal} (v : ℤ × ℤ) {c d : ℤ × ℤ} (h : Adj L c d) :
+    Adj L (c + v) (d + v) := by
+  obtain ⟨hne, hcase⟩ := h
+  refine ⟨fun heq => hne (add_left_injective v heq), ?_⟩
+  simp only [Prod.fst_add, Prod.snd_add]
+  rcases hcase with ⟨hr, hd⟩ | ⟨hr, hd⟩ | ⟨hr, hd⟩
+  · exact Or.inl ⟨by omega, by rwa [show c.1 + v.1 - (d.1 + v.1) = c.1 - d.1 by omega]⟩
+  · exact Or.inr (Or.inl ⟨by omega, by rwa [show d.1 + v.1 - (c.1 + v.1) = d.1 - c.1 by omega]⟩)
+  · exact Or.inr (Or.inr ⟨by omega, by rwa [show c.1 + v.1 - (d.1 + v.1) = c.1 - d.1 by omega]⟩)
+
+/-- **Connectivity transports along any adjacency-preserving map.** -/
+lemma conn_image {L : RowLocal} {f : ℤ × ℤ → ℤ × ℤ}
+    (hf : ∀ p q, Adj L p q → Adj L (f p) (f q)) {S : Finset (ℤ × ℤ)} (hS : Conn L S) :
+    Conn L (S.image f) := by
+  intro p hp q hq
+  simp only [Finset.mem_image] at hp hq
+  obtain ⟨a, haS, rfl⟩ := hp
+  obtain ⟨b, hbS, rfl⟩ := hq
+  refine Relation.ReflTransGen.lift f (fun x y hxy => ?_) (hS a haS b hbS)
+  exact ⟨Finset.mem_image_of_mem f hxy.1, Finset.mem_image_of_mem f hxy.2.1, hf _ _ hxy.2.2⟩
+
+/-- Connectivity is translation-invariant. -/
+lemma conn_translate {L : RowLocal} (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} (h : Conn L S) :
+    Conn L (translate v S) :=
+  conn_image (fun _ _ => adj_add v) h
+
 /-- `S` is origin-anchored: its bounding box has lower-left corner at the
 origin. This is the translation quotient: every fixed animal has exactly one
 anchored translate. -/

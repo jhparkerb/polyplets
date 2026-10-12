@@ -68,83 +68,36 @@ open scoped Topology
 
 /-! ## Translating a cell set
 
-Everything in the concatenation is a translate, so translation invariance of
-the three canonicity ingredients — cardinality, king adjacency, king
-connectivity — is proved once, generally. -/
+Everything in the concatenation is a translate (`translate` of
+`Universal/Defs.lean`, invariance of the king structure in `Defs.lean`);
+`shiftBy` is that map with the vector written out, and `mem_shiftBy_iff` its
+membership in the component form every proof below wants. -/
 
 /-- `S` translated by the vector `(e, d)`. -/
-def shiftBy (v : ℤ × ℤ) (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
-  S.image fun q => (q.1 + v.1, q.2 + v.2)
+abbrev shiftBy (v : ℤ × ℤ) (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := translate v S
 
-/-- Translating a single cell is injective. -/
-lemma shift_injective (v : ℤ × ℤ) :
-    Function.Injective fun q : ℤ × ℤ => (q.1 + v.1, q.2 + v.2) := by
-  intro x y h
-  simp only [Prod.mk.injEq] at h
-  exact Prod.ext (by omega) (by omega)
-
-/-- Membership in a translate, in component form (the form every proof below
-wants: no projections of literal pairs left over). -/
+/-- Membership in a translate, in component form (no projections of literal
+pairs left over). -/
 lemma mem_shiftBy_iff {e d : ℤ} {q : ℤ × ℤ} {S : Finset (ℤ × ℤ)} :
     q ∈ shiftBy (e, d) S ↔ ∃ p ∈ S, q.1 = p.1 + e ∧ q.2 = p.2 + d := by
-  rw [shiftBy, Finset.mem_image]
+  rw [shiftBy, translate, Finset.mem_image]
   constructor
   · rintro ⟨p, hp, rfl⟩
     exact ⟨p, hp, rfl, rfl⟩
   · rintro ⟨p, hp, h1, h2⟩
     exact ⟨p, hp, Prod.ext h1.symm h2.symm⟩
 
-/-- Translation preserves cardinality. -/
-lemma card_shiftBy (v : ℤ × ℤ) (S : Finset (ℤ × ℤ)) : (shiftBy v S).card = S.card :=
-  Finset.card_image_of_injective _ (shift_injective v)
-
 /-- Two translations compose. -/
 lemma shiftBy_shiftBy (e d e' d' : ℤ) (S : Finset (ℤ × ℤ)) :
     shiftBy (e', d') (shiftBy (e, d) S) = shiftBy (e + e', d + d') S := by
-  simp only [shiftBy, Finset.image_image]
-  refine Finset.image_congr fun q _ => ?_
-  simp only [Function.comp_apply, Prod.mk.injEq]
-  constructor <;> ring
-
-/-- Translating by zero does nothing. -/
-lemma shiftBy_zero (S : Finset (ℤ × ℤ)) : shiftBy (0, 0) S = S := by
-  ext q
-  rw [mem_shiftBy_iff]
-  constructor
-  · rintro ⟨p, hp, h1, h2⟩
-    have : q = p := Prod.ext (by omega) (by omega)
-    rwa [this]
-  · intro hq
-    exact ⟨q, hq, by omega, by omega⟩
+  rw [shiftBy, shiftBy, translate_translate, Prod.mk_add_mk]
 
 /-- **Translation is undone by the opposite translation.** Stated with the
 cancellation as hypotheses so that it applies without any `-0`/`0` mismatch. -/
 lemma shiftBy_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
     (S : Finset (ℤ × ℤ)) : shiftBy (e', d') (shiftBy (e, d) S) = S := by
-  rw [shiftBy_shiftBy, he, hd, shiftBy_zero]
-
-/-- King adjacency is translation-invariant. -/
-lemma kingAdj_shift (v : ℤ × ℤ) {x y : ℤ × ℤ} (h : kingAdj x y) :
-    kingAdj (x.1 + v.1, x.2 + v.2) (y.1 + v.1, y.2 + v.2) := by
-  obtain ⟨hne, h1, h2⟩ := h
-  rw [ne_eq, Prod.ext_iff] at hne
-  refine ⟨by simp only [ne_eq, Prod.mk.injEq]; omega, ?_, ?_⟩
-  · change |x.1 + v.1 - (y.1 + v.1)| ≤ 1
-    rw [show x.1 + v.1 - (y.1 + v.1) = x.1 - y.1 by ring]; exact h1
-  · change |x.2 + v.2 - (y.2 + v.2)| ≤ 1
-    rw [show x.2 + v.2 - (y.2 + v.2) = x.2 - y.2 by ring]; exact h2
-
-/-- King connectivity is translation-invariant. -/
-lemma kingConnected_shiftBy (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} (h : KingConnected S) :
-    KingConnected (shiftBy v S) := by
-  intro d hd e he
-  rw [shiftBy, Finset.mem_image] at hd he
-  obtain ⟨x, hx, rfl⟩ := hd
-  obtain ⟨y, hy, rfl⟩ := he
-  refine Relation.ReflTransGen.lift (fun q : ℤ × ℤ => (q.1 + v.1, q.2 + v.2))
-    (fun u w huw => ?_) (h x hx y hy)
-  exact ⟨by rw [shiftBy]; exact Finset.mem_image_of_mem _ huw.1,
-    by rw [shiftBy]; exact Finset.mem_image_of_mem _ huw.2.1, kingAdj_shift _ huw.2.2⟩
+  rw [shiftBy_shiftBy, he, hd]
+  exact translate_zero S
 
 /-- King paths reverse: the step relation is symmetric, so its reflexive
 transitive closure is. -/
@@ -398,11 +351,11 @@ theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
     IsCanonicalAnimal (m + n) (concat A B) := by
   have hcard : (concat A B).card = m + n := by
     rw [concat, Finset.card_union_of_disjoint (concat_disjoint hA.anchored.x_nonneg hB.anchored.x_nonneg),
-      card_shiftBy, card_shiftBy, hA.card, hB.card]
+      card_translate, card_translate, hA.card, hB.card]
   have hconn : KingConnected (concat A B) := by
     rw [concat]
-    refine kingConnected_union_of_adj (kingConnected_shiftBy _ hA.conn)
-      (kingConnected_shiftBy _ hB.conn) (bridgeA_mem hA) (bridgeB_mem hB) ?_
+    refine kingConnected_union_of_adj (kingConnected_translate _ hA.conn)
+      (kingConnected_translate _ hB.conn) (bridgeA_mem hA) (bridgeB_mem hB) ?_
     refine ⟨by simp only [ne_eq, Prod.mk.injEq]; omega, ?_, ?_⟩
     · change |(maxX A : ℤ) - ((maxX A : ℤ) + 1)| ≤ 1
       rw [abs_le]; omega
@@ -539,7 +492,7 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnim
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   have hmem : (maxX A + 1) ∈ {k : ℕ | (leftOf (concat A B) (k : ℤ)).card = m} := by
     change (leftOf (concat A B) ((maxX A + 1 : ℕ) : ℤ)).card = m
-    rw [hcast, leftOf_concat hA hB, card_shiftBy, hA.card]
+    rw [hcast, leftOf_concat hA hB, card_translate, hA.card]
   have hlow : ∀ k : ℕ, (k : ℤ) ≤ (maxX A : ℤ) → (leftOf (concat A B) (k : ℤ)).card < m := by
     intro k hk
     have hsub : leftOf (concat A B) (k : ℤ) ⊆ shiftBy (0, liftA A B) A := by
@@ -559,7 +512,7 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnim
     calc (leftOf (concat A B) (k : ℤ)).card
         < (shiftBy (0, liftA A B) A).card :=
           Finset.card_lt_card ((Finset.ssubset_iff_of_subset hsub).mpr ⟨_, hbr, hbrn⟩)
-      _ = m := by rw [card_shiftBy, hA.card]
+      _ = m := by rw [card_translate, hA.card]
   rw [cutAt]
   refine le_antisymm (Nat.sInf_le hmem) ?_
   by_contra hcon

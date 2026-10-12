@@ -35,7 +35,31 @@ def KingConnected (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ p ∈ S, ∀ q ∈ S,
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q
 
-export Universal (Anchored)
+export Universal (Anchored translate mem_translate translate_mem translate_translate translate_zero
+  card_translate translate_union translate_insert translate_erase)
+
+/-- King adjacency is translation-invariant. -/
+lemma kingAdj_add (v : ℤ × ℤ) {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj (p + v) (q + v) := by
+  obtain ⟨hne, h1, h2⟩ := h
+  refine ⟨fun hc => hne (add_left_injective v hc), ?_, ?_⟩
+  · simpa using h1
+  · simpa using h2
+
+/-- King connectivity transports along any adjacency-preserving map. -/
+lemma kingConnected_image {f : ℤ × ℤ → ℤ × ℤ}
+    (hadj : ∀ p q, kingAdj p q → kingAdj (f p) (f q))
+    {S : Finset (ℤ × ℤ)} (hS : KingConnected S) : KingConnected (S.image f) := by
+  intro p hp q hq
+  simp only [Finset.mem_image] at hp hq
+  obtain ⟨a, haS, rfl⟩ := hp
+  obtain ⟨b, hbS, rfl⟩ := hq
+  refine Relation.ReflTransGen.lift f (fun x y hxy => ?_) (hS a haS b hbS)
+  exact ⟨Finset.mem_image_of_mem f hxy.1, Finset.mem_image_of_mem f hxy.2.1, hadj _ _ hxy.2.2⟩
+
+/-- King connectivity is translation-invariant. -/
+lemma kingConnected_translate (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} (h : KingConnected S) :
+    KingConnected (translate v S) :=
+  kingConnected_image (fun _ _ => kingAdj_add v) h
 
 /-- `S` is the canonical (origin-anchored) representative of a fixed polyplet of
 `n` cells with bounding-box height exactly `H`: it has `n` cells, is

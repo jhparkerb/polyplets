@@ -180,34 +180,6 @@ end D4
 
 /-! ## Translations and re-anchoring -/
 
-/-- Translation by `t` preserves king adjacency. -/
-lemma kingAdj_add {p q : ℤ × ℤ} (t : ℤ × ℤ) (hpq : kingAdj p q) :
-    kingAdj (p + t) (q + t) := by
-  obtain ⟨hne, h1, h2⟩ := hpq
-  refine ⟨fun hc => hne (by simpa using hc), ?_, ?_⟩ <;> simpa using ‹_›
-
-/-- King paths transport along any adjacency-preserving map. -/
-lemma reflTransGen_image {f : ℤ × ℤ → ℤ × ℤ} (hadj : ∀ p q, kingAdj p q → kingAdj (f p) (f q))
-    {S : Finset (ℤ × ℤ)} {a b : ℤ × ℤ}
-    (hab : Relation.ReflTransGen (fun x y => x ∈ S ∧ y ∈ S ∧ kingAdj x y) a b) :
-    Relation.ReflTransGen
-      (fun x y => x ∈ S.image f ∧ y ∈ S.image f ∧ kingAdj x y) (f a) (f b) := by
-  induction hab with
-  | refl => exact Relation.ReflTransGen.refl
-  | @tail c c' _ hcc' ih =>
-      exact ih.tail ⟨Finset.mem_image_of_mem f hcc'.1,
-        Finset.mem_image_of_mem f hcc'.2.1, hadj _ _ hcc'.2.2⟩
-
-/-- King-connectivity is preserved by any adjacency-preserving map. -/
-lemma kingConnected_image {f : ℤ × ℤ → ℤ × ℤ}
-    (hadj : ∀ p q, kingAdj p q → kingAdj (f p) (f q))
-    {S : Finset (ℤ × ℤ)} (hS : KingConnected S) : KingConnected (S.image f) := by
-  intro p hp q hq
-  simp only [Finset.mem_image] at hp hq
-  obtain ⟨a, haS, rfl⟩ := hp
-  obtain ⟨b, hbS, rfl⟩ := hq
-  exact reflTransGen_image hadj (hS a haS b hbS)
-
 /-- `IsCanonicalAnimal` is "`n` cells, king-connected, anchored". -/
 lemma isCanonicalAnimal_iff (n : ℕ) (S : Finset (ℤ × ℤ)) :
     IsCanonicalAnimal n S ↔ S.card = n ∧ KingConnected S ∧ Anchored S :=

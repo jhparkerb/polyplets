@@ -778,8 +778,7 @@ row `0`, and `anchorX` picks the leftmost cell of that row. -/
 noncomputable def anchor (S : Finset (ℤ × ℤ)) : ℤ × ℤ := ((anchorX S : ℤ), 0)
 
 /-- `S` translated so that its scan-least cell sits at the origin. -/
-noncomputable def expShape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
-  S.image fun q => (q.1 - (anchor S).1, q.2 - (anchor S).2)
+noncomputable def expShape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := translate (-anchor S) S
 
 /-- Row `0` of a canonical animal is inhabited, so `anchorX` is a genuine
 minimum. -/
@@ -809,64 +808,35 @@ lemma anchor_min {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S
   simp only [anchor]
   omega
 
-/-- Translation is injective on cells. -/
-private lemma sub_injective (a : ℤ × ℤ) :
-    Function.Injective fun q : ℤ × ℤ => (q.1 - a.1, q.2 - a.2) := by
-  intro x y h
-  simp only [Prod.mk.injEq] at h
-  exact Prod.ext (by omega) (by omega)
-
-/-- Translation preserves king adjacency. -/
-private lemma kingAdj_sub (a : ℤ × ℤ) {x y : ℤ × ℤ} (h : kingAdj x y) :
-    kingAdj (x.1 - a.1, x.2 - a.2) (y.1 - a.1, y.2 - a.2) := by
-  obtain ⟨hne, h1, h2⟩ := h
-  rw [ne_eq, Prod.ext_iff] at hne
-  refine ⟨by simp only [ne_eq, Prod.mk.injEq]; omega, ?_, ?_⟩
-  · change |x.1 - a.1 - (y.1 - a.1)| ≤ 1
-    rw [show x.1 - a.1 - (y.1 - a.1) = x.1 - y.1 by ring]; exact h1
-  · change |x.2 - a.2 - (y.2 - a.2)| ≤ 1
-    rw [show x.2 - a.2 - (y.2 - a.2) = x.2 - y.2 by ring]; exact h2
-
 /-- **A canonical animal re-anchors to a shape.** Size and connectivity survive
 the translation; the origin is the image of the anchor; and every other cell is
 scan-greater because the anchor is scan-least. -/
 lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
     IsShape n (expShape S) where
-  card := by rw [expShape, Finset.card_image_of_injective _ (sub_injective _), hS.card]
-  conn := by
-    intro d hd e he
-    rw [expShape, Finset.mem_image] at hd he
-    obtain ⟨x, hx, rfl⟩ := hd
-    obtain ⟨y, hy, rfl⟩ := he
-    refine Relation.ReflTransGen.lift
-      (fun q : ℤ × ℤ => (q.1 - (anchor S).1, q.2 - (anchor S).2)) (fun u v huv => ?_)
-      (hS.conn x hx y hy)
-    exact ⟨by rw [expShape]; exact Finset.mem_image_of_mem _ huv.1,
-      by rw [expShape]; exact Finset.mem_image_of_mem _ huv.2.1, kingAdj_sub _ huv.2.2⟩
+  card := by rw [expShape, card_translate, hS.card]
+  conn := kingConnected_translate _ hS.conn
   origin := by
-    have := Finset.mem_image_of_mem (fun q : ℤ × ℤ => (q.1 - (anchor S).1, q.2 - (anchor S).2))
-      (anchor_mem hS)
-    simpa [expShape] using this
+    have := translate_mem (v := -anchor S) (anchor_mem hS)
+    rwa [add_neg_cancel, show ((0 : ℤ × ℤ)) = ((0 : ℤ), (0 : ℤ)) from rfl] at this
   scan := by
     intro d hd hd0
-    rw [expShape, Finset.mem_image] at hd
+    rw [expShape, translate, Finset.mem_image] at hd
     obtain ⟨q, hq, rfl⟩ := hd
     have hy := hS.anchored.y_nonneg q hq
     have hane : (anchor S).2 = 0 := rfl
-    simp only [ne_eq, Prod.mk.injEq, not_and] at hd0
-    simp only [scanPos, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq]
+    simp only [ne_eq, Prod.ext_iff, Prod.fst_add, Prod.snd_add, Prod.fst_neg, Prod.snd_neg,
+      not_and] at hd0
+    simp only [scanPos, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq, Prod.fst_add,
+      Prod.snd_add, Prod.fst_neg, Prod.snd_neg]
     rcases eq_or_lt_of_le hy with hy0 | hy0
     · have hmin := anchor_min hS hq hy0.symm
-      have : ¬ (q.1 - (anchor S).1 = 0) := fun h => hd0 h (by omega)
+      have : ¬ (q.1 + -(anchor S).1 = 0) := fun h => hd0 h (by omega)
       right; omega
     · left; omega
 
 /-- Re-anchoring is undone by translating back. -/
-lemma expShape_image (S : Finset (ℤ × ℤ)) :
-    (expShape S).image (fun d => (d.1 + (anchor S).1, d.2 + (anchor S).2)) = S := by
-  rw [expShape, Finset.image_image]
-  ext q
-  simp [Function.comp_def]
+lemma expShape_image (S : Finset (ℤ × ℤ)) : translate (anchor S) (expShape S) = S := by
+  rw [expShape, translate_translate, neg_add_cancel, translate_zero]
 
 /-- **Re-anchoring loses nothing.** Two canonical animals with the same shape
 have the same anchor: the animal's own `min x = 0` clause forces the anchor's
@@ -878,12 +848,11 @@ lemma expShape_injOn (n : ℕ) :
       expShape T₁ = expShape T₂ → (anchor T₁).1 ≤ (anchor T₂).1 := by
     intro T₁ T₂ hT₁ hT₂ h
     obtain ⟨q, hq, hq0⟩ := hT₁.anchored.x_zero
-    have hd : (q.1 - (anchor T₁).1, q.2 - (anchor T₁).2) ∈ expShape T₂ := by
-      rw [← h, expShape]; exact Finset.mem_image_of_mem _ hq
-    rw [expShape, Finset.mem_image] at hd
-    obtain ⟨r, hr, hre⟩ := hd
-    have hr0 : 0 ≤ r.1 := hT₂.anchored.x_nonneg r hr
-    simp only [Prod.mk.injEq] at hre
+    have hd : q + -anchor T₁ ∈ expShape T₂ := by
+      rw [← h, expShape]; exact translate_mem hq
+    rw [expShape, mem_translate] at hd
+    have hr0 := hT₂.anchored.x_nonneg _ hd
+    simp only [Prod.fst_add, Prod.fst_sub, Prod.fst_neg] at hr0
     omega
   intro S₁ h₁ S₂ h₂ heq
   have ha : anchor S₁ = anchor S₂ := by
@@ -892,10 +861,8 @@ lemma expShape_injOn (n : ℕ) :
     simp only [anchor] at e1 e2 ⊢
     have : (anchorX S₁ : ℤ) = (anchorX S₂ : ℤ) := by omega
     rw [this]
-  calc S₁ = (expShape S₁).image (fun d => (d.1 + (anchor S₁).1, d.2 + (anchor S₁).2)) :=
-        (expShape_image S₁).symm
-    _ = (expShape S₂).image (fun d => (d.1 + (anchor S₂).1, d.2 + (anchor S₂).2)) := by
-        rw [heq, ha]
+  calc S₁ = translate (anchor S₁) (expShape S₁) := (expShape_image S₁).symm
+    _ = translate (anchor S₂) (expShape S₂) := by rw [heq, ha]
     _ = S₂ := expShape_image S₂
 
 /-! ## The bound -/
