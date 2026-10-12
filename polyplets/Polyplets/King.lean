@@ -83,17 +83,30 @@ theorem Dc_king (k H : ℕ) : Dc kingLattice k H = Polyplets.Dc k H := by
   change (Dc kingLattice k H).card = (Polyplets.Dc k H).card
   rw [Dc_king]
 
-/-- V-configurations agree. -/
+/-- V-configurations agree: the universal `cap = 1` cap row is the king file's
+`row_top`. -/
 theorem isVConfig_king {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsVConfig kingLattice ℓ j S ↔ Polyplets.IsVConfig ℓ j S :=
-  ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.row_top, h.multi, conn_king.mp h.conn⟩,
-   fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.row_top, h.multi, conn_king.mpr h.conn⟩⟩
+    IsVConfig kingLattice ℓ j S ↔ Polyplets.IsVConfig ℓ j S := by
+  constructor
+  · intro h
+    exact ⟨h.card, h.origin, fun p hp => by simpa using h.rows p hp, h.row_zero,
+      h.cap_walk _ (by omega) (by simp), h.multi, conn_king.mp h.conn⟩
+  · intro h
+    refine ⟨h.card, h.origin, fun p hp => by simpa using h.rows p hp, h.row_zero,
+      fun y h1 h2 => ?_, h.multi, conn_king.mpr h.conn⟩
+    rw [show y = (ℓ : ℤ) + 1 by push_cast at h2; omega]
+    exact h.row_top
 
 /-- Vᵗ-configurations agree. -/
 theorem isVtConfig_king {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsVtConfig kingLattice ℓ j S ↔ Polyplets.IsVtConfig ℓ j S :=
-  ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.multi, conn_king.mp h.conn⟩,
-   fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.multi, conn_king.mpr h.conn⟩⟩
+    IsVtConfig kingLattice ℓ j S ↔ Polyplets.IsVtConfig ℓ j S := by
+  constructor
+  · intro h
+    exact ⟨h.card, h.origin, fun p hp => by simpa using h.rows p hp, h.row_zero, h.multi,
+      conn_king.mp h.conn⟩
+  · intro h
+    exact ⟨h.card, h.origin, fun p hp => by simpa using h.rows p hp, h.row_zero,
+      fun y h1 h2 => by push_cast at h2; omega, h.multi, conn_king.mpr h.conn⟩
 
 /-- The V-families agree. -/
 theorem CFGV_king (ℓ j : ℕ) : CFGV kingLattice ℓ j = Polyplets.CFGV ℓ j := by

@@ -81,8 +81,13 @@ Easiest and most depended-on first. One commit per item.
       `P2_closed` returns unconditional.
 - [x] A13 (2026-10-12). `Separation.reachable_seg_aux`: one proof for both cut lines
       instead of two 30-line mirror-image branches.
-- [ ] A14. `Peel`: classes B and C share one peel/glue pair parametrized by
-      whether a walk cell caps the cluster, instead of two ~350-line copies.
+- [x] A14 (2026-10-12: `IsConfig L cap ℓ j` in `Universal/Weights` with
+      `IsVConfig = IsConfig 1`, `IsVtConfig = IsConfig 0`; `peel cap H`,
+      `cluster_facts`, `peel_mem_and_glue`, `glue_mem_and_peel`, `card_class`
+      in `Peel`, with `card_classB`/`card_classC` as the two instances; 405
+      lines gone). `Peel`: classes B and C share one peel/glue pair
+      parametrized by whether a walk cell caps the cluster, instead of two
+      ~350-line copies.
 - [x] A15 (2026-10-12: `D4 = DihedralGroup 4`, `C4 = Multiplicative (ZMod 4)`
       through `rotHom`; the action is built from one quarter turn and one
       mirror). `Symmetry`: `DihedralGroup 4` from Mathlib in place of the

@@ -24,19 +24,21 @@ the row profile near the top and three peeling bijections:
   and re-anchoring is a bijection onto `L.D × Dc L k (H-1)`; the extra datum is
   the x-offset of the top cell over the second-top cell, which is an up-offset
   of `L` (`card_classA`).
-* **Class B** (walk top, multi second-top row): peeling the maximal cluster
-  `[b, H-2]` together with the walk cells directly below (row `b-1`) and on
-  top (row `H-1`) is a bijection onto `Σ (j,ℓ), CFGV L ℓ j × Dc L (k-j) (H-1-ℓ)`
-  (`card_classB`).
-* **Class C** (multi top row, for the c-identity): the same with the cluster
-  reaching the top edge, onto `Σ (j,ℓ), CFGVt L ℓ j × Dc L (k-j) (H-ℓ)`
+* **Classes B and C** are one bijection, `peel cap H` with `glueTop`, for a
+  cluster whose top row `H - 1 - cap` has `cap` walk rows above it
+  (`card_class`): peeling the maximal cluster `[b, H-1-cap]` together with the
+  walk cell directly below (row `b-1`) and the `cap` walk cells above is a
+  bijection onto `Σ (j,ℓ), CFG L cap ℓ j × Dc L (k-j) (H-cap-ℓ)`. Class B
+  (walk top, multi second-top row) is `cap = 1`, onto the `V`-configurations
+  (`card_classB`); class C (multi top row, for the c-identity) is `cap = 0`,
+  the cluster reaching the top edge, onto the `Vᵗ`-configurations
   (`card_classC`).
 
-All three share one x-renormalization pattern: the peeled configuration is
+Both share one x-renormalization pattern: the peeled configuration is
 based at its bottom walk cell (making it x-shift-invariant), the remainder is
 re-anchored by `xNorm`, and gluing shifts the configuration onto the
 remainder's unique top cell. Membership is always matched against the
-propositional characterizations `mem_Dc`, `mem_CFGV`, `mem_CFGVt`.
+propositional characterizations `mem_Dc` and `mem_CFG`.
 
 ## The verbatim wager, settled
 
@@ -732,49 +734,64 @@ the based configuration, and the re-anchored walk-top remainder. -/
 abbrev PeelData : Type :=
   Σ _ : ℕ, Σ _ : ℕ, Finset (ℤ × ℤ) × Finset (ℤ × ℤ)
 
-/-- Shared backward map of classes B and C: shift the configuration so its
-origin lands on the remainder's unique top cell (row `t - ℓ`), union,
-re-anchor. `t` is the cluster's top row: `H-2` for class B, `H-1` for
-class C. -/
+/-- Backward map of classes B and C: shift the configuration so its origin
+lands on the remainder's unique top cell (row `t - ℓ`), union, re-anchor.
+`t` is the cluster's top row: `H - 2` for class B, `H - 1` for class C. -/
 noncomputable def glueTop (t : ℤ) (x : PeelData) : Finset (ℤ × ℤ) :=
   xNorm (x.2.2.2 ∪
     shift (rowCell x.2.2.2 (t - (x.2.1 : ℤ))).1 (t - (x.2.1 : ℤ)) x.2.2.1)
 
-/-- Class-B forward map: peel the maximal cluster over rows
-`[b, H-2]` (`b = clusterBottom`) together with its bracketing walk cells
-(rows `b-1` and `H-1`); the configuration is based at the row-`(b-1)` walk
-cell, the remainder `[0, b-1]` is re-anchored. -/
-noncomputable def peelB (H : ℕ) (S : Finset (ℤ × ℤ)) : PeelData :=
-  ⟨(seg S (clusterBottom S ((H : ℤ) - 2)) ((H : ℤ) - 2)).card
-      - ((H : ℤ) - 1 - clusterBottom S ((H : ℤ) - 2)).toNat,
-   ((H : ℤ) - 1 - clusterBottom S ((H : ℤ) - 2)).toNat,
-   shift (-(rowCell S (clusterBottom S ((H : ℤ) - 2) - 1)).1)
-       (-(clusterBottom S ((H : ℤ) - 2) - 1))
-       (seg S (clusterBottom S ((H : ℤ) - 2) - 1) ((H : ℤ) - 1)),
-   xNorm (seg S 0 (clusterBottom S ((H : ℤ) - 2) - 1))⟩
+/-- Forward map of classes B and C, for the cluster whose top row
+`t = H - 1 - cap` has `cap` walk rows above it: peel the maximal cluster over
+rows `[b, t]` (`b = clusterBottom`) together with the walk cell on row `b - 1`
+and the `cap` walk cells above; the configuration is based at the row-`(b-1)`
+walk cell, the remainder `[0, b-1]` is re-anchored. Class B is `cap = 1`,
+class C is `cap = 0`. -/
+noncomputable def peel (cap H : ℕ) (S : Finset (ℤ × ℤ)) : PeelData :=
+  ⟨(seg S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card
+      - ((H : ℤ) - cap - clusterBottom S ((H : ℤ) - 1 - cap)).toNat,
+   ((H : ℤ) - cap - clusterBottom S ((H : ℤ) - 1 - cap)).toNat,
+   shift (-(rowCell S (clusterBottom S ((H : ℤ) - 1 - cap) - 1)).1)
+       (-(clusterBottom S ((H : ℤ) - 1 - cap) - 1))
+       (seg S (clusterBottom S ((H : ℤ) - 1 - cap) - 1) ((H : ℤ) - 1)),
+   xNorm (seg S 0 (clusterBottom S ((H : ℤ) - 1 - cap) - 1))⟩
 
-/-- Class-C forward map: as `peelB`, with the cluster reaching the top edge
-(rows `[b, H-1]`), so only the bottom bracketing walk cell exists. -/
-noncomputable def peelC (H : ℕ) (S : Finset (ℤ × ℤ)) : PeelData :=
-  ⟨(seg S (clusterBottom S ((H : ℤ) - 1)) ((H : ℤ) - 1)).card
-      - ((H : ℤ) - clusterBottom S ((H : ℤ) - 1)).toNat,
-   ((H : ℤ) - clusterBottom S ((H : ℤ) - 1)).toNat,
-   shift (-(rowCell S (clusterBottom S ((H : ℤ) - 1) - 1)).1)
-       (-(clusterBottom S ((H : ℤ) - 1) - 1))
-       (seg S (clusterBottom S ((H : ℤ) - 1) - 1) ((H : ℤ) - 1)),
-   xNorm (seg S 0 (clusterBottom S ((H : ℤ) - 1) - 1))⟩
+/-- The `cap` rows above row `H - 1 - cap` are walk rows: the source
+condition of classes B and C besides the multi row `H - 1 - cap` itself. -/
+def CapWalk (cap H : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
+  ∀ y ∈ Finset.Ioc ((H : ℤ) - 1 - cap) ((H : ℤ) - 1), rowSize S y = 1
 
-/-- The class-B target: `V`-configurations paired with walk-top remainders,
-indexed by `(j, ℓ)`. -/
-noncomputable def targetB (L : RowLocal) (k H : ℕ) : Finset PeelData :=
+noncomputable instance (cap H : ℕ) (S : Finset (ℤ × ℤ)) : Decidable (CapWalk cap H S) := by
+  unfold CapWalk
+  infer_instance
+
+lemma capWalk_iff {cap H : ℕ} {S : Finset (ℤ × ℤ)} :
+    CapWalk cap H S ↔ ∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 → rowSize S y = 1 := by
+  simp only [CapWalk, Finset.mem_Ioc, and_imp]
+
+/-- With one cap row, `CapWalk` says the top row is a walk row. -/
+lemma capWalk_one_iff {H : ℕ} {S : Finset (ℤ × ℤ)} :
+    CapWalk 1 H S ↔ rowSize S ((H : ℤ) - 1) = 1 := by
+  rw [capWalk_iff]
+  constructor
+  · intro h
+    exact h _ (by omega) le_rfl
+  · intro h y h1 h2
+    rw [show y = (H : ℤ) - 1 from by push_cast at h1; omega]
+    exact h
+
+/-- With no cap row, `CapWalk` is vacuous. -/
+lemma capWalk_zero {H : ℕ} {S : Finset (ℤ × ℤ)} : CapWalk 0 H S := by
+  rw [capWalk_iff]
+  intro y h1 h2
+  push_cast at h1
+  omega
+
+/-- The target of classes B and C: configurations with `cap` walk rows on top,
+paired with walk-top remainders, indexed by `(j, ℓ)`. -/
+noncomputable def target (L : RowLocal) (cap k H : ℕ) : Finset PeelData :=
   (Finset.Icc 1 k).sigma fun j => (Finset.Icc 1 j).sigma fun ℓ =>
-    CFGV L ℓ j ×ˢ Dc L (k - j) (H - 1 - ℓ)
-
-/-- The class-C target: `Vᵗ`-configurations paired with walk-top remainders,
-indexed by `(j, ℓ)`. -/
-noncomputable def targetC (L : RowLocal) (k H : ℕ) : Finset PeelData :=
-  (Finset.Icc 1 k).sigma fun j => (Finset.Icc 1 j).sigma fun ℓ =>
-    CFGVt L ℓ j ×ˢ Dc L (k - j) (H - ℓ)
+    CFG L cap ℓ j ×ˢ Dc L (k - j) (H - cap - ℓ)
 
 lemma xNorm_def' (S : Finset (ℤ × ℤ)) : xNorm S = shift (-minX S) 0 S := rfl
 
@@ -826,31 +843,44 @@ lemma xNorm_seg_mem_Dc {k' H' : ℕ} {S : Finset (ℤ × ℤ)} {b : ℤ}
   rw [rowSize_xNorm, show (H' : ℤ) - 1 = b - 1 by omega, rowSize_seg (by omega) le_rfl]
   exact hwb
 
-/-- Cluster bookkeeping for class B (`t = H - 2`, a walk row above the
-cluster): bounds of `b = clusterBottom`, the walk row below the cluster, and
-the three cell-count identities the bijection needs. -/
-lemma clusterB_facts {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
-    (hSc : IsCanonical L (H + k) H S) (hw1 : rowSize S ((H : ℤ) - 1) = 1)
-    (hm : ¬ rowSize S ((H : ℤ) - 2) = 1) :
-    1 ≤ clusterBottom S ((H : ℤ) - 2) ∧ clusterBottom S ((H : ℤ) - 2) ≤ (H : ℤ) - 2 ∧
-    (∀ y, clusterBottom S ((H : ℤ) - 2) ≤ y → y ≤ (H : ℤ) - 2 → 2 ≤ rowSize S y) ∧
-    rowSize S (clusterBottom S ((H : ℤ) - 2) - 1) = 1 ∧
-    ((seg S 0 (clusterBottom S ((H : ℤ) - 2) - 1)).card
-      + (seg S (clusterBottom S ((H : ℤ) - 2)) ((H : ℤ) - 2)).card + 1 = H + k) ∧
-    (clusterBottom S ((H : ℤ) - 2)
-      ≤ ((seg S 0 (clusterBottom S ((H : ℤ) - 2) - 1)).card : ℤ)) ∧
-    (2 * ((H : ℤ) - 1 - clusterBottom S ((H : ℤ) - 2))
-      ≤ ((seg S (clusterBottom S ((H : ℤ) - 2)) ((H : ℤ) - 2)).card : ℤ)) ∧
-    (seg S (clusterBottom S ((H : ℤ) - 2) - 1) ((H : ℤ) - 1)).card
-      = (seg S (clusterBottom S ((H : ℤ) - 2)) ((H : ℤ) - 2)).card + 2 := by
+/-- Rows that each hold one cell contribute one each to a row sum. -/
+lemma sum_rowSize_walk {S : Finset (ℤ × ℤ)} {a b : ℤ}
+    (h : ∀ y, a ≤ y → y ≤ b → rowSize S y = 1) :
+    ∑ y ∈ Finset.Icc a b, rowSize S y = (b + 1 - a).toNat := by
+  rw [Finset.sum_congr rfl fun y hy => h y (Finset.mem_Icc.mp hy).1 (Finset.mem_Icc.mp hy).2,
+    Finset.sum_const, smul_eq_mul, mul_one, Int.card_Icc]
+
+/-- Cluster bookkeeping for classes B and C, for the cluster whose top row is
+`t = H - 1 - cap` with `cap` walk rows above it: bounds of `b = clusterBottom`,
+the walk row below the cluster, and the cell-count identities the bijection
+needs. -/
+lemma cluster_facts {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (ℤ × ℤ)}
+    (hSc : IsCanonical L (H + k) H S)
+    (hw : ∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 → rowSize S y = 1)
+    (hm : ¬ rowSize S ((H : ℤ) - 1 - cap) = 1) :
+    1 ≤ clusterBottom S ((H : ℤ) - 1 - cap) ∧
+    clusterBottom S ((H : ℤ) - 1 - cap) ≤ (H : ℤ) - 1 - cap ∧
+    (∀ y, clusterBottom S ((H : ℤ) - 1 - cap) ≤ y → y ≤ (H : ℤ) - 1 - cap →
+      2 ≤ rowSize S y) ∧
+    rowSize S (clusterBottom S ((H : ℤ) - 1 - cap) - 1) = 1 ∧
+    ((seg S 0 (clusterBottom S ((H : ℤ) - 1 - cap) - 1)).card
+      + (seg S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card + cap
+        = H + k) ∧
+    (clusterBottom S ((H : ℤ) - 1 - cap)
+      ≤ ((seg S 0 (clusterBottom S ((H : ℤ) - 1 - cap) - 1)).card : ℤ)) ∧
+    (2 * ((H : ℤ) - cap - clusterBottom S ((H : ℤ) - 1 - cap))
+      ≤ ((seg S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card : ℤ)) ∧
+    (seg S (clusterBottom S ((H : ℤ) - 1 - cap) - 1) ((H : ℤ) - 1)).card
+      = (seg S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card + 1 + cap := by
+  set t : ℤ := (H : ℤ) - 1 - cap with ht_def
   have hocc : ∀ y, 0 ≤ y → y ≤ (H : ℤ) - 1 → 1 ≤ rowSize S y := fun y h0 h1 =>
     Finset.card_pos.mpr (canonical_fiber_nonempty hSc h0 h1)
-  have hm2 : 2 ≤ rowSize S ((H : ℤ) - 2) := by
-    have := hocc ((H : ℤ) - 2) (by omega) (by omega)
+  have hm2 : 2 ≤ rowSize S t := by
+    have := hocc t (by omega) (by omega)
     omega
   obtain ⟨⟨hb0, hbt⟩, hmulti, hminle, hwalk'⟩ :=
-    clusterBottom_spec (show (0 : ℤ) ≤ (H : ℤ) - 2 by omega) hm2
-  set b := clusterBottom S ((H : ℤ) - 2) with hb_def
+    clusterBottom_spec (show (0 : ℤ) ≤ t by omega) hm2
+  set b := clusterBottom S t with hb_def
   -- total cell count as a row sum
   have hself : seg S 0 ((H : ℤ) - 1) = S :=
     seg_eq_self fun p hp => ⟨hSc.anchored.y_nonneg p hp, hSc.y_le p hp⟩
@@ -863,19 +893,15 @@ lemma clusterB_facts {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
       (by omega) (by omega)
     simpa using h
   have hsplit2 : ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y
-      = (∑ y ∈ Finset.Icc b ((H : ℤ) - 2), rowSize S y)
-        + ∑ y ∈ Finset.Icc ((H : ℤ) - 1) ((H : ℤ) - 1), rowSize S y := by
-    have h := sum_Icc_split (rowSize S) (a := b) (b := (H : ℤ) - 2) (c := (H : ℤ) - 1)
-      (by omega) (by omega)
-    rw [show (H : ℤ) - 2 + 1 = (H : ℤ) - 1 from by ring] at h
-    exact h
-  have htop1 : ∑ y ∈ Finset.Icc ((H : ℤ) - 1) ((H : ℤ) - 1), rowSize S y = 1 := by
-    rw [Finset.Icc_self, Finset.sum_singleton]
-    exact hw1
+      = (∑ y ∈ Finset.Icc b t, rowSize S y)
+        + ∑ y ∈ Finset.Icc (t + 1) ((H : ℤ) - 1), rowSize S y :=
+    sum_Icc_split (rowSize S) (by omega) (by omega)
+  have hcap : ∑ y ∈ Finset.Icc (t + 1) ((H : ℤ) - 1), rowSize S y = cap := by
+    rw [sum_rowSize_walk fun y h1 h2 => hw y (by omega) h2]
+    omega
   have hn1sum : (seg S 0 (b - 1)).card = ∑ y ∈ Finset.Icc 0 (b - 1), rowSize S y :=
     card_seg_sum S 0 (b - 1)
-  have hn2sum : (seg S b ((H : ℤ) - 2)).card
-      = ∑ y ∈ Finset.Icc b ((H : ℤ) - 2), rowSize S y := card_seg_sum S b ((H : ℤ) - 2)
+  have hn2sum : (seg S b t).card = ∑ y ∈ Finset.Icc b t, rowSize S y := card_seg_sum S b t
   -- per-row lower bounds
   have hn1b : (b : ℤ) ≤ ((seg S 0 (b - 1)).card : ℤ) := by
     have hle : (Finset.Icc (0 : ℤ) (b - 1)).card • 1
@@ -886,16 +912,15 @@ lemma clusterB_facts {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
     rw [smul_eq_mul, mul_one, Int.card_Icc] at hle
     rw [hn1sum]
     omega
-  have hn2l : 2 * ((H : ℤ) - 1 - b) ≤ ((seg S b ((H : ℤ) - 2)).card : ℤ) := by
-    have hle : (Finset.Icc b ((H : ℤ) - 2)).card • 2
-        ≤ ∑ y ∈ Finset.Icc b ((H : ℤ) - 2), rowSize S y := by
+  have hn2l : 2 * ((H : ℤ) - cap - b) ≤ ((seg S b t).card : ℤ) := by
+    have hle : (Finset.Icc b t).card • 2 ≤ ∑ y ∈ Finset.Icc b t, rowSize S y := by
       refine Finset.card_nsmul_le_sum _ _ _ fun y hy => ?_
       rw [Finset.mem_Icc] at hy
       exact hmulti y hy.1 hy.2
     rw [smul_eq_mul, Int.card_Icc] at hle
     rw [hn2sum]
     omega
-  have hn12 : (seg S 0 (b - 1)).card + (seg S b ((H : ℤ) - 2)).card + 1 = H + k := by
+  have hn12 : (seg S 0 (b - 1)).card + (seg S b t).card + cap = H + k := by
     rw [hn1sum, hn2sum]
     omega
   have hb1 : 1 ≤ b := by omega
@@ -903,159 +928,81 @@ lemma clusterB_facts {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
     have h1 := hocc (b - 1) (by omega) (by omega)
     have h2 := hwalk' hb1
     omega
-  have hPcard : (seg S (b - 1) ((H : ℤ) - 1)).card
-      = (seg S b ((H : ℤ) - 2)).card + 2 := by
+  have hPcard : (seg S (b - 1) ((H : ℤ) - 1)).card = (seg S b t).card + 1 + cap := by
     have hs1 : ∑ y ∈ Finset.Icc (b - 1) ((H : ℤ) - 1), rowSize S y
         = (∑ y ∈ Finset.Icc (b - 1) (b - 1), rowSize S y)
           + ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := by
       have h := sum_Icc_split (rowSize S) (a := b - 1) (b := b - 1) (c := (H : ℤ) - 1)
         (by omega) (by omega)
       simpa using h
-    rw [card_seg_sum, hs1, Finset.Icc_self, Finset.sum_singleton, hwalkb, hsplit2,
-      htop1, hn2sum]
+    rw [card_seg_sum, hs1, Finset.Icc_self, Finset.sum_singleton, hwalkb, hsplit2, hcap,
+      hn2sum]
     omega
   exact ⟨hb1, hbt, hmulti, hwalkb, hn12, hn1b, hn2l, hPcard⟩
 
-/-- Cluster bookkeeping for class C (`t = H - 1`, the cluster caps the
-animal). -/
-lemma clusterC_facts {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)}
-    (hSc : IsCanonical L (H + k) H S) (hm : ¬ rowSize S ((H : ℤ) - 1) = 1) :
-    1 ≤ clusterBottom S ((H : ℤ) - 1) ∧ clusterBottom S ((H : ℤ) - 1) ≤ (H : ℤ) - 1 ∧
-    (∀ y, clusterBottom S ((H : ℤ) - 1) ≤ y → y ≤ (H : ℤ) - 1 → 2 ≤ rowSize S y) ∧
-    rowSize S (clusterBottom S ((H : ℤ) - 1) - 1) = 1 ∧
-    ((seg S 0 (clusterBottom S ((H : ℤ) - 1) - 1)).card
-      + (seg S (clusterBottom S ((H : ℤ) - 1)) ((H : ℤ) - 1)).card = H + k) ∧
-    (clusterBottom S ((H : ℤ) - 1)
-      ≤ ((seg S 0 (clusterBottom S ((H : ℤ) - 1) - 1)).card : ℤ)) ∧
-    (2 * ((H : ℤ) - clusterBottom S ((H : ℤ) - 1))
-      ≤ ((seg S (clusterBottom S ((H : ℤ) - 1)) ((H : ℤ) - 1)).card : ℤ)) ∧
-    (seg S (clusterBottom S ((H : ℤ) - 1) - 1) ((H : ℤ) - 1)).card
-      = (seg S (clusterBottom S ((H : ℤ) - 1)) ((H : ℤ) - 1)).card + 1 := by
-  have hocc : ∀ y, 0 ≤ y → y ≤ (H : ℤ) - 1 → 1 ≤ rowSize S y := fun y h0 h1 =>
-    Finset.card_pos.mpr (canonical_fiber_nonempty hSc h0 h1)
-  have hm2 : 2 ≤ rowSize S ((H : ℤ) - 1) := by
-    have := hocc ((H : ℤ) - 1) (by omega) (by omega)
-    omega
-  obtain ⟨⟨hb0, hbt⟩, hmulti, hminle, hwalk'⟩ :=
-    clusterBottom_spec (show (0 : ℤ) ≤ (H : ℤ) - 1 by omega) hm2
-  set b := clusterBottom S ((H : ℤ) - 1) with hb_def
-  have hself : seg S 0 ((H : ℤ) - 1) = S :=
-    seg_eq_self fun p hp => ⟨hSc.anchored.y_nonneg p hp, hSc.y_le p hp⟩
-  have htotal : (H : ℕ) + k = ∑ y ∈ Finset.Icc 0 ((H : ℤ) - 1), rowSize S y := by
-    rw [← card_seg_sum, hself, hSc.card]
-  have hsplit1 : ∑ y ∈ Finset.Icc 0 ((H : ℤ) - 1), rowSize S y
-      = (∑ y ∈ Finset.Icc 0 (b - 1), rowSize S y)
-        + ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := by
-    have h := sum_Icc_split (rowSize S) (a := 0) (b := b - 1) (c := (H : ℤ) - 1)
-      (by omega) (by omega)
-    simpa using h
-  have hn1sum : (seg S 0 (b - 1)).card = ∑ y ∈ Finset.Icc 0 (b - 1), rowSize S y :=
-    card_seg_sum S 0 (b - 1)
-  have hn2sum : (seg S b ((H : ℤ) - 1)).card
-      = ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := card_seg_sum S b ((H : ℤ) - 1)
-  have hn1b : (b : ℤ) ≤ ((seg S 0 (b - 1)).card : ℤ) := by
-    have hle : (Finset.Icc (0 : ℤ) (b - 1)).card • 1
-        ≤ ∑ y ∈ Finset.Icc 0 (b - 1), rowSize S y := by
-      refine Finset.card_nsmul_le_sum _ _ _ fun y hy => ?_
-      rw [Finset.mem_Icc] at hy
-      exact hocc y hy.1 (by omega)
-    rw [smul_eq_mul, mul_one, Int.card_Icc] at hle
-    rw [hn1sum]
-    omega
-  have hn2l : 2 * ((H : ℤ) - b) ≤ ((seg S b ((H : ℤ) - 1)).card : ℤ) := by
-    have hle : (Finset.Icc b ((H : ℤ) - 1)).card • 2
-        ≤ ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := by
-      refine Finset.card_nsmul_le_sum _ _ _ fun y hy => ?_
-      rw [Finset.mem_Icc] at hy
-      exact hmulti y hy.1 hy.2
-    rw [smul_eq_mul, Int.card_Icc] at hle
-    rw [hn2sum]
-    omega
-  have hn12 : (seg S 0 (b - 1)).card + (seg S b ((H : ℤ) - 1)).card = H + k := by
-    rw [hn1sum, hn2sum]
-    omega
-  have hb1 : 1 ≤ b := by omega
-  have hwalkb : rowSize S (b - 1) = 1 := by
-    have h1 := hocc (b - 1) (by omega) (by omega)
-    have h2 := hwalk' hb1
-    omega
-  have hPcard : (seg S (b - 1) ((H : ℤ) - 1)).card
-      = (seg S b ((H : ℤ) - 1)).card + 1 := by
-    have hs1 : ∑ y ∈ Finset.Icc (b - 1) ((H : ℤ) - 1), rowSize S y
-        = (∑ y ∈ Finset.Icc (b - 1) (b - 1), rowSize S y)
-          + ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := by
-      have h := sum_Icc_split (rowSize S) (a := b - 1) (b := b - 1) (c := (H : ℤ) - 1)
-        (by omega) (by omega)
-      simpa using h
-    rw [card_seg_sum, hs1, Finset.Icc_self, Finset.sum_singleton, hwalkb, hn2sum]
-    omega
-  exact ⟨hb1, hbt, hmulti, hwalkb, hn12, hn1b, hn2l, hPcard⟩
-
-/-- Forward well-definedness and the peel-then-glue round trip for class B. -/
-lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
-    (hS : S ∈ Dc L k H) (hm : ¬ rowSize S ((H : ℤ) - 2) = 1) :
-    peelB H S ∈ targetB L k H ∧ glueTop ((H : ℤ) - 2) (peelB H S) = S := by
-  obtain ⟨hc, hw1⟩ := mem_Dc.mp hS
-  obtain ⟨hb1, hbt, hmulti, hwalkb, hn12, hn1b, hn2l, hPcard⟩ :=
-    clusterB_facts hH hc hw1 hm
-  simp only [peelB, glueTop]
-  set b := clusterBottom S ((H : ℤ) - 2) with hb_def
-  set ln := ((H : ℤ) - 1 - b).toNat with hln_def
-  set jn := (seg S b ((H : ℤ) - 2)).card - ln with hjn_def
+/-- Forward well-definedness and the peel-then-glue round trip for classes B
+and C. -/
+lemma peel_mem_and_glue {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (ℤ × ℤ)}
+    (hSc : IsCanonical L (H + k) H S)
+    (hw : ∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 → rowSize S y = 1)
+    (hm : ¬ rowSize S ((H : ℤ) - 1 - cap) = 1) :
+    peel cap H S ∈ target L cap k H ∧ glueTop ((H : ℤ) - 1 - cap) (peel cap H S) = S := by
+  obtain ⟨hb1, hbt, hmulti, hwalkb, hn12, hn1b, hn2l, hPcard⟩ := cluster_facts hH hSc hw hm
+  simp only [peel, glueTop]
+  set t : ℤ := (H : ℤ) - 1 - cap with ht_def
+  set b := clusterBottom S t with hb_def
+  set ln := ((H : ℤ) - cap - b).toNat with hln_def
+  set jn := (seg S b t).card - ln with hjn_def
   set p := rowCell S (b - 1) with hp_def
-  have hlz : (ln : ℤ) = (H : ℤ) - 1 - b := by omega
+  have hlz : (ln : ℤ) = (H : ℤ) - cap - b := by omega
   have hln1 : 1 ≤ ln := by omega
-  have hlnn2 : ln ≤ (seg S b ((H : ℤ) - 2)).card := by omega
+  have hlnn2 : ln ≤ (seg S b t).card := by omega
   have hwrb : IsWalkRow S (b - 1) := hwalkb
   have hpS : p ∈ S := rowCell_mem hwrb
   have hpy : p.2 = b - 1 := rfl
   have hpP : p ∈ seg S (b - 1) ((H : ℤ) - 1) :=
     mem_seg.mpr ⟨hpS, by omega, by omega⟩
-  -- the peeled configuration is a V-configuration
+  -- the peeled configuration is a configuration with `cap` walk rows on top
   have hPconn : Conn L (seg S (b - 1) ((H : ℤ) - 1)) :=
-    conn_seg hc.conn (Or.inl hwrb) (Or.inr hc.y_le)
-  have hC0card :
-      (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))).card = ln + jn + 2 := by
-    rw [card_shift, hPcard]
+    conn_seg hSc.conn (Or.inl hwrb) (Or.inr hSc.y_le)
+  set C0 := shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)) with hC0_def
+  have hC0card : C0.card = ln + jn + 1 + cap := by
+    rw [hC0_def, card_shift, hPcard]
     omega
-  have h00 : ((0 : ℤ), (0 : ℤ)) ∈ shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)) := by
+  have h00 : ((0 : ℤ), (0 : ℤ)) ∈ C0 := by
     have h := shift_mem (a := -p.1) (b := -(b - 1)) hpP
     rwa [shiftCell_to_origin hpy] at h
-  have hC0rows : ∀ c ∈ shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)),
-      0 ≤ c.2 ∧ c.2 ≤ (ln : ℤ) + 1 := by
+  have hC0rows : ∀ c ∈ C0, 0 ≤ c.2 ∧ c.2 ≤ (ln : ℤ) + cap := by
     intro c hcm
-    rw [mem_shift, mem_seg] at hcm
+    rw [hC0_def, mem_shift, mem_seg] at hcm
     have h1 : b - 1 ≤ c.2 - -(b - 1) := hcm.2.1
     have h2 : c.2 - -(b - 1) ≤ (H : ℤ) - 1 := hcm.2.2
     omega
-  have hC0rs : ∀ y : ℤ, 0 ≤ y → y ≤ (ln : ℤ) + 1 →
-      rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) y
-        = rowSize S (y + (b - 1)) := by
+  have hC0rs : ∀ y : ℤ, 0 ≤ y → y ≤ (ln : ℤ) + cap →
+      rowSize C0 y = rowSize S (y + (b - 1)) := by
     intro y h0 h1
-    rw [rowSize_shift, rowSize_seg (by omega) (by omega)]
+    rw [hC0_def, rowSize_shift, rowSize_seg (by omega) (by omega)]
     congr 1
     ring
-  have hC0r0 : rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) 0 = 1 := by
+  have hC0r0 : rowSize C0 0 = 1 := by
     rw [hC0rs 0 le_rfl (by omega), show (0 : ℤ) + (b - 1) = b - 1 from by ring]
     exact hwalkb
-  have hC0rtop :
-      rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) ((ln : ℤ) + 1) = 1 := by
-    rw [hC0rs _ (by omega) le_rfl, show (ln : ℤ) + 1 + (b - 1) = (H : ℤ) - 1 from by omega]
-    exact hw1
-  have hC0multi : ∀ i ∈ Finset.Icc 1 ln,
-      2 ≤ rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) (i : ℤ) := by
+  have hC0cap : ∀ y : ℤ, (ln : ℤ) < y → y ≤ (ln : ℤ) + cap → rowSize C0 y = 1 := by
+    intro y h1 h2
+    rw [hC0rs y (by omega) h2]
+    exact hw _ (by omega) (by omega)
+  have hC0multi : ∀ i ∈ Finset.Icc 1 ln, 2 ≤ rowSize C0 (i : ℤ) := by
     intro i hi
     rw [Finset.mem_Icc] at hi
     rw [hC0rs _ (by omega) (by omega)]
     exact hmulti _ (by omega) (by omega)
-  have hC0V : shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)) ∈ CFGV L ln jn := by
-    rw [mem_CFGV]
-    exact ⟨hC0card, h00, hC0rows, hC0r0, hC0rtop, hC0multi,
-      conn_shift _ _ hPconn⟩
+  have hC0V : C0 ∈ CFG L cap ln jn := by
+    rw [mem_CFG]
+    exact ⟨hC0card, h00, hC0rows, hC0r0, hC0cap, hC0multi, conn_shift _ _ hPconn⟩
   -- the re-anchored remainder is a shorter walk-top animal
-  have hR0 : xNorm (seg S 0 (b - 1)) ∈ Dc L (k - jn) (H - 1 - ln) := by
-    refine xNorm_seg_mem_Dc hc.conn hc.anchored.y_nonneg hb1 (by omega) hwalkb
-      hc.anchored.y_zero (by omega)
+  have hR0 : xNorm (seg S 0 (b - 1)) ∈ Dc L (k - jn) (H - cap - ln) :=
+    xNorm_seg_mem_Dc hSc.conn hSc.anchored.y_nonneg hb1 (by omega) hwalkb
+      hSc.anchored.y_zero (by omega)
   clear_value jn ln
   have hjmem : jn ∈ Finset.Icc 1 k := Finset.mem_Icc.mpr ⟨by omega, by omega⟩
   have hlmem : ln ∈ Finset.Icc 1 jn := Finset.mem_Icc.mpr ⟨hln1, by omega⟩
@@ -1064,9 +1011,9 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
       Finset.mem_product.mpr ⟨hC0V, hR0⟩⟩⟩
   -- the round trip: glue the peeled pieces back
   · have hSne : S.Nonempty := by
-      obtain ⟨z, hzS, -⟩ := hc.anchored.y_zero
+      obtain ⟨z, hzS, -⟩ := hSc.anchored.y_zero
       exact ⟨z, hzS⟩
-    have hr : (H : ℤ) - 2 - (ln : ℤ) = b - 1 := by omega
+    have hr : t - (ln : ℤ) = b - 1 := by omega
     have hwQ : IsWalkRow (xNorm (seg S 0 (b - 1))) (b - 1) := by
       rw [isWalkRow_iff_rowSize, rowSize_xNorm, rowSize_seg (by omega) le_rfl]
       exact hwalkb
@@ -1085,41 +1032,46 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
       constructor
       · rintro (⟨h, -, -⟩ | ⟨h, -, -⟩) <;> exact h
       · intro hcS
-        have h0 := hc.anchored.y_nonneg c hcS
-        have h1 := hc.y_le c hcS
+        have h0 := hSc.anchored.y_nonneg c hcS
+        have h1 := hSc.y_le c hcS
         by_cases hcb : c.2 ≤ b - 1
         · exact Or.inl ⟨hcS, h0, hcb⟩
         · exact Or.inr ⟨hcS, by omega, h1⟩
-    rw [hr, hu',
+    rw [hr, hu', hC0_def,
       show (shiftCell (-minX (seg S 0 (b - 1))) 0 p).1
         = p.1 + -minX (seg S 0 (b - 1)) from rfl,
       shift_shift,
       show p.1 + -minX (seg S 0 (b - 1)) + -p.1 = -minX (seg S 0 (b - 1)) from by ring,
       show b - 1 + -(b - 1) = (0 : ℤ) from by ring,
       xNorm_def' (seg S 0 (b - 1)), ← shift_union, hQP, xNorm_shift _ hSne,
-      xNorm_eq_self hc.anchored.x_nonneg hc.anchored.x_zero]
+      xNorm_eq_self hSc.anchored.x_nonneg hSc.anchored.x_zero]
 
-/-- Backward well-definedness and the glue-then-peel round trip for class B. -/
-lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
-    (hx : x ∈ targetB L k H) :
-    (glueTop ((H : ℤ) - 2) x ∈ Dc L k H ∧
-      ¬ rowSize (glueTop ((H : ℤ) - 2) x) ((H : ℤ) - 2) = 1) ∧
-    peelB H (glueTop ((H : ℤ) - 2) x) = x := by
+/-- Backward well-definedness and the glue-then-peel round trip for classes B
+and C: the glued animal is canonical, its `cap` top rows are walk rows, its row
+`t = H - 1 - cap` is not, and peeling recovers the data. -/
+lemma glue_mem_and_peel {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {x : PeelData}
+    (hx : x ∈ target L cap k H) :
+    (IsCanonical L (H + k) H (glueTop ((H : ℤ) - 1 - cap) x) ∧
+      (∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 →
+        rowSize (glueTop ((H : ℤ) - 1 - cap) x) y = 1) ∧
+      ¬ rowSize (glueTop ((H : ℤ) - 1 - cap) x) ((H : ℤ) - 1 - cap) = 1) ∧
+    peel cap H (glueTop ((H : ℤ) - 1 - cap) x) = x := by
   obtain ⟨j, ℓ, C, R⟩ := x
-  rw [targetB, Finset.mem_sigma, Finset.mem_sigma, Finset.mem_product] at hx
+  rw [target, Finset.mem_sigma, Finset.mem_sigma, Finset.mem_product] at hx
   have hjm : j ∈ Finset.Icc 1 k := hx.1
   have hlm : ℓ ∈ Finset.Icc 1 j := hx.2.1
-  have hCm : C ∈ CFGV L ℓ j := hx.2.2.1
-  have hRm : R ∈ Dc L (k - j) (H - 1 - ℓ) := hx.2.2.2
+  have hCm : C ∈ CFG L cap ℓ j := hx.2.2.1
+  have hRm : R ∈ Dc L (k - j) (H - cap - ℓ) := hx.2.2.2
   rw [Finset.mem_Icc] at hjm hlm
   obtain ⟨hj1, hjk⟩ := hjm
   obtain ⟨hl1, hlj⟩ := hlm
-  have hCv : IsVConfig L ℓ j C := mem_CFGV.mp hCm
+  have hCv : IsConfig L cap ℓ j C := mem_CFG.mp hCm
   obtain ⟨hcR, hwR⟩ := mem_Dc.mp hRm
-  simp only [glueTop, peelB]
-  set r := (H : ℤ) - 2 - (ℓ : ℤ) with hr_def
+  simp only [glueTop, peel]
+  set t : ℤ := (H : ℤ) - 1 - cap with ht_def
+  set r := t - (ℓ : ℤ) with hr_def
   have hwRr : IsWalkRow R r := by
-    rw [isWalkRow_iff_rowSize, show r = ((H - 1 - ℓ : ℕ) : ℤ) - 1 from by omega]
+    rw [isWalkRow_iff_rowSize, show r = ((H - cap - ℓ : ℕ) : ℤ) - 1 from by omega]
     exact hwR
   set u := rowCell R r with hu_def
   have huR : u ∈ R := rowCell_mem hwRr
@@ -1135,7 +1087,7 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
     intro c hcm
     rw [hC'_def, mem_shift] at hcm
     have h1 : 0 ≤ c.2 - r := (hCrows _ hcm).1
-    have h2 : c.2 - r ≤ (ℓ : ℤ) + 1 := (hCrows _ hcm).2
+    have h2 : c.2 - r ≤ (ℓ : ℤ) + cap := (hCrows _ hcm).2
     omega
   have huC' : u ∈ C' := by
     have h0 := shift_mem (a := u.1) (b := r) hCv.origin
@@ -1153,10 +1105,10 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
   have hcardU : (R ∪ C').card = H + k := by
     have h := Finset.card_union_add_card_inter R C'
     rw [hinter, Finset.card_singleton] at h
-    have hC'c : C'.card = ℓ + j + 2 := by
+    have hC'c : C'.card = ℓ + j + 1 + cap := by
       rw [hC'_def, card_shift]
       exact hCv.card
-    have hRc : R.card = (H - 1 - ℓ) + (k - j) := hcR.card
+    have hRc : R.card = (H - cap - ℓ) + (k - j) := hcR.card
     omega
   have hC'conn : Conn L C' := by
     rw [hC'_def]
@@ -1178,23 +1130,33 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
   have hUe0 : ∃ c ∈ R ∪ C', c.2 = 0 := by
     obtain ⟨z, hzR, hzy⟩ := hcR.anchored.y_zero
     exact ⟨z, Finset.mem_union_left _ hzR, hzy⟩
+  -- the configuration's top row `ℓ + cap` is occupied: a walk row if `cap ≥ 1`,
+  -- the cluster's top row if `cap = 0`
+  have hCtop : 1 ≤ rowSize C ((ℓ : ℤ) + cap) := by
+    rcases Nat.eq_zero_or_pos cap with h0 | hpos
+    · have := hCv.multi ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
+      rw [h0, Nat.cast_zero, add_zero]
+      omega
+    · exact (hCv.cap_walk _ (by omega) le_rfl).ge
   have hUe1 : ∃ c ∈ R ∪ C', c.2 = (H : ℤ) - 1 := by
-    have hwtop : IsWalkRow C ((ℓ : ℤ) + 1) := hCv.row_top
-    obtain ⟨c0, hc0C, hc0y⟩ := hwtop.exists_mem
+    obtain ⟨c0, hc0f⟩ := Finset.card_pos.mp hCtop
+    rw [Finset.mem_filter] at hc0f
     refine ⟨shiftCell u.1 r c0, Finset.mem_union_right _ ?_, ?_⟩
     · rw [hC'_def]
-      exact shift_mem hc0C
+      exact shift_mem hc0f.1
     · change c0.2 + r = (H : ℤ) - 1
+      have := hc0f.2
       omega
   have hrsAbove : ∀ y : ℤ, r < y → rowSize (R ∪ C') y = rowSize C (y - r) := by
     intro y hy
     rw [rowSize_union_right fun c hcm => by have := (hRrows c hcm).2; omega,
       hC'_def, rowSize_shift]
-  have hG₀top : rowSize (R ∪ C') ((H : ℤ) - 1) = 1 := by
-    rw [hrsAbove _ (by omega), show (H : ℤ) - 1 - r = (ℓ : ℤ) + 1 from by omega]
-    exact hCv.row_top
-  have hG₀m : 2 ≤ rowSize (R ∪ C') ((H : ℤ) - 2) := by
-    rw [hrsAbove _ (by omega), show (H : ℤ) - 2 - r = (ℓ : ℤ) from by omega]
+  have hGcap : ∀ y : ℤ, t < y → y ≤ (H : ℤ) - 1 → rowSize (R ∪ C') y = 1 := by
+    intro y h1 h2
+    rw [hrsAbove _ (by omega)]
+    exact hCv.cap_walk _ (by omega) (by omega)
+  have hG₀m : 2 ≤ rowSize (R ∪ C') t := by
+    rw [hrsAbove _ (by omega), show t - r = (ℓ : ℤ) from by omega]
     exact hCv.multi ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
   have hwC'r : IsWalkRow C' r := by
     rw [isWalkRow_iff_rowSize, hC'_def, rowSize_shift, sub_self]
@@ -1203,69 +1165,63 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
     rw [rowSize, Finset.filter_union, filter_row_eq_singleton hwRr huR huy,
       filter_row_eq_singleton hwC'r huC' huy, Finset.union_self]
     exact Finset.card_singleton u
-  have hDc : xNorm (R ∪ C') ∈ Dc L k H := by
-    rw [mem_Dc]
-    refine ⟨isCanonical_xNorm hcardU hconnU hUy0 hUy1 hUe0 hUe1, ?_⟩
-    rw [rowSize_xNorm]
-    exact hG₀top
-  have hnot : ¬ rowSize (xNorm (R ∪ C')) ((H : ℤ) - 2) = 1 := by
-    rw [rowSize_xNorm]
-    omega
-  refine ⟨⟨hDc, hnot⟩, ?_⟩
+  refine ⟨⟨isCanonical_xNorm hcardU hconnU hUy0 hUy1 hUe0 hUe1,
+    fun y h1 h2 => by rw [rowSize_xNorm]; exact hGcap y h1 h2,
+    by rw [rowSize_xNorm]; omega⟩, ?_⟩
   -- the round trip: peel the glued animal back apart
   have hRne : R.Nonempty := by
     obtain ⟨z, hzR, -⟩ := hcR.anchored.y_zero
     exact ⟨z, hzR⟩
   -- the recomputed cluster bottom is `r + 1`
-  have hm2X : 2 ≤ rowSize (xNorm (R ∪ C')) ((H : ℤ) - 2) := by
+  have hm2X : 2 ≤ rowSize (xNorm (R ∪ C')) t := by
     rw [rowSize_xNorm]
     exact hG₀m
   obtain ⟨⟨hb0', hbt'⟩, hmulti', hminle', -⟩ :=
-    clusterBottom_spec (show (0 : ℤ) ≤ (H : ℤ) - 2 from by omega) hm2X
-  have hble : clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 2) ≤ r + 1 := by
+    clusterBottom_spec (show (0 : ℤ) ≤ t from by omega) hm2X
+  have hble : clusterBottom (xNorm (R ∪ C')) t ≤ r + 1 := by
     refine hminle' (r + 1) (by omega) (by omega) ?_
     intro y hy1 hy2
     rw [rowSize_xNorm, hrsAbove y (by omega),
       show y - r = (((y - r).toNat : ℕ) : ℤ) from by omega]
     exact hCv.multi _ (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
-  have hbgt : r < clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 2) := by
+  have hbgt : r < clusterBottom (xNorm (R ∪ C')) t := by
     by_contra hcon
     push Not at hcon
     have h2 := hmulti' r hcon (by omega)
     rw [rowSize_xNorm, hG₀r] at h2
     omega
-  have hbeq : clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 2) = r + 1 := by omega
+  have hbeq : clusterBottom (xNorm (R ∪ C')) t = r + 1 := by omega
   -- the interior cluster band of the configuration
-  have hsegRempty : seg R (r + 1) ((H : ℤ) - 2) = ∅ := by
+  have hsegRempty : seg R (r + 1) t = ∅ := by
     rw [seg, Finset.filter_eq_empty_iff]
     intro c hcm
     have := (hRrows c hcm).2
     omega
-  have hsegC' : seg C' (r + 1) ((H : ℤ) - 2) = shift u.1 r (seg C 1 (ℓ : ℤ)) := by
+  have hsegC' : seg C' (r + 1) t = shift u.1 r (seg C 1 (ℓ : ℤ)) := by
     rw [hC'_def, seg_shift, show r + 1 - r = (1 : ℤ) from by ring,
-      show (H : ℤ) - 2 - r = (ℓ : ℤ) from by omega]
+      show t - r = (ℓ : ℤ) from by omega]
   have hCcard : (seg C 1 (ℓ : ℤ)).card = ℓ + j := by
-    have hCself : seg C 0 ((ℓ : ℤ) + 1) = C := seg_eq_self hCrows
-    have h1 := card_seg_sum C 0 ((ℓ : ℤ) + 1)
+    have hCself : seg C 0 ((ℓ : ℤ) + cap) = C := seg_eq_self hCrows
+    have h1 := card_seg_sum C 0 ((ℓ : ℤ) + cap)
     have h2 := card_seg_sum C 1 (ℓ : ℤ)
-    have hs1 : ∑ y ∈ Finset.Icc (0 : ℤ) ((ℓ : ℤ) + 1), rowSize C y
+    have hs1 : ∑ y ∈ Finset.Icc (0 : ℤ) ((ℓ : ℤ) + cap), rowSize C y
         = (∑ y ∈ Finset.Icc (0 : ℤ) 0, rowSize C y)
-          + ∑ y ∈ Finset.Icc (1 : ℤ) ((ℓ : ℤ) + 1), rowSize C y := by
-      have h := sum_Icc_split (rowSize C) (a := (0 : ℤ)) (b := 0) (c := (ℓ : ℤ) + 1)
+          + ∑ y ∈ Finset.Icc (1 : ℤ) ((ℓ : ℤ) + cap), rowSize C y := by
+      have h := sum_Icc_split (rowSize C) (a := (0 : ℤ)) (b := 0) (c := (ℓ : ℤ) + cap)
         (by omega) (by omega)
       rwa [show (0 : ℤ) + 1 = 1 from by ring] at h
-    have hs2 : ∑ y ∈ Finset.Icc (1 : ℤ) ((ℓ : ℤ) + 1), rowSize C y
+    have hs2 : ∑ y ∈ Finset.Icc (1 : ℤ) ((ℓ : ℤ) + cap), rowSize C y
         = (∑ y ∈ Finset.Icc (1 : ℤ) (ℓ : ℤ), rowSize C y)
-          + ∑ y ∈ Finset.Icc ((ℓ : ℤ) + 1) ((ℓ : ℤ) + 1), rowSize C y :=
+          + ∑ y ∈ Finset.Icc ((ℓ : ℤ) + 1) ((ℓ : ℤ) + cap), rowSize C y :=
       sum_Icc_split (rowSize C) (by omega) (by omega)
+    have hs3 : ∑ y ∈ Finset.Icc ((ℓ : ℤ) + 1) ((ℓ : ℤ) + cap), rowSize C y = cap := by
+      rw [sum_rowSize_walk fun y hy1 hy2 => hCv.cap_walk y (by omega) hy2]
+      omega
     rw [hCself] at h1
     rw [show Finset.Icc (0 : ℤ) 0 = {(0 : ℤ)} from Finset.Icc_self 0,
       Finset.sum_singleton] at hs1
-    rw [show Finset.Icc ((ℓ : ℤ) + 1) ((ℓ : ℤ) + 1) = {((ℓ : ℤ) + 1)} from
-      Finset.Icc_self _, Finset.sum_singleton] at hs2
     have hr0' : rowSize C 0 = 1 := hCv.row_zero
-    have hrt' : rowSize C ((ℓ : ℤ) + 1) = 1 := hCv.row_top
-    have hCcardv : C.card = ℓ + j + 2 := hCv.card
+    have hCcardv : C.card = ℓ + j + 1 + cap := hCv.card
     omega
   -- the walk cell of the recomputed base row
   have hcellX : rowCell (xNorm (R ∪ C')) r = shiftCell (-minX (R ∪ C')) 0 u := by
@@ -1323,375 +1279,70 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
   · -- the remainder component
     rw [hsegbotX, xNorm_shift _ hRne, xNorm_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
 
+/-- **The cluster count**: canonical animals whose `cap` top rows are walk
+rows and whose row `H - 1 - cap` is not are counted by configurations with
+`cap` walk rows on top times shorter walk-top remainders, aggregated over
+`(j, ℓ)`. Class B is `cap = 1`, class C is `cap = 0`. -/
+lemma card_class (cap k H : ℕ) (hH : k + 1 + cap ≤ H) :
+    ((allCanon L k H).filter fun S =>
+      CapWalk cap H S ∧ ¬ rowSize S ((H : ℤ) - 1 - cap) = 1).card =
+      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
+        (CFG L cap ℓ j).card * d L (k - j) (H - cap - ℓ) := by
+  have htarget : (target L cap k H).card = ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
+      (CFG L cap ℓ j).card * d L (k - j) (H - cap - ℓ) := by
+    rw [target, Finset.card_sigma]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [Finset.card_sigma]
+    exact Finset.sum_congr rfl fun ℓ _ => by rw [Finset.card_product]; rfl
+  rw [← htarget]
+  refine Finset.card_nbij' (peel cap H) (glueTop ((H : ℤ) - 1 - cap)) ?_ ?_ ?_ ?_
+  · intro S hS
+    rw [Finset.mem_coe, Finset.mem_filter, mem_allCanon] at hS
+    rw [Finset.mem_coe]
+    exact (peel_mem_and_glue hH hS.1 (capWalk_iff.mp hS.2.1) hS.2.2).1
+  · intro x hx
+    rw [Finset.mem_coe] at hx
+    rw [Finset.mem_coe, Finset.mem_filter, mem_allCanon]
+    obtain ⟨⟨h1, h2, h3⟩, -⟩ := glue_mem_and_peel hH hx
+    exact ⟨h1, capWalk_iff.mpr h2, h3⟩
+  · intro S hS
+    rw [Finset.mem_coe, Finset.mem_filter, mem_allCanon] at hS
+    exact (peel_mem_and_glue hH hS.1 (capWalk_iff.mp hS.2.1) hS.2.2).2
+  · intro x hx
+    rw [Finset.mem_coe] at hx
+    exact (glue_mem_and_peel hH hx).2
+
 /-- **Class-B count**: walk-top animals with a multi second-top row are
 counted by interior cluster configurations times shorter walk-top remainders,
-aggregated over `(j, ℓ)`. -/
+aggregated over `(j, ℓ)`. The `cap = 1` case of `card_class`. -/
 lemma card_classB (k H : ℕ) (hH : k + 2 ≤ H) :
     ((Dc L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 2) = 1).card =
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V L ℓ j * d L (k - j) (H - 1 - ℓ) := by
-  have htarget : (targetB L k H).card = ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
-      V L ℓ j * d L (k - j) (H - 1 - ℓ) := by
-    rw [targetB, Finset.card_sigma]
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [Finset.card_sigma]
-    exact Finset.sum_congr rfl fun ℓ _ => by rw [Finset.card_product]; rfl
-  rw [← htarget]
-  refine Finset.card_nbij' (peelB H) (glueTop ((H : ℤ) - 2)) ?_ ?_ ?_ ?_
-  · intro S hS
-    rw [Finset.mem_coe, Finset.mem_filter] at hS
-    rw [Finset.mem_coe]
-    exact (peelB_mem_and_glue hH hS.1 hS.2).1
-  · intro x hx
-    rw [Finset.mem_coe] at hx
-    rw [Finset.mem_coe, Finset.mem_filter]
-    exact (glueB_mem_and_peel hH hx).1
-  · intro S hS
-    rw [Finset.mem_coe, Finset.mem_filter] at hS
-    exact (peelB_mem_and_glue hH hS.1 hS.2).2
-  · intro x hx
-    rw [Finset.mem_coe] at hx
-    exact (glueB_mem_and_peel hH hx).2
-
-/-! ## Class C -/
-
-/-- Forward well-definedness and the peel-then-glue round trip for class C. -/
-lemma peelC_mem_and_glue {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)}
-    (hS : S ∈ allCanon L k H) (hm : ¬ rowSize S ((H : ℤ) - 1) = 1) :
-    peelC H S ∈ targetC L k H ∧ glueTop ((H : ℤ) - 1) (peelC H S) = S := by
-  have hc := mem_allCanon.mp hS
-  obtain ⟨hb1, hbt, hmulti, hwalkb, hn12, hn1b, hn2l, hPcard⟩ :=
-    clusterC_facts hH hc hm
-  simp only [peelC, glueTop]
-  set b := clusterBottom S ((H : ℤ) - 1) with hb_def
-  set ln := ((H : ℤ) - b).toNat with hln_def
-  set jn := (seg S b ((H : ℤ) - 1)).card - ln with hjn_def
-  set p := rowCell S (b - 1) with hp_def
-  have hlz : (ln : ℤ) = (H : ℤ) - b := by omega
-  have hln1 : 1 ≤ ln := by omega
-  have hlnn2 : ln ≤ (seg S b ((H : ℤ) - 1)).card := by omega
-  have hwrb : IsWalkRow S (b - 1) := hwalkb
-  have hpS : p ∈ S := rowCell_mem hwrb
-  have hpy : p.2 = b - 1 := rfl
-  have hpP : p ∈ seg S (b - 1) ((H : ℤ) - 1) :=
-    mem_seg.mpr ⟨hpS, by omega, by omega⟩
-  have hPconn : Conn L (seg S (b - 1) ((H : ℤ) - 1)) :=
-    conn_seg hc.conn (Or.inl hwrb) (Or.inr hc.y_le)
-  have hC0card :
-      (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))).card = ln + jn + 1 := by
-    rw [card_shift, hPcard]
-    omega
-  have h00 : ((0 : ℤ), (0 : ℤ)) ∈ shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)) := by
-    have h := shift_mem (a := -p.1) (b := -(b - 1)) hpP
-    rwa [shiftCell_to_origin hpy] at h
-  have hC0rows : ∀ c ∈ shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)),
-      0 ≤ c.2 ∧ c.2 ≤ (ln : ℤ) := by
-    intro c hcm
-    rw [mem_shift, mem_seg] at hcm
-    have h1 : b - 1 ≤ c.2 - -(b - 1) := hcm.2.1
-    have h2 : c.2 - -(b - 1) ≤ (H : ℤ) - 1 := hcm.2.2
-    omega
-  have hC0rs : ∀ y : ℤ, 0 ≤ y → y ≤ (ln : ℤ) →
-      rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) y
-        = rowSize S (y + (b - 1)) := by
-    intro y h0 h1
-    rw [rowSize_shift, rowSize_seg (by omega) (by omega)]
-    congr 1
-    ring
-  have hC0r0 : rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) 0 = 1 := by
-    rw [hC0rs 0 le_rfl (by omega), show (0 : ℤ) + (b - 1) = b - 1 from by ring]
-    exact hwalkb
-  have hC0multi : ∀ i ∈ Finset.Icc 1 ln,
-      2 ≤ rowSize (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))) (i : ℤ) := by
-    intro i hi
-    rw [Finset.mem_Icc] at hi
-    rw [hC0rs _ (by omega) (by omega)]
-    exact hmulti _ (by omega) (by omega)
-  have hC0V : shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1)) ∈ CFGVt L ln jn := by
-    rw [mem_CFGVt]
-    exact ⟨hC0card, h00, hC0rows, hC0r0, hC0multi, conn_shift _ _ hPconn⟩
-  have hR0 : xNorm (seg S 0 (b - 1)) ∈ Dc L (k - jn) (H - ln) := by
-    refine xNorm_seg_mem_Dc hc.conn hc.anchored.y_nonneg hb1 (by omega) hwalkb
-      hc.anchored.y_zero (by omega)
-  clear_value jn ln
-  have hjmem : jn ∈ Finset.Icc 1 k := Finset.mem_Icc.mpr ⟨by omega, by omega⟩
-  have hlmem : ln ∈ Finset.Icc 1 jn := Finset.mem_Icc.mpr ⟨hln1, by omega⟩
-  constructor
-  · exact Finset.mem_sigma.mpr ⟨hjmem, Finset.mem_sigma.mpr ⟨hlmem,
-      Finset.mem_product.mpr ⟨hC0V, hR0⟩⟩⟩
-  · have hSne : S.Nonempty := by
-      obtain ⟨z, hzS, -⟩ := hc.anchored.y_zero
-      exact ⟨z, hzS⟩
-    have hr : (H : ℤ) - 1 - (ln : ℤ) = b - 1 := by omega
-    have hwQ : IsWalkRow (xNorm (seg S 0 (b - 1))) (b - 1) := by
-      rw [isWalkRow_iff_rowSize, rowSize_xNorm, rowSize_seg (by omega) le_rfl]
-      exact hwalkb
-    have hpQ : p ∈ seg S 0 (b - 1) := mem_seg.mpr ⟨hpS, by omega, le_of_eq hpy⟩
-    have hu' : rowCell (xNorm (seg S 0 (b - 1))) (b - 1)
-        = shiftCell (-minX (seg S 0 (b - 1))) 0 p := by
-      refine rowCell_eq hwQ ?_ ?_
-      · rw [xNorm_def']
-        exact shift_mem hpQ
-      · change p.2 + 0 = b - 1
-        rw [hpy]
-        ring
-    have hQP : seg S 0 (b - 1) ∪ seg S (b - 1) ((H : ℤ) - 1) = S := by
-      ext c
-      simp only [Finset.mem_union, mem_seg]
-      constructor
-      · rintro (⟨h, -, -⟩ | ⟨h, -, -⟩) <;> exact h
-      · intro hcS
-        have h0 := hc.anchored.y_nonneg c hcS
-        have h1 := hc.y_le c hcS
-        by_cases hcb : c.2 ≤ b - 1
-        · exact Or.inl ⟨hcS, h0, hcb⟩
-        · exact Or.inr ⟨hcS, by omega, h1⟩
-    rw [hr, hu',
-      show (shiftCell (-minX (seg S 0 (b - 1))) 0 p).1
-        = p.1 + -minX (seg S 0 (b - 1)) from rfl,
-      shift_shift,
-      show p.1 + -minX (seg S 0 (b - 1)) + -p.1 = -minX (seg S 0 (b - 1)) from by ring,
-      show b - 1 + -(b - 1) = (0 : ℤ) from by ring,
-      xNorm_def' (seg S 0 (b - 1)), ← shift_union, hQP, xNorm_shift _ hSne,
-      xNorm_eq_self hc.anchored.x_nonneg hc.anchored.x_zero]
-
-/-- Backward well-definedness and the glue-then-peel round trip for class C. -/
-lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
-    (hx : x ∈ targetC L k H) :
-    (glueTop ((H : ℤ) - 1) x ∈ allCanon L k H ∧
-      ¬ rowSize (glueTop ((H : ℤ) - 1) x) ((H : ℤ) - 1) = 1) ∧
-    peelC H (glueTop ((H : ℤ) - 1) x) = x := by
-  obtain ⟨j, ℓ, C, R⟩ := x
-  rw [targetC, Finset.mem_sigma, Finset.mem_sigma, Finset.mem_product] at hx
-  have hjm : j ∈ Finset.Icc 1 k := hx.1
-  have hlm : ℓ ∈ Finset.Icc 1 j := hx.2.1
-  have hCm : C ∈ CFGVt L ℓ j := hx.2.2.1
-  have hRm : R ∈ Dc L (k - j) (H - ℓ) := hx.2.2.2
-  rw [Finset.mem_Icc] at hjm hlm
-  obtain ⟨hj1, hjk⟩ := hjm
-  obtain ⟨hl1, hlj⟩ := hlm
-  have hCv : IsVtConfig L ℓ j C := mem_CFGVt.mp hCm
-  obtain ⟨hcR, hwR⟩ := mem_Dc.mp hRm
-  simp only [glueTop, peelC]
-  set r := (H : ℤ) - 1 - (ℓ : ℤ) with hr_def
-  have hwRr : IsWalkRow R r := by
-    rw [isWalkRow_iff_rowSize, show r = ((H - ℓ : ℕ) : ℤ) - 1 from by omega]
-    exact hwR
-  set u := rowCell R r with hu_def
-  have huR : u ∈ R := rowCell_mem hwRr
-  have huy : u.2 = r := rfl
-  set C' := shift u.1 r C with hC'_def
-  have hRrows : ∀ c ∈ R, 0 ≤ c.2 ∧ c.2 ≤ r := by
-    intro c hcm
-    have h1 := hcR.anchored.y_nonneg c hcm
-    have h2 := hcR.y_le c hcm
-    omega
-  have hCrows := hCv.rows
-  have hC'rows : ∀ c ∈ C', r ≤ c.2 ∧ c.2 ≤ (H : ℤ) - 1 := by
-    intro c hcm
-    rw [hC'_def, mem_shift] at hcm
-    have h1 : 0 ≤ c.2 - r := (hCrows _ hcm).1
-    have h2 : c.2 - r ≤ (ℓ : ℤ) := (hCrows _ hcm).2
-    omega
-  have huC' : u ∈ C' := by
-    have h0 := shift_mem (a := u.1) (b := r) hCv.origin
-    rw [shiftCell_origin, show ((u.1, r) : ℤ × ℤ) = u from by rw [← huy]] at h0
-    exact h0
-  have hinter : R ∩ C' = {u} := by
-    ext c
-    rw [Finset.mem_inter, Finset.mem_singleton]
-    constructor
-    · rintro ⟨hcR', hcC'⟩
-      exact hwRr.eq_of_mem hcR'
-        (le_antisymm (hRrows c hcR').2 (hC'rows c hcC').1) huR huy
-    · rintro rfl
-      exact ⟨huR, huC'⟩
-  have hcardU : (R ∪ C').card = H + k := by
-    have h := Finset.card_union_add_card_inter R C'
-    rw [hinter, Finset.card_singleton] at h
-    have hC'c : C'.card = ℓ + j + 1 := by
-      rw [hC'_def, card_shift]
-      exact hCv.card
-    have hRc : R.card = (H - ℓ) + (k - j) := hcR.card
-    omega
-  have hC'conn : Conn L C' := by
-    rw [hC'_def]
-    exact conn_shift _ _ hCv.conn
-  have hconnU : Conn L (R ∪ C') :=
-    conn_union rfl hcR.conn hC'conn ⟨u, Finset.mem_inter.mpr ⟨huR, huC'⟩⟩
-  have hUy0 : ∀ c ∈ R ∪ C', 0 ≤ c.2 := by
-    intro c hcm
-    rcases Finset.mem_union.mp hcm with h | h
-    · exact (hRrows c h).1
-    · have := (hC'rows c h).1
-      omega
-  have hUy1 : ∀ c ∈ R ∪ C', c.2 ≤ (H : ℤ) - 1 := by
-    intro c hcm
-    rcases Finset.mem_union.mp hcm with h | h
-    · have := (hRrows c h).2
-      omega
-    · exact (hC'rows c h).2
-  have hUe0 : ∃ c ∈ R ∪ C', c.2 = 0 := by
-    obtain ⟨z, hzR, hzy⟩ := hcR.anchored.y_zero
-    exact ⟨z, Finset.mem_union_left _ hzR, hzy⟩
-  have hCtop : 2 ≤ rowSize C (ℓ : ℤ) :=
-    hCv.multi ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
-  have hUe1 : ∃ c ∈ R ∪ C', c.2 = (H : ℤ) - 1 := by
-    have hpos : 0 < (C.filter fun c => c.2 = (ℓ : ℤ)).card := by
-      have h2 : 2 ≤ (C.filter fun c => c.2 = (ℓ : ℤ)).card := hCtop
-      omega
-    obtain ⟨c0, hc0f⟩ := Finset.card_pos.mp hpos
-    rw [Finset.mem_filter] at hc0f
-    refine ⟨shiftCell u.1 r c0, Finset.mem_union_right _ ?_, ?_⟩
-    · rw [hC'_def]
-      exact shift_mem hc0f.1
-    · change c0.2 + r = (H : ℤ) - 1
-      have := hc0f.2
-      omega
-  have hrsAbove : ∀ y : ℤ, r < y → rowSize (R ∪ C') y = rowSize C (y - r) := by
-    intro y hy
-    rw [rowSize_union_right fun c hcm => by have := (hRrows c hcm).2; omega,
-      hC'_def, rowSize_shift]
-  have hG₀m : 2 ≤ rowSize (R ∪ C') ((H : ℤ) - 1) := by
-    rw [hrsAbove _ (by omega), show (H : ℤ) - 1 - r = (ℓ : ℤ) from by omega]
-    exact hCtop
-  have hwC'r : IsWalkRow C' r := by
-    rw [isWalkRow_iff_rowSize, hC'_def, rowSize_shift, sub_self]
-    exact hCv.row_zero
-  have hG₀r : rowSize (R ∪ C') r = 1 := by
-    rw [rowSize, Finset.filter_union, filter_row_eq_singleton hwRr huR huy,
-      filter_row_eq_singleton hwC'r huC' huy, Finset.union_self]
-    exact Finset.card_singleton u
-  have hAll : xNorm (R ∪ C') ∈ allCanon L k H :=
-    mem_allCanon.mpr (isCanonical_xNorm hcardU hconnU hUy0 hUy1 hUe0 hUe1)
-  have hnot : ¬ rowSize (xNorm (R ∪ C')) ((H : ℤ) - 1) = 1 := by
-    rw [rowSize_xNorm]
-    omega
-  refine ⟨⟨hAll, hnot⟩, ?_⟩
-  have hRne : R.Nonempty := by
-    obtain ⟨z, hzR, -⟩ := hcR.anchored.y_zero
-    exact ⟨z, hzR⟩
-  have hm2X : 2 ≤ rowSize (xNorm (R ∪ C')) ((H : ℤ) - 1) := by
-    rw [rowSize_xNorm]
-    exact hG₀m
-  obtain ⟨⟨hb0', hbt'⟩, hmulti', hminle', -⟩ :=
-    clusterBottom_spec (show (0 : ℤ) ≤ (H : ℤ) - 1 from by omega) hm2X
-  have hble : clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 1) ≤ r + 1 := by
-    refine hminle' (r + 1) (by omega) (by omega) ?_
-    intro y hy1 hy2
-    rw [rowSize_xNorm, hrsAbove y (by omega),
-      show y - r = (((y - r).toNat : ℕ) : ℤ) from by omega]
-    exact hCv.multi _ (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
-  have hbgt : r < clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 1) := by
-    by_contra hcon
-    push Not at hcon
-    have h2 := hmulti' r hcon (by omega)
-    rw [rowSize_xNorm, hG₀r] at h2
-    omega
-  have hbeq : clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 1) = r + 1 := by omega
-  have hsegRempty : seg R (r + 1) ((H : ℤ) - 1) = ∅ := by
-    rw [seg, Finset.filter_eq_empty_iff]
-    intro c hcm
-    have := (hRrows c hcm).2
-    omega
-  have hsegC' : seg C' (r + 1) ((H : ℤ) - 1) = shift u.1 r (seg C 1 (ℓ : ℤ)) := by
-    rw [hC'_def, seg_shift, show r + 1 - r = (1 : ℤ) from by ring,
-      show (H : ℤ) - 1 - r = (ℓ : ℤ) from by omega]
-  have hCcard : (seg C 1 (ℓ : ℤ)).card = ℓ + j := by
-    have hCself : seg C 0 (ℓ : ℤ) = C := seg_eq_self hCrows
-    have h1 := card_seg_sum C 0 (ℓ : ℤ)
-    have h2 := card_seg_sum C 1 (ℓ : ℤ)
-    have hs1 : ∑ y ∈ Finset.Icc (0 : ℤ) (ℓ : ℤ), rowSize C y
-        = (∑ y ∈ Finset.Icc (0 : ℤ) 0, rowSize C y)
-          + ∑ y ∈ Finset.Icc (1 : ℤ) (ℓ : ℤ), rowSize C y := by
-      have h := sum_Icc_split (rowSize C) (a := (0 : ℤ)) (b := 0) (c := (ℓ : ℤ))
-        (by omega) (by omega)
-      rwa [show (0 : ℤ) + 1 = 1 from by ring] at h
-    rw [hCself] at h1
-    rw [show Finset.Icc (0 : ℤ) 0 = {(0 : ℤ)} from Finset.Icc_self 0,
-      Finset.sum_singleton] at hs1
-    have hr0' : rowSize C 0 = 1 := hCv.row_zero
-    have hCcardv : C.card = ℓ + j + 1 := hCv.card
-    omega
-  have hcellX : rowCell (xNorm (R ∪ C')) r = shiftCell (-minX (R ∪ C')) 0 u := by
-    refine rowCell_eq ?_ ?_ ?_
-    · rw [isWalkRow_iff_rowSize, rowSize_xNorm]
-      exact hG₀r
-    · rw [xNorm_def']
-      exact shift_mem (Finset.mem_union_left _ huR)
-    · change u.2 + 0 = r
-      omega
-  have hsegtopX : seg (xNorm (R ∪ C')) r ((H : ℤ) - 1)
-      = shift (-minX (R ∪ C')) 0 C' := by
-    rw [xNorm_def', seg_xShift]
-    congr 1
-    rw [seg_union]
-    have h1 : seg R r ((H : ℤ) - 1) = {u} := by
-      ext c
-      rw [mem_seg, Finset.mem_singleton]
-      constructor
-      · rintro ⟨hcR', h1', -⟩
-        exact hwRr.eq_of_mem hcR' (le_antisymm (hRrows c hcR').2 h1') huR huy
-      · rintro rfl
-        exact ⟨huR, le_of_eq huy.symm, by omega⟩
-    have h2 : seg C' r ((H : ℤ) - 1) = C' := seg_eq_self fun c hcm => hC'rows c hcm
-    rw [h1, h2]
-    exact Finset.union_eq_right.mpr (Finset.singleton_subset_iff.mpr huC')
-  have hsegbotX : seg (xNorm (R ∪ C')) 0 r = shift (-minX (R ∪ C')) 0 R := by
-    rw [xNorm_def', seg_xShift]
-    congr 1
-    rw [seg_union]
-    have h1 : seg R 0 r = R := seg_eq_self fun c hcm => hRrows c hcm
-    have h2 : seg C' 0 r = {u} := by
-      ext c
-      rw [mem_seg, Finset.mem_singleton]
-      constructor
-      · rintro ⟨hcC', -, h2'⟩
-        exact hwC'r.eq_of_mem hcC' (le_antisymm h2' (hC'rows c hcC').1) huC' huy
-      · rintro rfl
-        exact ⟨huC', by omega, le_of_eq huy⟩
-    rw [h1, h2]
-    exact Finset.union_eq_left.mpr (Finset.singleton_subset_iff.mpr huR)
-  rw [hbeq, show r + 1 - 1 = r from by ring]
-  simp only [Sigma.mk.injEq, heq_eq_eq, Prod.mk.injEq]
-  refine ⟨?_, by omega, ?_, ?_⟩
-  · rw [xNorm_def', seg_xShift, seg_union, hsegRempty, Finset.empty_union, hsegC',
-      card_shift, card_shift, hCcard]
-    omega
-  · rw [hcellX, hsegtopX,
-      show (shiftCell (-minX (R ∪ C')) 0 u).1 = u.1 + -minX (R ∪ C') from rfl,
-      shift_shift, hC'_def, shift_shift,
-      show -(u.1 + -minX (R ∪ C')) + -minX (R ∪ C') + u.1 = (0 : ℤ) from by ring,
-      show -r + 0 + r = (0 : ℤ) from by ring, shift_zero]
-  · rw [hsegbotX, xNorm_shift _ hRne, xNorm_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
+  have key : ((Dc L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 2) = 1)
+      = (allCanon L k H).filter fun S =>
+        CapWalk 1 H S ∧ ¬ rowSize S ((H : ℤ) - 1 - ((1 : ℕ) : ℤ)) = 1 := by
+    rw [Dc, Finset.filter_filter]
+    refine Finset.filter_congr fun S _ => ?_
+    rw [capWalk_one_iff, Nat.cast_one, show (H : ℤ) - 1 - 1 = (H : ℤ) - 2 from by ring]
+  rw [key]
+  exact card_class 1 k H (by omega)
 
 /-- **Class-C count**: canonical animals with a multi top row are counted by
 top-edge cluster configurations times shorter walk-top remainders, aggregated
-over `(j, ℓ)`. -/
+over `(j, ℓ)`. The `cap = 0` case of `card_class`. -/
 lemma card_classC (k H : ℕ) (hH : k + 1 ≤ H) :
     ((allCanon L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 1) = 1).card =
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt L ℓ j * d L (k - j) (H - ℓ) := by
-  have htarget : (targetC L k H).card = ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
-      Vt L ℓ j * d L (k - j) (H - ℓ) := by
-    rw [targetC, Finset.card_sigma]
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [Finset.card_sigma]
-    exact Finset.sum_congr rfl fun ℓ _ => by rw [Finset.card_product]; rfl
-  rw [← htarget]
-  refine Finset.card_nbij' (peelC H) (glueTop ((H : ℤ) - 1)) ?_ ?_ ?_ ?_
-  · intro S hS
-    rw [Finset.mem_coe, Finset.mem_filter] at hS
-    rw [Finset.mem_coe]
-    exact (peelC_mem_and_glue hH hS.1 hS.2).1
-  · intro x hx
-    rw [Finset.mem_coe] at hx
-    rw [Finset.mem_coe, Finset.mem_filter]
-    exact (glueC_mem_and_peel hH hx).1
-  · intro S hS
-    rw [Finset.mem_coe, Finset.mem_filter] at hS
-    exact (peelC_mem_and_glue hH hS.1 hS.2).2
-  · intro x hx
-    rw [Finset.mem_coe] at hx
-    exact (glueC_mem_and_peel hH hx).2
+  have key : ((allCanon L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 1) = 1)
+      = (allCanon L k H).filter fun S =>
+        CapWalk 0 H S ∧ ¬ rowSize S ((H : ℤ) - 1 - ((0 : ℕ) : ℤ)) = 1 := by
+    refine Finset.filter_congr fun S _ => ?_
+    rw [Nat.cast_zero, sub_zero]
+    exact ⟨fun h => ⟨capWalk_zero, h⟩, fun h => h.2⟩
+  have h := card_class (L := L) 0 k H (by omega)
+  simp only [Nat.sub_zero] at h
+  rw [key]
+  exact h
 
 /-! ## The main theorems -/
 
