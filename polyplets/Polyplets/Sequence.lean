@@ -34,10 +34,7 @@ height classes counted by `T n 1, …, T n n`:
 The upper height bound is the row analogue of `Finite.lean`'s `canonical_x_le`;
 both are instances of one anchored-projection lemma (`card_bound_of_anchored`).
 
-Finally a computable twin `ac n = ∑ H ∈ Finset.Icc 1 n, Tc n H` with
-`ac_eq_a` (`Checks.lean` decides `a 1 = 1`, `a 2 = 4` with it; `a 3 = 20`
-needs 6 GB in the kernel and `a 4` more than 8 GB, measured 2026-10-12), and
-the paper's §9 strip-capture lower bound `strip_sum_le_a`.
+Finally the paper's §9 strip-capture lower bound `strip_sum_le_a`.
 -/
 
 namespace Polyplets
@@ -219,18 +216,6 @@ theorem a_eq_sum (n : ℕ) :
   rw [a, Set.ncard_eq_toFinset_card _ (canonicalAnimal_finite n), hbi,
     Finset.card_biUnion hdisj]
   exact Finset.sum_congr rfl fun H _ => (T_eq_toFinset_card n H).symm
-
-/-! ## Computable twin -/
-
-/-- Computable counterpart of `a`: the row sum of the computable triangle `Tc`.
-Brute force (`Tc` enumerates subsets of the box), so useful only for small `n`. -/
-def ac (n : ℕ) : ℕ := ∑ H ∈ Finset.Icc 1 n, Tc n H
-
-/-- The computable twin agrees with `a`, termwise by `Tc_eq_T` and in total by
-`a_eq_sum`. -/
-theorem ac_eq_a (n : ℕ) : ac n = a n := by
-  rw [ac, a_eq_sum n]
-  exact Finset.sum_congr rfl fun H _ => Tc_eq_T n H
 
 /-! ## The §9 strip-capture lower bound -/
 

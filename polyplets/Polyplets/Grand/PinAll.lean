@@ -206,14 +206,7 @@ theorem level_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : �
   · exact hg i (by omega)
   · exact hG
 
-/-! ## The data: `P_k`, `c_k`, and the anchor cells -/
-
-/-- The production polynomials `P_0 … P_18` of `Pin.lean`. -/
-noncomputable def Pk : ℕ → Polynomial ℚ
-  | 0 => Pp0 | 1 => Pp1 | 2 => Pp2 | 3 => Pp3 | 4 => Pp4 | 5 => Pp5 | 6 => Pp6
-  | 7 => Pp7 | 8 => Pp8 | 9 => Pp9 | 10 => Pp10 | 11 => Pp11 | 12 => Pp12
-  | 13 => Pp13 | 14 => Pp14 | 15 => Pp15 | 16 => Pp16 | 17 => Pp17 | 18 => Pp18
-  | _ => 0
+/-! ## The data: `c_k` and the anchor cells (`Pk` is `Pin.lean`'s) -/
 
 /-- `c_i = μ_i·3^(2i-1)`, the integer staircase coefficients, `i ≤ 18`. -/
 def cTab : ℕ → ℚ
@@ -296,8 +289,7 @@ lemma stair_check : ∀ k, 1 ≤ k → k ≤ 18 → ∀ x : ℚ,
     (Pk k).eval (x + 1) = ∑ i ∈ Finset.range (k + 1), cTab i * (Pk (k - i)).eval (x - i) := by
   intro k h1 h2 x
   interval_cases k <;>
-    norm_num [Finset.sum_range_succ, Pk, cTab, Pp0, Pp1, Pp2, Pp3, Pp4, Pp5, Pp6, Pp7, Pp8,
-      Pp9, Pp10, Pp11, Pp12, Pp13, Pp14, Pp15, Pp16, Pp17, Pp18, prodPoly_eval] <;>
+    norm_num [Finset.sum_range_succ, Pk, cTab, prodPoly_eval] <;>
     ring
 
 set_option maxHeartbeats 1600000 in
@@ -309,8 +301,7 @@ lemma anchor_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
   intro k h1 h2
   rw [(hA k h1 h2).1]
   interval_cases k <;>
-    norm_num [Pk, anchorA, Pp1, Pp2, Pp3, Pp4, Pp5, Pp6, Pp7, Pp8, Pp9, Pp10, Pp11, Pp12, Pp13,
-      Pp14, Pp15, Pp16, Pp17, Pp18, prodPoly_eval]
+    norm_num [Pk, anchorA, prodPoly_eval]
 
 set_option maxHeartbeats 1600000 in
 -- 18 levels of `norm_num` on sums of up to 18 big rationals
@@ -323,17 +314,16 @@ lemma num_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
   intro k h1 h2
   rw [(hA k h1 h2).2]
   interval_cases k <;>
-    norm_num [Finset.sum_range_succ, Pk, cTab, anchorB, Pp0, Pp1, Pp2, Pp3, Pp4, Pp5, Pp6,
-      Pp7, Pp8, Pp9, Pp10, Pp11, Pp12, Pp13, Pp14, Pp15, Pp16, Pp17, Pp18, prodPoly_eval]
+    norm_num [Finset.sum_range_succ, Pk, cTab, anchorB, prodPoly_eval]
 
 /-! ## The climb -/
 
 /-- Level `0`: `3·T(H, H) = 1·3^H`, from `T(n,n) = 3^(n-1)`. -/
-lemma grand_zero : GrandForm 0 Pp0 := by
+lemma grand_zero : GrandForm 0 (Pk 0) := by
   intro H hH
-  simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one]
-  rw [T_diag_pow H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast, Pp0,
-    prodPoly_eval, show (3 : ℚ) ^ H = 3 * 3 ^ (H - 1) from by rw [← pow_succ']; congr 1; omega]
+  simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one, Pk, prodPoly_eval]
+  rw [T_diag_pow H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast,
+    show (3 : ℚ) ^ H = 3 * 3 ^ (H - 1) from by rw [← pow_succ']; congr 1; omega]
   norm_num
 
 /-- Level `0`: `P_0 = 1` and `μ_0`. -/
@@ -374,15 +364,15 @@ theorem grand_two : grandOK Pk 2 ∧ muOK cTab 2 := by
   have h1 : grandOK Pk 1 ∧ muOK cTab 1 :=
     level_step 1 (by norm_num) Pk cTab grand_base.1 grand_base.2
       (stair_check 1 (by norm_num) (by norm_num))
-      (by norm_num [T_3_2, Pk, Pp1, prodPoly_eval])
-      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cTab, Pp0, Pp1, prodPoly_eval])
+      (by norm_num [T_3_2, Pk, prodPoly_eval])
+      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cTab, prodPoly_eval])
   exact level_step 2 (by norm_num) Pk cTab h1.1 h1.2 (stair_check 2 (by norm_num) (by norm_num))
-    (by norm_num [Enum.T_5_3, Pk, Pp2, prodPoly_eval])
-    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cTab, Pp0, Pp1, Pp2, prodPoly_eval])
+    (by norm_num [Enum.T_5_3, Pk, prodPoly_eval])
+    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cTab, prodPoly_eval])
 
 /-- **`k = 2` diagonal, unconditional** (production form). -/
 theorem P2_pinned : ∀ n : ℕ, 2 * 2 + 1 ≤ n →
-    (T n (n - 2) : ℚ) = Pp2.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 2) :=
+    (T n (n - 2) : ℚ) = (Pk 2).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 2) :=
   grand_to_prod (grand_two.1 2 le_rfl)
 
 /-- **`k = 2` diagonal, human form**:
@@ -391,7 +381,7 @@ theorem P2_closed (n : ℕ) (hn : 5 ≤ n) :
     (T n (n - 2) : ℚ)
       = (1 / 2) * (625 * (n : ℚ) ^ 2 - 2459 * (n : ℚ) + 1134) * (3 : ℚ) ^ ((n : ℤ) - 7) := by
   have h := P2_pinned n hn
-  rw [Pp2, prodPoly_eval] at h
+  simp only [Pk, prodPoly_eval] at h
   norm_num at h ⊢
   rw [h]; ring_nf
 

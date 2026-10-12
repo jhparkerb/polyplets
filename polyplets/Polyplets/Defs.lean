@@ -169,4 +169,23 @@ arises for the intended `n, H` (finiteness is proved where a theorem needs it).
 noncomputable def T (n H : ℕ) : ℕ :=
   {S : Finset (ℤ × ℤ) | IsCanonical n H S}.ncard
 
+/-- `T 1 1 = 1`: the single cell `{(0, 0)}` is the only one-cell canonical set.
+The seed of the `k = 0` diagonal (`King.lean`). -/
+theorem T_1_1 : T 1 1 = 1 := by
+  rw [T, Set.ncard_eq_one]
+  refine ⟨{(0, 0)}, Set.ext fun S => ?_⟩
+  simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+  constructor
+  · intro h
+    obtain ⟨p, hp⟩ := Finset.card_eq_one.mp h.card
+    obtain ⟨q, hq, hq1⟩ := h.anchored.x_zero
+    obtain ⟨r, hr, hr2⟩ := h.anchored.y_zero
+    rw [hp, Finset.mem_singleton] at hq hr
+    rw [hq] at hq1
+    rw [hr] at hr2
+    rw [hp, show p = (0, 0) from Prod.ext hq1 hr2]
+  · rintro rfl
+    exact ⟨rfl, kingConnected_singleton _,
+      ⟨by simp, ⟨(0, 0), by simp⟩, by simp, ⟨(0, 0), by simp⟩⟩, by simp, ⟨(0, 0), by simp⟩⟩
+
 end Polyplets

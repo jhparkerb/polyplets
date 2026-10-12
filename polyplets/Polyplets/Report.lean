@@ -90,7 +90,7 @@ theorem report_T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
 /-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
 anchor cells, two per level (`BankedAnchors`: `anchorA`, `anchorB` in
 `Grand/PinAll.lean`).
-`Pk k` is the polynomial `Pp<k>` of `Pin.lean`. -/
+`Pk k` is the polynomial of `Pin.lean`. -/
 theorem report_Pk_known (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) (n : ℕ)
     (hn : 2 * k + 1 ≤ n) :
     (T n (n - k) : ℚ) = (Pk k).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) :=

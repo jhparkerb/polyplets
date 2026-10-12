@@ -28,28 +28,32 @@ through the stored boards of `EnumData.lean` (`README.md`, "No
 
 namespace Polyplets
 
-/-! ## The computable counter against the triangle -/
+/-! ## The smallest cells against the triangle -/
 
-/-- Degenerate and impossible shapes count zero, as `T` does. -/
-example : Tc 0 0 = 0 := by decide +kernel
-example : Tc 0 3 = 0 := by decide +kernel
-example : Tc 3 0 = 0 := by decide +kernel
-example : Tc 2 3 = 0 := by decide +kernel
-
+open Enum in
 /-- `T 2 1 = 1`: the horizontal king domino. -/
-theorem T_2_1 : T 2 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
+theorem T_2_1 : T 2 1 = 1 := by
+  rw [T_eq_length (by norm_num) (by norm_num)]; decide +kernel
 
+open Enum in
 /-- `T 2 2 = 3`: vertical domino and the two diagonal king dominoes. -/
-theorem T_2_2 : T 2 2 = 3 := by rw [← Tc_eq_T]; decide +kernel
+theorem T_2_2 : T 2 2 = 3 := by
+  rw [T_eq_length (by norm_num) (by norm_num)]; decide +kernel
 
+open Enum in
 /-- `T 3 1 = 1`: the horizontal tromino. -/
-theorem T_3_1 : T 3 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
+theorem T_3_1 : T 3 1 = 1 := by
+  rw [T_eq_length (by norm_num) (by norm_num)]; decide +kernel
 
+open Enum in
 /-- `a 1 = 1`: the single cell. -/
-theorem a_1 : a 1 = 1 := by rw [← ac_eq_a 1]; decide +kernel
+theorem a_1 : a 1 = 1 := by
+  rw [a_eq_length (by norm_num) (by norm_num)]; decide +kernel
 
+open Enum in
 /-- `a 2 = 4`: the horizontal, vertical and two diagonal king dominoes. -/
-theorem a_2 : a 2 = 4 := by rw [← ac_eq_a 2]; decide +kernel
+theorem a_2 : a 2 = 4 := by
+  rw [a_eq_length (by norm_num) (by norm_num)]; decide +kernel
 
 /-! ## The weights, and the peeling identities at their onset -/
 

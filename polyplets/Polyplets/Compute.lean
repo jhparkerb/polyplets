@@ -7,27 +7,22 @@ import Mathlib.Tactic.Push
 import Polyplets.Finite
 
 /-!
-# A computable counter for `T`
+# Deciding king connectivity, and the enumeration box
 
-`T n H` is defined noncomputably as an `ncard`. This file provides a computable
-counterpart `Tc n H` — enumerate the `n`-element subsets of the box
-`[0, n-1] × [0, H-1]` (the box `canonical_finite` proves contains every
-canonical set) and count those passing a decidable canonicality check — and
-proves `Tc_eq_T : Tc n H = T n H`.
+`Defs.lean` states king-connectivity via `Relation.ReflTransGen`. This file
+decides it by a bounded closure computation: `S.card` rounds of neighbor
+expansion inside `S` from a seed cell (`reachSet`). Soundness
+(`reachSet_sound`) reads a king path off the expansion rounds; completeness
+(`reachSet_complete`) is the finite fixpoint argument — the expansion chain is
+monotone and confined to `S`, so it stalls within `S.card` rounds
+(`stepExpand_reachSet`), and a stalled set absorbs king steps, hence contains
+everything path-reachable. With it `IsCanonical n H S` is decidable.
 
-The one nontrivial decidability ingredient is king-connectivity, which
-`Defs.lean` states via `Relation.ReflTransGen`. We decide it by a bounded
-closure computation: `S.card` rounds of neighbor expansion inside `S` from a
-seed cell (`reachSet`). Soundness (`reachSet_sound`) reads a king path off the
-expansion rounds; completeness (`reachSet_complete`) is the finite fixpoint
-argument — the expansion chain is monotone and confined to `S`, so it stalls
-within `S.card` rounds (`stepExpand_reachSet`), and a stalled set absorbs king
-steps, hence contains everything path-reachable.
-
-Kernel `decide` on `Tc` (and, through `Tc_eq_T`, on `T` itself) reaches the
-smallest banked values of `results/triangle.txt`; its memory grows fast with
-the cell (6 GB at `T 3 3`, past 8 GB at `T 5 4`), so the cells stop at
-`T 4 3`. The three the proofs need are here, the rest in `Checks.lean`.
+`box n H` is the finite box `[0, n-1] × [0, H-1]` that `canonical_finite`
+proves contains every canonical set; `Weights.lean` enumerates its subsets
+and `Enum.lean`'s bit-board flood is this closure on boards. The powerset
+counter `Tc` that once lived here was removed 2026-10-12: every cell it could
+decide (up to `T 4 3`, at 5.5 GB) the enumerator decides in under a second.
 -/
 
 namespace Polyplets
@@ -194,12 +189,6 @@ lemma mem_box {n H : ℕ} {p : ℤ × ℤ} :
     rw [Prod.ext_iff]
     constructor <;> simp <;> omega
 
-/-- **Computable counter for `T`**: enumerate the `n`-element subsets of the
-box and count the canonical ones. Pure brute force — exponential in the box
-size, meant for validation at small `n, H` only. -/
-def Tc (n H : ℕ) : ℕ :=
-  (((box n H).powersetCard n).filter fun S => IsCanonical n H S).card
-
 /-- Every canonical set is an `n`-element subset of the box — the height
 bounds are part of `IsCanonical`, the width bound is `canonical_x_le`. -/
 lemma canonical_mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
@@ -212,36 +201,5 @@ lemma canonical_mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
   have hy0 := h.anchored.y_nonneg p hp
   have hy1 := h.y_le p hp
   omega
-
-/-- **The computable counter agrees with `T`.** The filtered enumeration is
-exactly the materialized canonical set of `Finite.lean`. Degenerate cases need
-no special handling: for `n = 0` or `H = 0` the `∃`-clauses of `IsCanonical`
-are unsatisfiable, so both sides are `0`. -/
-theorem Tc_eq_T (n H : ℕ) : Tc n H = T n H := by
-  have hset : ((box n H).powersetCard n).filter (fun S => IsCanonical n H S)
-      = (canonical_finite n H).toFinset := by
-    ext S
-    simp only [Finset.mem_filter, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
-    exact ⟨fun h => h.2, fun h => ⟨canonical_mem_powersetCard_box h, h⟩⟩
-  rw [Tc, hset, T_eq_toFinset_card]
-
-/-! ## The cell the shape theorem seeds from
-
-`T 1 1 = 1` seeds the `k = 0` pin (`King.lean`). The two `P_1` onset cells,
-`T 3 2` and `T 4 3`, are decided through the bit-board enumerator at the end
-of `Enum.lean`, not through `Tc`: `T 4 3` costs 14.8 s and 5.5 GB here
-against 0.4 s there (measured 2026-10-12). -/
-
-/-- `T 1 1 = 1`: the single cell. -/
-theorem T_1_1 : T 1 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
-
-/-!
-Memory of kernel `decide` on this brute-force `Tc`
-(`scripts/lean-decide-trials.sh`, 2026-10-12): `T 1 1` … `T 3 2` peak at
-2.7–3.3 GB, `T 4 3` at 5.5 GB;
-`T 3 3` needs 6 GB; `T 5 4` (`C(20,5) = 15504` subsets) passes 8 GB and was
-killed. Cells beyond `P_1`'s onset points enter the development only as
-hypotheses (`Grand/PinAll.lean`, `BankedAnchors`).
--/
 
 end Polyplets

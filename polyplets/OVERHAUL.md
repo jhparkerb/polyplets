@@ -106,8 +106,9 @@ TODO.
 
 - [ ] C1. The king vocabulary is a bridged copy, not an instance:
       `Weights.lean` (rowSize, Dc, d, IsVConfig/IsVtConfig, CFGV/CFGVt, V,
-      Vt, window independence) and `Compute.lean`'s closure/`Tc` repeat
-      `Universal/{Weights,Compute}` at `kingLattice`, and `King.lean`
+      Vt, window independence) and `Compute.lean`'s closure repeat
+      `Universal/{Weights,Compute}` at `kingLattice` (the king `Tc`/`ac`
+      were removed 2026-10-12), and `King.lean`
       bridges them field by field. Make the king objects abbreviations of
       the universal ones, take `V 1 1`, `Vt 1 1`, `d 0 1` from `Enum` (which
       must then sit upstream of `LeadingCoeff` and `Grand/Mu`), and merge
@@ -132,11 +133,10 @@ TODO.
       4.1 GB), and `Nat.log2` costs 0.75 ms per board against 0.25 ms for
       a shift binary search (about 3 s of each `T_rows`/`d_rows`/`weights`
       check and of `T_6_4`). Together about a third off every EnumData run.
-- [ ] C4. Aliases of `translate`: `Growth.shiftBy` (48 uses, with
-      `shiftBy_shiftBy`/`shiftBy_cancel` restating `translate_translate`/
-      `translate_zero`) and `Universal/Peel.shift`; `Peel.rowSize_shift` at
-      `b = 0` is `Enum.rowSize_translate_x`. Use `translate` directly and
-      put `rowSize_shift` in `Universal/Defs`.
+- [ ] C4. Aliases of `translate`: `Universal/Peel.shift`; `Peel.rowSize_shift`
+      at `b = 0` is `Enum.rowSize_translate_x`. Use `translate` directly and
+      put `rowSize_shift` in `Universal/Defs`. (`Growth.shiftBy` done
+      2026-10-12: `translate` with `mem_translate_mk`.)
 - [ ] C5. Small twins: `Enum.minX`/`minY` with `minX_le`, `exists_minX`
       and the halves of `anchorVec_cells`, parametrized by the projection;
       the canonical-animal box bound rederived in `Enum` (three sites),

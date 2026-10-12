@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 43 modules, about 15,300 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 43 modules, about 15,200 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -71,8 +71,8 @@ the enumeration, no holdout exists, and no banked term uses it.
 Definitions (`Defs.lean`): a fixed polyplet is a finite set of cells of ℤ²,
 king-connected, anchored with min x = min y = 0; `T n H` is the number with
 n cells and max y = H − 1, `a n` the row sum (`Sequence.lean`). `Finite.lean` bounds the width so these are finite;
-`Compute.lean` gives the computable twin `Tc` and `Tc_eq_T`, which is how the
-small cells are decided by the kernel.
+`Compute.lean` decides king-connectivity, so `IsCanonical` is decidable; the
+small cells are decided by the kernel through the enumerator of `Enum.lean`.
 
 The peeling recursion (`Universal/Separation`, `Universal/Weights`,
 `Universal/Peel`, proved for every row-local lattice; `King.lean` reads the
@@ -137,8 +137,8 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 |---|---|
 | `Defs` | king adjacency, connectivity, canonical form, `T` |
 | `Finite` | width bound; `T` as a `Finset.card` |
-| `Compute` | computable `Tc`, `Tc_eq_T`, the three kernel-decided cells the proofs use |
-| `Sequence` | `a n`, `a_eq_sum`, computable twin `ac` |
+| `Compute` | decidable king-connectivity and `IsCanonical`; the enumeration box |
+| `Sequence` | `a n`, `a_eq_sum` |
 | `Weights` | the king `d`, `V`, `Vt` as computable enumerations, window independence, `V 1 1 = 25`, `d 0 1 = 1` |
 | `King` | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `c_ident`, `shape_production`, `production_int_all`, `T_diag_pow` in king vocabulary |
 | `DiscreteCalculus` | the discrete antiderivative, integer values by finite differences |
@@ -179,11 +179,12 @@ it is on the standard three axioms. (The RD = 3 certificate check was the last
 holdout: 5930 rows with `List.getD` lookups were beyond the kernel, balanced
 trees made it an 11-second `decide +kernel`.)
 
-The powerset counters (`Tc`, `ac`, the window enumerations of `Weights.lean`)
-reach the kernel only for the smallest cells: T(1,1), T(2,1), T(2,2), T(3,1),
-T(3,2), T(4,3), a(1), a(2), V(1,1), Vt(1,1), Vt(1,2), d(0,1), d(0,2), d(1,2)
-at 2.7–3.5 GB each; T(3,3), a(3), d(0,3) need 6 GB and anything larger passes
-8 GB (`scripts/lean-decide-trials.sh`, 2026-10-12). Everything up to six
+The window enumerations of `Weights.lean` reach the kernel only for the
+smallest cells: V(1,1), Vt(1,1), Vt(1,2), d(0,1), d(0,2), d(1,2) at 2.7–3.5 GB
+each; d(0,3) needs 6 GB and anything larger passes 8 GB
+(`scripts/lean-decide-trials.sh`, 2026-10-12; the powerset counters `Tc` and
+`ac` measured there were removed 2026-10-12, the enumerator having replaced
+them). Everything up to six
 cells comes instead from `Enum.lean`: a cell set is one natural number (bit
 `16y + x`), the animals of `n + 1` cells are grown from those of `n` cells by
 adjoining a frontier cell and keeping the child exactly when that cell is
