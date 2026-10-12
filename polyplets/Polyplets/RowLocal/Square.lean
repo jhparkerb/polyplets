@@ -27,7 +27,7 @@ counts fixed polyominoes of `n` cells and bounding-box height exactly `H`.
 
 ## What is determined here
 
-* `isDiagonalPoly_sqP1` / `square_T_sub_one` : `P₁(n) = 4n − 8`, i.e.
+* `isDiagonalPoly_squareP1` / `square_T_sub_one` : `P₁(n) = 4n − 8`, i.e.
   `T(n, n−1) = 4n − 8` for `n ≥ 3` (paper instance table, density `4 = 2²`),
   given the second cell `T(4,3) = 8` as a hypothesis. The first
   `T(3,2) = 4` the kernel decides from the generic enumerator `Tc`, and
@@ -87,40 +87,41 @@ theorem T_square_3_2 : T squareLattice 3 2 = 4 := by
 /-! ## Pinning `P₁` -/
 
 /-- The square lattice's level-1 diagonal polynomial `P₁ = 4X − 8`. -/
-noncomputable def sqP1 : Polynomial ℚ := C 4 * X - C 8
+noncomputable def squareP1 : Polynomial ℚ := C 4 * X - C 8
 
 /-- `P₁` has degree `≤ 1`. -/
-lemma sqP1_deg : sqP1.natDegree ≤ 1 := by
+lemma squareP1_deg : squareP1.natDegree ≤ 1 := by
   refine le_trans (natDegree_sub_le _ _) (max_le ?_ ?_)
   · exact le_trans (natDegree_C_mul_le _ _) (by simp)
   · simp
 
 /-- `P₁` evaluated. -/
-lemma sqP1_eval (x : ℚ) : sqP1.eval x = 4 * x - 8 := by simp [sqP1]
+lemma squareP1_eval (x : ℚ) : squareP1.eval x = 4 * x - 8 := by simp [squareP1]
 
 /-- Guard at the first pin point: `P₁(3) = T(3,2) · b^1 = 4`. -/
-lemma sqP1_eval_three :
-    sqP1.eval (3 : ℚ) = ((T squareLattice 3 2 * squareLattice.b ^ 1 : ℕ) : ℚ) := by
-  rw [sqP1_eval, T_square_3_2, b_square]; norm_num
+lemma squareP1_eval_three :
+    squareP1.eval (3 : ℚ) = ((T squareLattice 3 2 * squareLattice.b ^ 1 : ℕ) : ℚ) := by
+  rw [squareP1_eval, T_square_3_2, b_square]; norm_num
 
 /-- Guard at the second pin point: `P₁(4) = T(4,3) · b^0 = 8`, given the cell. -/
-lemma sqP1_eval_four (h43 : T squareLattice 4 3 = 8) :
-    sqP1.eval (4 : ℚ) = ((T squareLattice 4 3 * squareLattice.b ^ 0 : ℕ) : ℚ) := by
-  rw [sqP1_eval, h43, b_square]; norm_num
+lemma squareP1_eval_four (h43 : T squareLattice 4 3 = 8) :
+    squareP1.eval (4 : ℚ) = ((T squareLattice 4 3 * squareLattice.b ^ 0 : ℕ) : ℚ) := by
+  rw [squareP1_eval, h43, b_square]; norm_num
 
 /-- **The square `P₁`**, given the second cell
 `T(4,3) = 8`: Lagrange uniqueness identifies `4X − 8` with the witness of
 `RowLocal.exists_isDiagonalPoly`. -/
-theorem isDiagonalPoly_sqP1 (h43 : T squareLattice 4 3 = 8) :
-    IsDiagonalPoly squareLattice 1 sqP1 := by
-  refine isDiagonalPoly_of_eval squareLattice 1 sqP1 sqP1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
+theorem isDiagonalPoly_squareP1 (h43 : T squareLattice 4 3 = 8) :
+    IsDiagonalPoly squareLattice 1 squareP1 := by
+  refine isDiagonalPoly_of_eval squareLattice 1 squareP1 squareP1_deg ({3, 4} : Finset ℕ)
+    (by decide) ?_ ?_
   · intro n hn; fin_cases hn <;> norm_num
   · intro n hn
     fin_cases hn
     · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
-      exact sqP1_eval_three
+      exact squareP1_eval_three
     · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
-      exact sqP1_eval_four h43
+      exact squareP1_eval_four h43
 
 /-- **The square `P₁`, human form**: the number of fixed polyominoes with `n`
 cells and bounding-box height exactly `n − 1` is `4n − 8`, for every `n ≥ 3`,
@@ -128,8 +129,8 @@ given `T(4,3) = 8`. (The drift factor is `1^(n-4) = 1`, so the law
 *is* the closed form.) -/
 theorem square_T_sub_one (h43 : T squareLattice 4 3 = 8) (n : ℕ) (hn : 3 ≤ n) :
     (T squareLattice n (n - 1) : ℚ) = 4 * (n : ℚ) - 8 := by
-  have h := isDiagonalPoly_sqP1 h43 n (by omega)
+  have h := isDiagonalPoly_squareP1 h43 n (by omega)
   rw [b_square] at h
-  simpa [sqP1_eval] using h
+  simpa [squareP1_eval] using h
 
 end Polyplets.RowLocal

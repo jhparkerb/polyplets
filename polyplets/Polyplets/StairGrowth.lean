@@ -11,18 +11,18 @@ import Polyplets.Fekete
 import Polyplets.StairAnimals
 
 /-!
-# `µ`: the staircase king animals have a growth constant
+# `µ`: the staircase polyplets have a growth constant
 
 `StairAnimals.lean` proves the combinatorial core of
 `results/subclasses.md` Lemma 3 — the column-join stays in the class and
 is injective once both areas are fixed. This file is the counting layer on top
 of it, and the Fekete step:
 
-* `M n` — the number of staircase king animals of area `n`, up to translation;
+* `M n` — the number of staircase polyplets of area `n`, up to translation;
 * `M_supermul` — **Lemma 3**, `M i * M j ≤ M (i + j)`, for all `i` and `j`;
 * `M_tendsto` — `µ = lim M(n)^{1/n}` exists;
 * `M_le_mu_pow` — `M n ≤ µⁿ` for every `n`, the limit-is-supremum half;
-* `mu_gt_of_banked` — `3.1234 < µ`, **conditional** on the banked
+* `mu_gt_of_M_700` — `3.1234 < µ`, **conditional** on the banked
   `M 700` of `results/mk_stair_terms_n700.txt`.
 
 The last two are the point. `make gate-middle-kingdom` checks
@@ -52,7 +52,7 @@ compositions, `∏ (hⱼ + 1) ≤ 2ⁿ` offsets) done as a recursion instead of 
 product formula, which keeps it to one arithmetic lemma (`sum_pow_bound`).
 -/
 
-namespace Polyplets.Stair
+namespace Polyplets.Staircase
 
 open Finset
 
@@ -62,17 +62,17 @@ open Finset
 cells: a first column of height `k + 1 ≤ n` and offset `d ≤ p`, then a legal
 continuation of the remaining `n - k - 1` cells. No staircase inequality is
 enforced: this is a superset chosen so that its cardinality is easy to bound. -/
-def cand : ℕ → ℕ → Finset (List Col)
+def cand : ℕ → ℕ → Finset (List Column)
   | _, 0 => {[]}
   | p, (n + 1) =>
       (range (n + 1)).biUnion fun k =>
         (range (p + 1)).biUnion fun d =>
-          (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Col) :: t)
+          (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Column) :: t)
 termination_by _ n => n
 decreasing_by omega
 
 /-- Every legal continuation is a candidate. -/
-theorem mem_cand : ∀ (l : List Col) (p : ℕ), ValidFrom p l → l ∈ cand p (area l)
+theorem mem_cand : ∀ (l : List Column) (p : ℕ), ValidFrom p l → l ∈ cand p (area l)
   | [], p, _ => by simp [area, cand]
   | c :: t, p, hv => by
       have h1 : 1 ≤ c.1 := hv.1
@@ -118,17 +118,17 @@ theorem card_cand : ∀ (n p : ℕ), (cand p n).card ≤ (p + 1) * 4 ^ n
   | (n + 1), p => by
       rw [cand]
       calc ((range (n + 1)).biUnion fun k => (range (p + 1)).biUnion fun d =>
-              (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Col) :: t)).card
+              (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Column) :: t)).card
           ≤ ∑ k ∈ range (n + 1), ((range (p + 1)).biUnion fun d =>
-              (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Col) :: t)).card :=
+              (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Column) :: t)).card :=
             Finset.card_biUnion_le
         _ ≤ ∑ k ∈ range (n + 1), (p + 1) * ((k + 1 + 1) * 4 ^ (n - k)) := by
             refine Finset.sum_le_sum fun k _ => ?_
             calc ((range (p + 1)).biUnion fun d =>
-                    (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Col) :: t)).card
+                    (cand (k + 1) (n - k)).image (fun t => ((k + 1, d) : Column) :: t)).card
                 ≤ ∑ _d ∈ range (p + 1),
                     ((cand (k + 1) (n - k)).image
-                      (fun t => ((k + 1, _d) : Col) :: t)).card := Finset.card_biUnion_le
+                      (fun t => ((k + 1, _d) : Column) :: t)).card := Finset.card_biUnion_le
               _ ≤ ∑ _d ∈ range (p + 1), (k + 1 + 1) * 4 ^ (n - k) :=
                   Finset.sum_le_sum fun _ _ =>
                     le_trans Finset.card_image_le (card_cand (n - k) (k + 1))
@@ -141,27 +141,27 @@ theorem card_cand : ∀ (n p : ℕ), (cand p n).card ≤ (p + 1) * 4 ^ n
 
 /-- A staircase animal is in particular a legal continuation of a height-`0`
 column: pinning the first offset to `0` is exactly what `ValidFrom 0` asks. -/
-theorem validFrom_zero_of_valid : ∀ {l : List Col}, Valid l → ValidFrom 0 l
+theorem validFrom_zero_of_isStaircase : ∀ {l : List Column}, IsStaircase l → ValidFrom 0 l
   | _ :: _, hv => ⟨hv.1, le_of_eq hv.2.1, Nat.zero_le _, hv.2.2⟩
 
 /-- The staircase animals of a fixed area form a finite set. -/
-theorem setM_finite (n : ℕ) : {l : List Col | Valid l ∧ area l = n}.Finite := by
+theorem setM_finite (n : ℕ) : {l : List Column | IsStaircase l ∧ area l = n}.Finite := by
   refine Set.Finite.subset (cand 0 n).finite_toSet ?_
   rintro l ⟨hv, ha⟩
-  have hm := mem_cand l 0 (validFrom_zero_of_valid hv)
+  have hm := mem_cand l 0 (validFrom_zero_of_isStaircase hv)
   rw [ha] at hm
   exact Finset.mem_coe.mpr hm
 
 /-! ## `M n` and Lemma 3 -/
 
-/-- **`M n`** — staircase king animals of area `n`, up to translation.
+/-- **`M n`** — staircase polyplets of area `n`, up to translation.
 `Nat.card` returns the junk value `0` on an infinite type; `setM_finite` is what
 rules that out here. -/
-noncomputable def M (n : ℕ) : ℕ := Nat.card {l : List Col // Valid l ∧ area l = n}
+noncomputable def M (n : ℕ) : ℕ := Nat.card {l : List Column // IsStaircase l ∧ area l = n}
 
 /-- `Nat.card` of the subtype is `ncard` of the set, the form the `Finset`
 arguments below want. -/
-theorem M_eq_ncard (n : ℕ) : M n = {l : List Col | Valid l ∧ area l = n}.ncard :=
+theorem M_eq_ncard (n : ℕ) : M n = {l : List Column | IsStaircase l ∧ area l = n}.ncard :=
   Nat.card_coe_set_eq _
 
 /-- `M n` as a `Finset` cardinality — `a_supermul`'s `key`, one encoding over. -/
@@ -197,7 +197,7 @@ theorem M_le_pow (n : ℕ) : M n ≤ 4 ^ n := by
   have hsub : (setM_finite n).toFinset ⊆ cand 0 n := by
     intro l hl
     rw [Set.Finite.mem_toFinset] at hl
-    have hm := mem_cand l 0 (validFrom_zero_of_valid hl.1)
+    have hm := mem_cand l 0 (validFrom_zero_of_isStaircase hl.1)
     rwa [hl.2] at hm
   calc (setM_finite n).toFinset.card ≤ (cand 0 n).card := Finset.card_le_card hsub
     _ ≤ (0 + 1) * 4 ^ n := card_cand n 0
@@ -205,7 +205,7 @@ theorem M_le_pow (n : ℕ) : M n ≤ 4 ^ n := by
 
 /-- **Lemma 3** (`results/subclasses.md`): the staircase count is
 supermultiplicative, on the nose and with no factor. `StairAnimals.lean`'s
-`join_valid` says the join lands in the class and `join_injOn` says the pair is
+`join_isStaircase` says the join lands in the class and `join_injOn` says the pair is
 recovered from the join alone once both areas are fixed; this is those two read
 as a cardinality.
 
@@ -219,7 +219,7 @@ theorem M_supermul (i j : ℕ) : M i * M j ≤ M (i + j) := by
     rw [Finset.mem_coe, Finset.mem_product] at hz
     simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hz
     rw [Finset.mem_coe, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
-    exact ⟨join_valid hz.1.1 hz.2.1, by rw [area_join, hz.1.2, hz.2.2]⟩
+    exact ⟨join_isStaircase hz.1.1 hz.2.1, by rw [area_join, hz.1.2, hz.2.2]⟩
   · intro z hz w hw heq
     rw [Finset.mem_coe, Finset.mem_product] at hz hw
     simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hz hw
@@ -284,7 +284,7 @@ is far from the measured `µ = 3.128943269730886…`. It is not an extrapolation
 the inequality direction is `M_le_mu_pow`, a theorem, which is what Lemma 3
 buys. The digits appear once, in the statement; the proof carries `M 700` and
 rewrites by the hypothesis at the last moment. -/
-theorem mu_gt_of_banked (h : M 700 = 17368528651849586692964028326758271833612371383870423413808116889318363599460025100827498779086610136761902989817504169488748816867918876735230734086164154151538989546114696139586414190817304691612024386097843528450235138333808483697230123839488604376917096321409200698726184492443222298900447735379737893097804045322780266978742339265500438636729) : (15617 / 5000 : ℝ) < mu := by
+theorem mu_gt_of_M_700 (h : M 700 = 17368528651849586692964028326758271833612371383870423413808116889318363599460025100827498779086610136761902989817504169488748816867918876735230734086164154151538989546114696139586414190817304691612024386097843528450235138333808483697230123839488604376917096321409200698726184492443222298900447735379737893097804045322780266978742339265500438636729) : (15617 / 5000 : ℝ) < mu := by
   have hle : (M 700 : ℝ) ≤ mu ^ 700 := M_le_mu_pow 700
   have hnum : (15617 : ℕ) ^ 700 < M 700 * 5000 ^ 700 := by
     rw [h]
@@ -300,4 +300,4 @@ theorem mu_gt_of_banked (h : M 700 = 1736852865184958669296402832675827183361237
     exact hnumR
   exact lt_of_pow_lt_pow_left₀ 700 (le_of_lt mu_pos) hpow
 
-end Polyplets.Stair
+end Polyplets.Staircase

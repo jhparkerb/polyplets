@@ -8,11 +8,11 @@ import Mathlib.Data.Nat.Basic
 import Mathlib.Order.RelClasses
 
 /-!
-# Staircase king animals: the column-join is injective at fixed area
+# Staircase polyplets: the column-join is injective at fixed area
 
 `results/subclasses.md` Lemma 3, and B1 of `docs/publication.md`.
 
-A *staircase king animal* is a king animal whose column intervals have both
+A *staircase polyplet* is a polyplet whose column intervals have both
 boundaries nondecreasing (A225114 in OEIS; the middle block of the HV-convex
 phase factorisation). Up to translation it is a nonempty list of columns
 `(h, d)`, where `h` is the column's height and `d` the offset of its bottom
@@ -26,7 +26,7 @@ The content of Lemma 3 is that joining two of them with the offset
 `d = max(0, p − h')` lands back in the class and is **injective once the two
 areas are fixed**: column areas are positive, so the prefix of total area `i` is
 unique and no split index has to be carried alongside the join. This file proves
-exactly that — `join_valid`, `area_join`, `cut_join` — which is the combinatorial
+exactly that — `join_isStaircase`, `area_join`, `cut_join` — which is the combinatorial
 core of `M i * M j ≤ M (i + j)`.
 
 The counting layer on top of this — `M n`, `M i * M j ≤ M (i + j)`, and the
@@ -35,50 +35,50 @@ growth constant `µ` — is `StairGrowth.lean`, which reuses the Fekete ladder o
 combinatorial content: the join, the cut, and the injectivity.
 -/
 
-namespace Polyplets.Stair
+namespace Polyplets.Staircase
 
 /-- A column: its height, and the offset of its bottom above the previous
 column's bottom. -/
-abbrev Col := ℕ × ℕ
+abbrev Column := ℕ × ℕ
 
 /-- `ValidFrom p l`: `l` is a legal continuation to the right of a column of
 height `p`. -/
-def ValidFrom : ℕ → List Col → Prop
+def ValidFrom : ℕ → List Column → Prop
   | _, [] => True
   | p, c :: t => 1 ≤ c.1 ∧ c.2 ≤ p ∧ p ≤ c.1 + c.2 ∧ ValidFrom c.1 t
 
 /-- A staircase animal: nonempty, first offset pinned to `0` (the translation
 quotient), and every later column legal against its predecessor. -/
-def Valid : List Col → Prop
+def IsStaircase : List Column → Prop
   | [] => False
   | c :: t => 1 ≤ c.1 ∧ c.2 = 0 ∧ ValidFrom c.1 t
 
 /-- Area = total number of cells. -/
-def area (l : List Col) : ℕ := (l.map Prod.fst).sum
+def area (l : List Column) : ℕ := (l.map Prod.fst).sum
 
-/-- The height of the last column (`0` on the empty list, which `Valid` excludes). -/
-def lastH : List Col → ℕ
+/-- The height of the last column (`0` on the empty list, which `IsStaircase` excludes). -/
+def lastHeight : List Column → ℕ
   | [] => 0
   | [c] => c.1
-  | _ :: t => lastH t
+  | _ :: t => lastHeight t
 
 /-- Re-anchor: zero the first column's offset, undoing a join's translation. -/
-def norm : List Col → List Col
+def norm : List Column → List Column
   | [] => []
   | c :: t => (c.1, 0) :: t
 
 /-- The column-join: translate `y` so that its first column sits at offset
-`max(0, lastH x − h')`, then concatenate. Truncated subtraction *is* the
+`max(0, lastHeight x − h')`, then concatenate. Truncated subtraction *is* the
 `max(0, ·)`. -/
-def join (x y : List Col) : List Col :=
+def join (x y : List Column) : List Column :=
   match y with
   | [] => x
-  | c :: t => x ++ (c.1, lastH x - c.1) :: t
+  | c :: t => x ++ (c.1, lastHeight x - c.1) :: t
 
 /-- Recover the two factors: walk the columns until the cumulative area reaches
 `i`. Well defined because every column has positive height, so the prefix of
 area exactly `i` is unique. -/
-def cut : ℕ → List Col → List Col × List Col
+def cut : ℕ → List Column → List Column × List Column
   | _, [] => ([], [])
   | i, c :: t =>
       if i ≤ c.1 then ([c], t)
@@ -86,16 +86,16 @@ def cut : ℕ → List Col → List Col × List Col
 
 @[simp] theorem area_nil : area [] = 0 := rfl
 
-@[simp] theorem area_cons (c : Col) (t : List Col) : area (c :: t) = c.1 + area t := rfl
+@[simp] theorem area_cons (c : Column) (t : List Column) : area (c :: t) = c.1 + area t := rfl
 
-@[simp] theorem area_append (x y : List Col) : area (x ++ y) = area x + area y := by
+@[simp] theorem area_append (x y : List Column) : area (x ++ y) = area x + area y := by
   induction x with
   | nil => simp
   | cons c t ih => simp [area_cons, ih, Nat.add_assoc]
 
 /-- Every column of a valid continuation has positive height, so a nonempty
 continuation has positive area. -/
-theorem area_pos_of_validFrom {p : ℕ} : ∀ {l : List Col}, ValidFrom p l → l ≠ [] → 0 < area l
+theorem area_pos_of_validFrom {p : ℕ} : ∀ {l : List Column}, ValidFrom p l → l ≠ [] → 0 < area l
   | [], _, h => absurd rfl h
   | c :: t, hv, _ => by
       have : 1 ≤ c.1 := hv.1
@@ -104,48 +104,50 @@ theorem area_pos_of_validFrom {p : ℕ} : ∀ {l : List Col}, ValidFrom p l → 
 
 /-- The unfolding lemma for `ValidFrom` at a cons, stated so proofs can name the
 three constraints rather than re-deriving them from the definition. -/
-theorem validFrom_cons {p : ℕ} {c : Col} {t : List Col} :
+theorem validFrom_cons {p : ℕ} {c : Column} {t : List Column} :
     ValidFrom p (c :: t) ↔ 1 ≤ c.1 ∧ c.2 ≤ p ∧ p ≤ c.1 + c.2 ∧ ValidFrom c.1 t := Iff.rfl
 
 /-- Appending a legal continuation to a valid animal keeps `ValidFrom`. -/
-theorem validFrom_append {p : ℕ} : ∀ {x : List Col} {y : List Col},
-    ValidFrom p x → x ≠ [] → ValidFrom (lastH x) y → ValidFrom p (x ++ y)
+theorem validFrom_append {p : ℕ} : ∀ {x : List Column} {y : List Column},
+    ValidFrom p x → x ≠ [] → ValidFrom (lastHeight x) y → ValidFrom p (x ++ y)
   | [], _, _, h, _ => absurd rfl h
   | [c], y, hx, _, hy => by
       refine ⟨hx.1, hx.2.1, hx.2.2.1, ?_⟩
-      simpa [lastH] using hy
+      simpa [lastHeight] using hy
   | c :: c' :: t, y, hx, _, hy => by
       refine ⟨hx.1, hx.2.1, hx.2.2.1, ?_⟩
-      have : ValidFrom (lastH (c' :: t)) y := by simpa [lastH] using hy
+      have : ValidFrom (lastHeight (c' :: t)) y := by simpa [lastHeight] using hy
       exact validFrom_append hx.2.2.2 (by simp) this
 
 /-- A valid animal is nonempty. -/
-theorem Valid.exists_cons {x : List Col} (hx : Valid x) : ∃ e s, x = e :: s := by
+theorem IsStaircase.exists_cons {x : List Column} (hx : IsStaircase x) : ∃ e s, x = e :: s := by
   cases x with
   | nil => exact hx.elim
   | cons e s => exact ⟨e, s, rfl⟩
 
 /-- A valid animal is a legal continuation of its own first column's height
 (its first offset is `0`). -/
-theorem validFrom_of_valid {e : Col} {s : List Col} (hx : Valid (e :: s)) :
+theorem validFrom_of_isStaircase {e : Column} {s : List Column} (hx : IsStaircase (e :: s)) :
     ValidFrom e.1 (e :: s) :=
   ⟨hx.1, by have := hx.2.1; omega, by omega, hx.2.2⟩
 
-/-- **The join's step is legal.** `d = lastH x - h'` is `max(0, lastH x − h')`
-in `ℕ`, and both constraints it has to meet — `d ≤ lastH x` and
-`lastH x ≤ h' + d` — hold in each of the two cases. -/
-theorem validFrom_join_step (x : List Col) {c : Col} {t : List Col} (hy : Valid (c :: t)) :
-    ValidFrom (lastH x) ((c.1, lastH x - c.1) :: t) :=
+/-- **The join's step is legal.** `d = lastHeight x - h'` is `max(0, lastHeight x − h')`
+in `ℕ`, and both constraints it has to meet — `d ≤ lastHeight x` and
+`lastHeight x ≤ h' + d` — hold in each of the two cases. -/
+theorem validFrom_join_step (x : List Column) {c : Column} {t : List Column}
+    (hy : IsStaircase (c :: t)) :
+    ValidFrom (lastHeight x) ((c.1, lastHeight x - c.1) :: t) :=
   ⟨hy.1, Nat.sub_le _ _, by omega, hy.2.2⟩
 
 /-- **The join lands in the class.** -/
-theorem join_valid {x y : List Col} (hx : Valid x) (hy : Valid y) : Valid (join x y) := by
+theorem join_isStaircase {x y : List Column} (hx : IsStaircase x) (hy : IsStaircase y) :
+    IsStaircase (join x y) := by
   obtain ⟨c, t, rfl⟩ := hy.exists_cons
   obtain ⟨e, s, rfl⟩ := hx.exists_cons
   exact ⟨hx.1, hx.2.1,
-    (validFrom_append (validFrom_of_valid hx) (by simp) (validFrom_join_step _ hy)).2.2.2⟩
+    (validFrom_append (validFrom_of_isStaircase hx) (by simp) (validFrom_join_step _ hy)).2.2.2⟩
 
-@[simp] theorem area_join (x y : List Col) : area (join x y) = area x + area y := by
+@[simp] theorem area_join (x y : List Column) : area (join x y) = area x + area y := by
   cases y with
   | nil => simp [join, area]
   | cons c t => simp [join, area_cons]
@@ -153,8 +155,8 @@ theorem join_valid {x y : List Col} (hx : Valid x) (hy : Valid y) : Valid (join 
 /-- **The cut inverts the join at fixed area.** Walking `x ++ z` until the
 cumulative area reaches `area x` returns exactly `x` and `z`, because every
 column of `x` is nonempty and `z`'s columns are too. -/
-theorem cut_append : ∀ {x : List Col} {z : List Col} {p : ℕ},
-    ValidFrom p x → x ≠ [] → ValidFrom (lastH x) z → z ≠ [] →
+theorem cut_append : ∀ {x : List Column} {z : List Column} {p : ℕ},
+    ValidFrom p x → x ≠ [] → ValidFrom (lastHeight x) z → z ≠ [] →
     cut (area x) (x ++ z) = (x, z)
   | [], _, _, _, h, _, _ => absurd rfl h
   | [c], z, p, hx, _, hz, hznil => by
@@ -165,18 +167,18 @@ theorem cut_append : ∀ {x : List Col} {z : List Col} {p : ℕ},
       have hgt : ¬ (area (c :: c' :: t) ≤ c.1) := by
         simp only [area_cons]; omega
       have hrec : cut (area (c' :: t)) ((c' :: t) ++ z) = (c' :: t, z) :=
-        cut_append hx.2.2.2 (by simp) (by simpa [lastH] using hz) hznil
+        cut_append hx.2.2.2 (by simp) (by simpa [lastHeight] using hz) hznil
       rw [List.cons_append, cut, if_neg hgt]
       simp only [area_cons, Nat.add_sub_cancel_left] at hrec ⊢
       rw [hrec]
 
 /-- The join's second factor, anchored, is `y` again. -/
-theorem cut_join {x y : List Col} (hx : Valid x) (hy : Valid y) :
+theorem cut_join {x y : List Column} (hx : IsStaircase x) (hy : IsStaircase y) :
     (cut (area x) (join x y)).1 = x ∧ norm (cut (area x) (join x y)).2 = y := by
   obtain ⟨c, t, rfl⟩ := hy.exists_cons
   obtain ⟨e, s, rfl⟩ := hx.exists_cons
-  rw [show join (e :: s) (c :: t) = (e :: s) ++ (c.1, lastH (e :: s) - c.1) :: t from rfl,
-    cut_append (validFrom_of_valid hx) (by simp) (validFrom_join_step _ hy) (by simp)]
+  rw [show join (e :: s) (c :: t) = (e :: s) ++ (c.1, lastHeight (e :: s) - c.1) :: t from rfl,
+    cut_append (validFrom_of_isStaircase hx) (by simp) (validFrom_join_step _ hy) (by simp)]
   refine ⟨rfl, ?_⟩
   simp only [norm, List.cons.injEq, and_true]
   exact Prod.ext rfl hy.2.1.symm
@@ -184,12 +186,12 @@ theorem cut_join {x y : List Col} (hx : Valid x) (hy : Valid y) :
 /-- **Injectivity at fixed areas**: the pair is recovered from the join alone,
 so distinct pairs of equal areas have distinct joins. This is the step
 `results/subclasses.md` Lemma 3 turns into `M i * M j ≤ M (i + j)`. -/
-theorem join_injOn {x y x' y' : List Col} (hx : Valid x) (hy : Valid y)
-    (hx' : Valid x') (hy' : Valid y') (harea : area x = area x')
+theorem join_injOn {x y x' y' : List Column} (hx : IsStaircase x) (hy : IsStaircase y)
+    (hx' : IsStaircase x') (hy' : IsStaircase y') (harea : area x = area x')
     (h : join x y = join x' y') : x = x' ∧ y = y' := by
   have h1 := cut_join hx hy
   have h2 := cut_join hx' hy'
   rw [h, harea] at h1
   exact ⟨h1.1.symm.trans h2.1, h1.2.symm.trans h2.2⟩
 
-end Polyplets.Stair
+end Polyplets.Staircase

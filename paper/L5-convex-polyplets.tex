@@ -59,11 +59,11 @@ mirror equality, and the related-work section.]
 \ref{lem:stacks}, \ref{lem:supermul}} --- proved below, with no analytic input:
 an injection, Fekete's lemma, and an elementary partition bound.
 Lemma~\ref{lem:supermul}'s column join and its inverse are formalized in Lean~4
-against mathlib (\texttt{Stair.join\_valid}, \texttt{Stair.cut\_join},
-\texttt{Stair.join\_injOn}), with axiom footprint \texttt{[propext,
+against mathlib (\texttt{Staircase.join\_isStaircase}, \texttt{Staircase.cut\_join},
+\texttt{Staircase.join\_injOn}), with axiom footprint \texttt{[propext,
 Quot.sound]} --- not even \texttt{Classical.choice} --- and the counting layer
-and Fekete step are there too (\texttt{Stair.M\_supermul},
-\texttt{Stair.M\_tendsto}, \texttt{Stair.M\_le\_mu\_pow}), all guarded. So
+and Fekete step are there too (\texttt{Staircase.M\_supermul},
+\texttt{Staircase.M\_tendsto}, \texttt{Staircase.M\_le\_mu\_pow}), all guarded. So
 Lemma~\ref{lem:supermul} is a Lean theorem.
 \emph{Proposition~\ref{prop:squeeze} itself is NOT formalized}: the geometric
 HV-convex layer (Lemma~\ref{lem:blocks}) and the squeeze are paper proofs. They

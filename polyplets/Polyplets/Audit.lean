@@ -150,25 +150,25 @@ namespace Polyplets
 #guard_msgs in
 #print axioms RowLocal.IsDiagonalPoly.intValued
 
-/-- info: 'Polyplets.Stair.M_supermul' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Staircase.M_supermul' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Stair.M_supermul
+#print axioms Staircase.M_supermul
 
-/-- info: 'Polyplets.Stair.M_tendsto' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Staircase.M_tendsto' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Stair.M_tendsto
+#print axioms Staircase.M_tendsto
 
-/-- info: 'Polyplets.Stair.M_le_mu_pow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Staircase.M_le_mu_pow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Stair.M_le_mu_pow
+#print axioms Staircase.M_le_mu_pow
 
-/-- info: 'Polyplets.Stair.mu_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Staircase.mu_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Stair.mu_le
+#print axioms Staircase.mu_le
 
-/-- info: 'Polyplets.Stair.mu_gt_of_banked' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Staircase.mu_gt_of_M_700' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Stair.mu_gt_of_banked
+#print axioms Staircase.mu_gt_of_M_700
 
 /-- info: 'Polyplets.BuiSystem.certSum_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

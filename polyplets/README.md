@@ -178,7 +178,7 @@ L-paper modules:
 | `RowLocal/Compute`, `Hex`, `Square` | L1 | the generic enumerator and the values lemma; the hex and square instances and their `P_1` |
 | `Upper/Certificate` | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
 | `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
-| `StairAnimals`, `StairGrowth` | L5 | staircase king animals: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |
+| `StairAnimals`, `StairGrowth` | L5 | staircase polyplets: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |
 
 ## No `native_decide`
 

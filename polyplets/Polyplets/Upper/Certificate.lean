@@ -34,7 +34,7 @@ then forces `lambda ≤ 1/x` through `lambda_tendsto`.
 
 The two layers:
 
-* `BuiSystem` / `BuiSystem.Sat` / `BuiSystem.Super` — the abstract system over
+* `BuiSystem` / `BuiSystem.Satisfies` / `BuiSystem.IsSuperSolution` — the abstract system over
   an arbitrary index type: `rule` (the casing table), `rank` (a termination
   measure: the number of free king neighbors in the concrete system) with
   `rank_lt` making the `T'`-chain well-founded.
@@ -83,14 +83,14 @@ structure BuiSystem (ι : Type*) where
 /-- `φ` satisfies the system inequalities: base types count at most the
 isolated marked cell, split types obey the casing recurrence
 `φ_T n ≤ φ_{T'} n + ∑_{i=1}^{n-1} φ_{T'} i · φ_D (n-i)`. -/
-def BuiSystem.Sat {ι : Type*} (S : BuiSystem ι) (φ : ι → ℕ → ℕ) : Prop :=
+def BuiSystem.Satisfies {ι : Type*} (S : BuiSystem ι) (φ : ι → ℕ → ℕ) : Prop :=
   (∀ T, S.rule T = none → φ T 1 ≤ 1 ∧ ∀ n, 2 ≤ n → φ T n = 0) ∧
   (∀ T T' D, S.rule T = some (T', D) → ∀ n : ℕ,
     φ T n ≤ φ T' n + ∑ i ∈ Finset.Ico 1 n, φ T' i * φ D (n - i))
 
 /-- `u` is a nonnegative super-solution at `x`: `F_x(u) ≤ u` componentwise,
 where `F_x(u)_T = x` at base types and `u_{T'} + u_{T'}·u_D` at split types. -/
-def BuiSystem.Super {ι : Type*} (S : BuiSystem ι) (x : ℚ) (u : ι → ℚ) : Prop :=
+def BuiSystem.IsSuperSolution {ι : Type*} (S : BuiSystem ι) (x : ℚ) (u : ι → ℚ) : Prop :=
   (∀ T, 0 ≤ u T) ∧
   (∀ T, S.rule T = none → x ≤ u T) ∧
   (∀ T T' D, S.rule T = some (T', D) → u T' + u T' * u D ≤ u T)
@@ -147,7 +147,7 @@ super-solution at `x > 0`, every truncated weighted sum is dominated by `u`:
 induction on `rank T` handles the `d`-empty branch (same `N`, smaller rank),
 while both convolution factors drop to `N - 1` and use the outer hypothesis. -/
 theorem BuiSystem.certSum_le {ι : Type*} (S : BuiSystem ι) {φ : ι → ℕ → ℕ}
-    {x : ℚ} {u : ι → ℚ} (hφ : S.Sat φ) (hx : 0 < x) (hu : S.Super x u) :
+    {x : ℚ} {u : ι → ℚ} (hφ : S.Satisfies φ) (hx : 0 < x) (hu : S.IsSuperSolution x u) :
     ∀ N T, certSum φ x T N ≤ u T := by
   obtain ⟨hbase, hrec⟩ := hφ
   obtain ⟨hupos, hsupb, hsupr⟩ := hu
@@ -252,7 +252,7 @@ theorem BuiSystem.certSum_le {ι : Type*} (S : BuiSystem ι) {φ : ι → ℕ �
 `x^n · φ_T n ≤ u_T` for every `n ≥ 1` — one nonnegative term of `certSum`
 against the full truncated sum. -/
 theorem BuiSystem.pow_mul_le {ι : Type*} (S : BuiSystem ι) {φ : ι → ℕ → ℕ}
-    {x : ℚ} {u : ι → ℚ} (hφ : S.Sat φ) (hx : 0 < x) (hu : S.Super x u)
+    {x : ℚ} {u : ι → ℚ} (hφ : S.Satisfies φ) (hx : 0 < x) (hu : S.IsSuperSolution x u)
     (T : ι) (n : ℕ) (hn : 1 ≤ n) : x ^ n * (φ T n : ℚ) ≤ u T := by
   refine le_trans ?_ (S.certSum_le hφ hx hu n T)
   rw [certSum]
@@ -302,8 +302,8 @@ theorem lambda_le_of_pow_bound {C y : ℝ} (hC : 1 ≤ C) (hy : 0 < y)
 functions `φ`, a rational super-solution `u` at `x > 0`, and the anchor
 `a n ≤ φ_root n` together force `lambda ≤ 1/x`. -/
 theorem lambda_le_of_buiSystem {ι : Type*} (S : BuiSystem ι) {φ : ι → ℕ → ℕ}
-    {x : ℚ} {u : ι → ℚ} (root : ι) (hφ : S.Sat φ) (hx : 0 < x)
-    (hu : S.Super x u) (hroot : ∀ n : ℕ, 1 ≤ n → a n ≤ φ root n) :
+    {x : ℚ} {u : ι → ℚ} (root : ι) (hφ : S.Satisfies φ) (hx : 0 < x)
+    (hu : S.IsSuperSolution x u) (hroot : ∀ n : ℕ, 1 ≤ n → a n ≤ φ root n) :
     lambda ≤ ((x⁻¹ : ℚ) : ℝ) := by
   have hxinv : (0 : ℝ) < ((x⁻¹ : ℚ) : ℝ) := by
     have h : (0 : ℚ) < x⁻¹ := inv_pos.mpr hx
@@ -465,7 +465,7 @@ theorem lambda_le (c : RatCert) (hv : c.valid = true) (hs : c.SystemHolds) :
     intro i a b hsome
     exact (hrowRec i a b (lt_of_rule_eq_some hsome) hsome).2.2.1
   set S : BuiSystem ℕ := ⟨c.rule, c.rank, hrank_lt⟩ with hSdef
-  have hSat : S.Sat φ := by
+  have hSat : S.Satisfies φ := by
     constructor
     · intro i hnone
       by_cases hi : i < c.n
@@ -479,7 +479,7 @@ theorem lambda_le (c : RatCert) (hv : c.valid = true) (hs : c.SystemHolds) :
       have hab := hrowRec i A B hi hsome
       simp only [hφdef, hi, hab.1, hab.2.1, if_true]
       exact hr₀ i A B hi hsome n
-  have hSuper : S.Super x u := by
+  have hSuper : S.IsSuperSolution x u := by
     refine ⟨?_, ?_, ?_⟩
     · intro i
       simp only [hudef]
