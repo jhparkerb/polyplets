@@ -30,10 +30,13 @@ Two consequences, each a single theorem here rather than one copy per level:
   where the only unknown is `μ_k · T(k+1, k+1) = μ_k · 3^k`; the one new cell
   is `T(2k+2, k+2)`.
 
-Level `0` is `T(n,n) = 3^(n-1)`; levels `1 … 18` climb through `climb_step`
-with the 36 cells of `enumerated` as the only inputs (`EnumeratedCells`). The
-per-level arithmetic is three lemmas proved by `interval_cases`
-(`Pk_staircase`, `Pk_eval_cell`, `mu_eval_cell`).
+Level `0` is `T(n,n) = 3^(n-1)`; every later level is one `climb_step` on
+its two onset cells. Levels `1` and `2` use the four cells the kernel decides
+(`climb_two`, unconditional: `isDiagonalPoly_P1`, `T_sub_one`,
+`isDiagonalPoly_P2`, `T_sub_two`); levels `3 … 18` use the 32 cells of
+`enumerated` as their only inputs (`EnumeratedCells`). The per-level
+arithmetic is three lemmas proved by `interval_cases` (`Pk_staircase`,
+`Pk_eval_cell`, `mu_eval_cell`).
 
 The climb works in `H`-coordinates with denominators cleared
 (`IsDiagonalPolyH`; `isDiagonalPoly_of_H` returns to `IsDiagonalPoly`), and
@@ -234,15 +237,12 @@ def cInt : ℕ → ℚ
   | 18 => 2780470639303344734283777988650
   | _ => 0
 
-/-- **The 36 enumerated cells** the climb takes as input: for each level
-`k = 1 … 18` the first two cells of diagonal `k`, `T(2k+1, k+1)` and
+/-- **The 32 enumerated cells** the climb takes as input: for each level
+`k = 3 … 18` the first two cells of diagonal `k`, `T(2k+1, k+1)` and
 `T(2k+2, k+2)`, with the values the engine enumerated (`results/triangle.txt`;
-every one has `H ≤ 20`). `0` elsewhere. -/
+every one has `H ≤ 20`). `0` elsewhere. (Levels `1` and `2` use the cells the
+kernel decides, `climb_two`.) -/
 def enumerated : ℕ → ℕ → ℕ
-  | 3, 2 => 10
-  | 4, 3 => 55
-  | 5, 3 => 248
-  | 6, 4 => 1480
   | 7, 4 => 7898
   | 8, 5 => 47066
   | 9, 5 => 278240
@@ -278,10 +278,10 @@ def enumerated : ℕ → ℕ → ℕ
   | _, _ => 0
 
 /-- **The hypothesis of the climb**: `T` agrees with the enumerated table at the
-36 cells, two per level. Nothing in Lean certifies these values; they are the
-engine's. -/
+32 cells, two per level `3 … 18`. Nothing in Lean certifies these values; they
+are the engine's. -/
 def EnumeratedCells : Prop :=
-  ∀ k, 1 ≤ k → k ≤ 18 →
+  ∀ k, 3 ≤ k → k ≤ 18 →
     T (2 * k + 1) (k + 1) = enumerated (2 * k + 1) (k + 1) ∧
       T (2 * k + 2) (k + 2) = enumerated (2 * k + 2) (k + 2)
 
@@ -298,9 +298,9 @@ lemma Pk_staircase : ∀ k, 1 ≤ k → k ≤ 18 → ∀ x : ℚ,
     ring
 
 set_option maxHeartbeats 1600000 in
--- 18 levels of `norm_num` on up-to-30-digit cell values
+-- 16 levels of `norm_num` on up-to-30-digit cell values
 /-- `P_k` agrees with the cell `T(2k+1, k+1)`. -/
-lemma Pk_eval_cell (hcells : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
+lemma Pk_eval_cell (hcells : EnumeratedCells) : ∀ k, 3 ≤ k → k ≤ 18 →
     (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Pk k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1) := by
   intro k h1 h2
@@ -309,10 +309,10 @@ lemma Pk_eval_cell (hcells : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
     norm_num [Pk, enumerated, ofNumerators_eval]
 
 set_option maxHeartbeats 1600000 in
--- 18 levels of `norm_num` on sums of up to 18 big rationals
+-- 16 levels of `norm_num` on sums of up to 18 big rationals
 /-- The cell `T(2k+2, k+2)` solves the staircase at `H = k+1` with
 `μ_k = 3·c_k/3^(2k)`. -/
-lemma mu_eval_cell (hcells : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
+lemma mu_eval_cell (hcells : EnumeratedCells) : ∀ k, 3 ≤ k → k ≤ 18 →
     (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * cInt k * 3 ^ k +
       ∑ i ∈ Finset.range k, 3 * cInt i * 3 ^ (2 * k - 2 * i) *
         ((Pk (k - i)).eval ((k + 1 + (k - i) : ℕ) : ℚ) * 3 ^ (k + 1 + (k - i))
@@ -338,35 +338,9 @@ theorem climb_zero : IsDiagonalPolyHUpTo Pk 0 ∧ MuEqUpTo cInt 0 := by
   · interval_cases i; exact isDiagonalPolyH_zero
   · interval_cases i; rw [mu_zero]; norm_num [cInt]
 
-/-- **The climb: `P_0 … P_18` and `μ_0 … μ_18`**, from the enumerated cells:
-level `0` is `climb_zero`, each later level one `climb_step`. -/
-theorem climb (hcells : EnumeratedCells) :
-    ∀ k, k ≤ 18 → IsDiagonalPolyHUpTo Pk k ∧ MuEqUpTo cInt k := by
-  intro k
-  induction k with
-  | zero => exact fun _ => climb_zero
-  | succ k ih =>
-    intro hk
-    obtain ⟨hg, hm⟩ := ih (by omega)
-    exact climb_step (k + 1) (by omega) Pk cInt (by rwa [Nat.add_sub_cancel])
-      (by rwa [Nat.add_sub_cancel]) (Pk_staircase (k + 1) (by omega) hk)
-      (Pk_eval_cell hcells (k + 1) (by omega) hk) (mu_eval_cell hcells (k + 1) (by omega) hk)
-
-/-- **`P_k` is explicitly known for `k ≤ 18`**: `Pk k` satisfies the law, given
-the 36 enumerated cells. -/
-theorem isDiagonalPoly_Pk (hcells : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
-    IsDiagonalPoly k (Pk k) :=
-  isDiagonalPoly_of_H ((climb hcells k hk).1 k le_rfl)
-
-/-! ## Levels `1` and `2` unconditionally
-
-The climb's first two levels need four onset cells, `T(3,2)`, `T(4,3)`,
-`T(5,3)` and `T(6,4)`, all of which the kernel decides (`Enum.lean`,
-`EnumData.lean`), so `P_1` and `P_2` hold outright. `T_sub_one` of
-`DiagonalPolys.lean` is the Lagrange route to the first; this is the staircase route to
-both, and `T_sub_two` is the `k = 2` diagonal in closed form. -/
-
-/-- The climb to level `2`, from the kernel-decided cells. -/
+/-- **The climb to level `2`, unconditionally**: levels `1` and `2` need the
+four onset cells `T(3,2)`, `T(4,3)`, `T(5,3)`, `T(6,4)`, all of which the kernel
+decides (`Enum.lean`, `EnumData.lean`). -/
 theorem climb_two : IsDiagonalPolyHUpTo Pk 2 ∧ MuEqUpTo cInt 2 := by
   have h1 : IsDiagonalPolyHUpTo Pk 1 ∧ MuEqUpTo cInt 1 :=
     climb_step 1 (by norm_num) Pk cInt climb_zero.1 climb_zero.2
@@ -376,6 +350,42 @@ theorem climb_two : IsDiagonalPolyHUpTo Pk 2 ∧ MuEqUpTo cInt 2 := by
   exact climb_step 2 (by norm_num) Pk cInt h1.1 h1.2 (Pk_staircase 2 (by norm_num) (by norm_num))
     (by norm_num [Enum.T_5_3, Pk, ofNumerators_eval])
     (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cInt, ofNumerators_eval])
+
+/-- **The climb: `P_0 … P_18` and `μ_0 … μ_18`**: levels `0 … 2` are
+`climb_two`, each later level one `climb_step` on its two enumerated cells. -/
+theorem climb (hcells : EnumeratedCells) :
+    ∀ k, k ≤ 18 → IsDiagonalPolyHUpTo Pk k ∧ MuEqUpTo cInt k := by
+  intro k hk
+  rcases Nat.lt_or_ge k 2 with hlt | hge
+  · exact ⟨fun i hi => climb_two.1 i (by omega), fun i hi => climb_two.2 i (by omega)⟩
+  induction k, hge using Nat.le_induction with
+  | base => exact climb_two
+  | succ k hge ih =>
+    obtain ⟨hg, hm⟩ := ih (by omega)
+    exact climb_step (k + 1) (by omega) Pk cInt (by rwa [Nat.add_sub_cancel])
+      (by rwa [Nat.add_sub_cancel]) (Pk_staircase (k + 1) (by omega) hk)
+      (Pk_eval_cell hcells (k + 1) (by omega) hk) (mu_eval_cell hcells (k + 1) (by omega) hk)
+
+/-- **`P_k` is explicitly known for `k ≤ 18`**: `Pk k` satisfies the law, given
+the 32 enumerated cells. -/
+theorem isDiagonalPoly_Pk (hcells : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
+    IsDiagonalPoly k (Pk k) :=
+  isDiagonalPoly_of_H ((climb hcells k hk).1 k le_rfl)
+
+/-! ## The `k = 1` and `k = 2` diagonals in closed form -/
+
+/-- **`P₁ = Pk 1`, unconditionally.** -/
+theorem isDiagonalPoly_P1 : IsDiagonalPoly 1 (Pk 1) :=
+  isDiagonalPoly_of_H (climb_two.1 1 (by norm_num))
+
+/-- **`T(n, n-1) = (25n - 45)·3^(n-4)`** for `n ≥ 3`: the `k = 1` diagonal, the
+report's worked example. -/
+theorem T_sub_one (n : ℕ) (hn : 3 ≤ n) :
+    (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) := by
+  have h := isDiagonalPoly_P1 n hn
+  simp only [Pk, ofNumerators_eval] at h
+  norm_num at h ⊢
+  rw [h]; ring_nf
 
 /-- **`P₂ = Pk 2`, unconditionally.** -/
 theorem isDiagonalPoly_P2 : IsDiagonalPoly 2 (Pk 2) :=

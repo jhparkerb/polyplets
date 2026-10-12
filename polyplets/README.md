@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 42 modules, about 15,100 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 42 modules, about 15,000 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -34,9 +34,9 @@ the theorem takes as input rather than proves.
 | leading coefficient of P_k is 25^k/k! | `report_leading_coeff` | `IsDiagonalPoly.coeff_eq` (`LeadingCoeff`) | — |
 | P_k has degree exactly k | `report_Pk_degree` | `IsDiagonalPoly.natDegree_eq` (`LeadingCoeff`) | — |
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `isDiagonalPoly_of_coeff_of_eval_Icc` (`LeadingCoeff`) | — |
-| T(n,n−1) = (25n−45)·3^(n−4) | `report_T_sub_one` | `T_sub_one` (`DiagonalPolys`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
+| T(n,n−1) = (25n−45)·3^(n−4) | `report_T_sub_one` | `T_sub_one` (`Staircase/Climb`), the climb to level 1 from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
 | T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `T_sub_two` (`Staircase/Climb`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
-| P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Staircase/Climb`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 36 cells, below |
+| P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Staircase/Climb`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 32 cells, below |
 | 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `eight_mul_Free` (`Symmetry`) | — |
 | 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `four_mul_OneSided` (`Symmetry`) | — |
 | 2·bilateral = Hm + Dm | `report_bilateral` | `two_mul_Bilateral` (`Symmetry`) | — |
@@ -49,16 +49,18 @@ cells, the symmetry-class and hole counts) and the value λ ≈ 7.11. Those are
 enumeration output. Lean certifies nothing about the engine; the engine's
 numbers enter only as the hypothesis below.
 
-### The 36 enumerated cells
+### The 32 enumerated cells
 
 `EnumeratedCells` (`Staircase/Climb.lean`) says `T` agrees with the table
-`enumerated` at, for each level k = 1 … 18, the two cells T(2k+1, k+1) and
+`enumerated` at, for each level k = 3 … 18, the two cells T(2k+1, k+1) and
 T(2k+2, k+2), at and one above the onset of level k, with the values the
-engine enumerated (`results/triangle.txt`).
+engine enumerated (`results/triangle.txt`). Levels 1 and 2 need no
+hypothesis: their four cells T(3,2), T(4,3), T(5,3), T(6,4) are kernel-decided
+(`climb_two`).
 Every one has H ≤ 20, so every one was really swept, none was generated from
 a P_k. Provenance by second source:
 
-- levels 1 … 12 and T(27,14), 25 cells: confirmed by the independent strip
+- levels 3 … 12 and T(27,14), 21 cells: confirmed by the independent strip
   transfer matrix (H ≤ 14, n ≤ 36; `results/second-sources.md`), and the row
   totals through n = 22 by a second enumeration (Redelmeier);
 - the 11 cells beyond strip reach, kink engine only, re-run across machines
@@ -126,8 +128,9 @@ H ≥ k+1, one strong induction from the first peeling identity;
 `Staircase/Diagonal.lean` transports it to the diagonals (`T_staircase`). On this,
 `Staircase/Climb.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
 the climb's coordinates; `climb_step` passes from levels < k to level k given
-the two cells; `climb` runs it from `climb_zero` (P_0 = 1,
-unconditional) to k = 18 under `EnumeratedCells`, and `isDiagonalPoly_Pk` reads off
+the two cells; `climb_two` runs it to level 2 on the kernel-decided cells
+(so P_1 and P_2 hold outright: `T_sub_one`, `T_sub_two`), and `climb` goes on
+to k = 18 under `EnumeratedCells`; `isDiagonalPoly_Pk` reads off
 the diagonal law with the concrete `Pk k` of `DiagonalPolys.lean`. The 19 polynomials in
 `DiagonalPolys.lean` are the engine's (`orchestrator/sweep.go`, extracted to
 `pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
@@ -154,12 +157,12 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125
 | `King` | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `T_of_d`, `IsDiagonalPoly`, `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued`, `T_self` in king vocabulary |
 | `DiscreteCalculus` | the discrete antiderivative, integer values by finite differences |
 | `LeadingCoeff` | 25^k/k!, the degree is exactly k, `P_k` from k rows |
-| `DiagonalPolys` | the 19 diagonal polynomials `Pk`; `P_1 = Pk 1` from its two onset cells, `T_sub_one` |
+| `DiagonalPolys` | the 19 diagonal polynomials `Pk`, as data |
 | `Staircase/Series` | convolution toolkit |
 | `Staircase/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
 | `Staircase/WalkTop` | `d_staircase` |
 | `Staircase/Diagonal` | `T_staircase` |
-| `Staircase/Climb` | `IsDiagonalPolyH`, `climb_step`, `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
+| `Staircase/Climb` | `IsDiagonalPolyH`, `climb_step`, `climb_two` (`T_sub_one`, `T_sub_two`), `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
 | `Symmetry` | dihedral action, Burnside identities, `R90_eq_zero`, `Asym` |
 | `SymmetryRatio` | `symmetryRatio`: the symmetric counts are o(a(n)), so one-sided → a(n)/4 and free → a(n)/8 |
 | `UpperBound` | `a n ≤ C(5n,n)` |
@@ -218,7 +221,7 @@ unconditional 3.95 < λ and μ₂ that rested on them.
   defect D_j(k) (`results/below-onset.md`), and neither that identity nor
   the substitution is stated in Lean.
 - The engine. Nothing here certifies the enumeration, the banked triangle, or
-  the 36 enumerated values; a(40)'s warrant is `docs/publication.md`.
+  the 32 enumerated values; a(40)'s warrant is `docs/publication.md`.
 
 ## Removed from the build, 2026-10-12
 

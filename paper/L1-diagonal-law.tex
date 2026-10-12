@@ -68,8 +68,9 @@ both sharpness witnesses are machine computations
 \emph{Theorem~\ref{thm:C} (the product form)} --- paper proof below; the king
 instance is Lean, standard axioms only (\texttt{T\_staircase},
 \texttt{d\_staircase}, \texttt{climb}, \texttt{isDiagonalPoly\_Pk}), and the
-per-level production pinning for $k \le 18$ is conditional on the enumerated
-onset cells, two per level, which enter as hypotheses.
+per-level production pinning for $3 \le k \le 18$ is conditional on the
+enumerated onset cells, two per level, which enter as hypotheses ($k \le 2$
+is kernel-decided).
 \emph{The closed forms of Table~\ref{tab:machine}} --- each is a consequence of
 Theorem~\ref{thm:A} applied to $k+1$ enumerated values, and each survives 5--11
 withheld values that were not used to fit it.
@@ -902,7 +903,7 @@ than a result.
 \label{sec:formal}
 
 The theorems of Part~I are formalized in Lean~4 (toolchain v4.31.0) against
-mathlib~\cite{mathlib}, in a development of 42 modules and about 15{,}100
+mathlib~\cite{mathlib}, in a development of 42 modules and about 15{,}000
 lines with \textbf{no \texttt{sorry} and no
 \texttt{native\_decide}}: every theorem in it depends on the standard axioms
 (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) alone. What
@@ -932,9 +933,10 @@ is relevant here:
   three lattices are kernel-decided validation facts in \texttt{Checks.lean},
   outside the library.
 \item The $k \le 18$ production pinning (\texttt{climb},
-  \texttt{isDiagonalPoly\_Pk}) is \emph{conditional on enumerated cells}: the 36 onset
-  cells, two per level, are the hypothesis \texttt{EnumeratedCells} of the Lean
-  theorems, not proved in Lean.
+  \texttt{isDiagonalPoly\_Pk}) is \emph{conditional on enumerated cells}: the 32 onset
+  cells, two per level $3 \le k \le 18$, are the hypothesis
+  \texttt{EnumeratedCells} of the Lean theorems, not proved in Lean; the four
+  cells of levels 1 and 2 are kernel-decided.
 \end{itemize}
 
 Every headline theorem's axiom footprint is \emph{guarded}:

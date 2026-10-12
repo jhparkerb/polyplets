@@ -3,12 +3,7 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Ring
-import Polyplets.Enum
-import Polyplets.King
-import Polyplets.RowLocal.Compute
+import Mathlib.Algebra.Polynomial.Degree.Lemmas
 
 /-!
 # DiagonalPolys: the explicit diagonal polynomials `P_k`
@@ -17,13 +12,14 @@ import Polyplets.RowLocal.Compute
 degree `≤ k` with `T(n, n-k) = P_k(n)·3^(n-1-3k)` for `n ≥ 2k+1`
 (`exists_isDiagonalPoly`), but does not identify it. This file holds the concrete
 diagonal polynomials `Pk 0 … Pk 18` of `orchestrator/sweep.go` (numerator
-coefficients descending in `n`, over `k!`) and the `k = 1` diagonal
-`T_sub_one`: `Pk 1` passes through the two kernel-decided cells `T 3 2` and
-`T 4 3`, so it is `P₁` (`RowLocal.isDiagonalPoly_one_of_eval`).
+coefficients descending in `n`, over `k!`), as data: nothing is proved about
+them here.
 
-`Staircase/Climb.lean` determines every `Pk k`, `k ≤ 18`, from two enumerated
-cells per level; `LeadingCoeff.lean` from `k` rows given the leading
-coefficient. A mistyped coefficient fails there, at the cell evaluations.
+`Staircase/Climb.lean` determines every `Pk k`, `k ≤ 18`, from two onset cells
+per level (`P₁` and `P₂` from the kernel-decided cells, `isDiagonalPoly_P1`,
+`T_sub_one`, `isDiagonalPoly_P2`, `T_sub_two`); `LeadingCoeff.lean` from `k`
+rows given the leading coefficient. A mistyped coefficient fails there, at the
+cell evaluations.
 -/
 
 namespace Polyplets
@@ -102,35 +98,5 @@ noncomputable def Pk : ℕ → Polynomial ℚ
   | 17 => ofNumerators [582076609134674072265625, -44283457100391387939453125, 1549785345792770385742187500, -33886054842615127563476562500, 506738958957323265075683593750, -5253930386581950765319824218750, 34866787110157325826676367187500, -86528320883080938837347917187500, -889937241002481289280616442864375, 11422356391454342173853403279879275, -62157637321860866791915723663376800, 253251875227507029291999691317061400, -1898632937628268836106376147065825200, 16730852931327365644218857489259687600, -86335313597104845199405280481932515200, 218410029105004429734891444381037497600, -171351859928354717515789878977767372800, -114129552065978933164859052982947840000] 355687428096000
   | 18 => ofNumerators [14551915228366851806640625, -1216004602611064910888671875, 47220123186707496643066406250, -1152996117314100265502929687500, 19425111820647906303405761718750, -230445407070280340071105957031250, 1818181407908782536004023437500000, -6826614118228039757132018320312500, -34818861040188463329071106306984375, 701508624630574629016108663795874925, -4974015500069905129885380187424318850, 24632585272713265594357624257091138200, -181772288700805914476560807450032440000, 1799250000012213308990934660048459646800, -11981768558659998471685945614032297834400, 43413108716808863459147673721575806860800, -62928082571267723622620177718733540032000, -37079629775551619904419498589278737305600, 127787800900726736892183047952793411584000] 6402373705728000
   | _ => 0
-
-/-! ## The `k = 1` diagonal, unconditionally -/
-
-/-- `Pk 1` has degree `≤ 1`. -/
-lemma Pk_one_natDegree_le : (Pk 1).natDegree ≤ 1 := by
-  simp only [Pk]; exact le_trans (ofNumerators_natDegree_le _ _) (by norm_num)
-
-/-- `P₁(3) = T(3,2)·3`. -/
-lemma Pk_one_eval_three : (Pk 1).eval (3 : ℚ) = ((T 3 2 * 3 ^ 1 : ℕ) : ℚ) := by
-  simp only [Pk, ofNumerators_eval]; norm_num [T_3_2]
-
-/-- `P₁(4) = T(4,3)`. -/
-lemma Pk_one_eval_four : (Pk 1).eval (4 : ℚ) = ((T 4 3 * 3 ^ 0 : ℕ) : ℚ) := by
-  simp only [Pk, ofNumerators_eval]; norm_num [T_4_3]
-
-/-- **`P₁ = Pk 1`, unconditionally**: from the two kernel-decided cells. -/
-theorem isDiagonalPoly_P1 : IsDiagonalPoly 1 (Pk 1) :=
-  isDiagonalPoly_king.mp (RowLocal.isDiagonalPoly_one_of_eval RowLocal.kingLattice (Pk 1)
-    Pk_one_natDegree_le
-    (by rw [RowLocal.T_king, RowLocal.b_king]; exact Pk_one_eval_three)
-    (by rw [RowLocal.T_king, RowLocal.b_king]; exact Pk_one_eval_four))
-
-/-- **`T(n, n-1) = (25n - 45)·3^(n-4)`** for `n ≥ 3`: the `k = 1` diagonal, the
-report's worked example. -/
-theorem T_sub_one (n : ℕ) (hn : 3 ≤ n) :
-    (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) := by
-  have h := isDiagonalPoly_P1 n hn
-  simp only [Pk, ofNumerators_eval] at h
-  norm_num at h ⊢
-  rw [h]; ring_nf
 
 end Polyplets

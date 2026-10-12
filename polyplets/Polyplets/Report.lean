@@ -90,9 +90,10 @@ theorem report_T_sub_one (n : ℕ) (hn : 3 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) :=
   T_sub_one n hn
 
-/-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
-cells, two per level (`EnumeratedCells`: the table `enumerated` of
-`Staircase/Climb.lean`). `Pk k` is the polynomial of `DiagonalPolys.lean`. -/
+/-- **`P_k` is explicitly known for `k ≤ 18`**, given the 32 enumerated
+cells, two per level `3 … 18` (`EnumeratedCells`: the table `enumerated` of
+`Staircase/Climb.lean`; levels `1` and `2` are kernel-decided). `Pk k` is the
+polynomial of `DiagonalPolys.lean`. -/
 theorem report_Pk_known (hcells : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
     IsDiagonalPoly k (Pk k) :=
   isDiagonalPoly_Pk hcells k hk
