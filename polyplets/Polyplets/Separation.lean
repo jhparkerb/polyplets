@@ -3,12 +3,14 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Algebra.Order.Group.Abs
+import Mathlib.Tactic.Push
 import Polyplets.Graph
 
 /-!
 # Separation: walk rows glue and cut king-connected sets
 
-The structural engine of the peeling recursion (DESIGN.md). A *walk row* is a
+The structural engine of the peeling recursion (`README.md`). A *walk row* is a
 row holding exactly one cell of `S`; `seg S a b` is the band of cells with rows
 in `[a, b]`.
 

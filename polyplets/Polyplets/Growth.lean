@@ -3,8 +3,11 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Analysis.Subadditive
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Analysis.Subadditive
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
 import Polyplets.Fekete
 import Polyplets.Graph
 import Polyplets.UpperBound
@@ -712,19 +715,5 @@ theorem lambda_gt_of_banked (h : a 40 = 56749893611764175164545926946127) :
     refine lt_of_lt_of_le ?_ hle
     norm_num
   exact lt_of_pow_lt_pow_left₀ 40 (le_of_lt lambda_pos) hpow
-
-/-! ## Axiom audit
-
-Plain `#print axioms`; the `#guard_msgs`-wrapped versions are integrated into
-the campaign audit point by the orchestrator. `a_supermul`, `lambda_tendsto`,
-`a_le_lambda_pow` and `lambda_le` must carry the standard three;
-`lambda_gt_of_banked` takes its numeric input as a hypothesis rather than a
-computation, so it does too. -/
-
-#print axioms a_supermul
-#print axioms lambda_tendsto
-#print axioms a_le_lambda_pow
-#print axioms lambda_le
-#print axioms lambda_gt_of_banked
 
 end Polyplets

@@ -2570,8 +2570,7 @@ claimed, costs unestimated.
 - **A1. The universal diagonal law** (`docs/proofs/universal-diagonal-law.md`),
   stated for the row-local class and already run on square, hex and king
   (`experiments/universal_law_check.py`, `experiments/hex_gas.py`,
-  `experiments/diagonal_law_proof_check.py`; Lean `polyplets/Polyplets/Universal/`,
-  (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)).
+  `experiments/diagonal_law_proof_check.py`; Lean `polyplets/Polyplets/Universal/`).
   Not instanced: triangular, the spread-8 neighborhood, `|dx| ≤ 2` lattices,
   directed and anisotropic variants; the obvious target is the A001168
   near-diagonal closed forms by the same peeling recursion and modular spine.

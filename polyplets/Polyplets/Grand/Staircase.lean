@@ -3,6 +3,8 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 import Polyplets.Grand.MuRec
 
 /-!
@@ -22,7 +24,7 @@ the fresh μ-index `i` outward across the `(j, ℓ)`-sums, exactly the `c_ident`
 expansion of the right-hand side — one `c_ident (k − i) H` per `i`. The index
 swap is a plain `Finset.sum_comm`/`Finset.sum_comm'` transposition (`μ`'s index
 passes through unchanged; the `ℓ`-sum rides along inside `j`) — no convolution
-collapse is needed here, unlike GF-3.
+collapse is needed here, unlike `d_mu_rec`.
 
 The statement was verified on banked data at all 170 in-range instances
 (`experiments/staircase_check.py`); the numeric gate reproduces
@@ -141,13 +143,5 @@ theorem T_staircase_check_k1_H2 :
 theorem T_staircase_value_check :
     mu 0 * (T 3 2 : ℚ) + mu 1 * (T 2 2 : ℚ) = 55 := by
   rw [mu_zero, mu_one, T_3_2, T_2_2]; norm_num
-
-/-! ## Axiom sanity check -/
-
-section Sanity
-
-#print axioms T_staircase
-
-end Sanity
 
 end Polyplets

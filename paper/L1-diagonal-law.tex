@@ -921,19 +921,22 @@ is relevant here:
 \item \texttt{production\_leadingCoeff} (Corollary~\ref{cor:lead} for the
   king) is proved outright; the cluster weight $V(1,1) = 25$ it rests on is a
   kernel-decided cell (\texttt{decide +kernel}), not a compiled evaluation.
-\item The per-lattice instance determinations (\texttt{king\_P1\_*},
-  \texttt{square\_P1\_*}, \texttt{hex\_P1\_*}) and the cross-family row-sum
-  gates carry named leaves that amount to two triangle cells per lattice.
+\item The per-lattice $P_1$ determinations (\texttt{king\_P1\_*},
+  \texttt{square\_P1\_closed}, \texttt{hex\_P1\_closed}) rest on two
+  triangle cells per lattice: the king cells are kernel-decided, the square and
+  hex $T(4,3)$ is a hypothesis of the theorem. The cross-family row-sum checks
+  are kernel-decided.
 \item The $k \le 18$ production pinning (\texttt{grand\_all},
   \texttt{Pk\_prod}) is \emph{conditional on enumerated cells}: the 36 onset
   cells, two per level, are the hypothesis \texttt{BankedAnchors} of the Lean
   theorems, not proved in Lean.
 \end{itemize}
 
-Of the axiom footprints, 88 are \emph{guarded}: those modules wrap
-\texttt{\#print axioms} in \texttt{\#guard\_msgs}, so a changed footprint is a
-build error and building the project checks them. The remaining 148 print their
-footprints but are informational. There is no \texttt{sorryAx} and no
+Every headline theorem's axiom footprint is \emph{guarded}:
+\texttt{Polyplets/Audit.lean} wraps its \texttt{\#print axioms} in
+\texttt{\#guard\_msgs}, so a changed footprint is a build error and building
+the project checks all of them; there is no unguarded \texttt{\#print axioms}
+in the development. There is no \texttt{sorryAx} and no
 \texttt{Lean.ofReduceBool}: the trusted surface is the kernel.
 
 The development does \emph{not} certify the enumeration engine, the stored

@@ -8,9 +8,8 @@ import Polyplets.Finite
 /-!
 # Row profile of a canonical polyplet
 
-Step (b) infrastructure for the diagonal counts. For a canonical polyplet of `n`
-cells and height `H`, the **row profile** records, for each row `y`, how many
-cells sit in it.
+For a canonical polyplet of `n` cells and height `H`, the **row profile**
+records, for each row `y`, how many cells sit in it.
 
 The facts proved here:
 * `canonical_row_occupied` — every row `0 ≤ y ≤ H-1` contains at least one cell
@@ -20,10 +19,6 @@ The facts proved here:
 * `canonical_card_eq_row_sum` — the cell count is the sum of the per-row counts.
 * `canonical_fiber_nonempty` — each row's fiber is nonempty.
 
-For the `k = 1` diagonal (`H = n - 1`) these combine to the pigeonhole that
-drives step (b): `n` cells across `n - 1` occupied rows force **exactly one**
-row to hold two cells and every other row exactly one (proved in
-`row_profile_one_doubled`).
 -/
 
 namespace Polyplets
@@ -82,119 +77,5 @@ lemma canonical_fiber_nonempty {n H : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCan
     (S.filter (fun c => c.2 = y)).Nonempty := by
   obtain ⟨c, hcS, hc⟩ := canonical_row_occupied hS h0 hH
   exact ⟨c, by rw [Finset.mem_filter]; exact ⟨hcS, hc⟩⟩
-
-/-- **Step (c), forward.** In a canonical polyplet, any two consecutive occupied
-rows `t`, `t+1` are directly king-linked: some `a, b ∈ S` with `a.2 = t`,
-`b.2 = t+1`, `kingAdj a b`. (King-connectivity forces an edge across the
-`t`/`t+1` cut; a king edge across it lands exactly on the two rows.) The reverse
-direction — reconstructing connectivity from per-row links — is deferred to the
-step (e) bijection. -/
-lemma canonical_consecutive_rows_linked {n H : ℕ} {S : Finset (ℤ × ℤ)}
-    (hS : IsCanonical n H S) {t : ℤ} (h0 : 0 ≤ t) (hH : t + 1 ≤ (H : ℤ) - 1) :
-    ∃ a b, a ∈ S ∧ b ∈ S ∧ kingAdj a b ∧ a.2 = t ∧ b.2 = t + 1 := by
-  obtain ⟨pmin, hminS, hmin⟩ := hS.2.2.2.2.2.1
-  obtain ⟨pmax, hmaxS, hmax⟩ := hS.2.2.2.2.2.2.2
-  have hconn := hS.2.1 pmin hminS pmax hmaxS
-  exact exists_adj_cross_of_reflTransGen Prod.snd (fun _ _ hab => hab.2.2)
-    hconn (by omega) (by omega)
-
-/-- A `ℕ`-valued sum over a finset equals `1` iff exactly one summand is `1` and
-the rest are `0`. -/
-private theorem exists_unique_of_sum_eq_one {β : Type*}
-    {s : Finset β} {f : β → ℕ} (hsum : ∑ b ∈ s, f b = 1) :
-    ∃ a ∈ s, f a = 1 ∧ ∀ b ∈ s, b ≠ a → f b = 0 := by
-  classical
-  obtain ⟨a, ha, hfa⟩ :=
-    Finset.exists_ne_zero_of_sum_ne_zero (s := s) (f := f) (by omega)
-  have hle : f a ≤ ∑ b ∈ s, f b := Finset.single_le_sum (fun i _ => Nat.zero_le _) ha
-  refine ⟨a, ha, by omega, ?_⟩
-  have hrest : ∑ b ∈ s.erase a, f b = 0 := by
-    have hcomb := Finset.add_sum_erase s f ha
-    omega
-  intro b hb hba
-  exact (Finset.sum_eq_zero_iff.mp hrest) b (Finset.mem_erase.mpr ⟨hba, hb⟩)
-
-/-- **Step (b): exactly one doubled row.** For the `k = 1` diagonal (`H = n-1`),
-a canonical polyplet of `n` cells has all `n-1` rows occupied, so `n` cells over
-`n-1` rows forces exactly one row to hold two cells and every other row exactly
-one. -/
-theorem row_profile_one_doubled {n : ℕ} {S : Finset (ℤ × ℤ)} (hn : 2 ≤ n)
-    (hS : IsCanonical n (n - 1) S) :
-    ∃ y0 ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1),
-      (S.filter (fun c => c.2 = y0)).card = 2 ∧
-      ∀ y ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1), y ≠ y0 →
-        (S.filter (fun c => c.2 = y)).card = 1 := by
-  have hg1 : ∀ y ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1),
-      1 ≤ (S.filter (fun c => c.2 = y)).card := by
-    intro y hy
-    rw [Finset.mem_Icc] at hy
-    exact (canonical_fiber_nonempty hS hy.1 hy.2).card_pos
-  have hcardR : (Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1)).card = n - 1 := by
-    rw [← canonical_rows_image hS, canonical_rows_card hS]
-  have hsum : ∑ y ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1),
-      (S.filter (fun c => c.2 = y)).card = n := by
-    rw [← canonical_card_eq_row_sum hS, hS.1]
-  have hexc : ∑ y ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1),
-      ((S.filter (fun c => c.2 = y)).card - 1) = 1 := by
-    have hcongr : ∑ y ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1),
-        (((S.filter (fun c => c.2 = y)).card - 1) + 1)
-          = ∑ y ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1),
-              (S.filter (fun c => c.2 = y)).card :=
-      Finset.sum_congr rfl (fun y hy => by have := hg1 y hy; omega)
-    rw [Finset.sum_add_distrib, Finset.sum_const, hcardR, smul_eq_mul, mul_one,
-      hsum] at hcongr
-    omega
-  obtain ⟨y0, hy0R, hy0e, hrest⟩ := exists_unique_of_sum_eq_one hexc
-  refine ⟨y0, hy0R, ?_, ?_⟩
-  · have := hg1 y0 hy0R; omega
-  · intro y hyR hy
-    have hb := hrest y hyR hy
-    have := hg1 y hyR
-    omega
-
-/-- **Step (d)/(e) prep: the two doubled cells.** Materializes the doubled row's
-two cells as an ordered pair `c1.1 < c2.1`, both in `S` on row `y0`, together
-with the characterization that they are the *only* cells on that row. -/
-theorem row_profile_doubled_cells {n : ℕ} {S : Finset (ℤ × ℤ)} (hn : 2 ≤ n)
-    (hS : IsCanonical n (n - 1) S) :
-    ∃ y0 ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1), ∃ c1 c2 : ℤ × ℤ,
-      c1 ∈ S ∧ c2 ∈ S ∧ c1.2 = y0 ∧ c2.2 = y0 ∧ c1.1 < c2.1 ∧
-      (∀ c ∈ S, c.2 = y0 → c = c1 ∨ c = c2) := by
-  obtain ⟨y0, hy0R, hy0two, _⟩ := row_profile_one_doubled hn hS
-  rw [Finset.card_eq_two] at hy0two
-  obtain ⟨a, b, hab, hfilter⟩ := hy0two
-  have ha : a ∈ S.filter (fun c => c.2 = y0) := by rw [hfilter]; simp
-  have hb : b ∈ S.filter (fun c => c.2 = y0) := by rw [hfilter]; simp
-  rw [Finset.mem_filter] at ha hb
-  have hmem : ∀ c ∈ S, c.2 = y0 → c = a ∨ c = b := by
-    intro c hcS hcy
-    have hc : c ∈ S.filter (fun c => c.2 = y0) := Finset.mem_filter.mpr ⟨hcS, hcy⟩
-    rw [hfilter, Finset.mem_insert, Finset.mem_singleton] at hc
-    exact hc
-  have hne1 : a.1 ≠ b.1 := fun h => hab (Prod.ext_iff.mpr ⟨h, ha.2.trans hb.2.symm⟩)
-  refine ⟨y0, hy0R, ?_⟩
-  rcases lt_or_gt_of_ne hne1 with h | h
-  · exact ⟨a, b, ha.1, hb.1, ha.2, hb.2, h, hmem⟩
-  · exact ⟨b, a, hb.1, ha.1, hb.2, ha.2, h, fun c hcS hcy => (hmem c hcS hcy).symm⟩
-
-/-- **Step (d), neighbor confinement.** If a row `y0` holds exactly two cells
-`c1, c2` at column gap `≥ 2`, then any king-neighbor `b ∈ S` of `c1` lies in an
-*adjacent* row (`y0 ± 1`): it can't be on row `y0` (the only same-row candidate
-is `c2`, too far to be adjacent). This is the local fact behind the gap `≤ 2`
-disconnection — a would-be split cell's only bridges are the single cells in the
-neighboring rows. -/
-lemma neighbor_off_row_of_gap {S : Finset (ℤ × ℤ)} {c1 c2 b : ℤ × ℤ} {y0 : ℤ}
-    (hc1 : c1.2 = y0) (hgap : c1.1 + 2 ≤ c2.1)
-    (honly : ∀ c ∈ S, c.2 = y0 → c = c1 ∨ c = c2)
-    (hbS : b ∈ S) (hadj : kingAdj c1 b) : b.2 = y0 - 1 ∨ b.2 = y0 + 1 := by
-  have hy : |c1.2 - b.2| ≤ 1 := hadj.2.2
-  rw [abs_le] at hy
-  by_cases hby : b.2 = y0
-  · exfalso
-    rcases honly b hbS hby with rfl | rfl
-    · exact hadj.1 rfl
-    · have hx : |c1.1 - b.1| ≤ 1 := hadj.2.1
-      rw [abs_le] at hx; omega
-  · omega
 
 end Polyplets

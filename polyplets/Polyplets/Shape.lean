@@ -4,12 +4,19 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.NumberTheory.Bernoulli
+import Mathlib.Tactic.Choose
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Set
 import Polyplets.Peel
 
 /-!
 # Shape: the diagonal law by strong induction on the surplus
 
-The shape theorem of DESIGN.md v2, built on `Peel.lean`'s `d_rec` and
+The shape theorem of the peeling recursion (`README.md`), built on `Peel.lean`'s `d_rec` and
 `c_ident`:
 
 * `shape_d` : for every surplus `k` there is `δ_k ∈ ℚ[X]` with `deg ≤ k` and
@@ -22,7 +29,7 @@ The shape theorem of DESIGN.md v2, built on `Peel.lean`'s `d_rec` and
   `3^(3k+1) · T(n, n-k) = P_k(n) · 3^n` that `Pin.lean` should consume.
 * `production_int_onset` : integrality at the pinning window — for
   `2k+1 ≤ n ≤ 3k+1`, `P_k(n)` is the natural number `T(n,n-k) · 3^(3k+1-n)`.
-* `production_int_all` : (tier 2) any such `P_k` is integer-valued on all of
+* `production_int_all` : any such `P_k` is integer-valued on all of
   `ℤ`, by finite differences from the `k+1` onset points.
 
 The proof of `shape_d` is strong induction on `k` (`shape_d_step`): the
@@ -330,7 +337,7 @@ theorem shape_production (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree ≤ k �
 
 /-! ## Integrality -/
 
-/-- **Integrality at the pinning window** (tier 1): for `2k+1 ≤ n ≤ 3k+1` the
+/-- **Integrality at the pinning window**: for `2k+1 ≤ n ≤ 3k+1` the
 value `P_k(n)` is the natural number `T(n, n-k) · 3^(3k+1-n)`. These are
 exactly the `k+1` onset points `H = k+1 .. 2k+1` (`n = H+k`) that `Pin.lean`
 pins with. Stated for any `P` satisfying the production identity, so it
@@ -351,7 +358,7 @@ theorem production_int_onset {k : ℕ} {P : Polynomial ℚ}
   push_cast
   ring
 
-/-- Tier-1 integrality in `∃ z : ℤ` form. -/
+/-- Integrality at the pinning window, in `∃ z : ℤ` form. -/
 theorem production_int_onset' {k : ℕ} {P : Polynomial ℚ}
     (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
       (3 : ℚ) ^ (3 * k + 1) * (T n (n - k) : ℚ) = P.eval (n : ℚ) * 3 ^ n)
@@ -362,7 +369,7 @@ theorem production_int_onset' {k : ℕ} {P : Polynomial ℚ}
     push_cast
     ring⟩
 
-/-- **Finite differences** (tier 2 workhorse): a `ℚ`-polynomial of degree
+/-- **Finite differences**: a `ℚ`-polynomial of degree
 `≤ D` taking integer values at the `D+1` consecutive integers
 `a, a+1, …, a+D` takes integer values at every integer. Induction on `D`
 through the difference polynomial `P(X+1) - P(X)`, whose degree drops by one
@@ -453,9 +460,9 @@ theorem int_valued_of_consecutive :
     · exact hup m h
     · exact hdown m h
 
-/-- **Integrality tier 2**: any `P` of degree `≤ k` satisfying the production
+/-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the production
 identity is integer-valued on all of `ℤ` — the `k+1` onset points
-`n = 2k+1 .. 3k+1` are integer (tier 1) and consecutive, so finite
+`n = 2k+1 .. 3k+1` are integer (`production_int_onset`) and consecutive, so finite
 differences extend integrality everywhere. -/
 theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
     (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →

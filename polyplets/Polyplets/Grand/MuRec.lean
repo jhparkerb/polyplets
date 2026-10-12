@@ -3,6 +3,8 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 import Polyplets.Grand.Mu
 import Polyplets.Peel
 
@@ -222,13 +224,5 @@ theorem d_mu_rec_check_k2_H3 :
     (d 2 4 : ℚ) = mu 0 * d 2 3 + mu 1 * d 1 3 + mu 2 * d 0 3 := by
   have h := d_mu_rec 3 2 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
-
-/-! ## Axiom sanity check -/
-
-section Sanity
-
-#print axioms d_mu_rec
-
-end Sanity
 
 end Polyplets

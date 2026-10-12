@@ -42,7 +42,7 @@ cd polyplets
 for f in build/nd/${PAT:-*}.lean; do
   n=$(basename $f .lean)
   echo "=== $n $(date +%T)"
-  out=$(LEAN_NUM_THREADS=1 nice -n 10 ../scripts/lean-guard.sh ${CAP:-4} 240 ~/.elan/bin/lake env lean $f 2>&1)
+  out=$(LEAN_NUM_THREADS=1 nice -n 10 ../scripts/lean-guard.sh ${CAP:-4} ${TMO:-240} ~/.elan/bin/lake env lean $f 2>&1)
   echo "$out" | tail -3
   if echo "$out" | grep -q 'GUARD: exit=0'; then v=PASS; else v=FAIL; fi
   echo "$n $v $(echo "$out" | grep -o 'peak_rss=[0-9]*MB wall=[0-9]*s')" | tee -a build/nd/results.txt

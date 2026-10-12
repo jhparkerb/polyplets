@@ -3,6 +3,8 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Order.Lattice.Nat
 import Polyplets.Compute
 
 /-!
@@ -248,13 +250,5 @@ theorem strip_sum_le_a (n : ℕ) (hn : 10 ≤ n) :
     ∑ H ∈ Finset.Icc 1 10, T n H ≤ a n := by
   rw [a_eq_sum n]
   exact Finset.sum_le_sum_of_subset (Finset.Icc_subset_Icc_right hn)
-
-/-! ## Axiom audit
-
-Plain `#print axioms` here; the `#guard_msgs`-wrapped versions are integrated
-into the campaign audit point by the orchestrator. `a_eq_sum` must carry the
-standard three. -/
-
-#print axioms a_eq_sum
 
 end Polyplets

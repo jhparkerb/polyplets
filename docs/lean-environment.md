@@ -17,11 +17,13 @@ verified with `ls`/`find` against this machine on this date.
 - `polyplets/lake-manifest.json` — pins the resolved mathlib commit:
   `fabf563a7c95a166b8d7b6efca11c8b4dc9d911f` (tag `v4.31.0`).
 - `polyplets/Polyplets.lean` — the root import file, one `import
-  Polyplets.<Module>` per module (top-level modules plus `Grand.*`).
-- `polyplets/Polyplets/` — the module tree: 23 `.lean` files, in
-  `Polyplets/` (top level, 18) and `Polyplets/Grand/` (5). Since the
-  2026-10-12 overhaul the tree is the import cone of `Report.lean` plus
-  `Audit.lean`; modules outside it were deleted (list and reasons in
+  Polyplets.<Module>` per module (top-level modules plus `Grand.*`,
+  `Universal.*`, `Upper.*`).
+- `polyplets/Polyplets/` — the module tree: 44 `.lean` files, in
+  `Polyplets/` (top level, 20), `Polyplets/Grand/` (5), `Polyplets/Universal/`
+  (14) and `Polyplets/Upper/` (5). Since the 2026-10-12 overhaul the tree is
+  the import cone of `Report.lean`, the modules the L-papers cite, and
+  `Audit.lean`; the rest was deleted (list and reasons in
   `polyplets/README.md`).
 - Non-Lean surroundings: `polyplets/README.md` (the ledger: claims,
   proofs, hypotheses, removed modules), `polyplets/OVERHAUL.md` (the
@@ -73,7 +75,7 @@ essentially one 8169-file, 107M scan of `Mathlib/`. Scope greps as below.
 A Lean declaration reachable from this project lives in one of exactly these
 places — the exhaustive search list:
 
-1. `polyplets/Polyplets/` (project's own 23 files)
+1. `polyplets/Polyplets/` (project's own 44 files)
 2. `polyplets/.lake/packages/mathlib/Mathlib/`
 3. `polyplets/.lake/packages/batteries/Batteries/`
 4. `polyplets/.lake/packages/aesop/Aesop/`
@@ -117,7 +119,7 @@ All `lake` invocations below run from `polyplets/` and use
   check of the tree: on 2026-08-19 every module target was green while the
   root failed at import on a duplicate declaration. Build the root.
 - Full project, cold: `cd polyplets && ~/.elan/bin/lake build` — mathlib
-  build dominates; the project's own 23 files build in minutes once
+  build dominates; the project's own 44 files build in minutes once
   mathlib's `.olean`s are cached. Serial, logged, in tmux:
   `scripts/lean-root-build.sh` (log `build/lean-root2.log`).
 - Verify already-current: `cd polyplets && ~/.elan/bin/lake build

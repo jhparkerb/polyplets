@@ -3,13 +3,18 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Tactic.Push
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Ring.Basic
+import Mathlib.Tactic.Set
 import Polyplets.Weights
 import Polyplets.RowProfile
 
 /-!
 # Peeling: the d-recursion and the c-identity
 
-The two counting identities of DESIGN.md v2, proved by explicit bijections:
+The two counting identities of the peeling recursion, proved by explicit bijections:
 
 * `d_rec` : for `H ≥ k + 2`,
   `d k H = 3 * d k (H-1) + ∑_{j=1..k} ∑_{ℓ=1..j} V ℓ j * d (k-j) (H-1-ℓ)`.
@@ -1721,7 +1726,7 @@ lemma card_classC (k H : ℕ) (hH : k + 1 ≤ H) :
 
 /-! ## The main theorems -/
 
-/-- **The d-recursion** (DESIGN.md v2): for `H ≥ k + 2`, a walk-top animal
+/-- **The d-recursion**: for `H ≥ k + 2`, a walk-top animal
 splits by its second-top row — walk (class A: three offsets on a height-`H-1`
 walk-top remainder) or the base of a cluster (class B: an interior
 `V`-configuration capping a shorter walk-top remainder). -/

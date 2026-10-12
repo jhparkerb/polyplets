@@ -3,13 +3,16 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Order.Interval.Finset.Nat
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.NormNum.Basic
 import Polyplets.Compute
 import Polyplets.Separation
 
 /-!
 # Peeling weights: walk-top counts `d` and cluster configurations `V`, `Vᵗ`
 
-The counting objects of the peeling recursion (DESIGN.md v2). The primary
+The counting objects of the peeling recursion (`README.md`). The primary
 object is `d k H`, the number of canonical height-`H`, surplus-`k` animals
 whose **top row is a walk row** (holds exactly one cell); the recursion's
 weights aggregate cluster configurations by (rows `ℓ`, surplus `j`) only:
@@ -29,7 +32,7 @@ set containing the origin is bounded by its cell count, `connected_abs_x_le`).
 Downstream bijections (`Peel.lean`) must match against those propositional
 descriptions, never the window encoding.
 
-## Validation (anti-confabulation gates)
+## Validation
 
 The values the kernel can decide (each under 3 GB; the next ones up need
 6–9 GB, measured 2026-10-12), independently cross-checked by a direct
@@ -168,7 +171,7 @@ lemma mem_window {w y0 h : ℕ} {p : ℤ × ℤ} :
       omega
 
 /-- `S` is a **V-configuration** for `(ℓ, j)` — the peeled data of case 2 of
-the d-recursion (DESIGN.md v2): the fixed walk cell `p = (0,0)` alone on row
+the d-recursion: the fixed walk cell `p = (0,0)` alone on row
 `0`; a cluster occupying exactly rows `1..ℓ`, every one of those rows with at
 least two cells; a free walk cell `q` alone on row `ℓ + 1`; `ℓ + j + 2` cells
 in total (so the cluster has `ℓ + j` cells — surplus `j`); and the whole

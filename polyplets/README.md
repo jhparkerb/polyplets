@@ -1,7 +1,9 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 23 modules, about 8,700 lines,
-no `sorry`, no `native_decide`. `Polyplets/Report.lean` states each claim of
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 44 modules, about 14,200 lines,
+no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
+is on the standard three axioms, guarded in `Audit.lean`. The quality pass
+in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
 `paper/technical-report.tex` as a theorem, in the report's order, and proves
 it by reference into the rest of the tree. `Polyplets/Audit.lean` wraps
 `#print axioms` of every Report theorem in `#guard_msgs`, so a footprint that
@@ -147,12 +149,25 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 | `Fekete` | 164 | Fekete's lemma as a structure |
 | `Growth` | 755 | λ, `lambda_tendsto`, the brackets |
 | `Report` | 124 | the report's claims |
-| `Audit` | 94 | the `#guard_msgs` axiom guards |
+| `Audit` | 150 | the `#guard_msgs` axiom guards |
+
+The L-paper modules, restored 2026-10-12 after the morning's deletion:
+
+| module | lines | paper | what |
+|---|---|---|---|
+| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Peel` | 2,600 | L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
+| `Universal/AbstractShape`, `System` | 540 | L1 | the diagonal law as a theorem about any `PeelSystem`, hence for every row-local lattice |
+| `Universal/Compute`, `King`, `KingAgree`, `Hex`, `Square` | 1,030 | L1 | the generic enumerator; the king, hex and square instances and their `P_1` |
+| `Upper/Certificate` | 518 | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
+| `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | 700 | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
+| `StairAnimals`, `StairGrowth` | 500 | L5 | staircase king animals: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |
 
 ## No `native_decide`
 
 Since 2026-10-12 the tree has no `native_decide` at all, so every theorem in
-it is on the standard three axioms. The validation cells that remain are
+it is on the standard three axioms. (The RD = 3 certificate check was the last
+holdout: 5930 rows with `List.getD` lookups were beyond the kernel, balanced
+trees made it an 11-second `decide +kernel`.) The validation cells that remain are
 kernel-decided (`decide +kernel`): T(1,1), T(2,1), T(2,2), T(3,1), T(3,2),
 T(4,3), a(1), a(2), V(1,1), Vt(1,1), Vt(1,2), d(0,1), d(0,2), d(1,2), each
 under 3.5 GB. The brute-force definitions blow up fast in the kernel
@@ -178,7 +193,8 @@ nothing on the report's path consumed the rest.
 ## Removed from the build, 2026-10-12
 
 The overhaul (branch `lean-overhaul`) kept the import cone of `Report.lean`
-and deleted the rest. Everything below is at commit `697f376`
+and the modules the L-papers cite, and deleted the rest. Everything below is
+at commit `697f376`
 (`git show 697f376:polyplets/Polyplets/<module>.lean`), built green there with
 its own `#guard_msgs` audits (`AuditOutworks.lean`, `Grand/Audit.lean`).
 Lines are at that commit.
@@ -186,10 +202,7 @@ Lines are at that commit.
 | group | lines | what it proved |
 |---|---|---|
 | `GapWalk*`, `DepthOne*`, `KernelRoots`, `KernelSeries`, `DepthAssembly` (20 modules) | 14,000 | the Severance and Notary campaigns: the depth-1 defect's gap walk, `Φ(x, N(x)) = 0` at every order, the depth identities for D_j(k) with the weight tables as hypotheses (`results/below-onset.md` §11) |
-| `Universal/` (14) | 4,200 | the diagonal law for every row-local lattice, with square, hex and king instances and their P_1 |
-| `Upper/` (5) | 1,000 | the certificate side of λ ≤ 9.3154 (`lambda_le_of_bui_rd3`, one `native_decide` leaf) |
 | `Holes`, `HolesUpper` | 1,100 | the maximum-hole bound, lower side unconditional, upper side under the hypothesis `MoatBound` |
-| `StairAnimals`, `StairGrowth` | 500 | staircase king animals: Lemma 3 (`M_supermul`), µ exists, 3.1234 < µ ≤ 4 given M(700) |
 | `V5Denominator` | 300 | the 5-adic denominator law of P_k for k ≤ 18, kernel `decide` |
 | `Northcott` | 180 | bounded degree + bounded house ⇒ finitely many algebraic integers |
 | `IntCoeff` | 255 | k!·P_k ∈ ℤ[X] |

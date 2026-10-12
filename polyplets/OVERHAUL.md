@@ -2,16 +2,117 @@
 
 Branch `lean-overhaul`, started 2026-10-11. Target: `Polyplets/Report.lean`
 states every claim of `paper/technical-report.tex` and proves it from
-standard axioms only. Ledger: `README.md`.
+standard axioms only; the L-paper modules (`Universal/`, `Upper/`,
+`Stair*`) are held to the same standard. Ledger: `README.md`.
 
-## Queue
+The standard (2026-10-12, from the question "what would mathlib or a
+professional formalizer do"): no `native_decide`; computation by kernel
+`decide` on definitions that reduce, or by reflection; no hand enumeration of
+cases; validation facts out of the library proper; no duplicated
+developments (generalize, do not copy); named-field structures instead of
+positional conjunctions; minimal imports; no loose `#print axioms`; every
+headline theorem guarded; docstrings free of campaign jargon and true.
 
-1. **Deferred until it is the easiest thing left, and now the only thing
-   left**: one-sided → a(n)/4 and free → a(n)/8
-   (`Report.SymmetryRatioClaim`). Needs the symmetric counts o(a(n)): an
-   injection of each symmetric polyplet into something of about half the
-   size, then `a_supermul` to show a(n/2)/a(n) → 0. The injection is the
-   work (half of a symmetric animal need not be connected); not started.
+## Queue A — the Lean behind the technical report
+
+Easiest and most depended-on first. One commit per item.
+
+- [x] A1. Imports (2026-10-12; `lake exe shake` still lists prunable
+      imports and some dependency re-routings, left for a later pass). Replace `import Mathlib` (`Defs`, `StairAnimals`,
+      `Universal/Defs`) and `import Mathlib.Tactic` (`Grand/Series`) by the
+      `#min_imports` set; run `lake exe shake` and drop unused imports.
+- [x] A2. Lints (2026-10-12: `#lint in Polyplets`, 934 declarations, 0
+      findings after the six docstrings it asked for). Run Batteries' `#lint` over the whole tree (unused
+      arguments, docBlame, simpNF, …); fix what it reports.
+- [x] A3. Docstring hygiene (2026-10-12; the GD-n labels in `Universal/`
+      go with A7). Undo the "shape → expShape" search-and-replace
+      damage in `UpperBound`; strip campaign labels (tier 1/2, GF-3, GD-1,
+      Phase B, OW-n, "anti-confabulation") and stale pointers
+      (`docs/lean-record.md`, `AuditOutworks.lean`, `GRANDFORM-PLAN.md`,
+      `PLAN.md`, `DESIGN.md`); delete `example : True := trivial` in
+      `Grand/Series`.
+- [x] A4. Loose `#print axioms` out of library modules; every headline
+      theorem of the report and the L-papers gets a `#guard_msgs` guard in
+      `Audit.lean` instead.
+- [ ] A5. Validation out of the library: the kernel-decided cells, the
+      numeric gates (`c_ident_check_*`, `d_mu_rec_check_*`,
+      `T_staircase_check_*`, `shape_check_T_*`, the `Tc` examples) move to
+      one `Polyplets/Checks.lean` that the root builds and nothing imports;
+      what a proof actually needs (`T_1_1`, `T_3_2`, `T_4_3`, `V_1_1`,
+      `d_0_1`) stays where it is used.
+- [x] A6. Dead code (2026-10-12: 21 declarations; `#lint` has no unused-
+      declaration check, a usage scan found them) and restatements: `fixCountC`/`fixPred`/
+      `decidableIsCanonicalAnimal` (no consumer since the anchors went),
+      `nu_zero'`, `xNorm_def'`, `rowSize_union_left`, whatever `#lint` and
+      a usage grep show unused.
+- [ ] A7. One development, not two: the king tree (`Graph`, `Finite`,
+      `RowProfile`, `Separation`, `Weights`, `Peel`, `Shape`) becomes the
+      `kingLattice` instance of `Universal/` (`KingAgree` already proves the
+      objects agree definitionally), and `AbstractShape`'s copy of `Shape`
+      is the only shape proof. Deletes ~2,400 duplicated lines and the GD-1/
+      GD-2/GD-3 scaffolding (`KingShapeD` transcriptions, `kingSystemGeneric`,
+      the `king_*_via_universal` re-derivations). The report cone then runs
+      through `Universal/`.
+- [ ] A8. Structures with named fields for `IsCanonical`,
+      `IsCanonicalAnimal`, `Anchored`, `IsVConfig`, `IsVtConfig` (after A7,
+      so it is done once); replace the ~200 positional projections
+      (`hS.2.2.2.2.2.1`) by field names.
+- [ ] A9. One translation toolkit: `shift`/`shiftCell` (`Peel`), `shiftBy`
+      (`Growth`), the `p + t` images of `Symmetry`, the `sub` maps of
+      `UpperBound`, with cardinality, membership, adjacency and connectivity
+      invariance proved once.
+- [ ] A10. `Grand/Series` on `PowerSeries ℚ`: `conv a b = coeff (mk a * mk b)`,
+      `eps = 1`, `convPow = (·)^ℓ`; associativity, commutativity and the
+      collapse lemma come from Mathlib instead of a 40-line sigma bijection.
+- [ ] A11. `int_valued_of_consecutive` from Mathlib's forward differences
+      (`fwdDiff`, `shift_eq_sum_fwdDiff_iter`) instead of the 80-line
+      home-grown induction; likewise `exists_poly_sum_Icc` if Mathlib's
+      Faulhaber/`fwdDiff` material covers it.
+- [ ] A12. A counter that reduces in the kernel: `Tc`, `d`, `V`, `Vt`,
+      `fixCount` over `Fin`-indexed cells and `Bool` predicates (no
+      `Finset (ℤ × ℤ)` powersets in the evaluation path), proved equal to
+      the definitions; then the validation cells that `native_decide` used to
+      carry (rows ≤ 6 of `T`, `a 3 … a 6`, the j ≤ 3 weights, the symmetry
+      anchors n ≤ 5) return to `Checks.lean` as kernel facts, and
+      `P2_closed` returns unconditional.
+- [ ] A13. `Separation.reachable_seg_aux`: one proof for both cut lines
+      instead of two 30-line mirror-image branches.
+- [ ] A14. `Peel`: classes B and C share one peel/glue pair parametrized by
+      whether a walk cell caps the cluster, instead of two ~350-line copies.
+- [ ] A15. `Symmetry`: `DihedralGroup 4` from Mathlib in place of the
+      hand-rolled `D4` and `C4` tables.
+- [ ] A16. `SymmetryRatioClaim` as a theorem, conditional on the banked
+      a(40): encode a symmetric animal by its axis cells and the components
+      of one half, bound the count by `a_le_lambda_pow` and the components,
+      and beat it with `lambda_gt_of_banked`; needs the encoding tight enough
+      that `λ ≤ 12.2` suffices, or `lambda_le_of_bui_rd3` (9.3154) from
+      Queue B. Last: it is the only item that is new mathematics.
+
+## Queue B — the Lean behind the L-papers
+
+- [x] B1. `native_decide` in the restored modules (2026-10-12: `RatCert`
+      tables are balanced `NatMap` trees, `buiRD3_valid` is `decide +kernel`
+      in 11 s; the hex and square `P₁` pins take `T(4,3)` as a hypothesis) (18 sites in
+      `Universal/{King,Hex,Square}`, `buiRD3_valid`): kernel-decide what
+      closes under the guard, delete the rest with their consumers, and make
+      `RatCert.valid` kernel-checkable (iterate the three lists together
+      instead of `List.getD` index lookups, so the 5930-row check is linear
+      in the kernel). Must precede the next commit: `make lean` greps for
+      `native_decide`.
+- [x] B2. Pointers: `README.md` lists `Universal/`, `Upper/`, `Stair*` as
+      live again with the L-paper each supports; `docs/lean-environment.md`
+      counts; `StairGrowth`'s `docs/lean-record.md` reference.
+- [x] B3. Imports, lints, docstrings, loose `#print axioms`, guards for
+      these modules (A1–A4 applied to `Universal/`, `Upper/`, `Stair*`).
+- [ ] B4. `Universal/Compute.pin` duplicates `Pin.pin`; `Universal/Peel`
+      duplicates `Peel` (resolved by A7).
+- [ ] B5. `Upper`: the `RatCert` data files were converted in place
+      (`scripts/bui_lists_to_trees.py`); `scripts/gen_bui_cert.lean.py` emits
+      the same format but has not been rerun against the oracle; regenerate
+      and diff.
+- [ ] B6. `StairAnimals`: `cut`/`join` on `List (ℕ × ℕ)` is fine; replace the
+      `match … with` proofs by structural induction where `#lint` or
+      readability asks.
 
 ## Done
 
@@ -25,23 +126,18 @@ standard axioms only. Ledger: `README.md`.
   like levels 4–18, so `BankedAnchors` is 36 cells and `Weights3Heavy` leaves
   the Report cone. Every `Report.lean` theorem is on
   `[propext, Classical.choice, Quot.sound]` alone.
-- Delete outside the Report cone (2026-10-12): 60 modules, 24k lines, the
-  V(3,3) hour of every cold build, `Draft/`, the build receipts and logs,
-  the generators `gen_v33_chunks.py`, `gen_bui_cert.lean.py`, `gen_pin.py`,
-  the `gate-notary` Makefile target; `Pin.lean` cut to the polynomials, the
-  pin lemma and `P1_closed`. `README.md`'s "Removed" table says what each
-  group proved; all of it is at commit `697f376`.
-- `native_decide` burned down to zero (2026-10-12). Measured with
-  `scripts/lean-decide-trials.sh` under `scripts/lean-guard.sh`: 14 cells
-  close in the kernel under 3.5 GB and are now `decide +kernel`; the rest
-  need 6–9+ GB and were deleted with their consumers (`P2_closed`, `mu_two`,
-  `mu_three_of`, `lambda_gt`, the symmetry anchors, the Weights gates).
+- Delete outside the Report cone (2026-10-12, third checkpoint): 60 modules,
+  24k lines; `Pin.lean` cut to the polynomials, the pin lemma and
+  `P1_closed`. Reversed the same day for the L-paper modules `Universal/`,
+  `Upper/`, `StairAnimals`, `StairGrowth` (restored from 697f376); the rest
+  (GapWalk/DepthOne/Kernel, Holes, V5Denominator, Northcott, IntCoeff,
+  ExpForm/Lead, Weights3Heavy and chunks, ComputeBridge, Diagonal, Sanity,
+  AuditOutworks, Draft/) stays deleted; `README.md`'s "Removed" table says
+  what each proved.
+- `native_decide` burned down to zero in the Report cone (2026-10-12):
+  14 cells close in the kernel under 3.5 GB and are `decide +kernel`; the
+  rest needed 6–9+ GB and were deleted with their consumers.
 - Ledger fold (2026-10-12): `PROOF-STATUS.md`, `DESIGN.md`, the old
-  `README.md` and `docs/lean-record.md` are one file, `README.md`; pointers
-  across `docs/`, `results/` and `scripts/` fixed to it or to `697f376`.
-  Historical audits and reviews under `docs/audits/`, `docs/reviews/`,
-  `docs/pre-landing.md` and the `experiments/` scripts keep their old module
-  names as records.
+  `README.md` and `docs/lean-record.md` are one file, `README.md`.
 - `make lean` (2026-10-12): `sorry` and `native_decide` greps, then the root
-  build; axiom footprints are the `#guard_msgs` in `Polyplets/Audit.lean`,
-  one per Report theorem plus the internal results they rest on.
+  build; axiom footprints are the `#guard_msgs` in `Polyplets/Audit.lean`.

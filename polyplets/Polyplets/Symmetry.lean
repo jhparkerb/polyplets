@@ -3,6 +3,15 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Algebra.Group.MinimalAxioms
+import Mathlib.Analysis.Normed.Ring.Lemmas
+import Mathlib.CategoryTheory.Action.Concrete
+import Mathlib.Tactic.Abel
+import Mathlib.Tactic.DeriveFintype
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.Push
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Set
 import Polyplets.Sequence
 
 /-!
@@ -63,23 +72,19 @@ fixed by `σ²` is already fixed by `σ` (`2 p` is pinned by `t`, and so is
 `σ`-orbits all have exactly four elements: `card_div_four` peels them off one
 at a time, leaving `n % 4 ∈ {0, 1}`.
 
-## Validation
+## Conventions
 
-`fixCountC` is the computable twin (filter the `box n n` enumeration of
-`Compute.lean` by canonicality and `g`-fixedness), and `fixCountC_eq` transports
-it. The kernel cannot decide even `fixCountC 1` within 6 GB (measured
-2026-10-12), so the in-file anchors `n ≤ 5` against `results/sym_counts.txt`
-(`native_decide` facts until then) are gone; the counts `n = 1 … 6` are
-verified by the committed independent brute force
+The counts `n = 1 … 6` are verified outside Lean by the committed brute force
 `experiments/sym_brute_check.py` (run 2026-07-31, log alongside), including
 the `n = 6` row where `hmirror = 58` first parts company with `dmirror = 56`,
 and the derived free/one-sided/bilateral values match A030222/A030233/A030234
-through `n = 6`. In-file, the conventions are pinned by proof rather than
-anchor — `toFun_mul` forces the multiplication table to be composition of the
-eight explicit linear maps, and `D4.h` (negate `y`) vs `D4.d` (swap) are
-distinct conjugacy classes by `decide` — and nothing published depends on
-which mirror is which: `free_eq` and `bilateral_eq` are symmetric in `Hm` and
-`Dm`.
+through `n = 6`. (Kernel `decide` on the brute-force enumeration needs more
+than 6 GB even at `n = 1`, measured 2026-10-12, so no in-file anchors.)
+In-file, the conventions are pinned by proof rather than anchor —
+`toFun_mul` forces the multiplication table to be composition of the eight
+explicit linear maps, and `D4.h` (negate `y`) vs `D4.d` (swap) are distinct
+conjugacy classes by `decide` — and nothing published depends on which mirror
+is which: `free_eq` and `bilateral_eq` are symmetric in `Hm` and `Dm`.
 -/
 
 namespace Polyplets
@@ -886,59 +891,5 @@ theorem bilateral_eq (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun y _ => card_stab_eq_two_mul n y
   omega
-
-/-! ## Computable twin and banked anchors -/
-
-/-- `g`-fixedness of a cell set, phrased so it is decidable: `reanchor` is
-computable and `Finset` equality is decidable. -/
-def fixPred (g : D4) (S : Finset (ℤ × ℤ)) : Prop := reanchor (S.image (D4.toFun g)) = S
-
-instance decidableFixPred (g : D4) (S : Finset (ℤ × ℤ)) : Decidable (fixPred g S) := by
-  unfold fixPred; infer_instance
-
-instance decidableIsCanonicalAnimal (n : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsCanonicalAnimal n S) := by
-  unfold IsCanonicalAnimal; infer_instance
-
-/-- Every canonical animal of `n` cells is an `n`-subset of the `n × n` box —
-the enumeration `fixCountC` runs over. -/
-lemma mem_powersetCard_box {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
-    S ∈ (box n n).powersetCard n := by
-  rw [Finset.mem_powersetCard]
-  refine ⟨fun p hp => ?_, hS.1⟩
-  rw [mem_box]
-  have hx1 := canonicalAnimal_x_le hS hp
-  have hy1 := canonicalAnimal_y_le hS hp
-  have hx0 := hS.2.2.1 p hp
-  have hy0 := hS.2.2.2.2.1 p hp
-  omega
-
-/-- Computable counterpart of `fixCount`: enumerate the `n`-element subsets of
-the `n × n` box and count the canonical `g`-fixed ones. Brute force, so useful
-only for small `n` — see the cost note in the module header. -/
-def fixCountC (n : ℕ) (g : D4) : ℕ :=
-  (((box n n).powersetCard n).filter fun S => IsCanonicalAnimal n S ∧ fixPred g S).card
-
-/-- The computable twin agrees with `fixCount`. -/
-theorem fixCountC_eq (n : ℕ) (g : D4) : fixCountC n g = fixCount n g := by
-  rw [fixCountC, fixCount, ← Nat.card_eq_finsetCard]
-  refine Nat.card_congr ⟨fun S => ⟨⟨S.1, ((Finset.mem_filter.mp S.2).2).1⟩, ?_⟩,
-    fun x => ⟨x.1.1, ?_⟩, ?_, ?_⟩
-  · exact Subtype.ext ((Finset.mem_filter.mp S.2).2).2
-  · rw [Finset.mem_filter]
-    exact ⟨mem_powersetCard_box x.1.2, x.1.2, congrArg Subtype.val x.2⟩
-  · intro S; rfl
-  · intro x; rfl
-
-/-! ## Axiom audit
-
-Plain `#print axioms` here; the `#guard_msgs`-wrapped versions are integrated
-into the campaign audit point by the orchestrator. The four headline theorems
-must carry the standard three. -/
-
-#print axioms free_eq
-#print axioms oneSided_eq
-#print axioms bilateral_eq
-#print axioms r90_vanish
 
 end Polyplets

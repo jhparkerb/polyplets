@@ -3,6 +3,15 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.Choose
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.NormNum.Ineq
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Positivity.Core
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Ring.Basic
+import Mathlib.Tactic.Set
 import Polyplets.Sequence
 
 /-!
@@ -26,7 +35,7 @@ is available (the limit itself is not built here).
 
 Every canonical animal is first re-anchored: `expShape S` translates `S` so that
 its scan-least cell (row-major, `y` before `x`) sits at the origin. Canonicity
-pins the translation back, so `expShape` is injective (`expShape_injOn`), and the
+pins the translation back, so `expShape` is injective (`expShape_injOn`), and
 the shape is what the exploration reconstructs.
 
 The exploration is a breadth-first flood from the origin, run as a pure
@@ -45,7 +54,7 @@ accept-position set, which is what makes `S ↦ accept positions` injective.
 Two facts bound the number of steps:
 
 * the origin proposes only `4` candidates (the other four king neighbors are
-  scan-smaller, hence never cells of a expShape), and
+  scan-smaller, hence never cells of a shape), and
 * every later accepted cell `c` proposes at most `5`: its proposer `p` and all
   of `p`'s neighbors were already seen when `p` was accepted, and `p` shares
   at least two neighbors with `c` (`countP_new_le`).
@@ -65,7 +74,7 @@ Elementary and independent of the exploration, so it comes first. The engine is
 the one-step factorial identity `choose_step`, which turns the induction into a
 polynomial inequality with nonnegative coefficient differences. -/
 
-/-- Five factorial peels, with the successor expShape supplied by definitional
+/-- Five factorial peels, with the successor shape supplied by definitional
 unfolding of `Nat.add` (`m + 5` is `(m + 4) + 1`). -/
 private lemma factorial_add_five (m : ℕ) :
     factorial (m + 5)
@@ -365,12 +374,6 @@ lemma runO_steps (D : Finset (ℤ × ℤ)) (k : ℕ) : (runO D k).steps = k := b
   | zero => rfl
   | succ k ih => rw [runO, expStep_steps, ih]
 
-/-- The position run's counter is the iteration index. -/
-lemma runA_steps (A : Finset ℕ) (k : ℕ) : (runA A k).steps = k := by
-  induction k with
-  | zero => rfl
-  | succ k ih => rw [runA, expStep_steps, ih]
-
 /-- A "yes" answer names a head candidate. -/
 lemma oracleBit_true {D : Finset (ℤ × ℤ)} {st : ExpState} (h : oracleBit D st = true) :
     ∃ c p rest, st.queue = (c, p) :: rest ∧ c ∈ D := by
@@ -435,7 +438,7 @@ lemma runA_eq_runO (D : Finset (ℤ × ℤ)) (K : ℕ) :
 Fourteen clauses carried together: piecemeal invariants do not survive the
 accepting step, where the queue, the considered set and the budget all move at
 once. `D` is an arbitrary cell set here — nothing in this section needs it to
-be a expShape. -/
+be a shape. -/
 
 /-- The exploration invariant relative to a cell set `D`. -/
 structure Good (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
@@ -719,10 +722,10 @@ lemma runO_queue_nil {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn 
       simp only [List.length_cons] at h
       omega
 
-/-- **The exploration reconstructs the expShape.** Only cells of `D` are accepted,
+/-- **The exploration reconstructs the shape.** Only cells of `D` are accepted,
 and every cell of `D` is: the origin is decided first, and each further cell is
 reached along a king path from it — when its predecessor was accepted the cell
-was proposed (it is scan-positive, being a non-origin cell of a expShape), and a
+was proposed (it is scan-positive, being a non-origin cell of a shape), and a
 halted run has decided everything it proposed. -/
 lemma runO_accepted {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
     (runO D (5 * n)).accepted = D := by
@@ -824,7 +827,7 @@ private lemma kingAdj_sub (a : ℤ × ℤ) {x y : ℤ × ℤ} (h : kingAdj x y) 
   · change |x.2 - a.2 - (y.2 - a.2)| ≤ 1
     rw [show x.2 - a.2 - (y.2 - a.2) = x.2 - y.2 by ring]; exact h2
 
-/-- **A canonical animal re-anchors to a expShape.** Size and connectivity survive
+/-- **A canonical animal re-anchors to a shape.** Size and connectivity survive
 the translation; the origin is the image of the anchor; and every other cell is
 scan-greater because the anchor is scan-least. -/
 lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
@@ -927,15 +930,5 @@ theorem a_le_choose (n : ℕ) (hn : 1 ≤ n) : a n ≤ Nat.choose (5 * n) n := b
   rw [Set.ncard_coe_finset, Finset.card_powersetCard, Finset.card_range] at hle
   rw [a]
   exact hle
-
-/-! ## Axiom audit
-
-Plain `#print axioms`; the `#guard_msgs`-wrapped versions are integrated into
-the campaign audit point by the orchestrator. Both results must carry the
-standard three — no `native_decide` enters this file, the eight-case neighbor
-check being a kernel `decide`. -/
-
-#print axioms a_le_choose
-#print axioms choose_le_pow
 
 end Polyplets

@@ -3,6 +3,11 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 import Polyplets.Grand.Staircase
 import Polyplets.Pin
 
@@ -57,20 +62,6 @@ lemma grand_to_prod {k : ℕ} {P : Polynomial ℚ} (h : GrandForm k P) :
     zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast, zpow_natCast]
   field_simp
   linear_combination hg
-
-/-- Production `n`-form to grand form. -/
-lemma prod_to_grand {k : ℕ} {P : Polynomial ℚ}
-    (h : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k)) :
-    GrandForm k P := by
-  intro H hH
-  have hn := h (H + k) (by omega)
-  rw [show H + k - k = H from by omega] at hn
-  push_cast at hn
-  rw [hn, show ((H : ℤ) + k) - 1 - 3 * k = ((H + k : ℕ) : ℤ) - ((3 * k + 1 : ℕ) : ℤ) from by
-      push_cast; ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast, zpow_natCast]
-  field_simp
 
 /-! ## The two generic steps -/
 

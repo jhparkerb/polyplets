@@ -3,6 +3,9 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.SimpRw
 import Polyplets.Grand.Series
 import Polyplets.Weights
 
@@ -44,14 +47,6 @@ lemma v_vanish_lt {ℓ : ℕ} : ∀ j, j < ℓ → v ℓ j = 0 := by
   simp only [v]
   rw [if_neg]
   rintro ⟨hle, -⟩
-  omega
-
-/-- `v 0` is the zero sequence. -/
-lemma v_zero : v 0 = fun _ => 0 := by
-  funext j
-  simp only [v]
-  rw [if_neg]
-  rintro ⟨-, h1⟩
   omega
 
 /-- On its support, `v ℓ` reads the interior weight `V ℓ j`. -/
@@ -131,9 +126,6 @@ lemma mu_zero : mu 0 = 3 := by
   simp only [mu, Finset.Icc_eq_empty (by omega : ¬ (1 : ℕ) ≤ 0), Finset.sum_empty]
   norm_num [eps]
 
-/-- `ν₀ = 1/3` (re-export at the `μ` layer). -/
-lemma nu_zero' : nu 0 = 1/3 := nu_zero
-
 /-- For `m ≥ 1` the unit term drops out of `μ`. -/
 lemma mu_succ_eq {m : ℕ} (hm : 1 ≤ m) :
     mu m = ∑ ℓ ∈ Finset.Icc 1 m, conv (v ℓ) (convPow nu ℓ) m := by
@@ -198,9 +190,6 @@ theorem mu_conv_nu : conv mu nu = eps := by
   rw [Finset.sum_add_distrib, hA, hB]
   exact (root m).symm
 
-/-- `ν ∗ μ = eps` (commuted form). -/
-theorem nu_conv_mu : conv nu mu = eps := by rw [conv_comm, mu_conv_nu]
-
 /-- The inverse law lifts to convolution powers:
 `μ^{∗ℓ} ∗ ν^{∗ℓ} = eps`. -/
 theorem mu_conv_nu_pow (ℓ : ℕ) : conv (convPow mu ℓ) (convPow nu ℓ) = eps :=
@@ -220,25 +209,10 @@ lemma convPow_nu_two : convPow nu 2 = conv nu nu := by simp only [convPow, conv_
 lemma v_10 : v 1 0 = 0 := by simp [v]
 lemma v_11 : v 1 1 = 25 := by rw [v_eq (by norm_num) (by norm_num), V_1_1]; norm_num
 
-/-- `ν₁ = −25/27`. -/
-lemma nu_one : nu 1 = -25/27 := by
-  rw [nu_unfold 1 (le_refl 1), Finset.Icc_self, Finset.sum_singleton, convPow_nu_two]
-  simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [v_10, v_11, nu_zero]
-
 /-- **Gate μ₁.** `μ₁ = 25/3`, via `V_1_1`. -/
 theorem mu_one : mu 1 = 25 / 3 := by
   rw [mu_succ_eq (le_refl 1), Finset.Icc_self, Finset.sum_singleton, convPow_nu_one]
   simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
   norm_num [v_10, v_11, nu_zero]
-
-/-! ## Axiom sanity check -/
-
-section Sanity
-
-#print axioms mu_conv_nu
-#print axioms mu_one
-
-end Sanity
 
 end Polyplets

@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Algebra.BigOperators.NatAntidiagonal
-import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
-import Mathlib.Tactic
+import Mathlib.Analysis.Normed.Field.Lemmas
+import Mathlib.Tactic.Ring
 
 /-!
 # Series: a sequence-convolution toolkit over `ℕ → ℚ`
@@ -18,19 +18,17 @@ later files can pattern-match on the underlying lambdas.
 * `conv a b` — the Cauchy convolution `m ↦ ∑_{i ≤ m} a i · b (m − i)`.
 * `eps` — the convolution unit (`1` at `0`, else `0`).
 * `convPow a ℓ` — the `ℓ`-fold convolution power of `a` (`convPow a 0 = eps`).
-* `shiftSeq i a` — right-shift by `i` (`0` on the first `i` indices).
 
 The core reusable lemma is **`sum_conv_collapse`**: the reindexing
 `∑_i a i · (∑_t b t · f (k−i−t)) = ∑_s (conv a b) s · f (k−s)`, proved by a
 bijection of sigma index sets. It is `conv_assoc` in disguise (the inner sum is
-`conv b f (k − i)`), and GF-3, GF-4, GF-6 all consume it.
+`conv b f (k − i)`); `Mu`, `MuRec` and `Staircase` consume it.
 
-`conv` is a commutative, associative product with unit `eps`; convolution powers
-add exponents (`convPow_add`) and a convolution inverse lifts to powers
-(`conv_convPow_inv`). Truncation lemmas (`conv_congr_le`, `convPow_congr_le`,
-`conv_left_vanish_lt`, `convPow_vanish_lt`) express that coefficient `m` of a
+`conv` is a commutative, associative product with unit `eps`, and a convolution
+inverse lifts to powers (`conv_convPow_inv`). Truncation lemmas (`conv_congr_le`,
+`convPow_congr_le`, `conv_left_vanish_lt`) express that coefficient `m` of a
 convolution reads its arguments only at indices `≤ m` — the workhorses the
-well-founded `ν`/`μ` recursions of GF-2/GF-3 lean on.
+well-founded `ν`/`μ` recursions of `Mu.lean` lean on.
 -/
 
 namespace Polyplets
@@ -49,11 +47,6 @@ def eps : ℕ → ℚ := fun m => if m = 0 then 1 else 0
 def convPow (a : ℕ → ℚ) : ℕ → ℕ → ℚ
   | 0     => eps
   | ℓ + 1 => conv a (convPow a ℓ)
-
-/-- Right-shift a sequence by `i`: `shiftSeq i a m = a (m − i)` for `i ≤ m`, else
-`0`. -/
-def shiftSeq (i : ℕ) (a : ℕ → ℚ) : ℕ → ℚ :=
-  fun m => if i ≤ m then a (m - i) else 0
 
 /-! ## Antidiagonal form and commutativity -/
 
@@ -74,7 +67,7 @@ lemma conv_comm (a b : ℕ → ℚ) : conv a b = conv b a := by
 
 /-! ## The collapse lemma and associativity -/
 
-/-- **`sum_conv_collapse`** — the key reindexing used across GF-3/4/6: folding a
+/-- **`sum_conv_collapse`** — the key reindexing of the staircase: folding a
 nested convolution sum along the diagonal `s = i + t` turns the inner
 `∑_t b t · f (k − i − t)` into a genuine `conv a b` coefficient. Proved by a
 bijection of the two sigma index sets `{(i,t) : i + t ≤ k}` and
@@ -202,35 +195,7 @@ lemma conv_eq_zero_of_lt {a b : ℕ → ℚ} {ℓ : ℕ} (h : ∀ j, j < ℓ →
     {m : ℕ} (hm : m < ℓ) : conv a b m = 0 := by
   rw [conv_left_vanish_lt h m, Finset.Icc_eq_empty (by omega), Finset.sum_empty]
 
-/-- If `a` vanishes below `1` (i.e. `a 0 = 0`), the `ℓ`-th convolution power
-vanishes below `ℓ`. -/
-lemma convPow_vanish_lt {a : ℕ → ℚ} (h : a 0 = 0) :
-    ∀ (ℓ m : ℕ), m < ℓ → convPow a ℓ m = 0 := by
-  intro ℓ
-  induction ℓ with
-  | zero => intro m hm; exact absurd hm (Nat.not_lt_zero m)
-  | succ ℓ ih =>
-    intro m hm
-    simp only [convPow, conv]
-    refine Finset.sum_eq_zero fun i hi => ?_
-    rw [Finset.mem_range] at hi
-    rcases Nat.eq_zero_or_pos i with hi0 | hipos
-    · rw [hi0, h, zero_mul]
-    · have : m - i < ℓ := by omega
-      rw [ih (m - i) this, mul_zero]
-
 /-! ## Convolution powers -/
-
-/-- Exponents add: `convPow a (ℓ₁ + ℓ₂) = conv (convPow a ℓ₁) (convPow a ℓ₂)`. -/
-lemma convPow_add (a : ℕ → ℚ) (ℓ₁ ℓ₂ : ℕ) :
-    convPow a (ℓ₁ + ℓ₂) = conv (convPow a ℓ₁) (convPow a ℓ₂) := by
-  induction ℓ₂ with
-  | zero => simp only [Nat.add_zero, convPow, conv_eps]
-  | succ ℓ ih =>
-    have he : ℓ₁ + (ℓ + 1) = (ℓ₁ + ℓ) + 1 := by omega
-    rw [he]
-    simp only [convPow]
-    rw [ih, ← conv_assoc, conv_comm a (convPow a ℓ₁), conv_assoc]
 
 /-- A convolution inverse lifts to powers: if `conv a b = eps` then
 `conv (convPow a ℓ) (convPow b ℓ) = eps`. -/
@@ -243,18 +208,5 @@ lemma conv_convPow_inv {a b : ℕ → ℚ} (h : conv a b = eps) :
     simp only [convPow]
     rw [conv_assoc, ← conv_assoc (convPow a ℓ) b, conv_comm (convPow a ℓ) b,
         conv_assoc b, ih, conv_eps, h]
-
-/-! ## Axiom sanity check -/
-
-section Sanity
-
-/-- Axiom audit for the collapse lemma: standard axioms only, no `native_decide`. -/
-example : True := trivial
-
-#print axioms sum_conv_collapse
-#print axioms conv_assoc
-#print axioms conv_convPow_inv
-
-end Sanity
 
 end Polyplets

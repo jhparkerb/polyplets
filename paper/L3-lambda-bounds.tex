@@ -51,10 +51,9 @@ and is \emph{trusted, not certified} --- see \S\ref{sec:honest}.
 super-solution of a $5930$-component convolution system, all inequalities
 checked in exact rational arithmetic with no floating point anywhere in the
 chain; formalized in Lean (\texttt{RatCert.lambda\_le},
-\texttt{lambda\_le\_of\_buiSystem}: standard axioms only; the concrete
-certificate \texttt{lambda\_le\_of\_bui\_rd3} adds one named
-\texttt{native\_decide} leaf, which is the certificate's arithmetic validity
-check).
+\texttt{lambda\_le\_of\_buiSystem}, and the concrete certificate
+\texttt{lambda\_le\_of\_bui\_rd3}, whose arithmetic validity check the kernel
+decides: standard axioms only).
 \emph{The elementary bound $\lambda \le 5^5/4^4$
 (Proposition~\ref{prop:crude})} --- proved, by a BFS-frame encoding that is
 machine-verified over every animal with $n \le 8$ with a negative control. Its
@@ -626,13 +625,12 @@ and also passes.
 
 \paragraph{Formalization.} The certificate scheme is formalized in Lean~4:
 \texttt{BuiSystem.certSum\_le}, \texttt{lambda\_le\_of\_buiSystem} and
-\texttt{RatCert.lambda\_le} depend on standard axioms only, and the concrete
-window-$3$ instance \texttt{lambda\_le\_of\_bui\_rd3} depends additionally on one
-named \texttt{native\_decide} leaf, which is the certificate's arithmetic
-validity check. The naming matters: a named leaf says exactly which finite
-computation is being trusted, so the compiled-evaluation surface is enumerable
-rather than diffuse. There is no \texttt{sorry} and no anonymous
-\texttt{Lean.ofReduceBool} anywhere in the development.
+\texttt{RatCert.lambda\_le} depend on standard axioms only, and so does the
+concrete window-$3$ instance \texttt{lambda\_le\_of\_bui\_rd3}: the
+certificate's $5930$ rows are stored as balanced lookup trees and its
+arithmetic validity check is decided by the kernel (\texttt{decide +kernel},
+about eleven seconds), so nothing is compiled and trusted. There is no
+\texttt{sorry} and no \texttt{native\_decide} anywhere in the development.
 
 \section{Where the remaining gap lives}
 \label{sec:gap}
