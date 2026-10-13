@@ -1,9 +1,9 @@
 # The dm-mirror diagonal law: proof
 
-2026-07-15. Completes the program of `results/symmetry-classes.md`
+Completes the program of `results/symmetry-classes.md`
 (step 1 = the reversal lemma, proved there; this document is steps 2-4).
 Machine anchors: `experiments/dm_sym_enum.py` (ground truth, matches the
-banked strip data), `experiments/dm_phase_census.py` (reversal lemma tight;
+recorded strip data), `experiments/dm_phase_census.py` (reversal lemma tight;
 per-class quasi-polynomiality k <= 2, S <= 13).
 
 ## Statement
@@ -19,13 +19,13 @@ x = 1 and x = -1, of total order <= k+1 at each.
 
 (The sharp onset -- the single condition S_0 = 2k+2, no parity split:
 2k+3 on the odd class is just the least odd integer past 2k+2 -- is NOT
-proved here; it stays data-grade. King sharpness, by contrast, was closed
-2026-09-05: `docs/proofs/diagonal-law.md`, "What remains open".
+proved here; it stays data-grade. King sharpness, by contrast, is proved:
+`docs/proofs/diagonal-law.md`.
 The pole multiplicities (k+1, k) are NOT an independent data-grade item:
 writing d(S,S+k) = A(S) + (-1)^S B(S), they are equivalent to deg A = k
-and deg B = k-1, i.e. to the banked equal-leading-coefficients fact plus
+and deg B = k-1, i.e. to the recorded equal-leading-coefficients fact plus
 lead(P_even - P_odd) = (-1)^k/(k-1)! -- see
-`results/symmetry-classes.md`, 2026-07-31.)
+`results/symmetry-classes.md`.)
 
 ## Setup and the skeleton
 
@@ -151,7 +151,7 @@ dimension <= k (Lemmas 5, 2). A period-2 quasi-polynomial of degree <= k
 has generating function with poles only at +-1 of total order <= k+1 at
 each. QED
 
-## Status ledger (honest grades)
+## Status
 
 - Lemmas 1, 3, 4: complete proofs above.
 - Lemma 2 and the reversal lemma: proved (step 1 + above); TIGHT on data.
@@ -160,13 +160,12 @@ each. QED
   equality case) are its verification anchors. A referee should press
   here first.
 - Machine certification: for k <= 2 every phase class is separately
-  per-parity polynomial of degree <= k from S >= 2k+2 on all banked and
+  per-parity polynomial of degree <= k from S >= 2k+2 on all recorded and
   enumerated data (S <= 13), and classes partition d(S, S+k) —
   `experiments/dm_phase_census.py`.
 - NOT proved: sharp onset (2k+2 / 2k+3) and the exact multiplicity split
-  (k+1 at x=1, k at x=-1); both remain data-grade. The king analogue is no
-  longer a companion in that: it was proved 2026-09-05
-  (`docs/proofs/diagonal-law.md`), by a route that has no dm-mirror
+  (k+1 at x=1, k at x=-1); both remain data-grade. The king analogue is
+  proved (`docs/proofs/diagonal-law.md`), by a route that has no dm-mirror
   counterpart yet — no quartic is known for the dm-mirror defect.
   The same route would need a below-onset defect series for this family and
   an algebraic equation for it from a kernel argument; the family is a sum

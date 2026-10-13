@@ -1,6 +1,6 @@
 # The universal diagonal law (row-local lattices, and rows with a fiber)
 
-2026-07-15. Generalizes `docs/proofs/diagonal-law.md` (king lattice) to a
+Generalizes `docs/proofs/diagonal-law.md` (king lattice) to a
 class of lattices; the two instances proved there and in
 `results/diagonal-formula.md` become cases of one theorem, and the square
 lattice joins as the degenerate b = 1 case. Machine checks:
@@ -24,7 +24,7 @@ king D = {-1, 0, 1}, b = 3. Animals = finite connected nonempty
 cell sets up to translation; T(n, H) = those with n cells and exactly H
 nonempty rows spanning a height-H window.
 
-**What the b = 2 instance is, settled 2026-08-06 by measurement**
+**What the b = 2 instance is**, by measurement
 (`experiments/diagonal_machine.py` `identify()`, brute force to n = 8, run on
 every invocation so the labels cannot drift). D = {−1, 0} is **six**-regular,
 totals 1, 3, 11, 44, 186, 814, 3652, 16689 = **A001207: fixed hexagonal
@@ -139,7 +139,7 @@ Valuation: v_p(What_c) = (2k_c - l_c - 1) v_p(b) + v_p(W_c) >=
 (k_c - 1) v_p(b) >= 1 for every cluster except k = l = 1, using k >= l.
 Only the pair-row survives mod p, with weight What = W_pair. QED
 
-## Corollary: OEIS A308359's open conjecture (2026-08-06)
+## Corollary: OEIS A308359's open conjecture
 
 **A308359** (R. J. Mathar, May 2019) is the triangle of *fixed polyominoes with
 n cells by bounding-box width*, height free — our own T(n, H) transposed. It
@@ -164,7 +164,7 @@ check on our machinery. And the onset in their conjecture, "n ≥ 5", was
 presumably read off data; ours is 2k+1 for every k, proved, which is where the
 next diagonals would come from.
 
-## The diagonal machine (2026-08-06)
+## The diagonal machine
 
 `experiments/diagonal_machine.py`. Theorem A's degree bound and onset turn
 k+1 enumerated values into a proved closed form, for **any** row-local lattice.
@@ -199,7 +199,7 @@ Every row also survives 5–11 holdout values past the ones used to fit it.
 Coefficients are rational, not integral, which is the expected shape:
 `k!·P_k ∈ ℤ[n]` with P_k integer-*valued* (32/3 × 3! = 64).
 
-## The gas, made lattice-parametric (2026-08-06)
+## The gas, made lattice-parametric
 
 `experiments/gas_cumulants.py`. The machine above says *what* P_k is; the gas
 says *why*, and its content turns out to be one line about cumulants. Write
@@ -267,40 +267,26 @@ algebraic and reduces mod `b` (mod 2 for hex, mod 3 for king; on square it is
 `x/(1+x)` outright): `results/closed-doors.md` §The below-onset
 `D_1` is parametric, `results/below-onset.md` §3.
 
-CORRECTION 2026-07-31 (hygiene sweep; `experiments/universal_pair_weights.py`,
-two independent methods: direct gadget count with no gap cap, and
-end-to-end k = 1 diagonal enumeration with holdouts — [n]P_1 = W_pair
-confirmed on all six test lattices). The 2026-07-15 synthetic computation
-capped the pair's column gap at 2 — correct for max|dx| <= 1, silently
-lossy beyond — and its numerals for the wider lattices were undercounts:
-interval b = 4, 5 have **W_pair = 58, 114** (not 45, 69; the old numbers
-are exactly the gap <= 2 subtotals), and D = {-2, 0, 2} has **W_pair = 57**
-(not 48). Every qualitative conclusion survives, and the corrected
-sequence has a closed form for interval D:
+**Pair weights on wider lattices.** `experiments/universal_pair_weights.py`
+counts W_pair two independent ways (direct gadget count with no gap cap, and
+end-to-end k = 1 diagonal enumeration with holdouts; [n]P_1 = W_pair on all
+six test lattices). A pair's column gap must not be capped at 2: that is
+correct for max|dx| <= 1 and silently lossy beyond. Interval b = 4, 5 have
+**W_pair = 58, 114** and D = {-2, 0, 2} has **W_pair = 57**; for interval D,
 
     W_pair(b) = b^3 - b(b+1)/2 + 4     (verified b = 1..8 gadget-side,
                                         b <= 5 end-to-end),
 
-> **SCOPE NOTE 2026-07-31 (cold-eyed pass), on everything from the closed
-> form to the end of this paragraph.** The *correction* above is load-bearing
-> and stays in full: 45/69/48 were wrong, one of them reached the paper, and
-> killing the "densities are squares" reading was necessary. What is demoted
-> to supporting detail is the **generalization**: the cubic in b, and the
-> "degenerate iff 4 | b" classification, describe a family of hypothetical
-> interval lattices at b >= 4 that nobody enumerates. Exactly three members
-> of the class are objects anyone studies — square (b=1), hex (b=2), king
-> (b=3) — and all three are machine-checked here.
->
-> Theorem B's sharpness needs only two witnesses, and we have both
-> independently of the cubic: `D = {-2,0,2}` realizes w = 0 (degenerate
-> branch nonempty), and interval b = 5 gives w = 4 != 1 (scaling genuinely
-> nontrivial). Those two examples carry the theorem. Keep the closed form as
-> the convenient way to *generate* such witnesses; do not present it, or the
-> 4 | b classification, as a result in its own right, and do not extend the
-> b-family further.
-
 so densities are NOT squares beyond b = 3 — "squares" was a b <= 3
-artifact. The solid-pair term (b+1)^2 == 1 mod p | b stands. Mod-p
+artifact. The cubic and the classification below describe a family of
+interval lattices at b >= 4 that nobody enumerates; the three members of the
+class anyone studies are square (b=1), hex (b=2) and king (b=3), all
+machine-checked here. Theorem B's sharpness needs only two witnesses, and
+both exist independently of the cubic: `D = {-2,0,2}` realizes w = 0 (the
+degenerate branch is nonempty), and interval b = 5 gives w = 4 != 1 (the
+scaling is genuinely nontrivial). The closed form is a convenient way to
+generate such witnesses, not a result in its own right.
+The solid-pair term (b+1)^2 == 1 mod p | b stands. Mod-p
 corollary of the closed form: for **odd p | b** both b^3 and b(b+1)/2
 vanish, so **w == 4 (mod p) — always a unit**, and the universal spine for
 odd p is H^3 = H^2 + 4u with the 4 lattice-independent too (king's w = 1
@@ -313,12 +299,12 @@ needed; D = {-2, 0, 2} also lands there (57 == 0 mod 3, replacing the old
 when w == 0) is exactly sharp, with the branch condition now closed-form:
 degenerate iff p = 2 and 4 | b (for interval D).
 
-**Degree sharpening (2026-07-31).** deg q_k = k exactly, with leading
+**Degree sharpening.** deg q_k = k exactly, with leading
 coefficient [n^k]P_k = W_pair^k / k!: proved for king (grand-form
-Corollary 2, Lean `IsDiagonalPoly.coeff_eq` in `LeadingCoeff.lean`, which
-replaced `lead_coeff_25` on 2026-10-12; the argument is uniform in the weights
+Corollary 2, Lean `IsDiagonalPoly.coeff_eq` in `LeadingCoeff.lean`; the
+argument is uniform in the weights
 with 25 -> W_pair, not written out for general b), and measured: k = 1 at
-all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
+all six test lattices above (slope = W_pair), hex k <= 2 (recorded lead
 81/2 = 9^2/2!, `results/diagonal-formula.md`), square deg-k diagonals
 (`experiments/universal_law_check.py`). Since W_pair >= 4 > 0, the
 "degree <= k" of Theorem A is never slack at the top.
@@ -328,13 +314,13 @@ all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
 - Theorem A needs no symmetry of D and no b-specific arithmetic; it also
   holds per extra additive marker (holes etc.) by the same proof with
   marked weights.
-- Onset SHARPNESS (failure at n = 2k) remains per-lattice empirical, as in
-  the king case.
+- Onset sharpness (failure at n = 2k) is proved on square, hex and king
+  (above); for other lattices in the class it is empirical.
 - Together with the anisotropic non-D-finiteness theorem (same repo),
   which is also lattice-universal, the two structural results about
   by-height triangles hold across the class.
 
-## Prior art (2026-08-06, `docs/publication.md` N5)
+## Prior art
 
 No height-diagonal law for lattice-animal triangles was found in print, and
 `results/diagonal-formula.md` had already recorded no published T(n,n−k)

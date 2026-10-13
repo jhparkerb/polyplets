@@ -47,8 +47,9 @@ $$A + B_{\text{sep}} + B_{\text{adj}} = \tfrac12(625n^{2}-2459n+1134)\,3^{\,n-7}
 **Form (proven structure):** for each fixed k,
 `T(n,n−k) = P_k(n)·3^(n−1−3k)` with **P_k a degree-k polynomial**, valid in the
 bulk **n ≥ 2k+1** (below that, boundary terms). The k=0,1,2 cases are proven from
-first principles (A1, C1, §1); the leading coefficient is **25ᵏ/k!** — verified
-exactly for k=0…6 from the triangle.
+first principles (the single-cell chain, `T-n-nm1.md`, §1); the leading
+coefficient is **25ᵏ/k!** — verified exactly for k=0…6 from the triangle, and
+proved for all k in `grand-form.md`.
 
 **Why a single structure — the defect gas.** The excess-k cells form *defect
 clusters* (maximal runs of multi-cell rows) placed on the n-row chain; clusters
@@ -75,17 +76,14 @@ question whether they are algebraic.
 
 ## 3. Status / use
 
-- **Proven & engine-ready (gated against the triangle):** k=0 (A1), k=1 (C1),
-  **k=2 (§1)** → frees the top **three** heights of every run.
-- **Exact from data, not yet first-principles-proven:** k=3…6 (P_k pinned, leading
-  25ᵏ/k! confirmed). These would free the top **seven** heights — a large frontier
-  win — once the defect-gas proof is written for general k (the method of §1
-  extends; the bookkeeping grows). Until then they serve as cross-checks, not the
-  record path.
+- k=0 (the single-cell chain), k=1 (`T-n-nm1.md`) and k=2 (§1) are proved
+  from first principles and checked against the triangle by the engine gates.
+- The law for general k is `diagonal-law.md`; each P_k is then determined
+  from two in-onset entries (`grand-form.md`), and the engine's formula table
+  holds k ≤ 19.
 
-**Validity reminder for wiring:** `T(n,n−k)` holds for `n ≥ 2k+1`; the engine must
-fall back to a real sweep when `maxn < 2k+1` (irrelevant at the frontier, where
-maxn ≥ 20 ≫ 2k+1 for the small k we free).
+`T(n,n−k)` holds for `n ≥ 2k+1`; the engine falls back to a real sweep when
+`maxn < 2k+1`.
 
 ## 4. The defect gas is a partition structure (the proof skeleton for all k)
 
@@ -152,7 +150,7 @@ the single-cluster GF — which would deliver every k at once; the cluster weigh
 25, 388, … are its (positive-integer) building blocks and a better target for
 pattern-recognition than B(y)'s signed rationals.
 
-## 5. Closing B(y): the attempt, and why it is parked (2026-06-29)
+## 5. Closing B(y): the attempt, and why it is parked
 
 We tried to close B(y) and reached a clean **negative** result: no
 low-complexity closed form exists at any precision the available data can reach.
@@ -198,23 +196,21 @@ polyomino GF is conjectured so). Going further needs ~15–20 terms, which requi
 driving the engine into the expensive tall-strip / high-excess region (H≈14–18)
 for a poor-prior, high-degree fit.
 
-**Update 2026-08-10 — extended to the a(40) triangle, negative confirmed.**
-The a(40) per-height data (`results/ns_a40/`, banked) reaches into exactly the
-tall-strip region §above wanted, so the `λ_raw` slice now yields **18 converged
-terms** (was 9 at a(21); the first 9 reproduce the values above exactly,
-denominators still pure powers of 3). Re-running the falsifiable equation search
-at that ceiling — algebraic `P(f,y)=0` up to (deg_f 8 × deg_y 1) and linear ODEs
-up to order 4, on both `λ_raw` and `log λ_raw` — **every falsifiable form returns
-the trivial solution only**. So the 2026-06-29 negative is not a data-starvation
-artifact: at doubled precision, inside the 15–20-term window, B(y) still shows no
-algebraic or D-finite closed form. This is strong evidence it is genuinely
-non-D-finite, consistent with the polyomino-growth lore. (Restored + extended
-extractor: `experiments/braw_from_data.py [NMAX]`, log `build/braw_a40.log`.)
+**Extended to the a(40) triangle.** The a(40) per-height data
+(`results/ns_a40/`) reaches into exactly the tall-strip region wanted above, so
+the `λ_raw` slice yields **18 converged terms** (the first 9 reproduce the
+values above exactly, denominators still pure powers of 3). The falsifiable
+equation search at that ceiling — algebraic `P(f,y)=0` up to (deg_f 8 ×
+deg_y 1) and linear ODEs up to order 4, on both `λ_raw` and `log λ_raw` —
+returns the trivial solution only for every form. So the negative is not a
+data-starvation artifact: at doubled precision, inside the 15–20-term window,
+B(y) still shows no algebraic or D-finite closed form. This is strong evidence
+it is genuinely non-D-finite, consistent with the polyomino-growth lore.
+Extractor: `experiments/braw_from_data.py [NMAX]`, log `build/braw_a40.log`.
 
-**Status: parked, not blocking.** The *practical* value of B(y) is already banked
-— the proven diagonals free the expensive **top** heights (k≤4 wired into the
-engine; k≤7 data-pinned as cross-checks). Full B(y) closure would only
-formula-free the *cheap* low heights. So closing B(y) is a pure-math open question,
-not on the a(n) record path. Reproduce the extraction with
-`experiments/braw_from_data.py` against the per-height files in `results/ns_a40/`
-(or pass an `NMAX` with a matching `results/ns_a{NMAX}/` tree).
+**Parked, not blocking.** The diagonal formulas already free the expensive
+top heights; full B(y) closure would only formula-free the cheap low heights.
+So closing B(y) is a pure-math open question, not on the a(n) path. Reproduce
+the extraction with `experiments/braw_from_data.py` against the per-height
+files in `results/ns_a40/` (or pass an `NMAX` with a matching
+`results/ns_a{NMAX}/` tree).

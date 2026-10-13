@@ -1,10 +1,9 @@
 # The diagonal law is a theorem (shape, onset, integrality)
 
-2026-07-12. This closes the main conditionality of the whole diagonal thread:
-the *shape* of the diagonal law — polynomial × 3-power, degree ≤ k, onset
+The *shape* of the diagonal law — polynomial × 3-power, degree ≤ k, onset
 n ≥ 2k+1, integer-valued P_k — is proved below from an exact combinatorial
 decomposition. Machine checks: `experiments/diagonal_law_proof_check.py`
-(rational structure, degree bounds tight, exactness for every banked H,
+(rational structure, degree bounds tight, exactness for every recorded H,
 sharp onset, k ≤ 3). Companions: `results/diagonal-formula.md` (the decomposition
 and the enumerated weights), `results/arithmetic-structure.md` (the downstream
 mod-3 structure).
@@ -20,8 +19,9 @@ equivalently, with P_k(n) := 3^(1+2k) q_k(n−k):
 > T(n, n−k) = P_k(n) · 3^(n−1−3k)  for all n ≥ 2k+1,
 
 and P_k takes integer values at every integer. Validity from n = 2k+1 is
-proved below; so is failure at n = 2k, by the mod-3 argument under "Loose
-ends" at the foot of this file, so the onset is sharp for every k.
+proved below; so is failure at n = 2k, by the mod-3 argument under "Onset
+sharpness and the denominator" at the foot of this file, so the onset is sharp
+for every k.
 
 ## Setup
 
@@ -64,7 +64,7 @@ surplus add (exponents multiply as monomials). Hence the exact identity
 with S = 3z + Σ_c W_c y^(k_c) z^(ℓ_c+1) (a plain step, or a cluster plus the
 walk row above it), E_b = z(1 + Σ_c W^b_c y^(k_c) z^(ℓ_c)),
 E_t = 1 + Σ_c W^t_c y^(k_c) z^(ℓ_c), P = Σ_c W^p_c y^(k_c) z^(ℓ_c).
-Machine-verified against the banked triangle: 40/40 at (k ≤ 3, H ≤ 10) and
+Machine-verified against the recorded triangle: 40/40 at (k ≤ 3, H ≤ 10) and
 per-order to H = 33 in the checker.
 
 ## Step 3 — row bound and finiteness
@@ -109,7 +109,7 @@ degree bound comes from ℓ ≤ k. ∎
 P_k(n) = 3^(1+2k) q_k(n−k) = Σ_i 3^(1+2k) a_{k+1−i} C(n−k+i−1, i−1), and
 v₃(a_j) ≥ −(2k+1) with binomials integer, so **P_k(n) ∈ ℤ for every integer
 n**. Equivalently, P_k's coefficients in the Newton (binomial) basis are
-integers — verified numerically at every wired level k = 1..19.
+integers — verified numerically at every level k = 1..19 in the formula table.
 
 P_k is integer-*valued*; its monomial coefficients are not integers, the
 leading one being 25^k/k!. What the engine's storage form relies on is the
@@ -118,10 +118,8 @@ mod-3^j argument uses values.
 
 ## Corollary — the grand form G·H^n
 
-**Upgraded 2026-07-21: this corollary is now a standalone THEOREM with a
-full proof and sharp onset — `grand-form.md` (machine check:
-`experiments/grand_form_check.py`). The paragraph below is the original
-sketch.**
+This corollary is proved in full, with sharp onset, in `grand-form.md`
+(machine check: `experiments/grand_form_check.py`). The sketch:
 
 D(z) has the single perturbed root z*(y) near 1/3 (unique as a formal
 series); the residue resummation of Step 5 across k gives formal series
@@ -130,12 +128,12 @@ for H ≥ k+1. Taking logs, the cumulants of A_H are *exactly linear in H* in
 the law's range — this is the G(y)H(y)^n grand form used throughout
 (`results/diagonal-formula.md`), with H = μ/3 in the law's units, and
 it is what the master equation of `results/diagonal-formula.md` solves. The
-Ternary Spine's remaining conditionality therefore reduces to the finitely
+mod-3 spine's remaining conditionality therefore reduces to the finitely
 many enumerated weights that enter each modulus (5 integers mod 27).
 
-## Loose ends, and the two items that closed
+## Onset sharpness and the denominator
 
-- **Onset sharpness in general — CLOSED 2026-09-05.** The theorem proves
+- **Onset sharpness in general.** The theorem proves
   validity from n = 2k+1; failure at n = 2k is a non-cancellation
   (deg D = k exactly), i.e. `D_1(k) = T(2k,k) − P_k(2k)/3^(k+1) ≠ 0`. With
   `N_k = 3^(k+1) D_1(k)` — an integer, since `P_k` has degree `k` and takes
@@ -149,9 +147,10 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   standalone. The route through a rational generating function for the top
   coefficient does not exist — the all-pairs family is not C-finite, refuted
   at ℓ=16 — and is not needed: the generating function is algebraic.
-- **Denominator k! — CLOSED both ways (2026-07-31).** k!·P_k ∈ ℤ[n] is a
-  THEOREM for all k (integer-valuedness + deg ≤ k; Lean
-  `production_factorial_int` in `IntCoeff.lean`, (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)) — it is how
+- **The denominator k!.** k!·P_k ∈ ℤ[n] is a theorem for all k
+  (integer-valuedness + deg ≤ k; the Lean statement
+  `production_factorial_int` was last in the build at commit 697f376) — it is
+  how
   `orchestrator/sweep.go`'s `diagCoeffTable` stores each P_k, and the
   k!-divide guard checks exactness at each evaluation. But k! is NOT
   minimal: the minimal denominator is D_k = k!/5^{ĉ_k} with

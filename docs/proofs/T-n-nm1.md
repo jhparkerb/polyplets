@@ -2,7 +2,7 @@
 
 T(n,H) = number of **fixed** king-move animals (polyplets) of n cells whose
 bounding box has height **exactly** H. Here we prove the closed form for the
-first sub-diagonal, H = n−1, used by `contributePoleHeight` (commit C1). Valid
+first sub-diagonal, H = n−1, used by `contributePoleHeight`. Valid
 for n ≥ 4; n = 3 is a boundary case (T(3,2)=10, which the formula also gives via
 3^(n−4)=3^(−1)).
 
@@ -79,7 +79,7 @@ $$
 
 - n=3: (75−45)·3^(−1) = 10 = T(3,2). ✓
 - n=4: 55·1 = 55 = T(4,3). ✓  n=5: 80·3 = 240 = T(5,4). ✓  n=8: 155·81 = 12555 = T(8,7). ✓
-- n=21: 480·3^17 = 61,987,278,240 = T(21,20) (the dalby a(21) `h20.out` value). ✓
+- n=21: 480·3^17 = 61,987,278,240 = T(21,20) (the a(21) `h20.out` value). ✓
 - `TestPoleHeightFormula` pins it; `ns-gate-closedform` runs it on every change.
 
 ## 7. Why the form, and the road to T(n, n−k)
@@ -90,13 +90,13 @@ the answer is necessarily (linear in n)·3^(n−4). The two contributing gap-typ
 
 For the next diagonal, height n−2 carries **2 excess cells** → either one triple
 row or two double rows — a **two-defect** version of the same argument, which
-must give (quadratic in n)·3^(n−7). Empirically (fitted exact, n=5..20):
-`T(n,n−2) = ½(625 n² − 2459 n + 1134)·3^(n−7)`, leading coefficient 625/2 = 25²/2!.
+must give (quadratic in n)·3^(n−7): `T(n,n−2) = ½(625 n² − 2459 n +
+1134)·3^(n−7)` (`T-n-nm2-and-general.md`), leading coefficient 625/2 = 25²/2!.
 The diagonal leading coefficients run 1, 25, 25²/2! = **25^k/k!**, with power
 3^(n−1−3k) — i.e. `T(n,n−k) ~ 3^(n−1)·(25n/27)^k / k!`, a Poisson/defect-gas
-structure. The general T(n,n−k) is the open target this method is meant to reach.
+structure. The general T(n,n−k) is `diagonal-law.md`.
 
-## Formalization and supersession (2026-07-21)
+## Formalization
 
 This proof is fully formalized in Lean 4: `Staircase/Climb.lean`'s `T_sub_one`
 (stated for the report as `report_T_sub_one` in `Report.lean`), the climb's
@@ -105,9 +105,9 @@ axioms only; the
 gadget multiplicities 16+9 / 4+1 of §4 are the kernel-decided weights
 V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
 
-§7's road map is CLOSED, beyond what this method was meant to reach:
+What §7 anticipated is proved:
 
-- T(n,n−2) is no longer "fitted": the quadratic is `Pk 2` of `DiagonalPolys.lean`, and
+- T(n,n−2): the quadratic is `Pk 2` of `DiagonalPolys.lean`, and
   `T_sub_two` (`Staircase/Climb.lean`) proves it outright, standard axioms only:
   the climb to level 2 from the four kernel-decided cells T(3,2), T(4,3),
   T(5,3), T(6,4), the last two by the bit-board enumerator of `Enum.lean`.
@@ -121,8 +121,8 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
 - P_1..P_18 are determined for all n ≥ 2k+1 (`Staircase/Climb.lean`)
   as conditional theorems whose explicit hypotheses are two enumerated
   onset cells per level — engine values assumed, not proved in Lean
-  (levels ≥ 13 single-algorithm; see `polyplets/README.md`). k = 19, the
-  engine's last wired diagonal, is deliberately excluded:
-  fitted-no-holdout, load-bearing for no banked term.
+  (their independent checks: `polyplets/README.md`). k = 19, the last
+  diagonal in the formula table, is excluded: it is determined with no
+  holdout value, and of the computed terms only a(41) uses it.
 
 Status ledger: `polyplets/README.md`.

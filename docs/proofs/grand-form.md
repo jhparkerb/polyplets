@@ -1,17 +1,16 @@
 # The grand form is a theorem (exact one-mode resummation)
 
-2026-07-21. Upgrades the Corollary of `diagonal-law.md` from a sketch to a
-standalone theorem, with the sharp onset. Content: the diagonal cumulants are
-*exactly* linear — each level k adds exactly two new rational constants
-(a_k, b_k) — so the `scripts/derive_pk_fast.py` model
-`P_k(n) = [y^k] exp(Σ_j (a_j + b_j n) y^j)` is proved structure, not an
-ansatz. Combined with the shape theorem this removes the "defect-gas
-structure" conditionality from the wired diagonals k = 10..19 (modulo the
-Lean formalization of THIS proof, tracked separately).
+Proves the Corollary of `diagonal-law.md` in full, with the sharp onset.
+Content: the diagonal cumulants are *exactly* linear — each level k adds
+exactly two new rational constants (a_k, b_k) — so the
+`scripts/derive_pk_fast.py` model `P_k(n) = [y^k] exp(Σ_j (a_j + b_j n) y^j)`
+is proved structure, not an ansatz. Combined with the shape theorem, the
+diagonals k = 10..19 in the formula table rest on proved structure plus two
+enumerated entries per level.
 
 Machine check: `experiments/grand_form_check.py` — constructs z*, u, C, μ
 below ab initio from the Lean-verified cluster weights (j ≤ 3), reproduces
-the banked real triangle at every in-onset point it can reach, and
+the recorded triangle at every in-onset point it can reach, and
 reproduces the production P_1..P_3 coefficient-exactly.
 
 ## Statement
@@ -162,7 +161,7 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    determined by levels < k — exactly `scripts/derive_pk_fast.py`. Given the
    shape theorem (deg P_k ≤ k, Lean), any TWO in-onset values pin (a_k, b_k)
    by a nonsingular 2×2 rational solve, and every further in-onset value is a
-   theorem, not a test. The 28 extra exact matches recorded by
+   theorem, not a test. The 28 extra exact matches checked by
    `scripts/verify_diagonal_pins.py` are over-determination.
 2. **Leading coefficient, now proved.** The only n^k-term at order y^k is
    (b_1·n·y)^k/k!, so [n^k]P_k = b_1^k/k!. From the first-principles
@@ -170,16 +169,14 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    **[n^k]P_k = 25^k/k! for all k** — the conjecture of
    `results/diagonal-formula.md` (and the stretch goal `LeadingCoeff.lean` closed) —
    and deg P_k = k exactly.
-3. **Conditionality ledger.** a(30)..a(40) (wired cells on diagonals
-   k = 10..19) now rest on: the real sweeps (H ≤ 21 as of a(40)), the shape theorem
-   (Lean, deductive), THIS theorem (paper level, machine-checked), and the
-   banked 2-point solve inputs. The former free-standing assumption "the
-   defect gas is exactly linear" is discharged. The former Lean PREDICTED
-   tier for k = 12..16 is retired: this proof is formalized (§Formalization
-   below) and `isDiagonalPoly_Pk` determines every level from two enumerated cells with
-   H ≤ 20 (`polyplets/README.md`).
+3. **What the formula entries rest on.** The entries on diagonals
+   k = 10..19 rest on the enumerated sweeps (H ≤ 21 as of a(40)), the shape
+   theorem (Lean), this theorem (formalized, §Formalization below), and the
+   two determining entries per level; `isDiagonalPoly_Pk` determines every
+   level from two enumerated cells with H ≤ 20 (`polyplets/README.md`). No
+   free-standing assumption that the defect gas is linear remains.
 
-## Formalization (2026-07-21; trimmed 2026-10-12)
+## Formalization
 
 Formalized in Lean 4: `polyplets/Polyplets/Staircase/`. The proof was
 restructured for Lean as the **staircase route**: in sequence form, Steps
@@ -191,29 +188,19 @@ T-diagonals; both on **standard axioms only** (guarded in
 diagonal polynomials are determined for k ≤ 18 from two enumerated cells per
 level (`Staircase/Climb.lean`, `isDiagonalPoly_Pk`) — *conditional on those cells*: they
 are hypotheses of the Lean theorems, engine values assumed, not proved in
-Lean (`polyplets/README.md`). This retires the Lean PREDICTED tier. The
-exp-form statement itself (`grand_form`, `ExpForm.lean`/`Lead.lean`) left
-the build 2026-10-12 as a duplicate of the leading-coefficient route; last
-at commit 697f376. The item "Lean formalization" below is CLOSED.
+Lean (`polyplets/README.md`). The exp-form statement itself (`grand_form`) is
+not in the current build, being a duplicate of the leading-coefficient route;
+it was last there at commit 697f376.
 
-## What remains open (unchanged from diagonal-law.md)
+## What remains open
 
-- Onset sharpness at n = 2k (failure below onset) — verified on banked data,
-  proved ab initio only k ≤ 5.
-- **Denominator k! — CLOSED both ways (2026-07-31)**: `k!·P_k ∈ ℤ[n]` is
-  proved for all k (Lean `production_factorial_int`, out of the build since
-  2026-10-12, last at 697f376; integrality of the values survives as
-  `IsDiagonalPoly.intValued`); minimality is FALSE —
+- **The denominator k!**: `k!·P_k ∈ ℤ[n]` is proved for all k (Lean
+  `production_factorial_int`, last in the build at 697f376; integrality of
+  the values survives as `IsDiagonalPoly.intValued`); minimality is false —
   the minimal denominator is k!/5^{ĉ_k}, ĉ_k = v₅(k!) − v₅(⌊k/2⌋!) +
   [k ≡ 1 (mod 10)] (`results/arithmetic-structure.md`; lower bound proved,
-  exact k ≤ 19). The old "25^k/k! shows k! is necessary" pointed the wrong
-  way — it is why the 5-part drops.
-  (Corrected 2026-07-30, AUDIT-2026-07-30 P8: this entry previously read
-  "monomial integer coefficients of P_k, coefficient integrality observed
-  k ≤ 17". Monomial integrality is FALSE at every k ≥ 2 — P_2's leading
-  coefficient is 625/2 — measured across all 19 wired levels. Integer
-  *values* are proved: Step 6 of `diagonal-law.md`, `IsDiagonalPoly.intValued`
-  in Lean; the equivalent Newton-basis integrality checks out k = 1..19.)
-
-(The Lean formalization of this theorem, formerly listed here, is CLOSED —
-see §Formalization above.)
+  exact k ≤ 19). The 25^k/k! leading coefficient is why the 5-part drops.
+  Monomial integrality is false at every k ≥ 2 (P_2's leading coefficient is
+  625/2, and so on across all 19 levels in the formula table); integer
+  *values* are proved (Step 6 of `diagonal-law.md`, `IsDiagonalPoly.intValued`
+  in Lean), and the equivalent Newton-basis integrality checks out k = 1..19.

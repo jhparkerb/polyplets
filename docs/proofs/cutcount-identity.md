@@ -16,9 +16,9 @@ contributes weight 0 if they carry two distinct colors — so the frontier state
 is only the color-coincidence partition of the last `H + 1` cells, and the
 engine never decides connectivity.
 
-Thread **Birthright**, 2026-08-14. Tier 1 of `results/second-sources.md` §7: the
-mathematical content of the Motley/B1 second-source engine, in closed form and
-proved as combinatorics. Ground truth for the rule is the banked source
+This is the mathematical content of the coloring recount, the second
+enumeration program (Tier 1 of `results/second-sources.md` §7), in closed form
+and proved as combinatorics. Ground truth for the rule is the source
 `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256
 `59e90660b42a0d94ceae5459287db35b4d93f87a5e62753ccd549235edaa8d3d`), lines
 93–173 — `slot`, `canon`, `gather`, `shifted`, `successors`; the core of
@@ -244,10 +244,8 @@ model of §2, sums weights exactly in `ℤ[q]`, and compares against `q^{c(S)}`
 with `c(S)` from flood fill. It also audits Lemma 4 (every free non-minimal
 cell, is its component's label live?) and measures the king reach of Lemma 1.
 
-Run on **dalby**, 2026-08-14 23:18 UTC, python 3.13.12, script sha256
-`d2dc1fbf763b2ffd2e1aba32a2cd14f43ee1444f0a13708b290aa1dcb76dc672`
-(the run was routed to dalby because ayr was unreachable — `ssh: connect to
-host ayr port 22: No route to host` — and no project code may run on gympie):
+Run 2026-08-14 on dalby, python 3.13.12, script sha256
+`d2dc1fbf763b2ffd2e1aba32a2cd14f43ee1444f0a13708b290aa1dcb76dc672`:
 
 ```
 Birthright identity check
@@ -297,19 +295,18 @@ not by liveness. RED-4 (window of `H`, with neighbors outside it unseen) and
 RED-5 (liveness window `H − 2`) fire on either side of that, which is why both
 controls are in the battery.
 
-**Missing file.** The engine header cites `experiments/probe_cutcount_dp.py`
-as the brute-force validation of the rule ("5 board sizes, exact"). That file
-is not in the tree: it was added in commit `7b13137` and has since been
-deleted; `git cat-file -e HEAD:experiments/probe_cutcount_dp.py` fails. The
-header's claim is therefore uncheckable as it stands, and
-`birthright_identity_check.py` re-establishes an equivalent check under the
-definitions of §2 — with the difference that it checks the *theorem's* model
-rather than the engine's, and carries RED controls.
+The engine header cites a brute-force validation script ("5 board sizes,
+exact") that is no longer in the tree, so that claim cannot be checked as it
+stands; `birthright_identity_check.py` re-establishes an equivalent check
+under the definitions of §2, with the difference that it checks the
+*theorem's* model rather than the engine's, and carries controls that must
+fail.
 
 ## 6. Where the code differs from §7's description
 
-Four points, none of which invalidates §7's conclusion, all of which would
-mis-state the identity if copied into a theorem.
+Four points, none of which invalidates the conclusion of
+`results/second-sources.md` §7, all of which would mis-state the identity if
+copied into a theorem.
 
 1. **The identity is exact in `ℤ[q]`, not merely mod `q²`.** The truncation
    both §7 and the engine header describe is a computational economy — only
@@ -327,7 +324,7 @@ mis-state the identity if copied into a theorem.
    sum. This is the paraphrase most likely to produce a false statement.
 
 3. **`b` counts live labels, not live components** (§2, second point). The
-   brief's "b = number of live blocks" is right only if "block" means color
+   paraphrase "b = number of live blocks" is right only if "block" means color
    class. The proof is indifferent to the value of `b`, but a statement that
    said "number of live components" would be false.
 
@@ -364,9 +361,8 @@ of §3. The argument has three parts, all mechanical.
   expired label is never consulted again — neither by the clash rule (Lemma 1)
   nor by the adopt/`b` rules, which range over the window.
 
-§7 prices this as routine for this development, and the GapWalk chain (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376) is the
-precedent. The bridge from a formal model to the compiled binary (§7's Tier 3)
-is not addressed at all.
+`results/second-sources.md` §7 prices this as routine. The bridge from a
+formal model to the compiled binary (its Tier 3) is not addressed at all.
 
 ## 8. Limits ledger
 
@@ -377,13 +373,12 @@ reach) is discharged by Lemma 1, a theorem about the scan order rather than an
 assumption.
 
 **Checked, not proved.** That the model of §2 is the rule implemented by
-`successors`. That reading is mine, from lines 93–173 of the banked source; it
-is argued in §1 (slot indices to compass directions) and §2 (three points of
-difference from the paraphrases) but it is a reading of C++, not a derivation.
-A wrong reading here would make this document prove the wrong theorem, and no
-amount of internal rigour would show it. That is the single largest weak point
-and I am not able to close it from the paper side; closing it is Tier 2 plus
-Tier 3.
+`successors`. That reading is from lines 93–173 of the source; it is argued
+in §1 (slot indices to compass directions) and §2 (three points of difference
+from the paraphrases) but it is a reading of C++, not a derivation. A wrong
+reading here would make this document prove the wrong theorem, and no amount
+of internal rigour would show it. That is the single largest weak point and it
+cannot be closed from the paper side; closing it is Tier 2 plus Tier 3.
 
 **Checked, not proved.** That the engine computes the sum at all (Tier 2), and
 that the compiled binary computes what the engine's source says (Tier 3).
@@ -393,18 +388,16 @@ that the compiled binary computes what the engine's source says (Tier 3).
 the bounding-box height. It is shared with the strip engine and disjoint from
 the connectivity rule; §3's identity is per-board and says nothing about it.
 
-**Conceded weak points.**
+**Weak points.**
 
 - The brute force reaches 16 cells and `H ≤ 5`. It cannot see a phenomenon that
   first appears at larger `H`. The proof is uniform in `H` and `W`, so the
   check is there to catch a mis-statement, not to extend a range; but if the
   statement is wrong in a way that only bites at `H ≥ 6`, this battery will not
   say so.
-- The RED controls test the ingredients I identified as load-bearing. A missing
-  ingredient I did not think of would have no control.
-- The proof is a paper proof, unformalised. §7's own standard —
-  "every cell a real kernel-recorded theorem, not a comment" — is not met here
-  and is not claimed.
+- The controls test the ingredients identified as load-bearing. A missing
+  ingredient nobody thought of would have no control.
+- The proof is a paper proof, unformalised.
 - The `H = 1` boards exercise no free non-minimal cells at all (`loc_checks`
   column is 0), so Lemma 4 is checked only for `H ≥ 3`. That is correct
   behavior, not a gap: for `H ≤ 2` a free cell's component cannot re-enter
@@ -412,11 +405,8 @@ the connectivity rule; §3's identity is per-board and says nothing about it.
 
 ## 9. Priority: the identity is classical
 
-Added 2026-08-23, when `paper/L9-cutcount-identity.tex` was withdrawn as a
-manuscript and folded back into this file. The section is the priority pass's
-finding and the reason the withdrawal was right: this document is the engine's
-correctness argument, not a result. The pass itself, with the searches it ran,
-is `docs/l-papers-record.md`.
+This document is the engine's correctness argument, not a result. The
+literature searches behind this section are in `docs/l-papers-record.md`.
 
 **The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
 partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn, *Physica*
@@ -448,9 +438,7 @@ engine implements it.
 
 ## 10. Open problems
 
-Carried over from `paper/L9-cutcount-identity.tex`, deleted 2026-08-23 with its
-withdrawal, since §7 and §8 say what is *not* proved without saying which of it
-is worth doing.
+§7 and §8 say what is *not* proved; this is which of it is worth doing.
 
 **Formalize the identity.** Lemmas 1–5 are elementary, finite in statement and
 uniform in the board. The repository's Lean development already carries the
@@ -471,7 +459,6 @@ size suffice, and what is the minimal window?
 ## 11. Where to read what this bought
 
 A count with no closed form has nothing to lean on but a second method. What
-this one has closed is `results/second-sources.md` and `results/second-sources.md`; why
-the engine's own self-checks were never going to be enough is
-`results/second-sources.md`, which §3's corollary agrees with; the banked source
+this one has closed, and why the engine's own self-checks were never going to
+be enough (§3's corollary agrees), is `results/second-sources.md`; the source
 the model is a reading of is `results/cutcount_b1/`.
