@@ -1,4 +1,4 @@
-Reference-paper archive for paper/polyplets-report.tex
+Reference-paper archive for the papers in paper/
 (PDFs are gitignored local copies; this index and MISSING.md are tracked.)
 
 == Cited in the report's bibliography ==
@@ -288,9 +288,6 @@ Distributed-computing background (engine design era):
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.
   bu_2010_haloop.pdf                       Bu et al., HaLoop (2010).
   zaharia_2012_spark_rdd.pdf               Zaharia et al., Spark RDDs (NSDI 2012).
-
-Other:
-  refs-transfer-matrix.md                  reading notes on the transfer-matrix literature.
 
 MISSING.md — wanted papers we could not obtain (for library lookup).
 

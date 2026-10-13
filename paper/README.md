@@ -8,9 +8,9 @@ people's work, with `literature/INDEX.txt` recording provenance and
 called `papers/` until 2026-09-06.
 
 The top-level `.gitignore` starts by ignoring `literature/` — "copyrighted papers stay
-local, never pushed" - so the PDFs themselves never leave this machine. Five
-text files there are tracked anyway: `INDEX.txt`, `MISSING.md`, `README.md`,
-`refs-transfer-matrix.md` and `polyplets-2024-2026.bib`. A fresh clone gets
+local, never pushed" - so the PDFs themselves never leave this machine. Four
+text files there are tracked anyway: `INDEX.txt`, `MISSING.md`, `README.md`
+and `polyplets-2024-2026.bib`. A fresh clone gets
 the *record* of the library and none of its contents. Citations in `paper/` that
 point at a PDF under `literature/` are pointers into a working copy, not into the
 published tree; bibliographic detail a reader actually needs is in `shared/refs.bib`.

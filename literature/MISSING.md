@@ -6,10 +6,10 @@ can't be found; remove (and drop the PDF in `literature/`) once obtained.
 
 Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it. [priority]`
 
-## Claude's web-search pass over this file, 2026-08-06
+## Search of 2026-08-06
 
-Two obtained, six confirmed paywalled with their metadata pinned, one new lead.
-**Do not re-run the plain "title + pdf" search on the paywalled six; it has been run.**
+Two obtained, six confirmed paywalled, one new lead. A plain title search for
+the six paywalled papers finds no free copy.
 
 **Obtained:**
 
