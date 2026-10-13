@@ -19,15 +19,15 @@ and every column is a single contiguous run, no notches, no gaps.
 
 ## Method
 
-A row transfer matrix (`experiments/convex_polyplets.py`): build the animal
-row by row; the only state needed is `(left-phase, right-phase, width)`
-because HV-convex means the left border is v-shaped (non-increasing then
-non-decreasing) and the right border ∧-shaped. Transitions are counted by
-multiplicity (valid horizontal offsets), weighted by area. `king=True` lets
-consecutive rows corner-touch (polyplets); `king=False` requires column
-overlap (polyominoes). Validated against brute-force enumeration for n ≤ 8,
-and the polyomino setting reproduces the known convex-polyomino area
-sequence.
+A row transfer matrix (`experiments/convex_polyplets.py`; `python3
+experiments/convex_polyplets.py 38` reproduces the sequence): build the animal
+row by row; the only state needed is `(left-phase, right-phase, width)` because
+HV-convex means the left border is v-shaped (non-increasing then non-decreasing)
+and the right border ∧-shaped. Transitions are counted by multiplicity (valid
+horizontal offsets), weighted by area. `king=True` lets consecutive rows
+corner-touch (polyplets); `king=False` requires column overlap (polyominoes).
+Validated against brute-force enumeration for n ≤ 8, and the polyomino setting
+reproduces the known convex-polyomino area sequence.
 
 ## The sequences (by area)
 
@@ -68,11 +68,3 @@ positive and negative controls that keep it powered are a gate
 (`make gate-convex-dfinite`). Also: μ = 3.128943269730886252… (199 trusted
 digits), θ = 0 with a purely geometric correction, and no integer polynomial
 of degree ≤ 20 with height ≤ 1e8 has μ as a root.
-
-## Placement
-
-- A self-contained result: a new integer sequence, plus the non-D-finite-by-area
-  finding. Reproduce with `python3 experiments/convex_polyplets.py 38`.
-- Off the a(n) path: pure math, not the record.
-- The transfer matrix itself is the efficient way to compute the sequence
-  (μ ≈ 3.129 growth); there is just no D-finite coefficient formula by area.

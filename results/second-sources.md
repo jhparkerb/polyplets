@@ -55,14 +55,13 @@ transcription check. The brute-force anchor (`brute_T` in
 The first C++ run stopped after `C_13`, so its end-of-run comparison never
 ran. `C_14` needs about 38 GB; `C_15` would need over 200 GB.
 
-Redelmeier confirms whole rows only to `n = 22`; the strip's cost grows as
-about `2^H` whatever the count, so it confirms columns `H ≤ 14` at every `n`
-to 40. When a(40) was first computed, the closed forms `P_k`, `4 ≤ k ≤ 18`, had 30
-fit entries, 19 inside the strip's reach and 11 outside (the Lean development
-counts level 3's two cells as well, hence its 32): T(28,15), T(29,15),
-T(30,16), T(31,16), T(32,17), T(33,17), T(34,18), T(35,18), T(36,19),
-T(37,19), T(38,20). The coloring recount at `H ≤ 19` later recounted all but
-T(38,20).
+Redelmeier confirms whole rows only to `n = 22`; the strip's cost grows as about
+`2^H` whatever the count, so it confirms columns `H ≤ 14` at every `n` to 40.
+When a(40) was first computed, the closed forms `P_k`, `4 ≤ k ≤ 18`, had 30 fit
+entries, 19 inside the strip's reach and 11 outside (the Lean development counts
+level 3's two cells as well, hence its 32): T(28,15), T(29,15), T(30,16),
+T(31,16), T(32,17), T(33,17), T(34,18), T(35,18), T(36,19), T(37,19), T(38,20).
+The coloring recount at `H ≤ 19` later recounted all but T(38,20).
 
 **Coverage, three ways**, over the 820 entries `1 ≤ H ≤ n ≤ 40`: `R` =
 `H ≤ 4` (recurrences); `S` = strip, `H ≤ 14`; `P` = closed forms `P_k` on
@@ -302,13 +301,13 @@ residues in the parallel engine, projected 59 GB, measured 61.6. The release
 path measured 0.53× the peak of the same run without it.
 
 **`H = 19` on the single-thread engine**, priced from the first four `H = 18`
-passes at 79,039 s and 65.9 GB, with the ×3.209 wall and ×2.984 RSS per
-height: about 253,700 s (70.5 h) per pass, nine passes, 634 h ≈ 26 days
-(about 40 with change B), peak about 197 GB against 125. What `H = 19` buys
-does not depend on how it was run: two entries of row 40, T(40,19) and
-T(40,23) <!--q:row40_retires.cells@19=T(40,19),T(40,23)-->, and two terms,
-a(36) and a(37); it retires three congruence-only entries, (38,19), (39,19)
-and (40,19) <!--q:retires.count@19=3--><!--q:retires.cells@19=(38,19),(39,19),(40,19)-->.
+passes at 79,039 s and 65.9 GB, with the ×3.209 wall and ×2.984 RSS per height:
+about 253,700 s (70.5 h) per pass, nine passes, 634 h ≈ 26 days (about 40 with
+change B), peak about 197 GB against 125. What `H = 19` buys does not depend on
+how it was run: two entries of row 40, T(40,19) and T(40,23)
+<!--q:row40_retires.cells@19=T(40,19),T(40,23)-->, and two terms, a(36) and
+a(37); it retires three congruence-only entries, (38,19), (39,19) and (40,19)
+<!--q:retires.count@19=3--><!--q:retires.cells@19=(38,19),(39,19),(40,19)-->.
 The parallel engine ran it in 50,745 s of wall over nine passes.
 
 **Not levers**, measured with `experiments/cutcount/cutcount_b1_probe.cpp`
@@ -398,7 +397,7 @@ C++ at `H ≤ 6`, as `polyplets/Polyplets/Compute.lean` does for `T n H`.
   `H = 21`, is unpriced.
 - `C_15` of the strip transfer matrix, over 200 GB, has not been run.
 - Tiers 2 and 3 above, and formalizing the identity
-  (`docs/proofs/cutcount-identity.md` §10).
+  (`docs/proofs/cutcount-identity.md` §9).
 
 ## Reproduce
 

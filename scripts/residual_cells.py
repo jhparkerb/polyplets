@@ -519,12 +519,11 @@ def write_note(F: dict):
                     "—" if ret is None else fmt(ret),
                     fmt(F["row40_residual.cells@%d" % h])))
 
-    L.append("\n## Closure — the largest fully rule-independent a(n)\n")
+    L.append("\n## The largest a(n) with every entry rule-independent\n")
     L.append("The coloring recount covers `h ≤ H` from below; the closed-form band covers "
              "`h ≥ max(n−18, ⌈(n+1)/2⌉)` from above. The published figure "
-             "requires the two to **overlap** — at least one cell where both "
-             "methods produce the value and can be compared — not merely to "
-             "abut. The shortcut `n ≤ 2H−1` agrees for H ≤ 19 and parts company "
+             "requires at least one cell computed by both methods, not merely "
+             "adjacent ranges. The shortcut `n ≤ 2H−1` agrees for H ≤ 19 and parts company "
              "above it, so the criterion is computed rather than the shortcut.\n")
     L.append("| coloring recount reaches | a(n) closed for | `2H−1` |")
     L.append("|---|---|---|")
@@ -539,7 +538,8 @@ def write_note(F: dict):
              "pinning `P_19` from them to corroborate them is circular, and the "
              "non-circular route — `(a_19, b_19)` ab initio from surplus-19 "
              "cluster weights (`docs/proofs/grand-form.md`) — is ten levels past "
-             "the k ≤ 9 reached so far.\n")
+             "the k ≤ 9 for which the constants have been computed from cluster "
+             "weights.\n")
 
     OUT.write_text("\n".join(L))
 

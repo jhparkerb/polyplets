@@ -1,7 +1,7 @@
 # The cut-count cancellation identity
 
 **What it means.** The identity is the Potts spin form of the Fortuin–Kasteleyn
-correspondence (§9 for the references), specialized to king-adjacent cell sets
+correspondence (§8 for the references), specialized to king-adjacent cell sets
 in scan order: the colourings of a cell set `S` that are constant on its
 king-connected components number `q^{c(S)}`, so in the sum over all `n`-cell
 subsets of the board the connected subsets are exactly the coefficient of `q¹`.
@@ -16,14 +16,14 @@ contributes weight 0 if they carry two distinct colors — so the frontier state
 is only the color-coincidence partition of the last `H + 1` cells, and the
 engine never decides connectivity.
 
-This is the mathematical content of the coloring recount, the second
-enumeration program (Tier 1 of `results/second-sources.md` §7), in closed form
-and proved as combinatorics. Ground truth for the rule is the source
+This is the mathematical content of the coloring recount, the second enumeration
+program (Tier 1 of `results/second-sources.md` §7), in closed form and proved as
+combinatorics. Ground truth for the rule is the source
 `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256
 `59e90660b42a0d94ceae5459287db35b4d93f87a5e62753ccd549235edaa8d3d`), lines
 93–173 — `slot`, `canon`, `gather`, `shifted`, `successors`; the core of
-`experiments/cutcount/cutcount_b1_probe.cpp` is byte-identical over those
-lines, so there is one rule, not two. No program appears in the proof: the
+`experiments/cutcount/cutcount_b1_probe.cpp` is byte-identical over those lines,
+so the two files implement the same rule. No program appears in the proof: the
 engine, its arithmetic, its window state and its translation accounting are
 outside the statement, and what is proved is a fact about finite sets of cells.
 
@@ -33,8 +33,8 @@ The objects are those of `polyplets/Polyplets/Defs.lean`: `kingAdj p q` is
 Chebyshev-distance-one adjacency (`p ≠ q ∧ |p.1 − q.1| ≤ 1 ∧ |p.2 − q.2| ≤ 1`)
 and `KingConnected S` is pairwise reachability inside `S` under that relation,
 shown equivalent to `SimpleGraph.Reachable` in `kingGraph S` by
-`connected_iff_reachable` in `Polyplets/RowLocal/Graph.lean`, cited for agreement on
-definitions only: this is a paper proof, not a Lean task.
+`connected_iff_reachable` in `Polyplets/RowLocal/Graph.lean`, cited for
+agreement on definitions only: this is a paper proof, not a Lean task.
 
 Write `c(S)` for the number of king-connected components of a finite cell set
 `S`, with `c(∅) = 0`.
@@ -56,13 +56,12 @@ of `H + 1` cells immediately preceding it:
 
     Win(v) = { u ∈ Γ : ord(v) − (H+1) ≤ ord(u) ≤ ord(v) − 1 }.
 
-This is exactly the engine's frontier key: `slot k` of the key holds the label
+This is the engine's frontier key: `slot k` of the key holds the label
 of the cell `k + 1` positions back, for `0 ≤ k ≤ H`. Unrolling the indices,
 slot 0 is `(r−1, c)`, slot `H−2` is `(r+1, c−1)`, slot `H−1` is `(r, c−1)` and
 slot `H` is `(r−1, c−1)` — the north, south-west, west and north-west
-neighbors, which are precisely the four king neighbors of `(r, c)` that
-precede it in scan order. `gather` reads those four slots under exactly those
-in-board guards.
+neighbors, the four king neighbors of `(r, c)` that precede it in scan
+order. `gather` reads those four slots under those in-board guards.
 
 For `v ∈ S` put
 
@@ -105,15 +104,23 @@ cells at which `φ` gave birth. The **weight** of `φ` is the polynomial
 
 an empty product being 1.
 
-Three points where this is the code and not a paraphrase of it. First, adopt
-offers *every* live label, including labels of blocks the cell does not touch —
-`successors` loops `for (x = 1; x <= mx; x++) if (present[x])`, with no
+Three points to read from the code rather than from a paraphrase of it. First,
+adopt offers *every* live label, including labels of blocks the cell does not
+touch — `successors` loops `for (x = 1; x <= mx; x++) if (present[x])`, with no
 adjacency test. Second, `b` is the number of distinct live **labels**, not of
 live components: `successors` counts distinct ids present in the window, so two
-components that share a color are counted once. Because adopt lets one
-component take another's color, that distinction is real, not cosmetic. Third,
-"live" means *in the window*, so a label whose last cell has left the window is
-gone and is not counted in `b` — which is why the engine can recycle colors.
+components that share a color are counted once. Because adopt lets one component
+take another's color, the distinction matters. Third, "live" means *in the
+window*, so a label whose last cell has left the window is gone and is not
+counted in `b`, which is why the engine can recycle colors.
+
+The quantity the identity concerns is the sum of `w(φ)` over all
+configurations of `S`, exact in `ℤ[q]`; the engine's truncation to
+`ℤ[q]/(q²)` is applied afterwards, because only `[q¹]` is wanted. A subset
+carries that whole sum, not a single product of `(q − b_i)` factors: most
+configurations have fewer than `c(S)` birth factors, because some component
+minima adopt an existing color, and the all-birth configuration is one term
+among them.
 
 ## 3. The identity
 
@@ -122,8 +129,7 @@ gone and is not counted in `b` — which is why the engine can recycle colors.
 >
 >     Σ_{φ ∈ Cfg(S)}  Π_{v ∈ B(φ)} ( q − b_φ(v) )  =  q^{c(S)}      in ℤ[q].
 
-The equality is in `ℤ[q]` itself, with no truncation. This is stronger than
-what §7 and the engine's header claim, and it is discussed in §6 below.
+The equality is in `ℤ[q]` itself, with no truncation.
 
 **Corollary (what the engine reads off).** Summing over all `S ⊆ Γ` with
 `|S| = n` and reducing mod `q²`,
@@ -134,9 +140,8 @@ so `[q¹] A_n(q)` counts the connected `n`-cell subsets of the board and
 `[q⁰] A_n(q) = 0` for `n ≥ 1`. Setting `q = 1` gives `Σ_{φ} w(φ)|_{q=1} = 1`
 for every `S`, so the `q = 1` evaluation counts all subsets, `C(HW, n)`. Those
 two consequences are the engine's `q0_zero` and `q1eval_binomial` self-checks,
-and neither consults connectivity — which is why `results/second-sources.md` is
-right that only comparison against independently computed values catches the
-rule going wrong.
+and neither consults connectivity, so only comparison against independently
+computed values catches the rule going wrong (`results/second-sources.md`).
 
 ## 4. Proof
 
@@ -180,8 +185,9 @@ king-adjacent. Then `ord(x) < ord(v) ≤ ord(y)`, and by Lemma 1
 
 so `x ∈ Win(v)`. By Lemma 2, `φ(x) = φ(v_i)`, so `φ(v_i) ∈ L_φ(v)`. ∎
 
-Lemma 4 is where the window size earns its place, and it is the reason Lemma 1
-belongs to Tier 1 rather than Tier 2 (see §6).
+Lemma 4 is where the window size is used. Without Lemma 1 the adopt branch a
+component needs is not on offer and the identity is false; control 5 in §5
+exhibits a 3-cell witness on a 3×4 board.
 
 **Lemma 5 (configurations are choice sequences).** The map sending
 `φ ∈ Cfg(S)` to the sequence of its choices at `v_1, …, v_c` — for each `i`,
@@ -226,8 +232,7 @@ makes the induction go through. Taking `i = 1` and using Lemma 5,
 That is the whole cancellation: at each component minimum the `b` adopt terms
 of weight 1 and the birth term of weight `q − b` sum to `q`, and the downstream
 factor is independent of `b`, so the `b`-dependence never reaches the total.
-The "join a block it does not touch" branch is not an optimization — it is the
-term that cancels `−b`.
+The "join a block it does not touch" branch is the term that cancels `−b`.
 
 **Where each ingredient is used.** Removing the clash rule breaks Lemma 2;
 counting all labels rather than live ones breaks the `b + (q − b)` sum at the
@@ -238,8 +243,8 @@ mutates each of these in turn and each mutation fails at small size.
 
 ## 5. Verification
 
-`experiments/birthright_identity_check.py` checks the identity **as stated
-above**, not the engine: over every subset of ten small boards it enumerates the
+`experiments/birthright_identity_check.py` checks the identity as stated
+above, not the engine: over every subset of ten small boards it enumerates the
 model of §2, sums weights exactly in `ℤ[q]`, and compares against `q^{c(S)}`
 with `c(S)` from flood fill. It also audits Lemma 4 (every free non-minimal
 cell, is its component's label live?) and measures the king reach of Lemma 1.
@@ -262,20 +267,20 @@ board  cells  subsets   configs  H+1  reach  loc_checks  maxgap  result
 4x3      12     4096      5817    5      5        1264       3  OK
 4x4      16    65536    100709    5      5       27376       3  OK
 5x3      15    32768     56054    6      6       15088       4  OK
-
-GREEN totals: boards=10 subsets=223296 configurations=331935 mismatches=0
-locality lemma: 53552 open-component free cells checked, 0 failures
-wall_s=5.4
-
-RED controls (each must fire):
-RED-1  clash-voiding dropped                  FIRED   H=3 W=4 S=[(0, 0), (2, 0), (1, 1)]  sum=[0, 0, 1]  q^c=[0, 1]
-RED-2  b counts all labels, not live ones     FIRED   H=1 W=6 S=[(0, 0), (0, 3)]  sum=[0, -1, 1]  q^c=[0, 0, 1]
-RED-3  free cell cannot adopt a live label    FIRED   H=1 W=6 S=[(0, 0), (0, 2)]  sum=[0, -1, 1]  q^c=[0, 0, 1]
-RED-4  window of H cells, neighbors outside it unseen FIRED   H=2 W=5 S=[(0, 0), (1, 1)]  sum=[0, 0, 1]  q^c=[0, 1]
-RED-5  liveness window shortened to H-2       FIRED   H=3 W=4 S=[(0, 0), (2, 0), (1, 1)]  sum=[0]  q^c=[0, 1]
-
-RESULT: GREEN (identity holds on every subset of every board; all 5 RED controls fired)
 ```
+
+Totals: 10 boards, 223296 subsets, 331935 configurations, 0 mismatches;
+53552 free non-minimal cells checked for Lemma 4, 0 failures; 5.4 s wall.
+The script also runs five controls, each a mutation of the model that must
+fail, and each fails at the subset shown (coefficient lists ascending in `q`):
+
+| control | mutation | first failure |
+|---|---|---|
+| 1 | clash-voiding dropped | H=3 W=4 S={(0,0),(2,0),(1,1)}: sum [0,0,1], q^c [0,1] |
+| 2 | b counts all labels, not live ones | H=1 W=6 S={(0,0),(0,3)}: sum [0,−1,1], q^c [0,0,1] |
+| 3 | free cell cannot adopt a live label | H=1 W=6 S={(0,0),(0,2)}: sum [0,−1,1], q^c [0,0,1] |
+| 4 | window of H cells, neighbors outside it unseen | H=2 W=5 S={(0,0),(1,1)}: sum [0,0,1], q^c [0,1] |
+| 5 | liveness window shortened to H−2 | H=3 W=4 S={(0,0),(2,0),(1,1)}: sum [0], q^c [0,1] |
 
 Every number quoted in this document is printed by that script.
 
@@ -291,9 +296,9 @@ an earlier neighbor of `v`), so `ord(v) − ord(x) ≤ H`, and a gap of exactly
 `H` forces `Δc = 1, Δr = 0`, i.e. `x = (r, c−1)`, again a neighbor of `v`.
 Hence `ord(v) − ord(x) ≤ H − 1`. So the `(H+1)`-st slot is demanded by the
 clash/forced rule — the north-west neighbor sits exactly `H + 1` back — and
-not by liveness. RED-4 (window of `H`, with neighbors outside it unseen) and
-RED-5 (liveness window `H − 2`) fire on either side of that, which is why both
-controls are in the battery.
+not by liveness. Control 4 (window of `H`, with neighbors outside it unseen)
+and control 5 (liveness window `H − 2`) fail on either side of that, which is
+why both are in the battery.
 
 The engine header cites a brute-force validation script ("5 board sizes,
 exact") that is no longer in the tree, so that claim cannot be checked as it
@@ -302,50 +307,14 @@ under the definitions of §2, with the difference that it checks the
 *theorem's* model rather than the engine's, and carries controls that must
 fail.
 
-## 6. Where the code differs from §7's description
+Lemma 1, the bound on how far back an earlier king neighbor can sit in scan
+order, is part of the identity and not only of the engine's sufficient-statistic
+argument: without it Lemma 4 fails and the identity itself is false, as
+control 5 shows.
 
-Four points, none of which invalidates the conclusion of
-`results/second-sources.md` §7, all of which would mis-state the identity if
-copied into a theorem.
+## 6. Tier 2, delimited
 
-1. **The identity is exact in `ℤ[q]`, not merely mod `q²`.** The truncation
-   both §7 and the engine header describe is a computational economy — only
-   `[q¹]` is wanted — but the sum over configurations equals `q^{c(S)}` on the
-   nose. §7's remark that `(q−b₁)(q−b₂) = −q(b₁+b₂) + b₁b₂` mod `q²` invites
-   the reading that the cancellation is a mod-`q²` phenomenon. It is not: it is
-   `b·1 + (q − b) = q` repeated once per component, in `ℤ[q]`, and the `q²`
-   truncation happens afterwards.
-
-2. **"A product of `(q − b_i)` factors, one per component birth" describes one
-   term, not the subset's value.** §7's phrasing suggests each subset carries a
-   single product. It carries a sum over all configurations, most of which have
-   *fewer* than `c(S)` birth factors because some component minima adopted an
-   existing color instead. The all-birth configuration is one term of that
-   sum. This is the paraphrase most likely to produce a false statement.
-
-3. **`b` counts live labels, not live components** (§2, second point). The
-   paraphrase "b = number of live blocks" is right only if "block" means color
-   class. The proof is indifferent to the value of `b`, but a statement that
-   said "number of live components" would be false.
-
-4. **The window-reach lemma is Tier 1, not Tier 2.** §7 files "king adjacency
-   reaches at most `H+1` cells back in scan order" under Tier 2 as part of the
-   sufficient-statistic argument. It is load-bearing in Tier 1: without it
-   Lemma 4 fails, the adopt branch a component needs is not on offer, and the
-   identity itself is false — RED-5 exhibits a 3-cell witness on a 3×4 board.
-   The Tier 1 / Tier 2 line should be drawn after Lemma 4, not before it.
-
-Two smaller observations on the source, neither a defect:
-
-- The frontier-key comment says "a window of `H+2` cells" while the window is
-  `H+1` cells (`H+1` slots, slot `k` holding the cell `k+1` back). Comment only;
-  `canon` keeps ids at most `H+2`, inside the 5-bit field.
-- `gather` would evaluate `slot(key, H−2)` with `H−2 = −1` at `H = 1`, but the
-  guard `r + 1 < H` is false there, so it never does.
-
-## 7. Tier 2, delimited
-
-Not proved here, and deliberately: that the engine's window DP computes the sum
+Not proved here: that the engine's window DP computes the sum
 of §3. The argument has three parts, all mechanical.
 
 - **Locality.** Lemma 1 says every earlier king neighbor of `v` lies in
@@ -364,7 +333,7 @@ of §3. The argument has three parts, all mechanical.
 `results/second-sources.md` §7 prices this as routine. The bridge from a
 formal model to the compiled binary (its Tier 3) is not addressed at all.
 
-## 8. Limits ledger
+## 7. Limits ledger
 
 **Proved.** The identity of §3, for every `H, W ≥ 1` and every `S ⊆ Γ`, in
 `ℤ[q]`, unconditionally — no hypothesis was needed and none is carried. The
@@ -376,9 +345,9 @@ assumption.
 `successors`. That reading is from lines 93–173 of the source; it is argued
 in §1 (slot indices to compass directions) and §2 (three points of difference
 from the paraphrases) but it is a reading of C++, not a derivation. A wrong
-reading here would make this document prove the wrong theorem, and no amount
-of internal rigour would show it. That is the single largest weak point and it
-cannot be closed from the paper side; closing it is Tier 2 plus Tier 3.
+reading here would make this document prove the wrong theorem, and nothing
+inside the document would show it. That is the largest weak point; closing it
+is Tier 2 plus Tier 3.
 
 **Checked, not proved.** That the engine computes the sum at all (Tier 2), and
 that the compiled binary computes what the engine's source says (Tier 3).
@@ -395,28 +364,28 @@ the connectivity rule; §3's identity is per-board and says nothing about it.
   check is there to catch a mis-statement, not to extend a range; but if the
   statement is wrong in a way that only bites at `H ≥ 6`, this battery will not
   say so.
-- The controls test the ingredients identified as load-bearing. A missing
-  ingredient nobody thought of would have no control.
+- The controls test the ingredients the proof uses. A missing ingredient
+  nobody thought of would have no control.
 - The proof is a paper proof, unformalised.
 - The `H = 1` boards exercise no free non-minimal cells at all (`loc_checks`
   column is 0), so Lemma 4 is checked only for `H ≥ 3`. That is correct
   behavior, not a gap: for `H ≤ 2` a free cell's component cannot re-enter
   later. But the reader should not read 53,552 checks as spread evenly.
 
-## 9. Priority: the identity is classical
+## 8. Priority: the identity is classical
 
 This document is the engine's correctness argument, not a result. The
 literature searches behind this section are in `docs/l-papers-record.md`.
 
 **The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
-partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn, *Physica*
-57 (1972) 536–564), and counting connected subgraphs is its `q → 0`, `v = 1`
-content; the device of the opening paragraph — color each component, count
-colourings — is its Potts *spin* representation, the usual route to a transfer
-matrix carrying no connectivity state (Blöte & Nightingale, *Physica A* 112
-(1982) 405–465). §3 is that device specialized to site clusters in scan order,
-and §4's telescoping is it performed cell by cell. It is not a new theorem and
-none is claimed.
+partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn,
+*Physica* 57 (1972) 536–564), and counting connected subgraphs is its `q → 0`,
+`v = 1` content; the device of the opening paragraph — color each component,
+count colourings — is its Potts *spin* representation, the usual route to a
+transfer matrix carrying no connectivity state (Blöte & Nightingale, *Physica A*
+112 (1982) 405–465). §3 is that device specialized to site clusters in scan
+order, and §4's telescoping is it performed cell by cell. It is not a new
+theorem and none is claimed.
 
 **Two further antecedents.** §2's scan-order labeling is the signed version of
 Hoshen–Kopelman (*Phys. Rev. B* 14 (1976) 3438), which assigns cluster labels in
@@ -428,17 +397,16 @@ algorithm (2001), which is why an independent second source is worth building.
 window of `H+1` cells, the liveness convention that makes an expired label
 uncountable, the adopt branch offering every live label regardless of
 adjacency, and Lemma 1 showing that the window suffices under king adjacency.
-Lemma 1 is the one step that is not translation — it is a statement about the
-scan order, and it discharges the hypothesis a reader would otherwise expect
-to see attached to §3.
+Lemma 1 is the one step that is not translation: a statement about the scan
+order, discharging the hypothesis a reader would otherwise expect to see
+attached to §3.
 
-So the durable content here is implementation-grade, as §8's limits ledger
-already said: the mathematics is classical, and the rule is proved because an
-engine implements it.
+The durable content here is implementation-grade: the mathematics is
+classical, and the rule is proved because an engine implements it.
 
-## 10. Open problems
+## 9. Open problems
 
-§7 and §8 say what is *not* proved; this is which of it is worth doing.
+§6 and §7 say what is not proved; this is which of it is worth doing.
 
 **Formalize the identity.** Lemmas 1–5 are elementary, finite in statement and
 uniform in the board. The repository's Lean development already carries the
@@ -446,7 +414,7 @@ connectivity vocabulary (`kingAdj`, `KingConnected`,
 `kingConnected_iff_reach`) and a comparable chain, so this is a scoped
 target rather than a research problem.
 
-**Cross the bridge of §7.** The three parts are stated: locality, sufficient
+**Cross the bridge of §6.** The three parts are stated: locality, sufficient
 statistic, color reuse. Doing them turns "a program was checked against known
 values" into "a program provably computes a proved identity", which is the
 difference the second source exists to make.
@@ -456,9 +424,8 @@ king adjacency beyond Lemma 1, which bounds the scan distance to earlier
 neighbors. For which adjacency and scan-order pairs does a window of bounded
 size suffice, and what is the minimal window?
 
-## 11. Where to read what this bought
+## 10. Where to read what this bought
 
-A count with no closed form has nothing to lean on but a second method. What
-this one has closed, and why the engine's own self-checks were never going to
-be enough (§3's corollary agrees), is `results/second-sources.md`; the source
-the model is a reading of is `results/cutcount_b1/`.
+What this second method has confirmed, and why the engine's own self-checks
+were not enough (§3's corollary), is in `results/second-sources.md`; the
+source the model is a reading of is `results/cutcount_b1/`.

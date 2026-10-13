@@ -1,8 +1,8 @@
 # The grand form is a theorem (exact one-mode resummation)
 
 Proves the Corollary of `diagonal-law.md` in full, with the sharp onset.
-Content: the diagonal cumulants are *exactly* linear — each level k adds
-exactly two new rational constants (a_k, b_k) — so the
+Content: the diagonal cumulants are linear, each level k adding two new
+rational constants (a_k, b_k), so the
 `scripts/derive_pk_fast.py` model `P_k(n) = [y^k] exp(Σ_j (a_j + b_j n) y^j)`
 is proved structure, not an ansatz. Combined with the shape theorem, the
 diagonals k = 10..19 in the formula table rest on proved structure plus two
@@ -15,7 +15,7 @@ reproduces the production P_1..P_3 coefficient-exactly.
 
 ## Statement
 
-**THEOREM (grand form).** There are rational constants a_j, b_j (j ≥ 1),
+**Theorem (grand form).** There are rational constants a_j, b_j (j ≥ 1),
 with (a_j, b_j) determined by the cluster weights of surplus ≤ j, such that
 
 > P_k(n) = [y^k] exp( Σ_{j≥1} (a_j + b_j n) y^j )  for every k ≥ 0, n ≥ 2k+1,
@@ -27,10 +27,10 @@ C, μ ∈ ℚ[[y]] with C(0) = 1/3, μ(0) = 3 and
 > T(H+k, H) = [y^k]( C(y)·μ(y)^H )  for every k ≥ 0, H ≥ k+1;
 
 i.e. the cumulants c_j(H) = [y^j] log A_H of A_H(y) := Σ_k T(H+k,H) y^k are
-EXACTLY linear in H for H ≥ j+1.
+linear in H for H ≥ j+1.
 
 Everything happens in ℚ[[y]] (y-adic formal algebra); no analysis, no
-convergence, and — the load-bearing feature — **no weight enumeration**: the
+convergence, and no weight enumeration: the
 proof is uniform in the weights, so it covers all k at once.
 
 ## Setup (from the chain identity)
@@ -64,7 +64,7 @@ Order 0: u_0·(1/3 − z) = 1 − 3z gives u_0 = 3. Order j ≥ 1, collecting
 > (1/3 − z)·u_j = N_j − 3ζ_j,  N_j := −σ_j − Σ_{m=1}^{j−1} ζ_m u_{j−m}.
 
 N_j is a known polynomial with deg N_j ≤ j+1 (deg σ_j ≤ j+1; inductively
-deg u_{j−m} ≤ j−m < j+1). Choose **ζ_j := N_j(1/3)/3**: then the right side
+deg u_{j−m} ≤ j−m < j+1). Choose ζ_j := N_j(1/3)/3: then the right side
 vanishes at z = 1/3, the division by (1/3 − z) is exact in ℚ[z], and
 deg u_j ≤ j. This simultaneously constructs the root and the cofactor.
 
@@ -84,7 +84,7 @@ Hence for G := E_b · E_t · u^(−1), splitting k = k_b + k_t + k_u:
 
 > deg [y^k] G ≤ (k_b + 1) + k_t + k_u = k + 1.
 
-Equivalently, writing G = Σ_i g_i(y) z^i: **ord_y(g_i) ≥ i − 1**. (This is
+Equivalently, writing G = Σ_i g_i(y) z^i: ord_y(g_i) ≥ i − 1. (This is
 the fact that makes the resummation exact rather than asymptotic.)
 
 ## Step 3 — exactly one geometric mode for H ≥ k+1
@@ -96,7 +96,7 @@ Let μ := 1/z* (a unit, μ(0) = 3). In ℚ[[y]][[z]],
 
 with Ĉ := Σ_{i≥0} g_i z*^i (y-adically convergent, since
 ord_y(g_i z*^i) ≥ i−1) and tail ρ_H := Σ_{i>H} g_i z*^i, which has
-**ord_y(ρ_H) ≥ H**. So for H ≥ k+1 the tail contributes nothing at order y^k,
+ord_y(ρ_H) ≥ H. So for H ≥ k+1 the tail contributes nothing at order y^k,
 and [z^H][y^k]P = 0 as well (deg_z [y^k]P ≤ k < H). Setting C := Ĉ·μ:
 
 > T(H+k, H) = [y^k][z^H] F = [y^k]( C·μ^H )  for all H ≥ k+1. ∎
@@ -159,16 +159,15 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
 1. **Two new constants per level.** [y^k]exp(Σ c_j y^j) = (polynomial in
    c_1..c_{k−1}) + c_k, so P_k(n) = known_k(n) + a_k + b_k·n with known_k
    determined by levels < k — exactly `scripts/derive_pk_fast.py`. Given the
-   shape theorem (deg P_k ≤ k, Lean), any TWO in-onset values pin (a_k, b_k)
+   shape theorem (deg P_k ≤ k, Lean), any two in-onset values pin (a_k, b_k)
    by a nonsingular 2×2 rational solve, and every further in-onset value is a
    theorem, not a test. The 28 extra exact matches checked by
    `scripts/verify_diagonal_pins.py` are over-determination.
 2. **Leading coefficient, now proved.** The only n^k-term at order y^k is
-   (b_1·n·y)^k/k!, so [n^k]P_k = b_1^k/k!. From the first-principles
-   P_1(n) = 25n − 45 (`T-n-nm1.md`): b_1 = 25, a_1 = −45. Hence
-   **[n^k]P_k = 25^k/k! for all k** — the conjecture of
-   `results/diagonal-formula.md` (and the stretch goal `LeadingCoeff.lean` closed) —
-   and deg P_k = k exactly.
+   (b_1·n·y)^k/k!, so [n^k]P_k = b_1^k/k!. From the first-principles P_1(n) =
+   25n − 45 (`T-n-nm1.md`): b_1 = 25, a_1 = −45. Hence [n^k]P_k = 25^k/k! for
+   all k, the conjecture of `results/diagonal-formula.md` (and the stretch goal
+   `LeadingCoeff.lean` closed) — and deg P_k = k exactly.
 3. **What the formula entries rest on.** The entries on diagonals
    k = 10..19 rest on the enumerated sweeps (H ≤ 21 as of a(40)), the shape
    theorem (Lean), this theorem (formalized, §Formalization below), and the
@@ -179,18 +178,17 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
 ## Formalization
 
 Formalized in Lean 4: `polyplets/Polyplets/Staircase/`. The proof was
-restructured for Lean as the **staircase route**: in sequence form, Steps
-1–3 collapse to a convolution fixed point (ν = z*, μ = 1/z*) plus one
-strong induction (`d_staircase`), and `T_staircase` carries it to the
-T-diagonals; both on **standard axioms only** (guarded in
-`Polyplets/Audit.lean`). Corollary 2, the leading coefficient 25^k/k!, is
-`LeadingCoeff.lean`'s `IsDiagonalPoly.coeff_eq`, standard axioms only. The
-diagonal polynomials are determined for k ≤ 18 from two enumerated cells per
-level (`Staircase/Climb.lean`, `isDiagonalPoly_Pk`) — *conditional on those cells*: they
-are hypotheses of the Lean theorems, engine values assumed, not proved in
-Lean (`polyplets/README.md`). The exp-form statement itself (`grand_form`) is
-not in the current build, being a duplicate of the leading-coefficient route;
-it was last there at commit 697f376.
+restructured for Lean as the **staircase route**: in sequence form, Steps 1–3
+collapse to a convolution fixed point (ν = z*, μ = 1/z*) plus one strong
+induction (`d_staircase`), and `T_staircase` carries it to the T-diagonals; both
+on standard axioms only (guarded in `Polyplets/Audit.lean`). Corollary 2, the
+leading coefficient 25^k/k!, is `LeadingCoeff.lean`'s `IsDiagonalPoly.coeff_eq`,
+standard axioms only. The diagonal polynomials are determined for k ≤ 18 from
+two enumerated cells per level (`Staircase/Climb.lean`, `isDiagonalPoly_Pk`) —
+*conditional on those cells*: they are hypotheses of the Lean theorems, engine
+values assumed, not proved in Lean (`polyplets/README.md`). The exp-form
+statement itself (`grand_form`) is not in the current build, being a duplicate
+of the leading-coefficient route; it was last there at commit 697f376.
 
 ## What remains open
 

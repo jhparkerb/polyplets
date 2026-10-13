@@ -1,7 +1,8 @@
 # The dm-mirror diagonal law: proof
 
-Completes the program of `results/symmetry-classes.md`
-(step 1 = the reversal lemma, proved there; this document is steps 2-4).
+Proves that for fixed k the diagonal-mirror-symmetric counts d(S, S+k) are
+quasi-polynomial in S of period 2 and degree at most k. The reversal lemma
+it relies on is proved in `results/symmetry-classes.md`.
 Machine anchors: `experiments/dm_sym_enum.py` (ground truth, matches the
 recorded strip data), `experiments/dm_phase_census.py` (reversal lemma tight;
 per-class quasi-polynomiality k <= 2, S <= 13).
@@ -11,17 +12,17 @@ per-class quasi-polynomiality k <= 2, S <= 13).
 Let d(S, n) count diagonal-mirror-symmetric fixed polyplets with n cells
 and bounding box exactly S x S, and let k = n - S.
 
-**THEOREM.** For every k there exist polynomials p_k^even, p_k^odd of
+**Theorem.** For every k there exist polynomials p_k^even, p_k^odd of
 degree <= k and an effective S_0(k) such that
 d(S, S+k) = p_k^{parity(S)}(S) for all S >= S_0(k). Consequently the
 generating function sum_S d(S,S+k) x^S is rational with poles only at
 x = 1 and x = -1, of total order <= k+1 at each.
 
 (The sharp onset -- the single condition S_0 = 2k+2, no parity split:
-2k+3 on the odd class is just the least odd integer past 2k+2 -- is NOT
+2k+3 on the odd class is just the least odd integer past 2k+2 -- is not
 proved here; it stays data-grade. King sharpness, by contrast, is proved:
 `docs/proofs/diagonal-law.md`.
-The pole multiplicities (k+1, k) are NOT an independent data-grade item:
+The pole multiplicities (k+1, k) are not an independent data-grade item:
 writing d(S,S+k) = A(S) + (-1)^S B(S), they are equivalent to deg A = k
 and deg B = k-1, i.e. to the recorded equal-leading-coefficients fact plus
 lead(P_even - P_odd) = (-1)^k/(k-1)! -- see
@@ -34,18 +35,17 @@ so with n = S + k the row-surplus sum and the column-surplus sum both
 equal k, and the transpose symmetry maps row structure to column
 structure. Cells and structural features occur in **mirror orbits**
 (size 2 off the diagonal, size 1 on it). Since off-diagonal surplus cells
-come in pairs, the number of surplus ORBITS is at most k.
+come in pairs, the number of surplus orbits is at most k.
 
-Reading rows y = 1..S: rows outside the fat set W (|W| <= k) carry a
-single cell at position pi(y); between consecutive single rows,
-king-connectivity forces |pi(y+1) - pi(y)| <= 1, and pi(y+1) = pi(y)
-costs a column surplus (results/symmetry-classes.md, step 1). Maximal
-constant-direction stretches of the single-cell path are **segments**:
-perfect diagonal runs (x = y + d, offset d) or perfect anti-diagonal runs
-(x = c - y, center c). Everything else -- fat rows, zero-steps, and the
-O(1)-size neighborhoods where segments meet -- forms **defect clusters**.
-By the reversal lemma there are at most 2k+1 segments and at most 2k
-turns, so for fixed k the combinatorial picture is bounded.
+Reading rows y = 1..S: rows outside the fat set W (|W| <= k) carry a single cell
+at position pi(y); between consecutive single rows, king-connectivity forces
+|pi(y+1) - pi(y)| <= 1, and pi(y+1) = pi(y) costs a column surplus (the reversal
+lemma, `results/symmetry-classes.md`). Maximal constant-direction stretches of
+the single-cell path are **segments**: perfect diagonal runs (x = y + d, offset
+d) or perfect anti-diagonal runs (x = c - y, center c). Everything else -- fat
+rows, zero-steps, and the O(1)-size neighborhoods where segments meet -- forms
+**defect clusters**. By the reversal lemma there are at most 2k+1 segments and
+at most 2k turns, so for fixed k the combinatorial picture is bounded.
 
 ## Lemma 1 (segment decomposition, uniqueness)
 
@@ -64,16 +64,15 @@ Each mirror-orbit of turns consumes at least one unit of the cell surplus
 k, and distinct orbits consume distinct units. Hence
 (number of turn orbits) <= k.
 
-*Proof.* A turn is a failure of the single-cell path to continue its
-+-1 step: by step 1's argument it forces, within its O(1) cluster, either
-a fat row (row surplus) or a repeated column (column surplus). Row
-surplus at row y is column surplus at column y of the transposed feature:
-a turn orbit off the diagonal consists of two turns whose forced
-surpluses are a row unit and the mirror column unit -- together they
-force one extra CELL pair off the diagonal, i.e. cell-surplus >= 2 per
-off-diagonal orbit but shared across the pair: at least 1 unit of
-k = n - S per orbit. An on-diagonal (self-mirror) turn forces an extra
-cell at or adjacent to the diagonal: >= 1 unit. Clusters are disjoint, so
+*Proof.* A turn is a failure of the single-cell path to continue its +-1 step:
+by the reversal lemma's argument it forces, within its O(1) cluster, either a
+fat row (row surplus) or a repeated column (column surplus). Row surplus at row
+y is column surplus at column y of the transposed feature: a turn orbit off the
+diagonal consists of two turns whose forced surpluses are a row unit and the
+mirror column unit -- together they force one extra cell pair off the diagonal,
+i.e. cell-surplus >= 2 per off-diagonal orbit but shared across the pair: at
+least 1 unit of k = n - S per orbit. An on-diagonal (self-mirror) turn forces an
+extra cell at or adjacent to the diagonal: >= 1 unit. Clusters are disjoint, so
 the charges are distinct. QED
 
 ## Lemma 3 (type finiteness)
@@ -87,7 +86,7 @@ types is finite (depending only on k).
 *Proof.* At most 2k+1 segments (reversal lemma); at most k defect
 clusters each of O(k) cells within an O(k) window (a cluster with c cells
 spans < 3c columns); the mirror action is determined on a bounded set.
-Offsets INTERNAL to a cluster are bounded; offsets BETWEEN segments are
+Offsets internal to a cluster are bounded; offsets between segments are
 not part of the type -- they are integer variables of Lemma 4's system.
 QED
 
@@ -129,12 +128,12 @@ number of turn orbits, hence <= k by Lemma 2.
 *Proof.* Walk the segment sequence from the first row. The first
 segment's entry data is fixed by the boundary (O(1) choices, part of the
 type). Given the entry data of a segment, its exit data is determined by
-ONE free integer -- its length. But its length is not free once the NEXT
+one free integer -- its length. But its length is not free once the next
 entry is known: turn adjacency determines the exit position from the next
 cluster's anchor. Telescoping: the free parameters are in bijection with
 the clusters at which a genuinely new position can be chosen; mirror
 equations identify the parameters of paired features, leaving one
-parameter per ORBIT of turns; the global row-partition equation consumes
+parameter per orbit of turns; the global row-partition equation consumes
 one parameter against S. A worked instance (the k=1 three-segment class):
 the two turn equations force the outer segments to length 1 and the
 bridge to length S-2 -- dimension 0, matching the observed constant
@@ -154,16 +153,15 @@ each. QED
 ## Status
 
 - Lemmas 1, 3, 4: complete proofs above.
-- Lemma 2 and the reversal lemma: proved (step 1 + above); TIGHT on data.
+- Lemma 2 and the reversal lemma: proved; tight on data.
 - Lemma 5: proof by the telescoping argument above; this is the densest
   step, and the worked instances (constant three-segment class; zigzag
-  equality case) are its verification anchors. A referee should press
-  here first.
+  equality case) are its verification anchors.
 - Machine certification: for k <= 2 every phase class is separately
   per-parity polynomial of degree <= k from S >= 2k+2 on all recorded and
   enumerated data (S <= 13), and classes partition d(S, S+k) —
   `experiments/dm_phase_census.py`.
-- NOT proved: sharp onset (2k+2 / 2k+3) and the exact multiplicity split
+- Not proved: sharp onset (2k+2 / 2k+3) and the exact multiplicity split
   (k+1 at x=1, k at x=-1); both remain data-grade. The king analogue is
   proved (`docs/proofs/diagonal-law.md`), by a route that has no dm-mirror
   counterpart yet — no quartic is known for the dm-mirror defect.
@@ -176,11 +174,10 @@ each. QED
 
 ## Consequences
 
-- The paper's SS dm-diagonal conjecture upgrades to a theorem in its
-  quasi-polynomiality/degree part; the T3 tier's "degree transition"
-  failure mode is eliminated by proof, the "onset shift" mode is bounded
-  by the effective S_0.
-- With the universal diagonal law (docs/proofs/universal-diagonal-law.md)
-  this completes the program: BOTH triangles the paper studies now have
-  proved diagonal laws, and the two proofs are instances of one method --
-  bounded grammar + one-parameter lattice-point counting.
+- The quasi-polynomiality and degree part of the dm-diagonal conjecture is
+  a theorem; a change of degree at large S is ruled out, and any shift of
+  onset is bounded by the effective S_0.
+- With the universal diagonal law (docs/proofs/universal-diagonal-law.md),
+  both triangles the report studies have proved diagonal laws, and the two
+  proofs are instances of one method: bounded grammar plus one-parameter
+  lattice-point counting.

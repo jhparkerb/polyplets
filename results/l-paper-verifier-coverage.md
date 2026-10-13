@@ -1,12 +1,13 @@
 # What the L-paper verifier actually reads
 
-Measured by `tests/l_paper_coverage_audit.py`. Method: perturb the last digit of every numeric literal in a COPY of the
-`.tex` and re-run `paper/verify_l_papers.py`. A literal whose perturbation
-still passes is one the paper prints and no check reads.
+Measured by `tests/l_paper_coverage_audit.py`. Method: perturb the last digit of
+every numeric literal in a COPY of the `.tex` and re-run
+`paper/verify_l_papers.py`. A literal whose perturbation still passes is one the
+paper prints and no check reads.
 
 It matters more here than on the P side. There the question was how much of one
-guarded manuscript is guarded. Here **every one of the six manuscripts carries
-a disclosure block reading "human verification: none"**, and only four of them
+guarded manuscript is guarded. Here every one of the six manuscripts carries
+a disclosure block reading "human verification: none", and only four of them
 have any checks at all, so an unguarded literal has nothing else standing
 behind it.
 
@@ -14,29 +15,29 @@ behind it.
 
 | paper | pages | literals | guarded | unguarded |
 |---|---|---|---|---|
-| `L1-diagonal-law.tex` | 23 | 51 | 4 | **47** |
+| `L1-diagonal-law.tex` | 23 | 51 | 4 | 47 |
 | `L3-lambda-bounds.tex` | 13 | 152 | 50 | 102 |
-| `L4-not-dfinite.tex` | 10 | 22 | **17** | 5 |
-| `L5-convex-polyplets.tex` | 21 | 144 | **0** | 144 |
+| `L4-not-dfinite.tex` | 10 | 22 | 17 | 5 |
+| `L5-convex-polyplets.tex` | 21 | 144 | 0 | 144 |
 | `L6-perimeter-gradings.tex` | 14 | 93 | 3 | 90 |
-| `L8-below-onset.tex` | 15 | 69 | **0** | 69 |
-| **corpus** | 96 | **531** | **74** | **457** |
+| `L8-below-onset.tex` | 15 | 69 | 0 | 69 |
+| corpus | 96 | 531 | 74 | 457 |
 
-74 of 531. The whole sweep is **80 seconds** on one
+74 of 531. The whole sweep is 80 seconds on one
 core, because `verify_l_papers.py` runs in 0.16 s and needs no subprocess cache.
 
-## The measurement is not vacuous
+## What the guarded literals are
 
-74 literals did go red, which is what shows the harness detects a wrong number
-at all, and the ones that went red are the right ones:
+74 perturbations failed a check, which shows the harness detects a wrong
+number at all, and the guarded literals are the ones that matter:
 
-- **L3's two headline constants**, `6.543` and `9.3154`, are both guarded, as is
+- L3's two headline constants, `6.543` and `9.3154`, are both guarded, as is
   every rung of the certified ladder in both its printed precisions and the
   certificate `x = 2147/20000`.
-- **L4's ψ-degree boxes** `181/180`, `462/461`, `1254/1253`, `3289/3288` are
-  guarded on both sides of each pair, which is what puts the exclusion under
-  test rather than the number.
-- **L6's min-end constants** `187`, `470`, `1106` are guarded by
+- L4's ψ-degree boxes `181/180`, `462/461`, `1254/1253`, `3289/3288` are
+  guarded on both sides of each pair, which puts the exclusion under test
+  rather than the number.
+- L6's min-end constants `187`, `470`, `1106` are guarded by
   `check_l6_min_end`'s sequence test.
 
 The green control runs before every sweep: if the unmutated copy does not pass
@@ -47,18 +48,18 @@ on the box, the run exits 2 rather than reporting a wall of false "guarded".
 The P sweep is `[0-9]{4,}` with a lookbehind rejecting a leading `.`, which on
 this corpus would have been nearly blind.
 
-1. **Decimals count as one literal.** Without this the sweep cannot see `6.543`
+1. Decimals count as one literal. Without this the sweep cannot see `6.543`
    or `9.3154` — L3's entire result.
-2. **The integer floor is 3 digits, not 4.** L6's min-end constants are
+2. The integer floor is 3 digits, not 4. L6's min-end constants are
    `1, 6, 22, 68, 187, 470, 1106`; the floor is where those stop being noise.
 
-Also: `96{,}065` is one literal and not the fragment `065`, and `R{0.56\textwidth}`
-is a column width rather than a claim. Both were false positives the first run
-produced and both are handled in the extractor.
+Also: `96{,}065` is one literal and not the fragment `065`, and
+`R{0.56\textwidth}` is a column width rather than a claim. Both were false
+positives the first run produced and both are handled in the extractor.
 
 ## What is unguarded, by paper
 
-**L5 (144 of 144) and L8 (69 of 69) have no verifier at all.** Not one number
+L5 (144 of 144) and L8 (69 of 69) have no verifier at all. Not one number
 either paper prints is read by any check. What that leaves unread includes:
 
 - L5: `μ = 3.128943269730886…` and its 199-digit extension, `ν = 2.5145796…`,
@@ -86,10 +87,9 @@ window-lever table, and the `G_8(n)/a(n)` anchor row.
 It is not a claim that any of the 457 is wrong. `verify_l_papers.py`'s 336
 checks are green and the banked results behind the papers are checked
 elsewhere. What is unmeasured is the link from that data to what these
-manuscripts print — and on this corpus, unlike the P corpus, there is no human
-reader standing behind the link either.
+manuscripts print, and on this corpus, unlike the P corpus, no human reader
+has checked that link either.
 
-The audit is deliberately **not a gate**. Wiring it as one would demand that
-every literal in six papers be guarded before any of them can change, which is
-a bar the corpus does not meet and was never asked to meet. Its job is to say
-where the exposure is.
+The audit is not a gate. Wiring it as one would demand that every literal in
+six papers be guarded before any of them can change, a bar the corpus does not
+meet. Its job is to say where the exposure is.

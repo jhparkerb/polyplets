@@ -41,9 +41,9 @@ Row 40 only, and a different question: which cells still rest on the main progra
 | H ≤ 20 | 1 | T(40,20), T(40,22) | T(40,21) |
 | H ≤ 21 | 0 | T(40,21) | none |
 
-## Closure — the largest fully rule-independent a(n)
+## The largest a(n) with every entry rule-independent
 
-The coloring recount covers `h ≤ H` from below; the closed-form band covers `h ≥ max(n−18, ⌈(n+1)/2⌉)` from above. The published figure requires the two to **overlap** — at least one cell where both methods produce the value and can be compared — not merely to abut. The shortcut `n ≤ 2H−1` agrees for H ≤ 19 and parts company above it, so the criterion is computed rather than the shortcut.
+The coloring recount covers `h ≤ H` from below; the closed-form band covers `h ≥ max(n−18, ⌈(n+1)/2⌉)` from above. The published figure requires at least one cell computed by both methods, not merely adjacent ranges. The shortcut `n ≤ 2H−1` agrees for H ≤ 19 and parts company above it, so the criterion is computed rather than the shortcut.
 
 | coloring recount reaches | a(n) closed for | `2H−1` |
 |---|---|---|
@@ -56,4 +56,4 @@ The coloring recount covers `h ≤ H` from below; the closed-form band covers `h
 
 ## Where this stops
 
-Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM in any memory layout tried (`results/second-sources.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/grand-form.md`) — is ten levels past the k ≤ 9 reached so far.
+Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM in any memory layout tried (`results/second-sources.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/grand-form.md`) — is ten levels past the k ≤ 9 for which the constants have been computed from cluster weights.

@@ -141,8 +141,9 @@ comparison is equality of rationals.
   the same polynomial. The 189 include T(39,20) and T(40,21), the two entries
   P_19 was fitted from, predicted from a level 19 determined at H <= 18
   (depths 2, 3) or at H <= 17 (depths 3, 4). Levels 3 to 17 of the table each
-  had an entry withheld and reproduced when they were fitted; levels 18 and
-  19 had none until this. Levels through 15 (depths 2, 3) or 16 (depths 3, 4)
+  had an entry withheld and reproduced when they were fitted. Level 18's
+  holdout, T(39,21), was enumerated later, in the a(40) run; level 19 has
+  none apart from this. Levels through 15 (depths 2, 3) or 16 (depths 3, 4)
   are determined at H <= 14, inside the strip engine's range.
 - **"Shorter" is per level, not transitive.** The audit takes lower levels
   from the formula table, and P_18 embeds T(38,20), so the audit's prediction
@@ -208,8 +209,9 @@ Record: `results/a41/PROVENANCE.md`. Assembler: `experiments/undertow_a41.py`.
 | 20 | main program, 76 cores, 9.63 h (section below) | 2026-09-05 |
 | 21..41 | the assembly: k <= 19 from the formula table, level 20 determined below onset; T(41,21) is level 20 exactly at onset | |
 
-Before height 20 was enumerated the assembly also supplied T(41,20), as
-level 21 at depth 2, carrying D_2(21) = 1534183878653401344302049616588 / 3^23.
+The assembly also gives T(41,20), as level 21 at depth 2, carrying
+D_2(21) = 1534183878653401344302049616588 / 3^23; it equals the enumerated
+value (below).
 
 **Checks the assembler refuses without.**
 
@@ -336,10 +338,10 @@ of buying a third level-21 equation.
 
 | route | what it produces | buys | outcome |
 |---|---|---|---|
-| height 20 at size 41 | T(41,20); level 21 gets pairs (2,3), (2,4), (3,4) | validation of T(40,19), and an enumeration against P_21's prediction; no rule-independence (same program) | ran 2026-09-05 |
-| height 21 at size 42 | T(42,21) | the same kind of evidence at more wall and disk (extrapolated 44 h, 443 GB from phase C times 1.22); P_19's first withheld entry, its other justification, was already met by the audit | dominated; not run |
-| coloring recount at height 19 | T(40,19) directly under the other rule | rule-independence and validation in one act, through neither D_j nor the grand form | ran 2026-08-21 |
-| depth 5 | level 21 from T(39,18), T(38,17), both H <= 18 | a rule-independent derivation, agreeing with the enumerated entry; weaker in kind, since the chain runs through D_3, D_4, D_5 at k = 21 | table 2026-08-23 |
+| height 20 at size 41 | T(41,20); level 21 gets pairs (2,3), (2,4), (3,4) | validation of T(40,19), and an enumeration against P_21's prediction; no rule-independence (same program) | run |
+| height 21 at size 42 | T(42,21) | the same kind of evidence at more wall and disk (extrapolated 44 h, 443 GB from phase C times 1.22); P_19's first withheld entry, its other justification, was already met by the audit | not run (dominated) |
+| coloring recount at height 19 | T(40,19) directly under the other rule | rule-independence and validation in one act, through neither D_j nor the grand form | run |
+| depth 5 | level 21 from T(39,18), T(38,17), both H <= 18 | a rule-independent derivation, agreeing with the enumerated entry; weaker in kind, since the chain runs through D_3, D_4, D_5 at k = 21 | run |
 
 Where two routes look independent and are not: every formula statement about
 T(40,19) contains D_3(21); the two formula routes (determine from (2,4),
@@ -527,8 +529,9 @@ height, so H = 21 extrapolates to about 4.1 and 40 to 45 to about 1.6x. Two
 points setting a slope six heights out is a weak extrapolation. The
 enumeration's 4.4x per term is the cost of raising height and size together.
 
-**The family enumeration per unit of excess.** `scripts/lastditch/emax_ladder.sh`,
-ayr, 16 threads, K = 10; raw output `results/emax-ladder.txt`.
+**The family enumeration per unit of excess.**
+`scripts/lastditch/emax_ladder.sh`, ayr, 16 threads, K = 10; raw output
+`results/emax-ladder.txt`.
 
 | emax | wall | rss | per-e wall | per-e rss |
 |---|---|---|---|---|
@@ -565,9 +568,8 @@ series, and where each put `families 21 4`:
 | e = 4, K = 10 to 14 | 16 | 1.521x (wall 1.972x) | 51 GB, 23 h |
 | e = 4, K = 8 to 16, five points | 8 | decelerating | 8.5 to 16 GB |
 
-**Depth 5, priced and then run.** `results/depth5/ladder.txt`, ayr,
-2026-08-22 01:17 to 02:07 EDT, rev `a66bc61`, 8 threads throughout,
-`./build/severance_w3_families families K 4 8`; analysis
+**Depth 5.** `results/depth5/ladder.txt` (ayr, 2026-08-22, rev `a66bc61`,
+8 threads, `./build/severance_w3_families families K 4 8`); analysis
 `experiments/depth5_cost_ladder.py`, which steps a decaying ratio rather than
 a geometric mean.
 
@@ -579,26 +581,14 @@ a geometric mean.
 | 14 | 731.86 s | 2459.5 MB | 3.34 | 2.14 |
 | 16 | 1988.13 s | 4239.2 MB | 2.72 | 1.72 |
 
-K = 16 was predicted from the first four points before it ran: 1859 s and
-4607 MB against 1988 s and 4239 MB measured, 6.9% under on wall and 8.0% over
-on memory. Projections for K = 21, and the run:
+The K = 21 run (dalby, 2026-08-23, 8 threads) took 4 h 54 m (17,660 s) and
+18.3 GB (18,743 MB) against projections of 3.1 h to 6.7 h and 8.5 GB to
+16.1 GB from this ladder, so the method brackets wall and under-predicts
+memory, and every memory figure it produces is a floor.
 
-| | wall | rss |
-|---|---|---|
-| ratio keeps decelerating | 3.1 h | 8.5 GB |
-| ratio stops decelerating (pessimistic) | 6.7 h | 16.1 GB |
-| measured, dalby 2026-08-23, 8 threads | 4 h 54 m (17,660 s) | 18.3 GB (18,743 MB) |
-
-The wall projection bracketed the run; the memory projection did not, the run
-landing 14% above the pessimistic end. The method brackets wall and
-under-predicts memory, so every memory figure it produces is a floor. The
-decay model is fitted from two ratios; the thread scaling is asserted from the
-merge structure, not measured on this series (at 40 threads the projection
-was about 42 GB); K = 18 and 20 were never run.
-
-**Depth 6, priced, not run.** `scripts/lastditch/emax5_kladder.sh`, dalby,
-2026-08-23, 8 threads, about 2.2 h in all; analysis
-`experiments/depth6_cost_ladder.py`, which imports the depth-5 extrapolator.
+**Depth 6, not run.** `scripts/lastditch/emax5_kladder.sh` (dalby, 2026-08-23,
+8 threads, about 2.2 h in all); analysis `experiments/depth6_cost_ladder.py`,
+which imports the depth-5 extrapolator.
 
 | K | wall | rss | wall x per +2K | rss x per +2K |
 |---|---|---|---|---|
@@ -607,9 +597,9 @@ was about 42 GB); K = 18 and 20 were never run.
 | 12 | 1,951.05 s | 7,063.8 MB | 5.28 | 3.17 |
 | 14 | 7,633.96 s | 16,877.0 MB | 3.91 | 2.39 |
 
-K = 14 predicted from the three points below it: 6,295 s and 14,627 MB against
-7,634 s and 16,877 MB measured, 17.5% and 13.3% under. The extrapolator
-underestimates, and this series is looser than depth 5's.
+The extrapolator under-predicts this series too (K = 14 from the three points
+below it: 6,295 s and 14,627 MB against 7,634 s and 16,877 MB measured), and
+more loosely than depth 5's.
 
 | `families 21 5` at 8 threads | wall | rss |
 |---|---|---|
@@ -636,10 +626,10 @@ size 40, 32 threads (ayr), reproducing the five recorded residue rows
 
 against about 79,940 s per prime serially, 24x on a box with fewer cores. The
 serial pricing of height 19 was 27 to 40 days; the parallel program's run over
-heights 1 to 19 at size 41 took about 22 hours (`results/cutcount_b1/rows41/README.md`).
-Memory at height 19 was extrapolated from the H = 18 point at 3.0x per height
-to about 180 GB with 32-bit primes, 110 GB with 16-bit, 68 GB with 8-bit; the
-run used nine primes near 2^16.
+heights 1 to 19 at size 41 took about 22 hours
+(`results/cutcount_b1/rows41/README.md`). Memory at height 19 was extrapolated
+from the H = 18 point at 3.0x per height to about 180 GB with 32-bit primes, 110
+GB with 16-bit, 68 GB with 8-bit; the run used nine primes near 2^16.
 
 ## The square lattice
 

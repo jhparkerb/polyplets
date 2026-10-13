@@ -26,9 +26,9 @@ nonempty rows spanning a height-H window.
 
 **What the b = 2 instance is**, by measurement
 (`experiments/diagonal_machine.py` `identify()`, brute force to n = 8, run on
-every invocation so the labels cannot drift). D = {−1, 0} is **six**-regular,
-totals 1, 3, 11, 44, 186, 814, 3652, 16689 = **A001207: fixed hexagonal
-polyominoes**. Cells are hexagons; each has six neighbors; their centers form
+every invocation so the labels cannot drift). D = {−1, 0} is six-regular,
+totals 1, 3, 11, 44, 186, 814, 3652, 16689 = A001207: fixed hexagonal
+polyominoes. Cells are hexagons; each has six neighbors; their centers form
 the triangular *point* lattice, which is why the literature also calls this the
 triangular lattice (Madras's §3.1(b) "Tri"). This repo's "hex" label is the
 cell-side name and is correct.
@@ -53,7 +53,7 @@ its own entry and exit, and its b continuations are the b up-offsets. Write
 n_min(H) for the least cell count at height H; it is H in the row-local case.
 
 **Polyiamonds are in the class, with a fiber of two.** Cells are equilateral
-triangles, each with **three** edge-neighbors, and the up/down orientation
+triangles, each with three edge-neighbors, and the up/down orientation
 alternates: with cell (x, y) an up- or down-triangle by the parity of x + y,
 adjacency is (x ± 1, y) always and (x, y + 1) only when x + y is odd. Condition
 (U) fails outright — there is no single drift set D. Condition (M) holds with
@@ -82,7 +82,7 @@ polyiamonds under "the 2-dimensional hexagonal lattice".
 For every lattice satisfying (M) and every k >= 0 there is a polynomial q_k
 of degree <= k with
 
-    T(n_min(H)+k, H) = q_k(H) * b^H    for ALL H >= k+1.
+    T(n_min(H)+k, H) = q_k(H) * b^H    for all H >= k+1.
 
 For a row-local lattice n_min(H) = H, so this reads T(H+k, H) = q_k(H) b^H,
 equivalently T(n, n-k) = P_k(n) * b^(n-1-3k) for n >= 2k+1 with
@@ -127,7 +127,7 @@ mod p, the grand series H(u) of the law satisfies
     H = 1 + w u H^{-2},  i.e.  H^3 = H^2 + w u  over F_p .
 
 If w != 0 this is the spine cubic W^3 = W^2 + t after the rescaling
-t = w u: **the curve is lattice-independent**; the lattice chooses only
+t = w u: the curve is lattice-independent; the lattice chooses only
 the prime (through b) and the scaling (through W_pair). If w = 0 the
 mod-p triangle is trivial in the band (the hole-free/king mod-3 situation
 shows this branch is realized by natural subfamilies).
@@ -148,15 +148,15 @@ records `T(n,n-1) = 4n-8` for n ≥ 3 as known, and
 > **Conjecture: T(n,n−2) = 8n² − 51n + 86 for n ≥ 5.**
 
 That is Theorem A at b = 1, k = 2. The theorem gives deg ≤ 2 and onset
-n ≥ 2k+1 = 5 — exactly the range the conjecture states — so **three enumerated
-values determine the polynomial and the conjecture follows**.
+n ≥ 2k+1 = 5, the range the conjecture states, so three enumerated values
+determine the polynomial and the conjecture follows.
 `experiments/oeis_a308359_check.py` does it from our own enumeration rather
 than from their numbers: totals against A001168 first, then k=1 reproducing
 their proved 4n−8 (which is what certifies our triangle is theirs), then the
 quadratic through n = 5,6,7 — which comes out `8n² − 51n + 86` verbatim and
-reproduces every value to n = 11. Two RED controls: a linear fit through
+reproduces every value to n = 11. Two controls: a linear fit through
 n = 5,6 must miss at n = 7 (it gives 105 against 121), and the formula must
-**fail** at n = 2k = 4, since the onset is sharp (T(4,2) = 9, quadratic says
+fail at n = 2k = 4, since the onset is sharp (T(4,2) = 9, quadratic says
 10) — otherwise neither the degree nor the onset would be under test.
 
 Two things worth noting. The k=1 agreement is an independent third party's
@@ -167,7 +167,7 @@ next diagonals would come from.
 ## The diagonal machine
 
 `experiments/diagonal_machine.py`. Theorem A's degree bound and onset turn
-k+1 enumerated values into a proved closed form, for **any** row-local lattice.
+k+1 enumerated values into a proved closed form, for any row-local lattice.
 The script supplies the values with a surplus-budgeted row transfer DP that is
 parametric in the drift set D — state is (this row's cells normalized, which
 component of the animal-so-far each belongs to, surplus spent), components that
@@ -181,7 +181,7 @@ It reproduces every independently known form and then keeps going:
 | lattice | b | k | P_k(n) | status |
 |---|---|---|---|---|
 | square | 1 | 1 | 4n − 8 | matches A308359 (proved there) |
-| square | 1 | 2 | 8n² − 51n + 86 | matches A308359's **conjecture** |
+| square | 1 | 2 | 8n² − 51n + 86 | matches A308359's conjecture |
 | square | 1 | 3 | 32/3 n³ − 140n² + 1960/3 n − 1090 | new |
 | square | 1 | 4 | 32/3 n⁴ − 712/3 n³ + 12635/6 n² − 52813/6 n + 14496 | new |
 | hex | 2 | 1 | 9n − 15 | matches `results/diagonal-formula.md` |
@@ -206,7 +206,7 @@ says *why*, and its content turns out to be one line about cumulants. Write
 
     F(n, u) = Σ_k P_k(n) u^k,  P_0 = 1,   and   c_k = [u^k] log F.
 
-**Every c_k is linear in n**, on every lattice tested, at every k reached:
+Every c_k is linear in n, on every lattice tested, at every k reached:
 
 | lattice | c_1 | c_2 | c_3 | c_4 |
 |---|---|---|---|---|
@@ -215,7 +215,7 @@ says *why*, and its content turns out to be one line about cumulants. Write
 | king | 25n − 45 | −209/2 n − 891/2 | | |
 
 That is extensivity — an independent 1-D gas of defects whose interactions live
-entirely in the constants — and **the shape of the law follows from it**:
+entirely in the constants — and the shape of the law follows from it:
 deg P_k ≤ k because the top term of P_k is c_1^k/k!, and the leading
 coefficient is therefore `W^k/k!` with W the slope of c_1. Checked: square
 4^k/k!, hex 9^k/k!, king 25^k/k!, against the machine's polynomials.
@@ -272,12 +272,12 @@ counts W_pair two independent ways (direct gadget count with no gap cap, and
 end-to-end k = 1 diagonal enumeration with holdouts; [n]P_1 = W_pair on all
 six test lattices). A pair's column gap must not be capped at 2: that is
 correct for max|dx| <= 1 and silently lossy beyond. Interval b = 4, 5 have
-**W_pair = 58, 114** and D = {-2, 0, 2} has **W_pair = 57**; for interval D,
+W_pair = 58, 114 and D = {-2, 0, 2} has W_pair = 57; for interval D,
 
     W_pair(b) = b^3 - b(b+1)/2 + 4     (verified b = 1..8 gadget-side,
                                         b <= 5 end-to-end),
 
-so densities are NOT squares beyond b = 3 — "squares" was a b <= 3
+so densities are not squares beyond b = 3 — "squares" was a b <= 3
 artifact. The cubic and the classification below describe a family of
 interval lattices at b >= 4 that nobody enumerates; the three members of the
 class anyone studies are square (b=1), hex (b=2) and king (b=3), all
@@ -287,12 +287,12 @@ degenerate branch is nonempty), and interval b = 5 gives w = 4 != 1 (the
 scaling is genuinely nontrivial). The closed form is a convenient way to
 generate such witnesses, not a result in its own right.
 The solid-pair term (b+1)^2 == 1 mod p | b stands. Mod-p
-corollary of the closed form: for **odd p | b** both b^3 and b(b+1)/2
-vanish, so **w == 4 (mod p) — always a unit**, and the universal spine for
+corollary of the closed form: for odd p | b both b^3 and b(b+1)/2
+vanish, so w == 4 (mod p), always a unit, and the universal spine for
 odd p is H^3 = H^2 + 4u with the 4 lattice-independent too (king's w = 1
 is 4 mod 3; b = 5's w is 4 mod 5 — a unit but not 1, so "w = 1 always"
-stays false with genuine scaling). For **p = 2**, w == floor(b/2) (mod 2):
-the DEGENERATE branch is realized exactly when 4 | b — by an ordinary
+stays false with genuine scaling). For p = 2, w == floor(b/2) (mod 2):
+the degenerate branch is realized exactly when 4 | b — by an ordinary
 interval lattice (b = 4: W = 58 == 0 mod 2), no contrived offset set
 needed; D = {-2, 0, 2} also lands there (57 == 0 mod 3, replacing the old
 48). Theorem B's statement (curve up to scaling when w != 0; trivial band

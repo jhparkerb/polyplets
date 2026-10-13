@@ -1,16 +1,16 @@
 # The diagonal law is a theorem (shape, onset, integrality)
 
-The *shape* of the diagonal law — polynomial × 3-power, degree ≤ k, onset
-n ≥ 2k+1, integer-valued P_k — is proved below from an exact combinatorial
+The *shape* of the diagonal law — polynomial × 3-power, degree ≤ k, onset n ≥
+2k+1, integer-valued P_k — is proved below from an exact combinatorial
 decomposition. Machine checks: `experiments/diagonal_law_proof_check.py`
-(rational structure, degree bounds tight, exactness for every recorded H,
-sharp onset, k ≤ 3). Companions: `results/diagonal-formula.md` (the decomposition
-and the enumerated weights), `results/arithmetic-structure.md` (the downstream
-mod-3 structure).
+(rational structure, degree bounds tight, exactness for every recorded H, sharp
+onset, k ≤ 3). Companions: `results/diagonal-formula.md` (the decomposition and
+the enumerated weights), `results/arithmetic-structure.md` (the downstream mod-3
+structure).
 
 ## Statement
 
-**THEOREM.** For every k ≥ 0 there is a polynomial q_k of degree ≤ k with
+**Theorem.** For every k ≥ 0 there is a polynomial q_k of degree ≤ k with
 
 > T(H+k, H) = q_k(H) · 3^H  for ALL H ≥ k+1,
 
@@ -53,7 +53,7 @@ segment. ∎
 ## Step 2 — chain identity
 
 Let y mark surplus and z mark rows, F(y,z) = Σ T(n,H) y^(n−H) z^H. By
-Step 1 every animal decomposes **uniquely** into: an optional bottom-edge
+Step 1 every animal decomposes uniquely into: an optional bottom-edge
 cluster, an alternating chain cut at its walk rows, and an optional top-edge
 cluster — or it is a single pure cluster. Configurations of each piece are
 counted relative to the shared walk cell, so choices multiply, and rows and
@@ -69,17 +69,17 @@ per-order to H = 33 in the checker.
 
 ## Step 3 — row bound and finiteness
 
-Each cluster row carries ≥ 1 surplus, so **ℓ_c ≤ k_c**. At surplus level k
-the catalogue is the 2^(k−1) compositions of k, all weights finite. This is
-the load-bearing triviality (it also drives the mod-3 collapse in
-`results/diagonal-formula.md`).
+Each cluster row carries ≥ 1 surplus, so ℓ_c ≤ k_c. At surplus level k
+the catalogue is the 2^(k−1) compositions of k, all weights finite. This
+small bound carries the degree count of Step 4, and it also drives the mod-3
+collapse in `results/diagonal-formula.md`.
 
 ## Step 4 — rational structure
 
 Extract [y^k] F. Writing σ = S − 3z (every σ-term has y-order ≥ 1),
 (1−S)^(−1) = Σ_m σ^m/(1−3z)^(m+1), and [y^k]σ^m needs m ≤ k. So
 
-> [y^k] F = R_k(z) / (1−3z)^(k+1),  R_k ∈ ℤ[z],  **deg R_k ≤ 2k+1**.
+> [y^k] F = R_k(z) / (1−3z)^(k+1),  R_k ∈ ℤ[z],  deg R_k ≤ 2k+1.
 
 Degree count, using ℓ ≤ k on every piece: an E_b factor at surplus k_b has
 z-degree ≤ k_b+1; an E_t factor ≤ k_t; a σ^m term at surplus k_m has degree
@@ -96,7 +96,7 @@ R_k((1−w)/3) ∈ 3^(−(2k+1))ℤ. Then
 > [y^k] F = Σ_{j<k+1} a_j (1−3z)^(j−k−1) + D(z),
 
 where D = Σ_{j≥k+1} a_j (1−3z)^(j−k−1) is a polynomial of degree
-≤ (2k+1) − (k+1) = k. Taking [z^H] for **H ≥ k+1** (past deg D):
+≤ (2k+1) − (k+1) = k. Taking [z^H] for H ≥ k+1 (past deg D):
 
 > T(H+k, H) = Σ_{i=1}^{k+1} a_{k+1−i} C(H+i−1, i−1) 3^H =: q_k(H) 3^H,
 
@@ -107,8 +107,8 @@ degree bound comes from ℓ ≤ k. ∎
 ## Step 6 — integrality of P_k
 
 P_k(n) = 3^(1+2k) q_k(n−k) = Σ_i 3^(1+2k) a_{k+1−i} C(n−k+i−1, i−1), and
-v₃(a_j) ≥ −(2k+1) with binomials integer, so **P_k(n) ∈ ℤ for every integer
-n**. Equivalently, P_k's coefficients in the Newton (binomial) basis are
+v₃(a_j) ≥ −(2k+1) with binomials integer, so P_k(n) ∈ ℤ for every integer
+n. Equivalently, P_k's coefficients in the Newton (binomial) basis are
 integers — verified numerically at every level k = 1..19 in the formula table.
 
 P_k is integer-*valued*; its monomial coefficients are not integers, the
