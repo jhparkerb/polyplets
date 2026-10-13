@@ -1,6 +1,6 @@
-// libenum — the single-source-of-truth enumeration core (DESIGN §3).
+// libenum — the single-source-of-truth enumeration core.
 //
-// This is the ONLY header workers and gates include; arch_fitness enforces
+// This is the only header workers and gates include; arch_fitness enforces
 // that nothing reaches past this seam into core internals.
 //
 // Exposes:

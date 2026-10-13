@@ -1,6 +1,6 @@
-// profile.h — opt-in phase timers for the workers (Track B; designs/11,12).
+// profile.h — opt-in phase timers for the workers.
 //
-// ALL code here is behind POLY_PROFILE. The production build never defines it,
+// All code here is behind POLY_PROFILE. The production build never defines it,
 // so map_shard_file / mergeRunFiles compile byte-identically without it — zero
 // hot-path overhead. Build a throwaway profiling binary with -DPOLY_PROFILE to
 // get per-phase wall-time + counters appended to $POLY_PROFILE_OUT (one line per

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate G2: the C++ Redelmeier engine vs oracle and fixtures.
 
-Four checks, per implementation-plan.md:
+Four checks:
   A. aggregate counts equal pinned b-files (deeper than G1 can reach)
   B. per-bounding-box histograms equal the G1 oracle exactly
   C. split-mode invariance: the K split workers' outputs sum to the full run

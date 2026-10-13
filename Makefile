@@ -1,8 +1,7 @@
 # Recipes run under bash, explicitly. The `gates` recipe needs `set -o
-# pipefail` to see through its `tee`, and make's default SHELL is /bin/sh --
-# which is dash on Debian and rejects that option outright. It worked on gympie
-# (macOS /bin/sh is bash in sh mode) and broke `make` at step one on a clean
-# Linux clone, 2026-08-19.
+# pipefail` to see through its `tee`, and make's default SHELL is /bin/sh,
+# which is dash on Debian and rejects that option (macOS /bin/sh is bash in sh
+# mode, so the problem only shows on a Linux clone).
 SHELL := /bin/bash
 
 CXX ?= c++
@@ -14,7 +13,7 @@ CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 # from HEAD at all (untracked included), matching Python scripts/obs.py's porcelain check.
 # cpp/obs.h reads these via -D; absent them it falls back to "unknown".
 #
-# Probed ONCE, at the top level, and exported. `make gates` is ~40 nested makes
+# Probed once, at the top level, and exported. `make gates` is ~40 nested makes
 # now (one per gate, so each can be timed), and every Makefile parse used to
 # re-run all of this -- including `git status --porcelain`, a full worktree
 # walk, and two compiler --version probes below. Sub-makes inherit these from
@@ -36,10 +35,10 @@ export RESTRICT_FLAG
 endif
 
 # The Redelmeier kernel (build/g2) is measurably faster built with clang on
-# aarch64: ~9% over gcc-15 on Neoverse-N1 (measured, results/terminal-velocity.md),
-# and gcc PGO / -mcpu gave nothing. Prefer clang for the OPTIMIZED g2 only, per
-# box (clang++-19 on dalby, clang++ on mac/gympie), falling back to $(CXX) where
-# clang is absent (e.g. ayr uses g++). g2_asan stays on $(CXX): keeping the two
+# aarch64: ~9% over gcc-15 on Neoverse-N1 (measured), and gcc PGO / -mcpu
+# gave nothing. Prefer clang for the optimized g2 only, per box (clang++-19
+# where it is versioned, else clang++), falling back to $(CXX) where clang is
+# absent. g2_asan stays on $(CXX): keeping the two
 # builds on different compilers turns gate-g2 check D into a two-compiler count
 # cross-check for free.
 ifeq ($(MAKELEVEL),0)
@@ -65,12 +64,10 @@ endif
 # The Go ones stay: build/ns/orchestrate bakes GIT_REV in at link time on
 # purpose, and go build is cache-backed anyway.
 
-# All currently existing gates.
-# TODO(2026-08-19, from the simplify pass): nothing checks this list is
-# complete.  A `gate-foo:` recipe that never reaches GATE_TARGETS is a check
-# `make gates` does not run, which is the meta-version of the failure two of
-# this week's commits fixed.  A lint wants an allowlist for the deliberate
-# exclusions (papers, install-hooks, compile-commands), so it is its own change.
+# All currently existing gates. A `gate-foo:` recipe that never reaches
+# GATE_TARGETS is a check `make gates` does not run; gate-makefile-wiring
+# below checks the list against the recipes and the scripts, with an allowlist
+# for the deliberate exclusions (papers, install-hooks, compile-commands).
 # Push tier vs deep tier. Several gates re-derive, at full size, a fact that is
 # settled and does not move -- a fold symmetry, a level-6 DP holdout, a hole
 # convention. Those gates take $(GATE_DEEP): empty (the default) runs the push
@@ -84,20 +81,20 @@ GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
-# The gate suite runs the gates CONCURRENTLY: they are independent processes
+# The gate suite runs the gates concurrently: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
 # paths nobody else touches (gate_tma.py: runs/ckpt/gate_holes + runs/ckpt/gate_ih;
-# gate_dir4_perim_alg.py: build/dir4_perim_null199.txt). Measured 2026-08-06 on
-# gympie: 624 s serial -> 467 s at -j10, 16/16 GREEN. Parallelism is scoped to
-# THIS target via a sub-make rather than MAKEFLAGS, deliberately: the ns-gates
+# gate_dir4_perim_alg.py: build/dir4_perim_null199.txt). Measured on a 10-core
+# laptop: 624 s serial -> 467 s at -j10. Parallelism is scoped to
+# this target via a sub-make rather than MAKEFLAGS, deliberately: the ns-gates
 # chain shares fixed scratch paths across targets (/tmp/ns_*, and gate_runfile
 # runs twice under different env in ns-gate-frontier-zstd), so it has not been
 # cleared for -j and must keep inheriting whatever the caller asked for.
 #
-# JOBS defaults to the PERFORMANCE core count on Darwin (10 on gympie, the hard
-# cap per the box's budget), nproc on Linux. Override with `make JOBS=1 gates`
-# to get the old serial run back -- worth doing when a gate goes RED, since 3.81
-# has no --output-sync and concurrent gate output can interleave.
+# JOBS defaults to the performance-core count on Darwin, nproc on Linux.
+# Override with `make JOBS=1 gates` to get a serial run, worth doing when a gate
+# fails, since make 3.81 has no --output-sync and concurrent gate output can
+# interleave.
 ifeq ($(shell uname -s),Darwin)
   JOBS ?= $(shell sysctl -n hw.perflevel0.logicalcpu 2>/dev/null || sysctl -n hw.ncpu)
 else
@@ -105,27 +102,20 @@ else
 endif
 
 # The parallel run keeps its output live, and also lands in build/gates.log so
-# that a RED gate can be NAMED at the end.  make 3.81 -- what macOS ships, and
-# there is no gmake on gympie -- has no --output-sync, so the sub-make's
-# "*** [gate-foo] Error 1" line is printed several hundred lines above the
-# "*** [gates] Error 2" that ends the run.  A pre-push hook failing that way
-# reports nothing usable: this recipe pulls the target names back out.
+# that a failed gate can be named at the end.  make 3.81 (what macOS ships) has
+# no --output-sync, so the sub-make's "*** [gate-foo] Error 1" line is printed
+# several hundred lines above the "*** [gates] Error 2" that ends the run.  A
+# pre-push hook failing that way reports nothing usable: this recipe pulls the
+# target names back out.
 #
-# The bracket has TWO formats and the first version of this knew only one.
-# 3.81 prints "*** [gate-foo] Error 1"; GNU make 4.x -- 4.3 on ayr, 4.4.1 on
-# dalby -- prints "*** [Makefile:2: gate-foo] Error 1", so `\[gate-` matched
-# nothing and a red run on either Linux box printed an EMPTY list of red gates:
-# the very failure this recipe exists to fix, in the same worked-on-gympie-only
-# shape as the SHELL:=/bin/bash line at the top of this file.  The optional
-# "file:line: " prefix is part of the pattern now (POSIX BRE, so BSD and GNU
-# sed both take it), and a run that names no gate says so rather than printing
-# an empty heading -- a red PREREQUISITE ("*** [build/g2]") is named by no
-# gate line at all.
-#
-# A THIRD format now: the targets make runs are timed-gate-foo (see below), so
-# the bracket reads "[timed-gate-foo]" or "[Makefile:2: timed-gate-foo]". The
-# pattern takes any prefix and anchors on the last "gate-" in the bracket, which
-# covers all three. tests/gate_makefile_wiring.py holds it to that.
+# The bracket has three formats.  3.81 prints "*** [gate-foo] Error 1"; GNU
+# make 4.x prints "*** [Makefile:2: gate-foo] Error 1"; and since the targets
+# make runs are timed-gate-foo (see below), the bracket reads "[timed-gate-foo]"
+# or "[Makefile:2: timed-gate-foo]".  The pattern takes any prefix (POSIX BRE,
+# so BSD and GNU sed both take it) and anchors on the last "gate-" in the
+# bracket, which covers all three; tests/gate_makefile_wiring.py holds it to
+# that.  A run that names no gate says so rather than printing an empty
+# heading: a failed prerequisite ("*** [build/g2]") is named by no gate line.
 # Ask make for the value of any variable: `make print-GATE_TARGETS`. Tools that
 # need these lists should read them this way rather than sed the Makefile --
 # which is how scripts/profile_gates.sh broke the day `ns-gate-fast:` grew a
@@ -148,7 +138,7 @@ gates-deep:
 gates-force:
 	$(MAKE) gates FORCE_GATES=1
 
-# Everything the gates need built, built ONCE before the timed run below.
+# Everything the gates need built, built once before the timed run below.
 # The timed run is a sub-make per gate, and two sub-makes that share a binary --
 # build/g2 is a prerequisite of three gates -- would otherwise race to compile
 # it into the same output file. Building them first in a single make process
@@ -165,10 +155,10 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
 
 # --- input gating -----------------------------------------------------------
 # A gate that re-runs when nothing it reads has changed is pure waiting. A gate
-# that does NOT run when something it reads HAS changed is a silent hole, and
-# this repo has been bitten by that twice (the scripts/symcount.py deletion, the
-# four unwired Severance gates). So the default is: every gate runs, every time.
-# A gate is skipped only if it is DECLARED here with the full set of things it
+# that does not run when something it reads has changed is a silent hole, and
+# this repo has had both a deleted script and four unwired depth-table gates go
+# unnoticed that way. So the default is: every gate runs, every time.
+# A gate is skipped only if it is declared here with the full set of things it
 # reads, and its stamp is newer than all of them.
 #
 # Undeclared is the safe state, so forgetting to declare a gate costs time, not
@@ -186,12 +176,11 @@ PAPER_SRC = $(wildcard paper/*.tex paper/*.py paper/*.bib)
 DOCS_SRC  = $(wildcard docs/*.md docs/*/*.md docs/*/*/*.md)
 
 # `go test ./orchestrator/... ./verify/...` reads Go packages and nothing else
-# in this tree -- it has no Makefile prerequisites and builds nothing. 16 s on
-# gympie, serially, on every push including documentation-only ones.
+# in this tree -- it has no Makefile prerequisites and builds nothing. 16 s
+# serially on a laptop, on every push including documentation-only ones.
 DEPS_ns-gate-go             = $(GO_SRC)
-# Everything verify_technical_report.py reads: the stamp was fail-open while it
-# listed paper/ alone (a regenerated provenance table or a changed sweep.go
-# constant stayed green until someone edited the paper; found 2026-10-13).
+# Everything verify_technical_report.py reads, not paper/ alone: a regenerated
+# provenance table or a changed sweep.go constant must re-run it too.
 DEPS_gate-p-paper-verifier  = $(PAPER_SRC) tests/gate_p_paper_verifier.py \
                               scripts/provenance_table.py results/triangle.txt \
                               experiments/cluster_weight_dp.py experiments/depth1_gap_walk.py \
@@ -219,15 +208,13 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/g2 \
                 tests/gate_tma.py tests/common.py \
                 $(FIXTURES) results/holes_n14.txt
-# Every declared gate that reads ANY fixture takes the whole directory. The
+# Every declared gate that reads any fixture takes the whole directory. The
 # module side of a dependency list is computed (check_gate_imports); the data
-# side is hand-written, and naming individual b-files is where it goes wrong --
+# side is hand-written, and naming individual b-files is where it goes wrong:
 # a gate that gains a fixture would skip while that fixture changed. Over-broad
-# is the safe direction, and fixtures/ changes rarely.
-# TODO(2026-08-24): the computed version -- grep each declared script and its
-# imports for fixtures/ and results/ literals, require them in DEPS -- is a
-# third lint of moderate fragility. Same family as the GATE_TARGETS-completeness
-# TODO above.
+# is the safe direction, and fixtures/ changes rarely. A computed version
+# (grep each declared script and its imports for fixtures/ and results/
+# literals, require them in DEPS) would be a third lint and is not written.
 FIXTURES  = $(wildcard fixtures/*)
 
 # Gates whose recipe just runs a binary: the binary IS the input. Make rebuilds
@@ -340,134 +327,110 @@ gates:
 # format hygiene (contiguous n, nonnegative values, no duplicates). A wrong
 # digit in a b-file is the most embarrassing failure available here and nothing
 # re-derived these artifacts before. Three RED controls, each of which must
-# fire, including a term dropped from the MIDDLE (a trailing drop is reported
+# fire, including a term dropped from the middle (a trailing drop is reported
 # as staleness, not failure). ~1 s.
 gate-bfiles:
 	python3 scripts/bfile_gate.py --selftest
 	python3 scripts/bfile_gate.py
 
 # Gate PROVENANCE: results/provenance-table.md is generated, and every headline
-# share it carries is recomputed here from the banked triangle and compared with
-# the note that publishes it. Five notes used to state these figures separately
-# and one pair had already drifted (strip cell coverage vs holdout mass). Also
-# pins the count of cells carrying ONLY the mod-4 congruence: if that grows,
-# something regressed; when Motley reaches H=18 it must shrink, which fires the
-# gate and forces the number to be updated deliberately rather than silently.
-# Motley's reach is derived from the banked C rows and VERIFIED against the
-# triangle (a row that does not assemble caps it, RED control included), and
-# the tower-from-Motley source (tag U, experiments/undertow_ri.py run per row)
-# is a fourth tier, pinned at 192 cells, so "one tower strategy pinned from
-# Motley's data" (AUDIT-2026-09-02 M2/M3) is carried by a check, not prose.
-# Three RED controls (--selftest). ~0.5 s, no build needed.
+# figure it carries is recomputed here from the banked triangle and compared
+# with the note that publishes it (several notes used to state these figures
+# separately, and they drifted). Also pins the count of cells carrying only the
+# mod-4 congruence: if that grows, something regressed; when the coloring
+# recount reaches a new height it must shrink, which fires the gate and forces
+# the number to be updated deliberately rather than silently. The recount's
+# reach is derived from the banked C rows and checked against the triangle (a
+# row that does not assemble caps it), and the tower refitted from the
+# recount's cells (tag U, experiments/undertow_ri.py run per row) is a fourth
+# tier, pinned at 192 cells. Three controls that must fail (--selftest).
+# ~0.5 s, no build needed.
 gate-provenance:
 	python3 scripts/provenance_table.py --selftest
 	python3 scripts/provenance_table.py --check
 
 # Gate RESIDUAL-CELLS: results/residual-cells.md is the one place the "cells
 # that still have one source" figures live, and every restatement of them
-# anywhere in the tree is checked against it -- count AND cell list, which is
-# what gate-provenance did not do.  Written 2026-08-19 after a sweep found four
-# accounts of those figures in four notes, three of them right: TWO quantities
-# were sharing one name (Q1 congruence-only over all 820 cells; Q2 row 40's
-# rule-independence band), and nothing defined either.  A residual claim with no
-# `<!--q:fact=value-->` marker fails; so does a marker that disagrees; so does a
-# scan that matches nothing at all.  15 RED controls (--selftest), one of them
-# for the fail-OPEN that let "**only** the mod-4" past the pattern and one
-# for the hatch accepting a wrong cell LIST.  A fourth trigger shape, "N of 40
-# cells", added 2026-09-05 after results/confidence.md carried "35 of 40 cells
-# ... Now: 40 of 40" past the gate for sixteen days (AUDIT-2026-09-02 M2).
-# 17 RED controls.  ~0.3 s.
+# anywhere in the tree is checked against it, count and cell list.  Two
+# quantities share that name (Q1, congruence-only cells over all 820; Q2, row
+# 40's rule-independence band) and the script defines both.  A residual claim
+# with no `<!--q:fact=value-->` marker fails; so does a marker that disagrees;
+# so does a scan that matches nothing at all.  Trigger shapes include
+# emphasis-wrapped phrases ("**only** the mod-4") and "N of 40 cells".
+# 17 controls that must fail (--selftest).  ~0.3 s.
 gate-residual-cells:
 	python3 scripts/residual_cells.py --selftest
 	python3 scripts/residual_cells.py --check
 
-# Gate CUTCOUNT-ASSEMBLY: Motley's banked rows still make the triangle, and the
-# held-out prime still predicts.  T(n,H) = C_H - 2 C_{H-1} + C_{H-2} over
-# results/cutcount_b1/rows/, 567 cells H=1..18 against results/triangle.txt;
-# then C_18 reconstructed by CRT from four of Confetti's five primes, the fifth
-# predicted (40/40) and the reconstruction tied back to the banked exact row.
-# Written 2026-08-19: the assembly existed only inside a dalby runner `make`
-# never touches, so a corrupted row would have sat in results/ unnoticed, and
-# the 40/40 was the runner's word until the residue rows were banked the same
-# day.  Coverage is pinned as well as agreement -- a dropped row or prime fails
-# rather than shrinking the check.  Three more arms since 2026-09-05
-# (AUDIT-2026-09-02 M3): the Nmax-41 ladder's rows41/ assembled against the
-# triangle (589 cells) and against the kink engine's own Nmax-41 sweep at
-# n = 41 (19 cells -- the two-engine agreement on a(41)'s swept half), and its
-# held-out verdict re-derived at every one of the 19 heights from the 171
-# residue rows banked in residues41/ (779 cells).  16 RED controls.  ~1.5 s.
+# Gate CUTCOUNT-ASSEMBLY: the coloring recount's banked rows still make the
+# triangle, and the held-out prime still predicts.  T(n,H) = C_H - 2 C_{H-1} +
+# C_{H-2} over results/cutcount_b1/rows/, 567 cells H=1..18 against
+# results/triangle.txt; then C_18 reconstructed by CRT from four of the H=18
+# run's five primes, the fifth predicted (40/40) and the reconstruction tied
+# back to the banked exact row.  Coverage is pinned as well as agreement: a
+# dropped row or prime fails rather than shrinking the check.  Three more arms:
+# the Nmax-41 rows41/ assembled against the triangle (589 cells) and against
+# the kink engine's own Nmax-41 sweep at n = 41 (19 cells, the two-engine
+# agreement on a(41)'s swept half), and its held-out verdict re-derived at
+# every one of the 19 heights from the 171 residue rows banked in residues41/
+# (779 cells).  16 controls that must fail.  ~1.5 s.
 gate-cutcount-assembly:
 	python3 scripts/cutcount_assembly_gate.py --selftest
 	python3 scripts/cutcount_assembly_gate.py
 
-# Undertow's 3-power congruence gate (results/undertow-review-A.md B17).  Every
-# below-onset tower cell is an integer, its main term carries 3^-(k+j) and
-# D_j(k)'s denominator divides 3^(k+j) -- verified, not assumed -- so
-# integrality forces a congruence on each defect mod 3^(k+j).  71 banked cells
-# are checked for full equality; the two defects with no banked cell at all,
-# D_1(21) and D_2(21), get their congruence.  It fails closed if that free set
-# empties.  Four RED controls, including one that catches the single-source
-# D_4(21) transitively through the pin it feeds -- for a FRACTIONAL error only.
-# An integer shift of a defect passes (its RED 3, by design), and every error a
-# real family-table entry can carry is an integer shift: gate-undertow-pairs
-# below is what catches those.
-#
+# The below-onset fits' 3-power congruence gate.  Every below-onset tower cell
+# is an integer, its main term carries 3^-(k+j) and D_j(k)'s denominator
+# divides 3^(k+j) (checked, not assumed), so integrality forces a congruence on
+# each defect mod 3^(k+j).  71 banked cells are checked for full equality; the
+# two defects with no banked cell at all, D_1(21) and D_2(21), get their
+# congruence.  It fails if that free set empties.  Four controls that must
+# fail, including one that catches the single-source D_4(21) transitively
+# through the pin it feeds, for a fractional error only.  An integer shift of
+# a defect passes (control 3, by design), and every error a real family-table
+# entry can carry is an integer shift: gate-undertow-pairs below is what
+# catches those.
 gate-undertow-congruence:
 	python3 experiments/undertow_congruence_gate.py --selftest
 	python3 experiments/undertow_congruence_gate.py
 
-# Gate UNDERTOW-PAIRS (AUDIT-2026-09-02 M1).  Level 21 of the a(41) tower had
-# one below-onset pin pair at depths j <= 4 and so no check at its own level;
-# +9 on sig[3][21] of results/severance_w3_families_K22_e3.txt leaves the
-# congruence gate green and moves the depth-4 a(41) by exactly 9 (measured).
-# At depth 5 -- results/severance_w3_families_K21_e4.txt, banked 2026-08-23 and
-# never wired into the assembler -- level 21 has THREE pin pairs through
-# T(38,17), T(39,18), T(40,19), and any single-entry error in that row makes
-# them disagree.  The gate builds the depth-5 tower with the pin cells and pair
-# counts pinned, requires a(41) from results/a41/h*.out plus the tower to equal
-# the banked value, and runs five RED controls, the first being that mutation
-# end to end.  Pure Python over tracked files, ~1 s.
+# Gate UNDERTOW-PAIRS.  Level 21 of the a(41) tower has one below-onset pin
+# pair at depths j <= 4 and so no check at its own level: +9 on sig[3][21] of
+# results/severance_w3_families_K22_e3.txt leaves the congruence gate green and
+# moves the depth-4 a(41) by exactly 9 (measured).  At depth 5
+# (results/severance_w3_families_K21_e4.txt) level 21 has three pin pairs
+# through T(38,17), T(39,18), T(40,19), and any single-entry error in that row
+# makes them disagree.  The gate builds the depth-5 tower with the pin cells
+# and pair counts pinned, requires a(41) from results/a41/h*.out plus the tower
+# to equal the banked value, and runs five controls that must fail, the first
+# being that mutation end to end.  Pure Python over tracked files, ~1 s.
 gate-undertow-pairs:
 	python3 experiments/undertow_pairs_gate.py --selftest
 	python3 experiments/undertow_pairs_gate.py
 
-# Gate KINK-ORACLE (AUDIT-2026-09-02, a(23)..a(35)).  The kink-carry kernel
-# produced a(30)..a(41)'s swept half, and its only in-make oracle coverage was
-# the maxn-14 sweeps where the wired diagonals inject every H >= 8 -- so the
-# kernel itself was checked at H <= 7.  --max-diag-k 0 disables the injection
-# (orchestrator/maxdiagk_test.go).  Two all-real sweeps: kink at maxn 18, row
-# sums against the externally published a(1..18) of fixtures/b006770.txt (the
-# whole known sequence, every height enumerated); and kink vs column at maxn
-# 16, per-height rows byte-identical.  Both comparisons are done by the script
-# from h<H>.out, not read off the orchestrator's --compare line.  Measured on
-# gympie 2026-09-05: kink 18 = 68 s at 8 cores / 90 MB, column 16 = 101 s at
-# 4 cores / 300 MB, kink 16 = 0.7 s; the recipe runs at 4 cores.  Declared, so
-# it is skipped while the binaries and inputs are unchanged.  4 RED controls.
+# Gate KINK-ORACLE.  The kink-carry kernel produced a(30)..a(41)'s swept half,
+# and the maxn-14 sweeps elsewhere in this file let the wired diagonals inject
+# every H >= 8, so they check the kernel itself only at H <= 7.  --max-diag-k 0
+# disables the injection (orchestrator/maxdiagk_test.go).  Two all-real
+# sweeps: kink at maxn 18, row sums against the externally published a(1..18)
+# of fixtures/b006770.txt (the whole known sequence, every height enumerated);
+# and kink vs column at maxn 16, per-height rows byte-identical.  Both
+# comparisons are done by the script from h<H>.out, not read off the
+# orchestrator's --compare line.  Measured on a 10-core laptop: kink 18 = 68 s
+# at 8 cores / 90 MB, column 16 = 101 s at 4 cores / 300 MB, kink 16 = 0.7 s;
+# the recipe runs at 4 cores.  Declared, so it is skipped while the binaries
+# and inputs are unchanged.  4 controls that must fail.
 gate-kink-oracle: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	python3 tests/gate_kink_oracle.py --selftest
 	python3 tests/gate_kink_oracle.py
 
-# The Severance gate family (W1, W2, W3, and W3 at depth 5).  These four were
-# outside GATE_TARGETS until 2026-08-24 -- successor row S-A5 in
-# results/undertow-review-queue.md, which asked for the decision to be made for
-# the family rather than per-file.  It is made here: all four are wired.
-#
-# The one that had a real reason to stay out was the depth-5 gate, written
-# red-first and correctly exiting 1 until a severance_w3_families_K>=19_e4
-# table existed.  That table landed 2026-08-23 and the gate is green
-# (results/depth5-gate-green.md), so the reason is spent.  The other three had
-# no reason beyond nobody having wired them, which is exactly the failure the
-# GATE_TARGETS comment above warns about: a gate-foo: recipe that never reaches
-# GATE_TARGETS is a check `make gates` does not run.
-#
-# Each recipe runs the RED control first and the production check second, so a
-# gate that has quietly stopped being able to fail is caught before its green
-# is believed.  Measured on gympie 2026-08-24, production run: W1 219 s,
-# W2 69 s, W3 0.1 s, depth 5 0.1 s.  W1 is the only slow one and it is well
-# inside the suite's parallel critical path, so wiring these does not move the
-# `make gates` wall.  They are separate targets rather than one gate-severance
-# so that -j schedules them independently and a RED one gets NAMED by the
-# recipe at the end of `gates`.
+# The depth-table gates (W1, W2, W3, and W3 at depth 5).  Each recipe runs the
+# control that must fail first and the production check second, so a gate that
+# has quietly stopped being able to fail is caught before its pass is believed.
+# Production run on a 10-core laptop: W1 219 s, W2 69 s, W3 0.1 s, depth 5
+# 0.1 s.  W1 is the only slow one and it is well inside the suite's parallel
+# critical path.  They are separate targets rather than one gate-severance so
+# that -j schedules them independently and a failed one is named by the recipe
+# at the end of `gates`.
 gate-severance-w1:
 	python3 experiments/severance_w1_gate.py --selftest
 	python3 experiments/severance_w1_gate.py $(GATE_DEEP)
@@ -486,36 +449,27 @@ gate-severance-depth5:
 
 # Gate MODP: the R3 u32 mod-p sweep.  CRT of sum_H B_H(n) mod p_i over three
 # primes must equal the exact a(n) from build/tma, both unfolded and under
-# --fold (the R1xR3 composition).  Written 2026-08 and referenced by
-# docs/engine-design.md and results/r4/r4-a.md, but never wired -- it was found
-# by gate-makefile-wiring below, green and unrun since August.  ~31 s.
+# --fold (the R1xR3 composition).  ~31 s.
 gate-modp: build/tma build/tma_modp_test
 	python3 tests/gate_modp.py $(GATE_DEEP)
 
-# The mod-p test engine. It used to be compiled INSIDE tests/gate_modp.py, with
-# a subprocess c++ call on every single run -- so every push paid an -O3 build
-# of it whether or not anything it depends on had changed. As a make target it
-# is built once and then skipped, and its rebuild is triggered by the right
-# thing (its own source and the headers it includes).
+# The mod-p test engine. As a make target (rather than a subprocess c++ call
+# inside tests/gate_modp.py) it is built once and then skipped, and its rebuild
+# is triggered by its own source and the headers it includes.
 build/tma_modp_test: cpp/tma_modp_test.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread $< -o $@
 
-# Gate MOTLEY-CRT: scripts/motley_crt.py was extracted out of a runner heredoc
-# precisely because a heredoc is code `make` never touches -- and then its own
-# --selftest sat in exactly the same position, run by nothing. It reconstructs
-# C_18 from the banked residues, requires it to equal the banked row exactly,
-# and holds out a prime as a RED control. Every input is tracked and it is
-# 0.03 s (dalby, 2026-08-24), so there is no reason for it to be by-hand.
+# Gate MOTLEY-CRT: scripts/motley_crt.py reconstructs C_18 from the banked
+# residues, requires it to equal the banked row exactly, and holds out a prime
+# as a control that must fail. Every input is tracked and it is 0.03 s.
 gate-motley-crt:
 	python3 scripts/motley_crt.py --selftest
 
 # Gate MAKEFILE-WIRING: the lint the GATE_TARGETS comment above asks for.
-# It checks TWO surfaces.  Recipe-vs-GATE_TARGETS is the obvious one.  The
-# other -- script-vs-Makefile -- is the one that actually bit us: the four
-# Severance gates above had no recipe AT ALL, so a recipe-level check sees a
-# consistent Makefile and passes.  Verified against the pre-fix tree: the
-# recipe surface alone reports nothing on it.  The script surface reports all
-# four, and turned up gate-modp as a fifth.
+# It checks two surfaces.  Recipe-vs-GATE_TARGETS is the obvious one.  The
+# other, script-vs-Makefile, catches a gate script with no recipe at all, which
+# a recipe-level check cannot see (the four depth-table gates above and
+# gate-modp were once in that state).
 #
 # Both surfaces have an allowlist carrying a written reason per entry, and both
 # are red on a stale entry or on an excuse for something now wired, so an
@@ -541,9 +495,9 @@ gate-perimeter-defect: build/perimeter_defect build/g2
 # census -- a different search entirely. A hypothesis violation shows up as a
 # missing animal. Includes a RED control.
 #
-# The "~2 s" this comment used to claim was the three census cross-checks, which
-# really are ~1 s together. The gate measured 417 s (dalby, 2026-08-24): check
-# E's W=13 second-source case, run twice. See the script.
+# The three census cross-checks are ~1 s together; the gate measures 417 s
+# on an 80-core ARM server because of check E's W=13 second-source case, run
+# twice. See the script.
 gate-perimeter-min: build/perimeter_min build/g2
 	./scripts/perimeter_min_gate.sh $(GATE_DEEP)
 
@@ -579,9 +533,8 @@ gate-citations:
 	python3 tests/gate_citations.py
 
 # Gate NO-COPYRIGHT-PDFS: no PDF is tracked at all.  .gitignore's first rule is
-# "copyrighted papers stay local, never pushed" and until 2026-08-19 nothing
-# enforced it -- the only check was a printed line in scripts/clean_clone_check.sh,
-# a runner make never touches, which set no exit code.  Sub-second, git only.
+# "copyrighted papers stay local, never pushed"; this enforces it with an exit
+# code (scripts/clean_clone_check.sh only prints).  Sub-second, git only.
 gate-no-copyright-pdfs:
 	python3 tests/gate_no_copyright_pdfs.py
 
@@ -595,11 +548,11 @@ gate-docs-index:
 # Gate L-PAPER-VERIFIER: mutation-tests paper/verify_l_papers.py, which is the
 # only thing standing between the L manuscripts and a wrong printed number.
 #
-# It exists because that verifier asserted "the paper prints X" with
-# `str(X) in src` -- substring containment -- at three sites, and on 2026-08-07
-# six of twelve deliberate manuscript corruptions went undetected, wrong-digit
-# typos among them. It carried thirteen RED controls and not one of them was on
-# a text assertion, so nothing ever established that those checks could fail.
+# It exists because a verifier that asserts "the paper prints X" with
+# `str(X) in src` (substring containment) lets wrong-digit typos through: an
+# earlier version of this one missed six of twelve deliberate manuscript
+# corruptions, and none of its own controls was on a text assertion, so
+# nothing had established that those checks could fail.
 #
 # A verifier is trusted silently by everything downstream of it, so it is held
 # to a higher standard than the papers it protects, not a lower one. This gate
@@ -643,17 +596,16 @@ build/g2: cpp/g2_redelmeier.cpp | build
 
 # Defect-pruned Redelmeier for the site-perimeter grading. Separate binary
 # because the prune changes the search, not the bookkeeping, and it needs
-# NMAX far past g2's 40 (docs/perimeter-defect-plan.md, Task B).
+# NMAX far past g2's 40.
 build/perimeter_defect: cpp/perimeter_defect.cpp cpp/obs.h | build
 	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
 
 # Minimum-perimeter (isoperimetric-end) enumerator. Complementation, not
 # growth: the min-side defect is not monotone under cell addition, so
 # Exhaustive minimal-site-perimeter census for king animals: eps(n), |M_n|,
-# and the (|B|, c=|P|-|B|) split, n<=25. Written 2026-08-13 for the
-# Barequet--Ben-Shachar constant-isomer premise check; the measured failure
-# of their Premise 2 (c=9 at inflation-chain roots, 8 elsewhere) and the
-# 9/9 |M_n|=|M_{n+eps}| match live in the reading-pass record.
+# and the (|B|, c=|P|-|B|) split, n<=25. Written for the Barequet--Ben-Shachar
+# constant-isomer premise check; their Premise 2 fails here (c=9 at
+# inflation-chain roots, 8 elsewhere) and |M_n|=|M_{n+eps}| holds 9/9.
 build/kingperim: cpp/kingperim.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
@@ -670,40 +622,36 @@ build/perimeter_min: cpp/perimeter_min.cpp cpp/obs.h | build
 # H<=14). -std=c++17 and no $(CXXFLAGS) deliberately: mirrors the build line
 # in scripts/run_strip_h14.sh exactly, so the gate binary and the production
 # run binary are the same program built the same way.
-# results/strip-engine.md's "Reproduce" section documented this target before
-# it existed (AUDIT-2026-07-30 S7).
 build/strip_tm: cpp/strip_tm.cpp | build
 	$(CXX) -O3 -std=c++17 $< -o $@
 
 # Strip growth-constant engines (mu_H, the rigorous lambda lower-bound ladder).
-# strip_mu_cert is the CERTIFICATE tool: float power iteration to locate x*, then
+# strip_mu_cert is the certificate tool: float power iteration to locate x*, then
 # an exact unsigned-__int128 Collatz-Wielandt check that promotes mu_H to a
-# machine-checkable rational. Since 2026-07-31 both phases drive the frozen
-# stage operators of cpp/strip_stage_ops.h (~240x at H=11/12), so that header is
+# machine-checkable rational. Both phases drive the frozen stage operators of
+# cpp/strip_stage_ops.h (~240x at H=11/12), so that header is
 # a dependency here as well as under build/strip_mu_fast. -I. for core/ and
 # cpp/obs.h rides the quoted include.
 build/strip_mu: cpp/strip_mu.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
-# motley_par: the PARALLEL Motley engine (results/motley-par/README.md).  Same
-# frozen rule core as results/cutcount_b1/cutcount_b1.cpp.59e90660; the
+# motley_par: the parallel coloring-recount engine (results/motley-par/README.md).
+# Same frozen rule core as results/cutcount_b1/cutcount_b1.cpp.59e90660; the
 # parallelism, the flat arena and the chunked release are accounting.  -fopenmp
 # is not optional -- the cell-step is an OpenMP loop -- and scripts/
 # gen_compile_commands.sh mirrors that so clangd and gate-compile-db agree.
 build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O2 -fopenmp -o $@ $<
 
-# Gate the parallel engine against the BANKED exact C_H rows at three payload
+# Gate the parallel engine against the banked exact C_H rows at three payload
 # widths, byte-identically against cutcount_b1, and for thread-count
 # determinism.
 #
-# Wired NOWHERE, and this comment used to claim it "lives with the ns-gates",
-# which was not true -- ns-gates has never listed it. The real reason is
-# -fopenmp: build/motley_par does not compile on gympie (Apple clang, no
-# libomp by default) or on dalby (no omp.h), so putting it in any automatic
-# chain would make that chain fail on two of the three boxes. It runs on ayr,
-# by hand: `make gate-motley-par`. Verified green there 2026-08-24 -- 1200
-# cell-comparisons over H=1..10, both RED controls firing.
+# Not in any automatic chain, because of -fopenmp: build/motley_par does not
+# compile under Apple clang without libomp, or on a box with no omp.h, so a
+# chain containing it would fail there. Run by hand where OpenMP is present:
+# `make gate-motley-par` (1200 cell-comparisons over H=1..10, both controls
+# that must fail firing).
 gate-motley-par: build/motley_par
 	python3 tests/gate_motley_par.py --selftest
 	python3 tests/gate_motley_par.py 10
@@ -715,7 +663,7 @@ build/strip_mu_cert: cpp/strip_mu_cert.cpp cpp/strip_stage_ops.h cpp/obs.h \
                      core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
 
-# strip_mu_fast is the INDEXED-ARRAY engine: the same cell-at-a-time kink sweep,
+# strip_mu_fast is the indexed-array engine: the same cell-at-a-time kink sweep,
 # with the per-stage state graph enumerated once and frozen into int32 successor
 # arrays (cpp/strip_stage_ops.h), so a matvec is a flat scatter instead of a
 # hash-map rebuild. ~200x strip_mu_kink at H=11 (results/strip-mu-fast.md). The
@@ -724,9 +672,9 @@ build/strip_mu_fast: cpp/strip_mu_fast.cpp cpp/strip_stage_ops.h cpp/obs.h \
                      core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
 
-# Gate strip-fast: the fast engine against BOTH the map engine (same mu_H, same
-# state counts, H<=8) and the published certificates (the exact kernel must PASS
-# the certified numerator and FAIL numerator+1). RED arms are in --selftest: a
+# Gate strip-fast: the fast engine against both the map engine (same mu_H, same
+# state counts, H<=8) and the published certificates (the exact kernel must pass
+# the certified numerator and fail numerator+1). RED arms are in --selftest: a
 # corrupted transition table and a corrupted finalize map must both move mu_6,
 # and an over-claim or an all-zero vector must be refused. ~10 s.
 gate-strip-fast: build/strip_mu_fast build/strip_mu_kink
@@ -825,35 +773,35 @@ gate-e0: build/subgraph_count
 build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
-# Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form
-# (results/directed-cone-anchor.md). Also the docs/middle-kingdom-plan.md Phase 0
-# 16-cell grid mode ("grid"/"gridbad") and Phase 1c's multi-directed filter
-# ("mdir"/"mdirbad", results/multi-directed.md). -Icpp for obs.h.
+# Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form.
+# Also the 16-cell directedness grid mode ("grid"/"gridbad") and the
+# multi-directed filter ("mdir"/"mdirbad"); both in results/subclasses.md.
+# -Icpp for obs.h.
 build/directed_cone_anchor: cpp/directed_cone_anchor.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread -Icpp $< -o $@
 
-# Gate KING-GRID: docs/middle-kingdom-plan.md Phase 0 -- the 16-cell grid mode
-# vs the plan's reference table + RED controls (existing + gridbad staircase).
+# Gate KING-GRID: the 16-cell directedness grid mode vs its reference table,
+# plus controls that must fail (existing + gridbad staircase).
 gate-king-grid: build/directed_cone_anchor
 	python3 tests/gate_king_grid.py $(GATE_DEEP)
 
-# Gate SITE-PERIM: docs/middle-kingdom-followups-plan.md Phase 4a -- the
-# grid-mode min-reduce of site perimeter (KING adjacency, minSPKing) vs the
-# 4k+4 perfect-square hand check and an independent oracle (build/g2's
-# square8 lattice, same population/convention, different code), plus the
-# rook-adjacency RED control (minSPRook) which must diverge.
+# Gate SITE-PERIM: the grid-mode min-reduce of site perimeter (king
+# adjacency, minSPKing) vs the 4k+4 perfect-square hand check and an
+# independent oracle (build/g2's square8 lattice, same population/convention,
+# different code), plus the rook-adjacency control (minSPRook) which must
+# diverge.
 gate-site-perim: build/directed_cone_anchor build/g2
 	python3 tests/gate_site_perim.py
 
-# Gate MULTIDIRECTED: docs/middle-kingdom-plan.md Phase 1c -- Bacher's
-# Definition 2 brute force ("mdir") vs the Theorem 8 generating function, plus
-# the RED controls (keystone condition dropped; "control B") and the
-# 6.4752-not-6.118 growth-constant trap. results/multi-directed.md.
+# Gate MULTIDIRECTED: Bacher's Definition 2 brute force ("mdir") vs the
+# Theorem 8 generating function, plus the controls that must fail (keystone
+# condition dropped; "control B") and the 6.4752-not-6.118 growth-constant
+# trap. results/subclasses.md.
 gate-multidirected: build/directed_cone_anchor
 	python3 tests/gate_multidirected.py $(GATE_DEEP)
 
 # GMP (mpz_class/gmpxx): headers live in /usr/include on Linux, /opt/local on
-# macOS/MacPorts. AUTO-DETECTED same as zstd above -- if the dev header is
+# macOS/MacPorts. Auto-detected same as zstd above -- if the dev header is
 # absent, convex_area_tm is skipped rather than failing the whole `make`.
 ifeq ($(shell uname -s),Darwin)
   GMP_HDR := /opt/local/include/gmpxx.h
@@ -876,44 +824,44 @@ else
 endif
 
 # HV-convex-by-area transfer matrix, C++/GMP port of experiments/convex_tm.py
-# (docs/middle-kingdom-plan.md Phase 1a -- Python's N^4-DP-steps x N-digit-bigint
-# cost is too slow past n~200; this is a straight translation onto mpz_class).
+# (Python's N^4-DP-steps x N-digit-bigint cost is too slow past n~200; this is
+# a straight translation onto mpz_class).
 ifneq ($(GMP_LDFLAGS),)
 build/convex_area_tm: cpp/convex_area_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 
 # HV-convex-by-semiperimeter exact-box transfer matrix, C++/GMP port of
-# experiments/convex_perimeter.py (docs/middle-kingdom-plan.md Phase 1b).
+# experiments/convex_perimeter.py.
 build/convex_perim_tm: cpp/convex_perim_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 
-# Column transfer matrix for the column-convex cells of the Phase 3 grid
-# (docs/middle-kingdom-plan.md, results/middle-kingdom-phase3.md): directedness
-# on a column-convex animal is a condition on the bottom profile alone.
+# Column transfer matrix for the column-convex cells of the directedness grid
+# (results/subclasses.md): directedness on a column-convex animal is a
+# condition on the bottom profile alone.
 build/middle_kingdom_tm: cpp/middle_kingdom_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 endif
 
-# Gate MIDDLE-KINGDOM: docs/middle-kingdom-plan.md Phase 3 -- the column
-# transfer matrix for every column-convex grid cell vs Phase 0's brute-force
-# 16-cell table, the A187077/A007052/convex-polyplet positive controls, and
-# the loosened-predicate RED controls. Needs GMP; skipped without it.
+# Gate MIDDLE-KINGDOM: the column transfer matrix for every column-convex
+# grid cell vs the brute-force 16-cell table, the A187077/A007052/
+# convex-polyplet positive controls, and the loosened-predicate controls that
+# must fail. Needs GMP; skipped without it.
 gate-middle-kingdom: $(if $(GMP_LDFLAGS),build/middle_kingdom_tm)
 	python3 tests/gate_middle_kingdom.py
 
 # P-recurrence / algebraic-relation exclusion mod p (no GMP: the series terms
-# are reduced mod p on the way in). docs/middle-kingdom-plan.md Phase 2a.
+# are reduced mod p on the way in).
 build/prec_guess: cpp/prec_guess.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
 
 # Cluster-weight row-transfer DP, C++ port of experiments/cluster_weight_dp.py
-# (Severance W1, docs/onset-defect-severance-plan.md section 3): the ab-initio
-# interior/boundary/pure weights per composition, levels k = 1..K.
+# (the depth tables' W1 stage): the ab-initio interior/boundary/pure weights
+# per composition, levels k = 1..K.
 build/severance_w1: cpp/severance_w1.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
 
 # Bounded-excess cluster-weight families, C++ port of the row-transfer DP in
-# experiments/severance_w3_depths.py (Severance W3): the aggregated interior /
+# experiments/severance_w3_depths.py (the depth tables' W3 stage): the aggregated interior /
 # bottom-edge / pure series by (excess e, surplus k). Feeds the cached table
 # results/severance_w3_families_K19_e3.txt that unblocks depth j = 4.
 build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
@@ -950,34 +898,27 @@ lean:
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
-# constants. Deliberately does NOT depend on build/convex_area_tm (GMP is
+# constants. Deliberately does not depend on build/convex_area_tm (GMP is
 # optional here): the series files are in the tree, and the gate skips only
 # the transfer-matrix oracle when GMP is absent. ~4 s.
 gate-convex-dfinite: build/prec_guess
 	python3 tests/gate_convex_dfinite.py
 
-# Gate MK-DIR4-PERIM: docs/middle-kingdom-followups-plan.md Phase 2a -- the
-# dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
+# Gate MK-DIR4-PERIM: the dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
 # filtered to half-plane-4-cone-directed, Proposition 2 of
-# results/middle-kingdom-phase3.md translated onto the row-built transfer
-# matrix) vs directed_cone_anchor's "gridperim" brute force, the RED control
-# (dir4bad, the plan's own "non-strict decrease" example), and the termwise
-# dir4<=hv sanity check. Needs GMP for convex_perim_tm; skipped without it.
-# Unlike its two siblings this gate has NO banked-series fallback -- every check
-# in it needs a fresh convex_perim_tm run. Without GMP it would print one skip
-# line and return 0, so `make gates` reported a green gate that verified
-# nothing. Say so loudly instead; the aggregate still passes, but not quietly.
-# Always runs the gate script, even without GMP.  Until 2026-08-22 the no-GMP
-# branch was a bare `echo` and `make` exited 0, so this was the one gate that
-# could decline to run and still leave the suite green
-# (results/gate-class-sweep.md, finding F3).  The script now records the absent
-# binary as a SKIPPED CHECK and fails on it, waivable with
-# POLY_ALLOW_DEGRADED_GATES=1.
+# results/subclasses.md translated onto the row-built transfer matrix) vs
+# directed_cone_anchor's "gridperim" brute force, the control that must fail
+# (dir4bad, the "non-strict decrease" example), and the termwise dir4<=hv
+# sanity check. Needs GMP for convex_perim_tm.  Unlike its two siblings this
+# gate has no banked-series fallback: every check in it needs a fresh
+# convex_perim_tm run, so without GMP it would verify nothing.  The script
+# therefore always runs, records the absent binary as a skipped check and
+# fails on it, waivable with POLY_ALLOW_DEGRADED_GATES=1.
 gate-mk-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/directed_cone_anchor
 	python3 tests/gate_mk_dir4_perim.py
 
-# Gate DIR4-PERIM-ALG: docs/middle-kingdom-followups-plan.md Phase 2b -- the
-# (dir4, HV-convex)-by-semiperimeter generating function is ALGEBRAIC of
+# Gate DIR4-PERIM-ALG: the (dir4, HV-convex)-by-semiperimeter generating
+# function is algebraic of
 # degree 4 (results/convex-polyplets.md). Pins the quartic coefficient for
 # coefficient, its minimality in both directions, the nullity law a genuine
 # minimal relation obeys, and the negative/null controls that keep the
@@ -1002,8 +943,8 @@ NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
 # zstd spill compression (POLY_ZSTD): the map/merge workers compress internal
 # spill files. libzstd headers live in /usr/include on Linux and /opt/local on
 # macOS/MacPorts. Only the C++ workers link it (orchestrate is Go and never
-# touches libzstd). AUTO-DETECTED: if the dev header is absent (e.g. ayr, which
-# has libzstd runtime but not -dev), POLY_ZSTD is left off and spill files are
+# touches libzstd). Auto-detected: if the dev header is absent (a box with the
+# libzstd runtime but not -dev), POLY_ZSTD is left off and spill files are
 # written plain (see core/runfile.h) — the build still compiles cleanly.
 ifeq ($(shell uname -s),Darwin)
   ZSTD_HDR := /opt/local/include/zstd.h
@@ -1032,19 +973,18 @@ build/ns:
 
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
-# regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
+# regression in those paths can't rot undetected.
 # gate-g2 is included so the g2 Redelmeier oracle (the independent cross-check
 # for T(n,H) and the polyplet totals) has an automatic correctness gate: its hot
 # kernel took a burst of perf work (L1..L4, dropped reachedUndo) with no routine
 # gate covering it — a miscount would otherwise rely on a dev running `make gates`.
 ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2
 
-# Diagonal-pin audit gate (AUDIT-2026-07-30 D4): re-derives nothing, but
-# fail-closed checks every wired P_k (k=1..19) against every REAL-swept
-# in-onset cell of results/triangle.txt (H <= 21), re-interpolates the levels
-# real data alone pins, and prints the per-term conditionality decomposition
-# for n=29..40 — the project's circularity map. Wired here so it cannot rot
-# again: it had been silently exiting on a parse error since P_17 was wired.
+# Diagonal-pin gate: re-derives nothing, but checks every wired P_k (k=1..19)
+# against every real-swept in-onset cell of results/triangle.txt (H <= 21),
+# re-interpolates the levels real data alone pins, and prints the per-term
+# conditionality decomposition for n=29..40, the project's circularity map.
+# Wired here so a parse error cannot leave it silently unrun.
 ns-gate-diag-pins:
 	python3 scripts/verify_diagonal_pins.py
 
@@ -1119,7 +1059,7 @@ ns-gate-run: build/ns/gate_run
 build/ns/gate_run: tests/engine/gate_run.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
-# Kink-carry stage kernel gate (Design 14 Phase 1): map_shard_stage (core/kink.h)
+# Kink-carry stage kernel gate: map_shard_stage (core/kink.h)
 # vs ground truth (unwindowed kinkStageTransition) + shard-invariance.
 ns-gate-kink: build/ns/gate_kink
 	./build/ns/gate_kink
@@ -1127,7 +1067,7 @@ ns-gate-kink: build/ns/gate_kink
 build/ns/gate_kink: tests/engine/gate_kink.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
-# Kink-carry column-boundary gate (Design 14 Phase 2.2): kinkSeedStage0 +
+# Kink-carry column-boundary gate: kinkSeedStage0 +
 # kinkFinalizeColumn (core/kink_column.h) vs ground truth (unwindowed,
 # no map_shard_stage windowing involved).
 ns-gate-kink-column: build/ns/gate_kink_column
@@ -1136,7 +1076,7 @@ ns-gate-kink-column: build/ns/gate_kink_column
 build/ns/gate_kink_column: tests/engine/gate_kink_column.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
-# Kink-carry file-backed stage gate (Design 14 Phase 2.3): map_shard_stage_file
+# Kink-carry file-backed stage gate: map_shard_stage_file
 # (core/kink.h) byte-matches the in-RAM map_shard_stage, both direct-write
 # and forced-spill.
 ns-gate-kink-stage-file: build/ns/gate_kink_stage_file
@@ -1145,7 +1085,7 @@ ns-gate-kink-stage-file: build/ns/gate_kink_stage_file
 build/ns/gate_kink_stage_file: tests/engine/gate_kink_stage_file.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
-# Kink-carry map_worker CLI gate (Design 14 Phase 2.4): drives the REAL
+# Kink-carry map_worker CLI gate: drives the real
 # compiled map_worker binary through --kernel kink --stage seed/<r>/finalize
 # for one column and byte-matches --kernel column on the same input.
 ns-gate-kink-worker-cli: build/ns/gate_kink_worker_cli build/ns/map_worker
@@ -1154,8 +1094,8 @@ ns-gate-kink-worker-cli: build/ns/gate_kink_worker_cli build/ns/map_worker
 build/ns/gate_kink_worker_cli: tests/engine/gate_kink_worker_cli.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
-# Persistent-worker gate (Bottleneck #5): drives map_worker --persistent
-# through a full kink seed/stage/finalize chain over ONE process (stdin-fed
+# Persistent-worker gate: drives map_worker --persistent
+# through a full kink seed/stage/finalize chain over one process (stdin-fed
 # requests) and byte-matches the column-kernel one-shot path; also checks
 # two independent columns replayed through one process don't bleed state.
 ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker build/ns/merge_worker
@@ -1181,7 +1121,7 @@ build/ns/gate_runfile: tests/engine/gate_runfile.cpp $(NS_HEADERS) | build/ns
 # frontier compression ON at the default frame size AND at a deliberately tiny
 # non-power-of-two frame (7 records: many frames, frame boundaries landing
 # mid-index-stride, exercising the seek-into-frame path hard), then the
-# kink-vs-column sweep equivalence through the REAL worker binaries with
+# kink-vs-column sweep equivalence through the real worker binaries with
 # compression on.
 ns-gate-frontier-zstd: build/ns/gate_runfile build/ns/gate_kink_stage_file build/ns/map_worker build/ns/merge_worker
 	POLY_FRONTIER_ZSTD=1 ./build/ns/gate_runfile
@@ -1273,7 +1213,7 @@ build/ns/predict: orchestrator/cmd/predict/main.go orchestrator/*.go | build/ns
 build/ns/combine: orchestrator/cmd/combine/main.go orchestrator/*.go | build/ns
 	go build -o $@ ./orchestrator/cmd/combine/
 
-# AC-2a: parallel (cores=4) == serial (cores=1) for n≤14
+# Parallel (cores=4) == serial (cores=1) for n≤14
 ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	rm -rf /tmp/ns_m2_parallel && mkdir -p /tmp/ns_m2_parallel/spill
 	./build/ns/orchestrate --maxn 14 --cores 4 --ram 67108864 \
@@ -1295,7 +1235,7 @@ ns-gate-split: build/ns/orchestrate build/ns/combine build/ns/map_worker build/n
 	    --run-dir /tmp/ns_split/B --spill-dir /tmp/ns_split/B/spill --checkpoint /tmp/ns_split/B/CK --checkpoint-every 0
 	./build/ns/combine --in /tmp/ns_split/outA,/tmp/ns_split/outB --maxn 14 --compare --require-cover
 
-# AC-2b: resume from EVERY checkpoint boundary reproduces the serial result.
+# Resume from every checkpoint boundary reproduces the serial result.
 # Exhaustive (not random): the test enumerates each (H,col) checkpoint, cancels
 # there via an in-package test seam, resumes, and compares. See resume_test.go.
 # TestKinkResumeMidColumn additionally covers a MID-column kill on the kink
@@ -1359,8 +1299,8 @@ ns-gate-resume:
 #   make paper-L3-lambda-bounds   one, by file stem
 #   make papers-verify       the numeric verifiers over the manuscripts
 #
-# Deliberately NOT in GATE_TARGETS: `make gates` must stay runnable on a box
-# with no TeX installed (dalby and ayr are compute boxes and have none).
+# Deliberately not in GATE_TARGETS: `make gates` must stay runnable on a box
+# with no TeX installed (the compute boxes have none).
 papers:
 	@$(MAKE) --no-print-directory -C paper
 

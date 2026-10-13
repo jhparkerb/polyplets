@@ -6,10 +6,10 @@
 //               [--checkpoint-every SECS] [--resume] [--compare]
 //               [--workers-dir DIR]
 //
-// AC-2 gate (parallel == serial):
+// Parallel == serial check:
 //   orchestrate --maxn 16 --compare
 //
-// AC-2 gate (kill+resume):
+// Kill+resume check:
 //   orchestrate --maxn 16 --compare   # kill with SIGTERM mid-run
 //   orchestrate --maxn 16 --resume --compare  # resumes from checkpoint
 package main
@@ -41,7 +41,7 @@ func main() {
 		debug.SetGCPercent(1000)
 	}
 	// ...but GOGC is a RATIO with no ceiling, which is how the orchestrator
-	// reached 4.4 GB RSS and climbing as an OOM contributor (O6; no leak was
+	// reached 4.4 GB RSS and climbing as an OOM contributor (no leak was
 	// found). The soft memory limit bounds what that ratio can cost.
 	if _, err := orchestrator.ApplyGoMemoryLimit(); err != nil {
 		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
@@ -235,7 +235,7 @@ func main() {
 	}
 
 	// Diagnostic only (POLY_MEMPROFILE=path): root-causing the GC-churn finding
-	// in docs/engine-record.md Bottleneck #3 -- GOGC=1000 masks
+	// in docs/engine-record.md -- GOGC=1000 masks
 	// frequent collection but doesn't explain WHY the allocation rate is high
 	// enough to trigger ~26 GCs/sec against an 8MB heap goal in the first
 	// place. runtime.GC() forces a final collection first so the profile

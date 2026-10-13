@@ -35,9 +35,9 @@ def read_terms_file(path):
     return vals
 
 
-# TODO(2026-09-05, /simplify): gate_g2, gate_holes, gate_modp and gate_tma each
-# grew their own guard against an engine that prints nothing or dies after
-# printing (AUDIT-2026-09-02, gate hygiene).  The shared fix is for run() to
+# TODO: gate_g2, gate_holes, gate_modp and gate_tma each grew their own guard
+# against an engine that prints nothing or dies after printing.  The shared
+# fix is for run() to
 # refuse empty stdout and parse_counts() an empty table, with gate_holes moved
 # onto run().  Deferred: it changes every gate's contract in one edit.
 def run(binary, *args):
@@ -55,13 +55,13 @@ def run(binary, *args):
 
 # Background engine runs. A gate is a chain of independent engine invocations
 # scored in printed order, and the long ones dominate: gate_tma's three full
-# square8 n<=14 sweeps are 365 s of its 429 s (measured 2026-08-06, gympie).
+# square8 n<=14 sweeps are 365 s of its 429 s (measured on a 10-core laptop).
 # spawn() starts such a run immediately and returns a handle whose .result() is
 # the same stdout string run() would have returned -- so the CHECK order, the
 # arguments, and the assertions are untouched; only the waiting overlaps. The
 # threads do nothing but wait on subprocesses, so the GIL is irrelevant here.
 #
-# ONLY for runs with no ordering dependency on each other. A gate step that
+# Only for runs with no ordering dependency on each other. A gate step that
 # reads state an earlier step wrote (gate_tma's J/L checkpoint write->resume
 # chains) must keep calling run() straight-line.
 _POOL = None

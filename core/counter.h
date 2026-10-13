@@ -1,4 +1,4 @@
-// counter.h — Counter type tags and widening guards (DESIGN §3, evolvability §10).
+// counter.h — Counter type tags and widening guards.
 //
 // The counter is a compile-time template parameter on RunRecord and on the
 // map_shard/merge instantiations. Two concrete tags:

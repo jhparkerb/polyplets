@@ -1,37 +1,31 @@
 #!/usr/bin/env python3
 """The residual-cell statement, computed once, plus a gate over every restatement.
 
-Written 2026-08-19 after the Confetti harvest, when a sweep of the notes found
-FOUR mutually inconsistent accounts of "the cells that still have one source":
-
-  docs/motley-plan.md (deleted)           row 40's residual band 9 -> 7 -> 5 -> 3
-  results/second-sources.md   Ticker Tape's two cells: T(40,19), T(40,23)
-  the project handoff file (removed)                    the 9 -> 7 -> 5 band "does not reproduce"
-
-Three of the four are right and they disagree because **two different
-quantities share one name**.  Nothing anywhere defined either of them, and
-`scripts/provenance_table.py` pinned a COUNT for one of them and no list, so a
-wrong list -- and a claim about the other quantity entirely -- sailed through
-the gate for a day.
+"The cells that still have one source" names two different quantities, and
+restating either by hand lets a wrong count or a wrong list through, so both
+are computed here and every restatement in the tree is checked against the
+computed value.
 
 The two quantities:
 
-  Q1  CONGRUENCE-ONLY cells.  Over all 820 cells of the triangle: those with no
+  Q1  Congruence-only cells.  Over all 820 cells of the triangle: those with no
       exact recount and no closed form, so the only thing standing behind the
       value is the mod-2/mod-4 subgroup census, which catches an error iff it
       is nonzero mod 4.  This is what scripts/provenance_table.py computes and
       pins.  Rule: results/symmetry-classes.md, results/provenance-table.md.
 
-  Q2  ROW 40'S RESIDUAL BAND.  Row 40 only: the cells that are not
-      RULE-INDEPENDENT -- that still rest on the incumbent engine's union-find
-      connectivity rule.  Two ends, per results/second-sources.md section 1:
-        h <= 21   swept by the incumbent; rule-independent once Motley reaches h
+  Q2  Row 40's residual band.  Row 40 only: the cells that are not
+      rule-independent, i.e. still rest on the main transfer matrix's
+      union-find connectivity rule.  Two ends, per results/second-sources.md
+      section 1:
+        h <= 21   swept by the main transfer matrix; rule-independent once the
+                  coloring recount reaches h
         h >= 22   never enumerated, wired from the P_k closed form at level
                   k = 40 - h.  The shape is a theorem (docs/proofs/
                   diagonal-law.md) but the two free coefficients per level are
                   fit from real swept cells, so the cell is rule-independent iff
-                  BOTH anchors T(2k+1, k+1) and T(2k+2, k+2) -- heights 41 - h
-                  and 42 - h -- are within Motley's reach.
+                  both anchors T(2k+1, k+1) and T(2k+2, k+2) -- heights 41 - h
+                  and 42 - h -- are within the recount's reach.
 
 They are different questions.  Q1 asks "was this value ever recomputed"; Q2
 asks "does this value still depend on one connectivity rule".  A cell can be
@@ -41,34 +35,33 @@ looks fine and is.
 
     python3 scripts/residual_cells.py            # write results/residual-cells.md
     python3 scripts/residual_cells.py --check    # gate
-    python3 scripts/residual_cells.py --selftest # RED controls
+    python3 scripts/residual_cells.py --selftest # controls that must fail
 
-THE GATE.  results/residual-cells.md is the one place these numbers live.
+The gate.  results/residual-cells.md is the one place these numbers live.
 Every other tracked document that states one must mark it inline with the fact
-it is quoting, and the gate verifies the marked value -- count AND cell list --
+it is quoting, and the gate verifies the marked value, count and cell list,
 against the computed one:
 
     <!--q:congruence_only.count@18=6-->
     <!--q:congruence_only.cells@18=(38,19),(39,19),(39,20),(40,19),(40,20),(40,21)-->
 
 A unit that mentions residual or congruence-only cells and carries no marker
-FAILS.  The unit is the PARAGRAPH for prose and the ROW for tables, because
+fails.  The unit is the paragraph for prose and the row for tables, because
 prose wraps and a triggered table header has its numbers in the body; a bullet
 starts a new unit so one marker cannot cover a list.  A unit that genuinely
 states no checkable number declares `<!--q:prose-->`, and that declaration is
 itself checked twice: numbers that are names (a cell, a row, a term, a modulus,
 a height bound, Q1/Q2, a date) are stripped and any digit still standing
 rejects the declaration, and a unit naming two or more cells is stating the
-residual SET and must declare a `.cells@H` fact instead -- otherwise the hatch
-smuggles a wrong list past the gate, which it did until 2026-08-19.
+residual set and must declare a `.cells@H` fact instead; otherwise the hatch
+would let a wrong list past the gate.
 
-Trigger matching runs with markdown emphasis stripped: the project handoff file (removed) wrote
-"**only** the mod-4 congruence" and the first version of the pattern walked
-straight past it, which is a fail-OPEN and has its own RED control.
+Trigger matching runs with markdown emphasis stripped, so "**only** the mod-4
+congruence" triggers; a control checks that it does.
 
-Fail-closed in the vacuous direction too: if the scan finds no trigger lines at
-all, the trigger pattern has rotted and the gate fails rather than reporting
-that everything is fine.
+The vacuous direction fails too: if the scan finds no trigger lines at all,
+the trigger pattern has rotted and the gate fails rather than reporting that
+everything is fine.
 """
 from __future__ import annotations
 
@@ -130,26 +123,26 @@ def formula_lo(n: int) -> int:
 
 
 def row40_residual(motley_h: int) -> list[tuple[int, int]]:
-    """Q2: row 40's cells that still rest on the incumbent connectivity rule."""
+    """Q2: row 40's cells that still rest on the main transfer matrix's connectivity rule."""
     out = []
     for h in range(1, NMAX + 1):
         if h <= PT.SWEEP_H:
-            if h > motley_h:                 # swept, not yet re-swept by Motley
+            if h > motley_h:                 # swept, not yet reached by the recount
                 out.append((NMAX, h))
         else:
             # wired at level k = 40 - h; anchors sit at heights 41-h and 42-h,
-            # and the higher of the two is what has to be inside Motley's reach
+            # and the higher of the two is what has to be inside the recount's reach
             if (42 - h) > motley_h:
                 out.append((NMAX, h))
     return out
 
 
 def closure_n(motley_h: int) -> int:
-    """Largest n whose every cell is rule-independent, by the OVERLAP criterion.
+    """Largest n whose every cell is rule-independent, by the overlap criterion.
 
-    Motley covers h <= H from below and the closed-form band covers
+    The recount covers h <= H from below and the closed-form band covers
     h >= formula_lo(n) from above.  The published figure requires the two to
-    OVERLAP -- at least one cell where both methods produce the value and can
+    overlap -- at least one cell where both methods produce the value and can
     be compared -- not merely to abut.  That is the conservative reading and it
     is the one results/second-sources.md publishes ("n <= 35" at H = 18).
 
@@ -203,11 +196,10 @@ def facts() -> dict:
 # anchored to this triangle: results/below-onset.md and
 # results/arithmetic-structure.md talk about fit residuals over cells and are not
 # about this at all.
-# "N of 40 cells" is the fourth shape (AUDIT-2026-09-02 M2): results/confidence.md
-# wrote "35 of 40 cells independently confirmed. Now: 40 of 40" and the gate
-# never saw it, because none of the words above appear.  Number words count as
-# numbers; only row 40's cell count is a trigger, since the facts this gate can
-# check are row-40 facts.
+# "N of 40 cells" is the fourth shape: "35 of 40 cells independently
+# confirmed" states a row-40 figure with none of the words above.  Number words
+# count as numbers; only row 40's cell count is a trigger, since the facts this
+# gate can check are row-40 facts.
 _NUMWORD = (r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven"
             r"|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen"
             r"|nineteen|twenty(?:-\w+)?|thirty(?:-\w+)?|forty)")
@@ -219,10 +211,9 @@ TRIGGER_RE = re.compile(
     r"|\b" + _NUMWORD + r" of (?:its )?(?:40|forty) cells\b",
     re.I)
 
-# Emphasis inside the phrase must not hide it.  "**only** the mod-4 congruence"
-# is the exact wording the project handoff file (removed) used and the trigger walked straight past it,
-# which is a fail-OPEN and the worst kind of gate defect.  Trigger matching runs
-# on the line with markdown emphasis stripped.
+# Emphasis inside the phrase must not hide it: "**only** the mod-4 congruence"
+# is a residual claim.  Trigger matching runs on the line with markdown
+# emphasis stripped.
 EMPHASIS_RE = re.compile(r"[*_`]")
 
 
@@ -249,11 +240,11 @@ NONCOUNT_RE = re.compile(
 GENERATED_PEER = "results/provenance-table.md"
 
 
-# TODO(2026-08-19, from the simplify pass): results/residual-cells.md -- the
-# file this gate calls "the one place", and the file every other document is
-# told to trust -- is the one restatement --check never reads.  tracked_docs()
-# excludes CANONICAL by design (it is generated, not quoted), so a stale
-# tracked copy carries yesterday's counts while the gate reports GREEN.  The
+# TODO: results/residual-cells.md -- the file this gate calls "the one place",
+# and the file every other document is told to trust -- is the one restatement
+# --check never reads.  tracked_docs() excludes CANONICAL by design (it is
+# generated, not quoted), so a stale tracked copy carries old counts while the
+# gate passes.  The
 # fix is to render write_note()'s content to a string in --check and fail on
 # any difference from the tracked file, missing file included, as
 # provenance_table.py --check now does for its own table.
@@ -407,15 +398,14 @@ def scan(F: dict, docs: list[str], verbose=False, root: Path = ROOT):
                     # The escape hatch, and it is checked twice over.
                     #
                     # First: a line declaring it states no number may not
-                    # contain one, once the numbers that are NAMES are
+                    # contain one, once the numbers that are names are
                     # stripped.
                     #
-                    # Second, and this was a fail-OPEN until 2026-08-19:
-                    # NONCOUNT_RE strips every (n,h) and T(n,h) as a name, so a
-                    # unit that LISTS cells -- the residual set itself, the
-                    # thing this gate is for -- stripped to nothing and passed
-                    # as prose with its list unchecked.  A wrong six-cell list
-                    # scanned clean and was counted as verified.  A unit naming
+                    # Second: NONCOUNT_RE strips every (n,h) and T(n,h) as a
+                    # name, so a unit that lists cells -- the residual set
+                    # itself, the thing this gate is for -- would strip to
+                    # nothing and pass as prose with its list unchecked.  A
+                    # wrong six-cell list would scan clean.  A unit naming
                     # two or more cells is stating the set, not talking about
                     # it, so it must declare a `.cells@H` fact.  One named cell
                     # stays prose-able: headers and pointers say "T(40,21)".
@@ -704,19 +694,15 @@ def selftest() -> int:
                         "(triggers=%d, %s)" % (trig, bad))
 
     # RED 15: markdown emphasis inside the trigger phrase must not hide it.
-    # This one was live -- the project handoff file (removed) wrote "**only** the mod-4 congruence" and
-    # the pattern walked past it.  Fail-open, so it gets its own control.
     bad, _, trig = run("cells carrying **only** the mod-4 congruence "
                        "drop 11 -> 6\n", "r15.md")
     if trig != 1 or not any("no `<!--q:" in b for b in bad):
         problems.append("RED 15: emphasis inside the trigger phrase hid the "
                         "claim (triggers=%d)" % trig)
 
-    # RED 17: the "N of 40 cells" shape.  results/confidence.md's "35 of 40
-    # cells independently confirmed" carried a row-40 figure past this gate for
-    # sixteen days (AUDIT-2026-09-02 M2).  Unmarked it must fail; the same
-    # sentence with a row-40 fact marked must pass; and a number word is a
-    # number.
+    # RED 17: the "N of 40 cells" shape ("35 of 40 cells independently
+    # confirmed" is a row-40 figure).  Unmarked it must fail; the same sentence
+    # with a row-40 fact marked must pass; and a number word is a number.
     bad, _, trig = run("Before the run, 35 of 40 cells had a second source.\n",
                        "r17.md")
     if trig != 1 or not any("no `<!--q:" in b for b in bad):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate MIDDLE-KINGDOM: results/subclasses.md (formerly docs/middle-kingdom-plan.md, removed) Phase 3 acceptance.
+"""Gate MIDDLE-KINGDOM: the column-convex directedness grid (results/subclasses.md).
 
 build/middle_kingdom_tm is a COLUMN transfer matrix for the column-convex
 cells of the Phase 3 grid. Phase 3's finding is that on a column-convex king

@@ -1,4 +1,4 @@
-// G2: Redelmeier fixed-animal counter (implementation-plan.md, Layer 1).
+// G2: Redelmeier fixed-animal counter.
 //
 // Counts fixed lattice animals without duplicates: each animal is generated
 // exactly once, translated so that its scan-minimal cell (smallest (y,x)

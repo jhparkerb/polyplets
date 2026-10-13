@@ -1,14 +1,12 @@
-// motley_par.cpp — PARALLEL color-symmetrized spin transfer matrix (Motley).
+// motley_par.cpp — parallel color-symmetrized spin transfer matrix, the
+// coloring recount's engine.
 //
-// Same rule, same answer, more cores.  `results/second-sources.md` §4 names the
-// wall this file removes: "The engine is still single-threaded ... the wall
-// figures demand a parallel frontier that does not exist yet.  RAM is the wall
-// this document plans around; cores are the next one."  Confetti (H = 18) spent
-// 399,700 s of wall on ONE core of an 80-core box.
+// Same rule, same answer, more cores: the single-threaded engine spent
+// 399,700 s of wall on one core of an 80-core box for H = 18.
 //
-// THE RULE IS NOT MINE TO CHANGE.  `slot`, `canon`, `gather`, `shifted` and
-// `successors` below are transcribed character for character from the frozen
-// spec `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256 59e90660...,
+// The rule is frozen.  `slot`, `canon`, `gather`, `shifted` and `successors`
+// below are transcribed character for character from
+// `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256 59e90660...,
 // lines 93-173), which is what `docs/proofs/cutcount-identity.md` proves and
 // what every banked C_H row was produced by.  Everything else in this file --
 // the table, the parallelism, the payload width, the checkpoint -- is

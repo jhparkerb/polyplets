@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 """One per-cell provenance table for the a(40) triangle, and a gate over it.
 
-Until now "what is confirmed, by which independent source, covering what share"
-was spread over results/ns_a40/PROVENANCE.md, results/second-sources.md,
-results/symmetry-classes.md, the strip-engine note (since folded into
-second-sources.md) and the project handoff file (removed).  Five places
-drift, and one of them already did: the strip-coverage-vs-holdout-mass
-confusion recorded in results/second-sources.md.
-
-This script is the single source.  It assigns every one of the 820 cells its
-set of corroborating sources from the rules the source notes state, and it
-recomputes from the banked triangle every headline share those notes quote.
+"What is confirmed, by which independent source, covering which cells" is
+stated in several notes (results/ns_a40/PROVENANCE.md,
+results/second-sources.md, results/symmetry-classes.md), and separately
+stated figures drift.  This script is the single source.  It assigns every
+one of the 820 cells its set of corroborating sources from the rules the
+source notes state, and it recomputes from the banked triangle every headline
+figure those notes quote.
 
     python3 scripts/provenance_table.py            # write results/provenance-table.md
     python3 scripts/provenance_table.py --check    # gate: recompute and compare
 
-The gate is fail-closed in both directions: a share that drifts fails, and so
-does a cell with no source at all.  RED control included (--selftest).
+The gate fails in both directions: a figure that drifts fails, and so does a
+cell with no source at all.  Controls that must fail are in --selftest.
 
 Source rules, each traceable to the note that establishes it:
 
@@ -29,30 +26,29 @@ Source rules, each traceable to the note that establishes it:
   P  closed forms P_k, credited only where a real sweep also reached the cell
                                        k = n-H <= 18, n >= 2k+1, H <= 21
                                                         second-sources.md
-                                                        ("honest" rule)
-  M  Motley/cutcount, rule-independent H <= MOTLEY_H    motley-h18.md
+  M  the coloring recount, rule-independent
+                                       H <= MOTLEY_H    second-sources.md
   F  P_k formula-derived cell, the formula itself holdout-validated elsewhere
                                        k <= 18, n >= 2k+1, H > 21
                                                         ns_a40/PROVENANCE.md
-  U  Undertow tower pinned from Motley's own cells, agreeing with the incumbent
-                                       H > MOTLEY_H, measured per cell
+  U  below-onset tower pinned from the recount's own cells, agreeing with the
+     main transfer matrix               H > MOTLEY_H, measured per cell
                                                         undertow.md,
                                                         experiments/undertow_ri.py
-  C  subgroup mod-2/mod-4 congruence   every cell       subgroup-mod4.md
+  C  subgroup mod-2/mod-4 congruence   every cell       symmetry-classes.md
                                                         (congruence level only:
                                                         an error survives iff
                                                         it is 0 mod 4)
 
 Four tiers, and the difference between them is the whole point of the table:
-an EXACT source recomputed the cell by other means; F means the cell's value
+an exact source recomputed the cell by other means; F means the cell's value
 came from a closed form whose other cells were checked against real sweeps, so
 the formula is corroborated and this cell is not; U means the cell is
-reproduced by the diagonal tower refitted to Motley's cells -- a formula-level
-check that shares the depth tables D_j and the grand form with the wired route,
-so it is not an exact recount either (AUDIT-2026-09-02 M2: "one tower strategy
-pinned from Motley's data"); C is a congruence, which catches an error only if
-it is nonzero mod 4.  U is derived by running the tower, not by a rule, and is
-claimed only at the measured Motley reach.
+reproduced by the diagonal tower refitted to the recount's cells, a
+formula-level check that shares the depth tables D_j and the grand form with
+the wired route, so it is not an exact recount either; C is a congruence,
+which catches an error only if it is nonzero mod 4.  U is derived by running
+the tower, not by a rule, and is claimed only at the recount's measured reach.
 """
 from __future__ import annotations
 
@@ -82,15 +78,14 @@ def read_triangle(path=TRIANGLE):
 
 
 def _reach_by_rowdir(nmax, root):
-    """Motley's verified reach per banked row set: {dir: H}.
+    """The coloring recount's checked reach per banked row set: {dir: H}.
 
     `T(n,H) = C_H - 2C_{H-1} + C_{H-2}` needs all three cut-count rows at the
-    SAME Nmax, so a height counts only when C_H, C_{H-1}, C_{H-2} all live in
-    one directory, all reach n >= nmax, AND the assembled T(n,H) equals the
+    same Nmax, so a height counts only when C_H, C_{H-1}, C_{H-2} all live in
+    one directory, all reach n >= nmax, and the assembled T(n,H) equals the
     banked triangle at every cell n <= nmax the triangle has.  Reach is
     contiguous from H = 1: the first height that fails caps it, so a corrupt
-    banked row shrinks the reach and the pinned count below fires
-    (AUDIT-2026-09-02 M3).
+    banked row shrinks the reach and the pinned count below fires.
     """
     T = read_triangle(root / "results" / "triangle.txt")
     out = {}
@@ -112,10 +107,9 @@ def _reach_by_rowdir(nmax, root):
 
 
 def motley_reach(nmax=None, root=None):
-    """The greatest height Motley covers, DERIVED from the banked row sets and
-    VERIFIED against the triangle (see _reach_by_rowdir).  A hand-edited
-    constant here went stale the day the Nmax-41 ladder landed, and the gate,
-    which compares the published note against this generator, stayed green."""
+    """The greatest height the coloring recount covers, derived from the banked
+    row sets and checked against the triangle (see _reach_by_rowdir), rather
+    than a hand-edited constant that goes stale when a new row set lands."""
     root = Path(root) if root else ROOT
     nmax = NMAX if nmax is None else nmax
     return max(_reach_by_rowdir(nmax, root).values(), default=0)
@@ -135,12 +129,13 @@ MOTLEY_DIR = motley_rowdir()
 
 @functools.lru_cache(maxsize=None)
 def tower_cells(motley_h=None, rowdir=None, jmax=4):
-    """The cells above Motley's reach that the Motley-pinned Undertow tower
-    reproduces EXACTLY -- experiments/undertow_ri.py, one tower per row with
-    the row excluded from its own pinning set, levels 1..9 ab initio and the
-    rest pinned from Motley cells at H <= motley_h.  Only cells that agree
-    with the incumbent come back; a cell that disagrees makes undertow_ri red
-    on its own, and this refuses too rather than tag around it."""
+    """The cells above the recount's reach that the below-onset tower pinned
+    from the recount's cells reproduces exactly: experiments/undertow_ri.py,
+    one tower per row with the row excluded from its own pinning set, levels
+    1..9 ab initio and the rest pinned from recount cells at H <= motley_h.
+    Only cells that agree with the main transfer matrix come back; a cell that
+    disagrees makes undertow_ri fail on its own, and this refuses too rather
+    than tag around it."""
     motley_h = MOTLEY_H if motley_h is None else motley_h
     rowdir = MOTLEY_DIR if rowdir is None else rowdir
     if not motley_h or rowdir is None:
@@ -176,24 +171,19 @@ EXPECTED = {
     "strip_alone_pct": (57.2, "results/second-sources.md"),
     # No share-of-a(n) figures are computed or pinned here.  A cell is
     # corroborated or it is not; a wrong cell ruins a(n) whatever its size, so a
-    # percentage of a(n) carries no decision and is not tracked.  Standing
-    # ruling, restated 2026-08-18.
-    # The cells that carry ONLY the mod-4 congruence -- no exact recount and no
+    # percentage of a(n) carries no decision and is not tracked.
+    # The cells that carry only the mod-4 congruence -- no exact recount and no
     # closed form.  This is the project's real gap, so it is pinned: if it grows
-    # something regressed, and a rung that widens Motley's reach must shrink it,
-    # which fires the gate and forces this number to be updated deliberately.
-    # It did, twice.  Confetti landed 2026-08-19 and took it from 11 to 6,
-    # retiring (36,18), (37,18), (38,18), (39,18) and (40,18).  Then Motley's
-    # reach went to H<=19 -- MOTLEY_H above is derived from the banked row sets
-    # now, not hand-set -- which retired the three H=19 cells (38,19), (39,19)
-    # and (40,19).  What is left is (39,20), (40,20), (40,21): the three below.
-    # This narration said "six" for a while after the pin already said 3; the
-    # pin is the thing the gate checks, so the story was the half that drifted.
+    # something regressed, and a run that widens the recount's reach must
+    # shrink it, which fires the gate and forces this number to be updated
+    # deliberately.  The H=18 rows took it from 11 to 6, retiring (36,18),
+    # (37,18), (38,18), (39,18) and (40,18); the H=19 rows retired (38,19),
+    # (39,19) and (40,19).  What is left is (39,20), (40,20), (40,21).
     "congruence_only_cells": (3, "results/cutcount_b1/rows41/README.md; "
                                  "Motley at H<=%d, derived from the banked "
                                  "row sets" % MOTLEY_H),
     # Every cell with no exact recount -- the formula-only ones and the three
-    # above -- is reproduced by the Motley-pinned tower (tag U).  Pinned so that
+    # above -- is reproduced by the recount-pinned tower (tag U).  Pinned so that
     # a tower that stops reaching one of them, or a cell that stops agreeing,
     # fails here rather than dropping out of the table quietly.
     "tower_reproduced_unsourced": (192, "results/undertow.md; "
@@ -244,7 +234,7 @@ def analyze(T, motley_h=MOTLEY_H):
                                        if not exact[c] and "U" in src[c]],
     }
     # The published figure uses exactly R u S u (P n {H<=21}) -- it predates
-    # both Motley and the fixed-height GF arm, so reproducing it means using
+    # both the recount and the fixed-height GF arm, so reproducing it means using
     # its own three sources and no more.
     honest_doc = [c for c in cells if exact[c] & {"R", "S", "P"}]
     stats["honest_pct"] = round(100 * len(honest_doc) / len(cells), 1)
@@ -385,10 +375,8 @@ def selftest(T):
     if bad:
         print("SELFTEST FAILED: clean run should pass:", bad)
         return 1
-    # RED: widening Motley's reach by one height must change the pinned count
-    # of congruence-only cells.  (The old control doubled a cell's value and
-    # watched a share move; shares are gone, and a cell count is the right
-    # thing to guard anyway -- it is what the table asserts.)
+    # RED: widening the recount's reach by one height must change the pinned
+    # count of congruence-only cells (a cell count is what the table asserts).
     _, _, _, stats2 = analyze(T, motley_h=MOTLEY_H + 1)
     if not check(stats2, verbose=False):
         print("SELFTEST FAILED: Motley at H=%d left the pinned cell count "
@@ -435,7 +423,7 @@ def selftest(T):
         undertow_ri.cover = real
         tower_cells.cache_clear()
     # RED 4: a tracked table that differs from the regeneration by one line
-    # must fail (the 2026-10 copy had its title overwritten and passed).
+    # must fail (a title-only corruption once passed).
     text = render_table(T, a, src, exact, stats)
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "provenance-table.md"

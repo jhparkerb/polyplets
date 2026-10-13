@@ -1,4 +1,4 @@
-// run.h — sorted-run record format and I/O (DESIGN §9, data formats).
+// run.h — sorted-run record format and I/O.
 //
 // A sorted run is a sequence of RunRecords in ascending memcmp(sig) order.
 // Each record:

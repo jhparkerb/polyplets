@@ -1,10 +1,10 @@
-// kink.h — kink-carry stage kernel (Design 14, Phase 1: library only, dark).
+// kink.h — kink-carry stage kernel.
 //
-// The production engine (core/mapreduce.h) transfers a WHOLE COLUMN per step.
-// Kink-carry instead moves the boundary ONE CELL at a time (H micro-stages per
+// The column engine (core/mapreduce.h) transfers a whole column per step.
+// Kink-carry instead moves the boundary one cell at a time (H micro-stages per
 // column), carrying the one NW cell each stage overwrites so king adjacency
-// stays available without needing the whole old column. Serial win measured
-// in experiments/kink_tm/kink_tm.cpp: docs/engine-record.md.
+// stays available without needing the whole old column. The serial win is
+// measured in docs/engine-record.md.
 //
 // Mixed-state key during a stage sweep (32-byte Sig, keyLen = H+4):
 //   b[0..H)   mixed boundary: new-column cells for rows < stage (this
@@ -89,11 +89,9 @@ inline bool labelInMixedState(const Sig& s, int H, unsigned char L) {
 // count-vec's index n advances. `ms` is the minimum cell count already placed
 // (budget check, mirrors RunRecord::minSize()).
 //
-// Ported verbatim from experiments/kink_tm/kink_tm.cpp's kinkSweep() per-r
-// loop body (occupy in {0,1}; union-find over N/W/NW/SW; canonicalize;
-// stranding check on the outgoing carry). This is the single source of truth
-// for the transition -- experiments/kink_tm/kink_tm.cpp reuses it directly so
-// the probe and the ported kernel can never drift apart.
+// The per-r loop body of the kink sweep (occupy in {0,1}; union-find over
+// N/W/NW/SW; canonicalize; stranding check on the outgoing carry). This is
+// the single source of truth for the transition.
 template <class F>
 inline void kinkStageTransition(const Sig& s, int H, int r, int ms, int maxn,
                                 F&& emit) {
@@ -152,8 +150,7 @@ struct KinkStageCfg {
   std::string spill_dir;
 };
 
-// map_shard_stage: one micro-stage of the kink-carry sweep (Design 14 Phase
-// 1). Consumes a shard of the current stage's mixed-state table (keyLen
+// map_shard_stage: one micro-stage of the kink-carry sweep. Consumes a shard of the current stage's mixed-state table (keyLen
 // H+4) and produces that shard's successor records for stage+1 as a sorted,
 // deduplicated Run<W> -- the same Run<W>/mergeRuns contract core/mapreduce.h's
 // map_shard uses, just keyed on the mixed state instead of the end-of-column
@@ -203,7 +200,7 @@ Run<W> map_shard_stage(const Run<W>& src, const KinkStageCfg& cfg) {
 // alongside the column kernel, so the two constants must not collide).
 static constexpr unsigned kKinkProgressStrideMask = (1u << 10) - 1;
 
-// File-backed version of map_shard_stage (Design 14 Phase 2.3): reads a
+// File-backed version of map_shard_stage: reads a
 // shard of the current stage's mixed-state table from POLYRUN files (keyLen
 // kinkKeyLen(H)), spills to disk past cfg's RAM budget, and writes one
 // sorted POLYRUN output file for stage+1. Mirrors map_shard_file's shell

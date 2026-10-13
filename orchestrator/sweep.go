@@ -42,7 +42,7 @@ type SweepConfig struct {
 	CostProfileOut  string        // where to emit the cost profile (default: <RunDir>/cost_profile.tsv)
 	CostProfileRef  string        // optional reference profile to drive the live ETA
 	Heights         []int         // subset of heights to sweep (empty = 1..Maxn); for multi-machine split
-	MaxDiagK        int           // cap on wired diagonal closed-forms: negative (maxDiagKNoCap) = no cap, 0 = NO diagonal injection at all, k = cap at that k. Set to k-1 to force the H=Maxn-k strip back to a REAL column sweep — e.g. 16 makes a maxn=37 run sweep H20 for real (the strict route: the swept T(37,20) is P_17's first independent holdout). NOTE the zero value of this struct means "no injection": callers that want production dispatch must set maxDiagKNoCap explicitly (D7), which fails toward more real sweeping, never toward a wrong cell
+	MaxDiagK        int           // cap on wired diagonal closed-forms: negative (maxDiagKNoCap) = no cap, 0 = NO diagonal injection at all, k = cap at that k. Set to k-1 to force the H=Maxn-k strip back to a REAL column sweep — e.g. 16 makes a maxn=37 run sweep H20 for real (the strict route: the swept T(37,20) is P_17's first independent holdout). The zero value of this struct means "no injection": callers that want production dispatch must set maxDiagKNoCap explicitly, which fails toward more real sweeping, never toward a wrong cell
 	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
 	// fastRes serializes tmpfs admission for --fast-map-dir (fastmap.go).
@@ -50,7 +50,7 @@ type SweepConfig struct {
 	fastRes *fastMapReserver
 
 	// Pool, if non-nil, dispatches map/merge work to a WorkerPool of
-	// persistent processes (Bottleneck #5) instead of spawning a fresh
+	// persistent processes instead of spawning a fresh
 	// map_worker/merge_worker per unit. Optional and nil-safe: callers that
 	// don't set it (tests, gates) get the original exec-per-unit behavior
 	// unchanged. The production CLI (cmd/orchestrate) sets it.
@@ -2297,8 +2297,8 @@ func diagonalStripValid(maxn, k int) bool {
 // maxDiagKNoCap is MaxDiagK's "no cap" sentinel: every structurally valid
 // diagonal may dispatch. It is NEGATIVE, not 0, because 0 has to mean the
 // thing an operator typing `--max-diag-k 0` is asking for — no injection at
-// all (D7 "Cap Zero Inverts"; the old predicate read 0 as "all wired", making
-// the accidental disable value 1).
+// all (a predicate reading 0 as "all wired" would make the accidental
+// disable value 1).
 const maxDiagKNoCap = -1
 
 // maxDiagKMax is the largest wired diagonal (see diagonalStripValid); a cap

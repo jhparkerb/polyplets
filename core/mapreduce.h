@@ -1,4 +1,4 @@
-// mapreduce.h — map_shard() and merge() (DESIGN §4, §5).
+// mapreduce.h — map_shard() and merge().
 //
 // map_shard<Classifier>(source_run, cfg, out_classified) -> Run<W>
 //   Stream source states, apply the king-column transition, sort + deduplicate
@@ -8,9 +8,9 @@
 // merge<W>(runs) -> Run<W>
 //   K-way merge of sorted runs (equal keys combined via RunRecord::combine).
 //   The commutative+associative combine means result is independent of run order
-//   and shard partition cuts (the bit-identical property, DESIGN §0).
+//   and shard partition cuts (the bit-identical property).
 //
-// Both are in-RAM (no file I/O, no spill) for M0. Spill is added in M1.
+// Both are in-RAM (no file I/O, no spill); the file-backed versions spill.
 
 #pragma once
 
@@ -231,7 +231,7 @@ std::pair<size_t, size_t> map_shard_file(
     const volatile std::sig_atomic_t* stop_flag = nullptr,
     std::string* stop_key_hex = nullptr) {
 
-  // Work-stealing (DESIGN 08, T2.3): when the orchestrator detects this unit is
+  // Work-stealing: when the orchestrator detects this unit is
   // the straggler holding up a column's tail, it raises *stop_flag (via SIGTERM).
   // We finish the input key currently being merged, stop reading at the next
   // key boundary (the cursor), and finalize a fully valid sorted output over

@@ -1,6 +1,6 @@
-// classifier.h — Completion-side classifier templates (DESIGN §3, §10).
+// classifier.h — Completion-side classifier templates.
 //
-// The classifier handles the "closing column" path (sweep8.h:95-96): when a
+// The classifier handles the "closing column" path (cpp/tma/sweep8.h): when a
 // state's empty-next-column closure is a valid complete animal, it contributes
 // to the output. Two classifier tags for v1:
 //
@@ -34,7 +34,7 @@ struct TriangleRow {
 
 // ─── Triangle classifier (O1) ────────────────────────────────────────────────
 
-// Mirrors sweep8.h:95-96:
+// Mirrors cpp/tma/sweep8.h:
 //   if comps == 1 && touch_top && touch_bottom:
 //       for n in 1..maxn: row[n] += counts[n]
 struct ClassifyTriangle {
@@ -78,10 +78,10 @@ struct HolesRow {
 // RunRecord value alongside the cell-count-vec — for v1 this is implemented
 // as an extended RunRecord or a separate parallel structure.
 //
-// DESIGN NOTE: For M0 (the in-RAM driver), the holes classifier is scaffolded
-// but not fully wired (holes need the Euler delta accumulated per-step, which
-// requires threading it through the map loop in mapreduce.h). Full wiring is
-// part of M5 / T5.4. The skeleton here ensures the seam compiles cleanly.
+// Note: for the in-RAM driver, the holes classifier is scaffolded but not
+// fully wired (holes need the Euler delta accumulated per-step, which requires
+// threading it through the map loop in mapreduce.h). The skeleton here ensures
+// the seam compiles cleanly.
 
 struct ClassifyHoles {
   template <class W>

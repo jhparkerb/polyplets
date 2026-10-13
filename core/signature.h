@@ -1,4 +1,4 @@
-// T1(a): generic partition signature (implementation-plan.md, Layer 2).
+// Generic partition signature.
 //
 // A signature is a std::string of H+2 bytes:
 //   bytes [0, H)   boundary cell states: 0 = empty, else component label

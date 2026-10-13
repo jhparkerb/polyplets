@@ -1,7 +1,6 @@
-// kink_column.h — column-boundary seed/finalize for the kink-carry kernel
-// (Design 14, Phase 2). core/kink.h (Phase 1, already gated) ports only the
-// per-stage fan-out; this header adds the two column-boundary steps Phase 1
-// deliberately left out:
+// kink_column.h — column-boundary seed/finalize for the kink-carry kernel.
+// core/kink.h holds only the per-stage fan-out; this header adds the two
+// column-boundary steps:
 //
 //   kinkSeedStage0   — column start: harvest (classify) the previous column's
 //                      end-of-column records, then seed stage 0 of the next
@@ -11,12 +10,9 @@
 //                      admissibility-prune, R1-fold, and dedup back down to
 //                      the next column's end-of-column Run<W>.
 //
-// Ported from experiments/kink_tm/kink_tm.cpp's kinkSweep() column loop
-// (kink_tm.cpp:100-162), which was re-read directly to settle a design-doc
-// ambiguity: harvest happens at COLUMN START (via a per-column-start
-// completion check on the state being seeded), not column end; finalize
-// itself never classifies. Both header comments below cite the exact
-// invariant kept.
+// Harvest happens at column start (via a per-column-start completion check
+// on the state being seeded), not column end; finalize itself never
+// classifies. Both header comments below cite the exact invariant kept.
 //
 // Deliberately a separate header from core/kink.h: kink.h's map_shard_stage
 // is already committed and gated (tests/engine/gate_kink.cpp); keeping these two

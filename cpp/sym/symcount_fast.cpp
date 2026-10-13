@@ -2,11 +2,10 @@
 //
 // Counts connected king-move animals invariant under a chosen symmetry type,
 // summed over that type's center/axis placements, by size 1..MAXN. Method
-// matches the validated Python: Redelmeier over the ORBIT GRAPH (nodes =
+// matches the validated Python: Redelmeier over the orbit graph (nodes =
 // orbits of cells under the symmetry group), keeping only subsets whose lifted
 // cell set is genuinely king-connected, with a per-type anchor pinning any
-// residual translation a mirror axis leaves free. See scripts/symcount.py and
-// docs-s2-symmetric-enumerator.md.
+// residual translation a mirror axis leaves free. See scripts/symcount.py.
 //
 // CLI:  symcount_fast {r90|r180|hmirror|dmirror|c4|d2ax|d2diag|d4} MAXN
 //                                                        -> "n count" lines.

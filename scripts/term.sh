@@ -1,65 +1,41 @@
 #!/bin/bash
 # term.sh N -- compute a(N) on the kink kernel, then validate.
 #
-# Called dalby_term.sh until 2026-09-06, after the box it was tuned on; the
-# name said nothing to anyone else and the script was never dalby-specific.
-# It reads its core count from the machine it is on and its repository root
-# from its own location, so it runs anywhere.  Run records and log files from
-# before the rename name the old path; it is the same script.
+# Reads its core count from the machine it is on and its repository root from
+# its own location.  maxn=N: the wired closed-form diagonals cover
+# H(N-2)..H(N-12); the real sweep is H3..H(N-13) (top real height grows +1
+# per term).  counter=u128; --ram 1 GiB per worker (kink is RAM-light).
 #
-# Generalizes dalby_a30.sh (deleted) for the successive-term loop (a31, a32, ...).
-# Config = the a29-cell-validated kink config. maxn=N: P9-P12 closed-form
-# diagonals cover H(N-2)..H(N-12); real sweep is H3..H(N-13) (top real height
-# grows +1 per term). counter=u128. RAM 80c x 1GiB (kink is RAM-light).
+# Production settings and the A/B measurements behind them are in
+# docs/engine-record.md.  In short: --overlap-heights N sweeps all owned
+# heights concurrently in one core pool (overlap = number of swept heights
+# owned; overshooting is harmless, and the co-resident RAM for all real-swept
+# heights is <100 MB), which took a maxn=30 run from 689.6 s to 378.2 s at
+# near-identical CPU-seconds.  unit-mult=8, merge-mult=1, steal-grain=0.05,
+# persistent workers and GOGC=1000 are the orchestrator's defaults and are not
+# passed here; the reasons for each are in the body comments below.
 #
-# --overlap-heights N: sweeps ALL owned heights concurrently in one core pool
-# (docs/engine-record.md's own recommendation -- "overlap = number of swept
-# heights owned"; overshooting the real count is harmless, RAM co-resident
-# for all real-swept heights is <100MB, see docs/engine-record.md
-# Bottleneck #1). Validated real dalby maxn=30 A/B on identical code+range
-# (H3-H15 real sweep): overlap=1 689.6s/21.6% util vs overlap=15 378.2s/38.8%
-# util, near-identical CPU-seconds (11926.6 vs 11742.2), byte-identical
-# a(30)=227969227118066423789154 both configs. Checkpoints at height
-# boundaries (gated: orchestrator/overlap_resume_test.go), not per-column.
-#
-# --merge-mult 1: caps merge fan-out at 1 range/core (80) instead of
-# following --unit-mult (320). Per-merge-range wall_s barely correlates with
-# record count (Pearson r=0.24 on real data) -- most of each ~37ms range is
-# fixed process-spawn overhead, not proportional work (Bottleneck #2).
-# Validated real dalby A/B, maxn=30/overlap=15, identical code: merge-mult=4
-# (implicit default) 377.7s wall/11670.5 cpu_s vs merge-mult=1 305.7s
-# wall/7291.7 cpu_s -- 19% faster wall, 37% less total CPU-seconds, correct
-# a(30) both. (Utilization ratio itself dips slightly, 38.6%->29.8%: fewer
-# concurrent ranges fill the pool less densely even though there's less
-# total waste -- a real net win on wall-clock and CPU-seconds, not a
-# regression despite the lower ratio.)
-#
-# Resume: term.sh N --resume
-# The kink real-SIGTERM + resume over-count bug is FIXED (2026-07-09,
-# docs/engine-record.md: seed contributions are now folded into
-# hTri only after a column fully completes, so mid-column checkpoints are
-# consistent). This script runs overlap mode, whose height-set resume was
-# never affected anyway. Gated by TestKinkResumeMidColumn +
-# overlap_resume_test.go. Resume is safe again.
+# Resume: term.sh N --resume.  Checkpoints are at height boundaries
+# (orchestrator/overlap_resume_test.go), and seed contributions are folded
+# into hTri only after a column fully completes, so a mid-column checkpoint is
+# consistent (TestKinkResumeMidColumn).  For N >= 40 each phase has its own
+# checkpoint and only phases that have started are resumed.
 #
 # VALIDATE_ONLY=1 [RUNDIR=...] term.sh N runs the post-run validation
-# block against an existing $RUNDIR/a_n.txt and exits -- no sweep, no combine.
-# It exists so the chain check can be exercised without an N-hour run
-# (AUDIT-2026-07-30 P4).
+# block against an existing $RUNDIR/a_n.txt and exits -- no sweep, no combine,
+# so the chain check can be exercised without an N-hour run.
 set -e
-# Repo root from the script's own location, not a hardcoded ~/src/polyominoes:
-# a fresh clone lands wherever the reader put it, and the acceptance-queue
-# item-2 run found this line was the first thing that broke outside our tree.
+# Repo root from the script's own location, not a hardcoded path: a fresh
+# clone lands wherever the reader put it.
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="$1"
 [ -n "$N" ] || { echo "usage: term.sh N [--resume]   (or VALIDATE_ONLY=1 term.sh N)"; exit 2; }
 
-# Core count from the box, not from dalby's 80. CORES=n overrides. Every
-# measurement quoted in this header was taken at 80 on dalby, which is what
-# nproc returns there, so the validated configuration is unchanged where it was
-# validated; elsewhere the run fits the machine instead of oversubscribing it.
+# Core count from the box. CORES=n overrides. The measurements quoted in this
+# file were taken at 80 cores, so the validated configuration is unchanged on
+# that box; elsewhere the run fits the machine instead of oversubscribing it.
 CORES=${CORES:-$(nproc 2>/dev/null || sysctl -n hw.ncpu)}
-RUNDIR=${RUNDIR:-runs/ns_a${N}/dalby}
+RUNDIR=${RUNDIR:-runs/ns_a${N}}
 
 RESUME_FLAG=""
 [ "$2" = "--resume" ] && RESUME_FLAG="--resume"
@@ -74,11 +50,9 @@ RESUME_FLAG=""
 FASTMAP_FLAG=""
 if [ "${FRONTIER_LEVERS:-0}" = "1" ]; then
   export POLY_FRONTIER_ZSTD=1
-  # RAM co-budget (the a(40) OOM lesson, 2x): worker spill budgets + tmpfs
-  # pages + zstd contexts all share the same 125GB. Derived from the flags
-  # THIS script actually passes (AUDIT-2026-07-30 E7: the old comment quoted
-  # "--ram 768MiB x 80 workers (60GB) ... ~90GB", but the invocations below
-  # pass --ram 1073741824 = 1 GiB):
+  # RAM co-budget: worker spill budgets + tmpfs pages + zstd contexts all
+  # share the same 125GB. Derived from the flags this script actually passes
+  # (--ram 1073741824 = 1 GiB):
   #   phase A  --ram 1GiB x 80 workers  = 80GB
   #   phase B  --ram 1GiB x 48 workers  = 48GB
   #   phase C  --ram 1GiB x 32 workers  = 32GB
@@ -87,10 +61,10 @@ if [ "${FRONTIER_LEVERS:-0}" = "1" ]; then
   # ~102GB of the 125GB, leaving ~23GB for page cache, zstd context pools and
   # the orchestrator itself. Phases B/C are far under.
   #
-  # CAVEAT (AUDIT-2026-07-30 O5, floor redesign DEFERRED): the floor is
-  # enforced against statfs on /dev/shm -- tmpfs headroom -- not against
-  # system RAM. The two coincide only while nothing else is resident, so this
-  # budget is an arithmetic argument, not something the guard enforces.
+  # Caveat: the floor is enforced against statfs on /dev/shm -- tmpfs
+  # headroom -- not against system RAM. The two coincide only while nothing
+  # else is resident, so this budget is an arithmetic argument, not something
+  # the guard enforces.
   export POLY_FASTMAP_FLOOR_GB=${POLY_FASTMAP_FLOOR_GB:-40}
   FASTMAP_FLAG="--fast-map-dir /dev/shm/ns_a${N}"
   echo "frontier levers ON: POLY_FRONTIER_ZSTD=1 $FASTMAP_FLAG floor=${POLY_FASTMAP_FLOOR_GB}GB"
@@ -98,11 +72,10 @@ fi
 
 # cost_profile.tsv is append-only (orchestrator/telemetry.go), so a fresh
 # (non-resume) run into a reused RUNDIR would silently mix stale rows from
-# any earlier run into this run's utilization numbers (bit us once this
-# round: a stale a33 cost_profile.tsv from before P13-15 closed-form were
-# wired made a genuinely-fixed height look like it was still real-swept --
-# docs/engine-record.md). Resume must NOT touch it (or the
-# checkpoint/spill state); only clear it on a fresh start.
+# any earlier run into this run's utilization numbers (a stale a33
+# cost_profile.tsv from before P13-15 were wired once made an injected height
+# look real-swept). Resume must not touch it (or the checkpoint/spill state);
+# only clear it on a fresh start.
 [ -z "$RESUME_FLAG" ] && rm -f "$RUNDIR/cost_profile.tsv" "$RUNDIR/run.log"
 
 echo "=== a${N} KINK run starting: $(date -Iseconds) ==="
@@ -111,34 +84,32 @@ echo "rev: $(git rev-parse --short HEAD)"
 # --persistent-workers: a pool of long-lived --persistent map_worker/
 # merge_worker processes fed one request per work item over a pipe, instead
 # of a fresh fork+exec per unit (thousands of sub-second spawns per real
-# run). Bottleneck #5. Validated real dalby A/B, maxn=30/overlap=15/
-# merge-mult=1/GOGC=1000: 282.5s/7755.3 cpu_s -> 265.0s/7155.8 cpu_s --
-# 6.2% faster wall, 7.7% fewer CPU-seconds, correct a(30), zero orphaned
-# processes after normal exit or a real SIGTERM.
+# run). A/B at maxn=30, overlap=15, merge-mult=1, GOGC=1000: 282.5s/7755.3
+# cpu_s -> 265.0s/7155.8 cpu_s, correct a(30), zero orphaned processes after
+# normal exit or a SIGTERM.
 #
-# --unit-mult 8: Bottleneck #6 (Kink-Stage Concurrency Collapse). A prior
-# "finer unit-mult rejected" finding in memory was from the OLD engine
-# (pre-kink-carry, a18/a23), not re-verified against kink -- this session's
-# own coarser-unit-mult test (2, rejected) never tested RAISING it either.
-# Real dalby A/B, maxn=30: unit-mult=8 gives 215.4s vs unit-mult=4's 265.0s
-# (18.7% faster); unit-mult=16 regresses to 252.0s (sweet spot is 8, not
-# monotonic). REAL maxn=33 production confirmation: 6798.6s -> 5674.2s
-# (16.5% faster), utilization 10.2%->12.4% (the first real-scale
-# utilization GAIN this whole round), correct a(33). The best win of the
-# whole session, and the first fix that actually moves the H17 dominant
-# floor instead of only helping smaller/secondary costs.
-# unit-mult=8, merge-mult=1, steal-grain=0.05, persistent-workers, GOGC=1000
-# are now the ENGINE DEFAULTS (baked into orchestrate) -- no longer passed
-# here. --overlap-heights "$N" (all owned heights) stays: it is run-specific.
-# The commentary above records WHY those values were chosen.
+# --merge-mult 1 caps merge fan-out at 1 range/core instead of following
+# --unit-mult. Per-merge-range wall barely correlates with record count
+# (Pearson r=0.24): most of each ~37ms range is fixed process-spawn overhead.
+# A/B at maxn=30, overlap=15: merge-mult=4 377.7s/11670.5 cpu_s vs merge-mult=1
+# 305.7s/7291.7 cpu_s, correct a(30) both.
+#
+# --unit-mult 8: A/B at maxn=30, unit-mult=8 gives 215.4s vs unit-mult=4's
+# 265.0s; unit-mult=16 regresses to 252.0s (the optimum is 8, not monotonic).
+# Confirmed at maxn=33: 6798.6s -> 5674.2s, utilization 10.2% -> 12.4%,
+# correct a(33). An older "finer unit-mult rejected" finding was from the
+# column engine and did not carry over to kink.
+#
+# Those four values plus steal-grain=0.05 are the orchestrator's defaults and
+# are not passed here. --overlap-heights "$N" (all owned heights) stays: it is
+# run-specific.
+#
 # banked_value N -- resolve n's previously banked a(n), setting BANK (the
 # value, "" if none found) and BANK_SRC (the file it came from).
 #
-# AUDIT-2026-07-30 P4 "Ungated Chain": the chain check used to consult ONLY
-# results/ns_a{n}/triangle.txt in 2-column form, print "a(n): no banked value"
-# and continue -- never counting coverage, never failing. At N=40 it silently
-# skipped n=22,23,24,25 (four of the nineteen chain links) even though every
-# one of them IS banked, just in a different file. Sources, in order:
+# The banked terms live in several files (n=22,23,24,25 are not under
+# results/ns_a{n}/triangle.txt), and a link with no banked value is a failure,
+# not a skipped comparison. Sources, in order:
 #   results/ns_a{n}/a_n.txt              (ns_a23, ns_a24)
 #   results/ns_a{n}/triangle.txt         (2-column form: a21, a26..a39)
 #   results/redelmeier_row{n}/combined.txt  (n=22, no ns_a22 dir exists)
@@ -166,7 +137,7 @@ banked_value() {
 
 # validate_chain compares this run's a_n.txt against the b-file (n<=20) and
 # every banked term (21..N-1), then reports coverage. An uncovered link is a
-# FAILURE now, not a printed shrug: the whole point of recomputing the chain
+# failure, not a printed shrug: the whole point of recomputing the chain
 # is that a fresh a(N) run re-derives every earlier term, and a link nobody
 # compared is a link nobody checked.
 validate_chain() {
@@ -178,8 +149,8 @@ validate_chain() {
     known=$(awk -v n=$n '$1==n{print $2}' fixtures/b006770.txt)
     if [ "$got" = "$known" ]; then echo "a($n)=$got OK"; else echo "a($n)=$got MISMATCH (b=$known)"; MISMATCH=1; fi
   done
-  echo "=== validate a(21)-a($((N-1))) vs banked ==="
-  # seq counts down when its bounds are reversed; below N = 22 there is no link.
+  # Below N = 22 every earlier term is in the b-file and there is no link here.
+  [ "$N" -ge 22 ] && echo "=== validate a(21)-a($((N-1))) vs banked ==="
   for n in $( [ "$N" -ge 22 ] && seq 21 $((N-1)) ); do
     LINKS=$((LINKS+1))
     got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
@@ -197,7 +168,7 @@ validate_chain() {
       MISMATCH=1
     fi
   done
-  echo "chain coverage: $COVERED/$LINKS"
+  [ "$N" -ge 22 ] && echo "chain coverage: $COVERED/$LINKS"
 
   aN=$(awk -v n=$N '$1==n{print $2}' "$RUNDIR/a_n.txt")
   aP=$(awk -v n=$((N-1)) '$1==n{print $2}' "$RUNDIR/a_n.txt")
@@ -215,38 +186,36 @@ fi
 
 mkdir -p "$RUNDIR/spill" runs/ns_a${N}/perheight
 T0=$(date +%s)
-# PHASED EXECUTION for N>=40 (Overcommit Hydra, docs/engine-record.md):
-# maxn>=40 with full --overlap-heights does NOT fit dalby's 125GB — worker
-# RSS alone hits 90-120GB when H19+H20+H21 rounds co-reside (four measured
-# OOM kills 2026-07-25). Single-height phases bound RAM at ONE height's
-# working set by construction; the tall poles are disk-bound (eff_cores ~14)
-# so fewer cores there cost little wall. Same mechanism as the a(36)
-# ayr/dalby --heights split; perheight accumulates across phases; each phase
-# has its own checkpoint (resume reruns only the phase that died).
-# N<40: the classic single all-heights invocation, unchanged.
+# Phased execution for N>=40 (docs/engine-record.md): maxn>=40 with full
+# --overlap-heights does not fit 125GB of RAM; worker RSS alone hits 90-120GB
+# when the H19+H20+H21 rounds co-reside (four measured OOM kills).
+# Single-height phases bound RAM at one height's working set by construction;
+# the tall poles are disk-bound (eff_cores ~14) so fewer cores there cost
+# little wall. Same mechanism as a two-machine --heights split; perheight
+# accumulates across phases; each phase has its own checkpoint (resume reruns
+# only the phase that died). N<40: a single all-heights invocation.
 #
-# PHASE_DIAG_CAP (AUDIT-2026-07-30 D1 "Phase C Phantom"): the diagonal index
-# is k = N - H, and the phase split is defined by fixed offsets from N, so
-# each phase's k range is the same for every N >= 40:
+# PHASE_DIAG_CAP: the diagonal index is k = N - H, and the phase split is
+# defined by fixed offsets from N, so each phase's k range is the same for
+# every N >= 40:
 #   phase A  H = 1..N-21   -> k = 21..N-1  (past the k<=19 fence: real)
-#            H = N-18..N   -> k = 0..18    (the INJECTED closed-form tail)
+#            H = N-18..N   -> k = 0..18    (the injected closed-form tail)
 #   phase B  H = N-20      -> k = 20       (past the fence: real)
-#   phase C  H = N-19      -> k = 19       (P_19 is wired -- would INJECT)
-# With P_19 wired and the fence at k<=19, phase C stopped performing the real
-# H=N-19 sweep and injected it from the very formula that cell was fitted to:
-# a re-run silently destroys the P_0..P_18 mass holdout, the project's
-# strongest validation artifact, and falsifies the shipped "P_19 is used for
-# no banked term" claims. Capping at 18 forces phase C back to a real sweep
-# while leaving phase A's k<=18 tail untouched. Pinned on ALL THREE phases:
-# on A and B it is a no-op today (neither owns a k=19 height) and stays
-# correct if the fence or the split ever moves.
+#   phase C  H = N-19      -> k = 19       (P_19 is wired -- would inject)
+# Without the cap, phase C would inject the H=N-19 cell from the very formula
+# that cell was fitted to instead of sweeping it, destroying the P_0..P_18
+# holdout and the statement that P_19 is used for no banked term. Capping at
+# 18 forces phase C back to a real sweep while leaving phase A's k<=18 tail
+# untouched. Pinned on all three phases: on A and B it is a no-op today
+# (neither owns a k=19 height) and stays correct if the fence or the split
+# ever moves.
 PHASE_DIAG_CAP=18
 run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
   local LABEL=$1 HEIGHTS=$2 CORES=$3 OVERLAP=$4
   # --resume is per-phase: orchestrate --resume exits 1 when the checkpoint
-  # file is missing, and a phase that has never started has none — a driver
-  # resumed after phase B completed killed phase C at launch (a(40),
-  # 2026-07-26). Resume only phases with a checkpoint; later ones run fresh.
+  # file is missing, and a phase that has never started has none (a driver
+  # resumed after phase B completed would kill phase C at launch). Resume only
+  # phases with a checkpoint; later ones run fresh.
   local PHASE_RESUME=$RESUME_FLAG
   [ -f "$RUNDIR/POLYCKPT.$LABEL" ] || PHASE_RESUME=""
   echo "=== phase $LABEL: heights=$HEIGHTS cores=$CORES resume=${PHASE_RESUME:-no} $(date -Iseconds) ==="
@@ -262,12 +231,11 @@ run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
 }
 if [ "$N" -ge 40 ]; then
   RC=0
-  # B/C core counts: 48/32 (were 64/48). The 5th OOM measured BOTH
-  # persistent fleets (map + merge = 2x cores processes) retaining ~1GB+
-  # each; malloc_trim now returns freed pages between requests, and the
-  # smaller fleets bound the sum even at retained peaks. The poles are
-  # disk-bound (eff_cores ~14), so the wall cost is small.
-  # 80/48/32 on dalby, held as the same proportions of whatever CORES is.
+  # B/C core counts: 48/32 of 80. Both persistent fleets (map + merge = 2x
+  # cores processes) were measured retaining ~1GB+ each; malloc_trim returns
+  # freed pages between requests, and the smaller fleets bound the sum even
+  # at retained peaks. The poles are disk-bound (eff_cores ~14), so the wall
+  # cost is small. Held as the same proportions of whatever CORES is.
   run_phase A "1-$((N-21)),$((N-18))-$N" "$CORES" "$N" && \
   run_phase B "$((N-20))" "$(( CORES * 6 / 10 ))" 1 && \
   run_phase C "$((N-19))" "$(( CORES * 4 / 10 ))" 1 || RC=$?
