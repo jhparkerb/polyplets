@@ -171,14 +171,16 @@ banked_value() {
 # compared is a link nobody checked.
 validate_chain() {
   local MISMATCH=0 COVERED=0 LINKS=0 n got known aN aP
-  echo "=== validate a(1)-a(20) vs b-file ==="
-  for n in $(seq 1 20); do
+  local NB=$(( N < 20 ? N : 20 ))
+  echo "=== validate a(1)-a($NB) vs b-file ==="
+  for n in $(seq 1 $NB); do
     got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
     known=$(awk -v n=$n '$1==n{print $2}' fixtures/b006770.txt)
     if [ "$got" = "$known" ]; then echo "a($n)=$got OK"; else echo "a($n)=$got MISMATCH (b=$known)"; MISMATCH=1; fi
   done
   echo "=== validate a(21)-a($((N-1))) vs banked ==="
-  for n in $(seq 21 $((N-1))); do
+  # seq counts down when its bounds are reversed; below N = 22 there is no link.
+  for n in $( [ "$N" -ge 22 ] && seq 21 $((N-1)) ); do
     LINKS=$((LINKS+1))
     got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
     banked_value "$n"
