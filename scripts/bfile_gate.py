@@ -232,10 +232,7 @@ def compare(name, banked, derived, path):
 # The front page asserts a(40) in full, and until 2026-08-19 nothing re-derived
 # it: verify_technical_report covers the manuscript, this gate covered the
 # b-files, and the one number every visitor reads first was checked by nobody.
-# Scoped to the top-level README deliberately. A tree-wide sweep would flag
-# results/ns_a26/PROVENANCE.md, which quotes the WRONG a(26) on purpose --- it
-# records the stale-binary near-miss --- so tree-wide wants an exemption
-# mechanism, and the front page does not.
+# Scoped to the top-level README.
 # TODO(2026-08-19, from the simplify pass): this is a second bespoke mechanism
 # for "a document restates a banked number wrong", and the general one now
 # exists -- scripts/residual_cells.py's q-marker fact table, which has the

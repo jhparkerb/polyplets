@@ -1,44 +1,30 @@
-# a(35) — provenance
+# a(35)
 
-**a(35) = 3561147281381782175236253062**  (new frontier term)
+a(35) = 3561147281381782175236253062
 
-- **Computed:** 2026-07-10, **two-machine disk-split** (dalby + ayr), **KINK
-  kernel**, u128 counter. First use of the multi-machine split-by-height =
-  split-by-DISK approach (each machine's heights hit only its own disk, so the
-  single-disk I/O contention that dominates a solo run is eliminated for free).
-  Driver `scripts/run_height_subset.sh N HEIGHTS CORES RAM`.
-  - **dalby** (aarch64 / ARM Neoverse-N1, 80 cores), engine rev `b8f13d41`:
-    `--heights 1-2,19-35` = the real top height **H19** (the long pole) plus all
-    closed forms. orchestrate wall **25112.2s (~7.0h)**, rss_max **372 MB**.
-    Run-dir on NVMe (scratch on disk, not tmpfs).
-  - **ayr** (x86_64, 32 cores), engine rev `d6e5679` (native build, Go 1.24.13):
-    `--heights 3-18` = the other real heights. wall **19831.6s (~5.5h)**,
-    rss_max **339 MB**.
-  - Both concurrent → **total ~7.0h wall vs ~16h single-machine (~2.3x)**. The
-    two engine revs differ only in docs/scripts after `b8f13d41`; the kink
-    engine itself is identical.
-  - Config: `--kernel kink --counter u128 --overlap-heights 35`, per-worker
-    `--ram` 1 GiB (dalby) / 1.5 GiB (ayr), `--checkpoint-every 300`.
-- **Height coverage:** P16 is NOT wired in `b8f13d41`, so the real sweep ran
-  **H3-H19** (H19 swept as a real height, unlike a34 where P15 held the top real
-  at H18). H20-H35 closed-form (P9-P15 diagonals k=2..16-ish + pole H34 + top
-  H35), plus low H1,H2. All 35 per-height shards present exactly once (combine
-  errors on a missing/truncated shard); `results/ns_a35/perheight/`.
-- **Validation:**
-  - a(1)-a(20) byte-match `fixtures/b006770.txt`.
-  - a(21)-a(34) match banked `results/ns_a{21..34}` exactly (a22-a25 have no
-    2-column banked triangle, skipped — all others OK). `A35_VALIDATE_PASS`.
-  - growth a35/a34 = **6.9106** (trend .../6.8987/6.9048/6.9106, monotone,
-    still climbing toward λ≈7.1).
-  - **P16 holdout now available (not yet run):** T(35,19) is a REAL computed
-    value (H19 was swept, not taken from P16). P16 was *fit* from T(33,17) and
-    T(34,18), so T(35,19) is the first independent point P16 predicts — comparing
-    the fitted P16(35,19) against this real T(35,19) is the first genuine holdout
-    test of P16. a34's top cell had no such holdout.
-- **Method note / tier:** the split ran DIFFERENT heights on ARM (dalby) vs x86
-  (ayr) — a partial cross-ISA computation, NOT a full same-heights cross-ISA
-  re-verify (as a34 had). The kink kernel is the a29 cell-diff-validated
-  independent reimplementation of the column kernel, so the method is
-  cross-checked; this specific term is one-algorithm, banked-prefix + growth
-  validated. A full cross-ISA re-verify (recompute all heights on one machine)
-  is a follow-up if a stronger tier is wanted.
+Computed 2026-07-10 on two machines, each enumerating its heights against
+its own disk, driven by `scripts/run_height_subset.sh`: dalby (ARM, 80
+cores, revision `b8f13d41`) ran heights 1, 2 and 19..35, that is the
+enumerated H = 19 plus every closed-form height, in 25,112.2 s of wall
+(peak RSS 372 MB); ayr (x86_64, 32 cores, revision `d6e5679`, which
+differs from `b8f13d41` only in docs and scripts) ran heights 3..18 in
+19,831.6 s (peak RSS 339 MB). Production transfer matrix, 128-bit counter,
+`--overlap-heights 35`, 1 GiB per worker on dalby and 1.5 GiB on ayr,
+checkpoints every 300 s. P_16 was not wired at this revision, so H = 19 was
+enumerated; heights 20..35 came from P_0..P_15.
+
+Files: `triangle.txt`, `perheight/h{1..35}.out`.
+
+Checks:
+
+- All 35 heights present exactly once in the combine.
+- a(1)..a(20) match `fixtures/b006770.txt`; a(21)..a(34) match
+  `results/ns_a{21..34}` (a(22)..a(25) by their recorded values, as those
+  directories hold no two-column triangle).
+- Growth: a(35)/a(34) = 6.9106.
+
+T(35,19) = 121081244529132538941157409 is enumerated and is the first cell
+P_16 (fitted from T(33,17) and T(34,18)) predicts; P_16 reproduces it, and
+`orchestrator/diag_p16_test.go` holds the cell out of the fit and checks
+that. The two machines ran different heights, so this run is not a
+cross-machine repeat of any cell.

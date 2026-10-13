@@ -1,15 +1,14 @@
-# Provenance — a(20) run (predates the PROVENANCE.md convention)
+# a(20)
 
-This directory predates the per-term `PROVENANCE.md` convention used from
-`results/ns_a26/` onward; its provenance lives in the original artifacts:
+a(20) = 1025573519362016
 
-- `summary.txt` — per-height job stats (ayr, seek-index engine, 30 cores,
-  420 columns over 20 heights; harvested 2026-06-28, commit `f7f6366`).
-- `a20.log` — the run log.
-- `Tnh_triangle.txt` / `triangle_Tnh.txt`, `columns.tsv`, `perheight/` —
-  the swept triangle and per-height outputs.
+Computed on ayr with the earlier column engine (`cpp/tma`, seek-index
+variant), 30 cores, 420 columns over 20 heights; harvested 2026-06-28 at
+commit `f7f6366`. Every height was enumerated.
 
-Validation status: a(20) is inside the two-algorithm confirmed range —
-a(1)–a(22) match digit-for-digit between the Redelmeier enumerator
-(`build/g2`) and the transfer-matrix engine (fleet run completed
-2026-07-16, `results/redelmeier_row22/`).
+Files: `summary.txt` (per-height job statistics), `a20.log` (the run log),
+`Tnh_triangle.txt` and `triangle_Tnh.txt` (the triangle T(n,H)),
+`columns.tsv`, and `perheight/` (one file per height).
+
+Check: a(1)..a(22) agree between this family of transfer-matrix programs and
+the Redelmeier enumerator `build/g2` (`results/redelmeier_row22/`).

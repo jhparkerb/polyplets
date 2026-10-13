@@ -1,11 +1,8 @@
-# Provenance — a(25)
+# a(25)
 
-See `RESULT.md`, `provenance.txt`, and `provenance_triangle.txt` in this
-directory (this run predates the uppercase `PROVENANCE.md` naming
-convention used from `results/ns_a26/` onward; the records are complete
-under the older names).
-
-Summary: a(25)=14994811325186658577, CERTIFIED 2026-07-02 (commit
-`6943a20`) after all three independent verification jobs passed; dalby
-solo, rev `54d41fc`, real-swept H1-16 + closed-form diagonal injection
-P0-P8 for H17-25.
+The run record is `RESULT.md` in this directory, with `provenance.txt` and
+`provenance_triangle.txt` showing which cells were enumerated and which
+came from a closed form. In brief: a(25) = 14994811325186658577, computed
+2026-07-02 on dalby at revision `54d41fc`, heights 1..16 enumerated and
+17..25 from the closed forms P_0..P_8; three independent checks passed
+(commit `6943a20`).

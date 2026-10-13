@@ -1,40 +1,25 @@
-# a(34) — provenance
+# a(34)
 
-**a(34) = 515316838423862758858377704**  (new frontier term)
+a(34) = 515316838423862758858377704
 
-- **Computed:** 2026-07-04, dalby-solo, **KINK kernel**. rev `d1b6bcb`
-  (P15 wired), u128 counter. `scripts/term.sh 34`. orchestrate wall
-  **13316.7s (~222.0 min / ~3.70h)**, 80 cores (dalby = aarch64 / ARM
-  Neoverse-N1).
-  - Config = the a29-cell-validated kink config: `--kernel kink --counter
-    u128 --cores 80 --ram 1GiB --unit-mult 4 --steal-grain 0.05` (no
-    overlap-heights). RAM light (kink rss_max **~6.44 GB** peak at the H18
-    peak column).
-  - P9-P15 closed-form diagonals cover H19-32 (k=2..15) + pole H33 + top
-    H34 + low H1,H2; real sweep was **H3-18**. **P15 held the top real
-    height at H18** (without it a34 would have swept H19, ~11h). H18 =
-    **9336s (~70% of the sweep wall)**; H17 2376s (18%); H16 722s (see
-    cost_profile_dalby.tsv).
-- **Combine:** `combine -in runs/ns_a34/perheight -maxn 34`, all 34 heights
-  present exactly once.
-- **Validation:**
-  - a(1)-a(20) byte-match `fixtures/b006770.txt`.
-  - a(21)-a(33) match banked `results/ns_a{21..33}` exactly.
-  - growth a34/a33 = **6.9048** (trend .../6.8853/6.8922/6.8987/6.9048,
-    monotone, still climbing toward λ≈7.1).
-  - **No closed-form holdout for the top cell**: T(34,18) =
-    23288787870043631158670332 is a diagonal-16 point, and P_16 is not yet
-    derivable independently of it (P_16 fits from T(33,17) and T(34,18), so
-    T(34,18) is a *fit* input, not a prediction). Unlike a(33) (whose
-    T(33,18) matched the held-out P_15), a(34)'s top cell is validated only
-    by the banked-prefix + growth checks. T(34,18) now enables P_16.
-- **Cross-ISA verify (2026-07-04, ayr):** full recompute on ayr (x86_64,
-  32 cores, ~13.5h) from the same rev, `A34_VERIFY_PASS` — triangle
-  n=1..34 **byte-identical** to the banked dalby (ARM) run, including
-  T(34,18). Same algorithm, independent hardware/ISA/toolchain: rules out
-  machine-, arch-, and build-specific corruption (not a second algorithm).
-- **Tier:** computed, single-source-algorithm, cross-ISA-verified. The
-  kink kernel is the a29 cell-diff-validated independent reimplementation
-  of the column kernel, so the method is cross-checked; this specific term
-  is one-algorithm. Term chase parked here (2026-07-04) per the close
-  plan.
+Computed 2026-07-04 on dalby (80 cores) at revision `d1b6bcb` (P_15 newly
+wired) by `scripts/term.sh 34`, production transfer matrix, 128-bit counter,
+13,316.7 s of wall, peak RSS 6.44 GB. Heights 3..18 enumerated (H = 18 took
+9336 s, H = 17 2376 s, H = 16 722 s); heights 1, 2 and 19..34 from the
+closed forms P_0..P_15.
+
+Files: `triangle.txt`, `perheight/h{1..34}.out`, `cost_profile_dalby.tsv`.
+
+Checks:
+
+- All 34 heights present exactly once in the combine.
+- a(1)..a(20) match `fixtures/b006770.txt`; a(21)..a(33) match
+  `results/ns_a{21..33}`.
+- Growth: a(34)/a(33) = 6.9048.
+- The whole run was repeated on ayr (x86_64, 32 cores, about 13.5 h) at the
+  same revision; the triangle for n = 1..34 is byte-identical, including
+  T(34,18). Same program, different machine, instruction set and toolchain.
+
+T(34,18) = 23288787870043631158670332 lies on the k = 16 diagonal. P_16 is
+fitted from T(33,17) and T(34,18), so this cell is an input to P_16 rather
+than a check of it; the first cell P_16 predicts is T(35,19).

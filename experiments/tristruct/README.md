@@ -31,7 +31,7 @@ T(40,40)=3^39 and T(40,39)=955·3^36, structural zeros (H>n), and file
 completeness.
 
 **Not every banked cell is an enumeration result.** Determination, from
-`results/ns_a40/PROVENANCE.md` line 26 ("Real sweeps H3-H21; H22-H40 via
+`results/ns_a40/PROVENANCE.md` ("Real sweeps H3-H21; H22-H40 via
 wired P_k closed forms (k = 40-H <= 18)") and `orchestrator/sweep.go`
 (lines 428-430 and 1938-1970, `lowHeightRow`/`contributeLowHeight`):
 
