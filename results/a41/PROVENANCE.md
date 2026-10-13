@@ -40,9 +40,9 @@ only at k ≤ 19; the checks below are about that.
 ## Checks
 
 - The Nmax-41 enumeration also produces every row n ≤ 40 at every height
-  it covers; all 800 positions with n ≤ 40 and H ≤ 20 (610 of them nonzero)
-  agree with `results/triangle.txt`, 0 disagree. `undertow_a41.py` refuses the n = 41 row unless they match and
-  at least 200 cells were compared.
+  it covers. All 800 positions with n ≤ 40 and H ≤ 20 (610 of them nonzero)
+  agree with `results/triangle.txt`. `undertow_a41.py` refuses the n = 41
+  row unless they match and at least 200 cells were compared.
 - A separate assembly with row 40 excluded from its own pinning set
   reproduces 21 cells of row 40, 0 wrong, and the row re-sums to a(40).
 - T(41,41) = 3^40 and T(41,40) = (25·41 − 45)·3^37.
