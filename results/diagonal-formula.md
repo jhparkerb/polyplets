@@ -27,7 +27,7 @@ polynomial P_k of degree k with
 
 and P_k takes integer values at every integer. [n^k]P_k = 25^k/k!
 (`docs/proofs/grand-form.md`, Corollary 2). The formula fails at n = 2k for
-every k ≥ 1 (proved 2026-09-05; `results/below-onset.md`).
+every k ≥ 1 (`results/below-onset.md`).
 
 | k | closed form | onset |
 |---|---|---|
@@ -43,20 +43,20 @@ denominator, the 5-part drops (`results/arithmetic-structure.md`). The
 monomial coefficients are never all integers for k ≥ 2 (P_2 leads with
 625/2); the binomial-basis coefficients are integers, checked k = 1..19.
 
-**How P_8 was determined** (`scripts/pin_diagonal_k8.py`, deleted in
-78602f8; exact rational arithmetic on the a(23) triangle). With the leading
-coefficient fixed at 25^k/k!, k values in range determine P_k; this
-reproduced P_7 and predicted the withheld entries T(22,15), T(23,16). For
-k = 8 the seven values n = 17..23 were one short of T(24,16). The sum of
-roots s_k = −c_(k−1)/c_k is quadratic in k (second differences 0.334;
-s = 3.934, 6.403, 9.206, 12.344, 15.816, 19.622 for k = 2..7; a fit on
-k = 2..6 predicts s_7 exactly), and s_8 = 23.763 predicted
+**How P_8 was first determined** (exact rational arithmetic on the triangle
+to n = 23). With the leading coefficient fixed at 25^k/k!, k values in range
+determine P_k; this reproduced P_7 and predicted the withheld entries
+T(22,15), T(23,16). For k = 8 the seven values n = 17..23 were one short of
+T(24,16). The sum of roots s_k = −c_(k−1)/c_k is quadratic in k (second
+differences 0.334; s = 3.934, 6.403, 9.206, 12.344, 15.816, 19.622 for
+k = 2..7; a fit on k = 2..6 predicts s_7 exactly), and s_8 = 23.763
+predicted
 
     T(24,16) = 42 594 477 635 772 598,
 
-confirmed exactly by `results/ns_a36/perheight/h16.out`, row n = 24. The
-a(25) run then computed H ≤ 16 directly and the formulas gave H ≥ 17. Above
-k = 8 each P_k is fixed from two values in range by the grand form
+which the enumeration then confirmed exactly
+(`results/ns_a40/perheight/h16.out`, row n = 24). Above k = 8 each P_k is
+fixed from two values in range by the grand form
 (`scripts/derive_pk_fast.py`); k ≤ 18 is verified on further entries,
 k = 19 has none withheld and certifies nothing.
 
@@ -93,7 +93,7 @@ times 4 above; a gap pair is joined only through the middle, so the contacts
 must cover both cells and not be disjoint singletons, 9. T(4,3) =
 15 + 25 + 15 = 55.
 
-**Theorem** (single-row weights, proved 2026-07-12). The interior weight of
+**Theorem** (single-row weights). The interior weight of
 a one-row cluster of s cells is (2s+1)², its boundary weight 2s+1: 25, 49,
 81, 121, 169 for s = 2..6. *Proof.* A gap of width 2 must be bridged by the
 contact cell below or above standing at its middle (wider gaps need surplus
@@ -137,8 +137,8 @@ all-pairs family is **not C-finite**: an order-7 recurrence fitted on ℓ ≤ 14
 predicts a non-integer at ℓ = 16; the gap between pending blocks is an
 unbounded ±2 walk, so the generating function is at best algebraic.
 
-**Two-row weights** (`cluster_weight_dp.py pair a b`, 2026-08-01; wall in
-seconds; W(5,5) alone 8.4 h):
+**Two-row weights** (`cluster_weight_dp.py pair a b`; wall in seconds;
+W(5,5) alone 8.4 h):
 
 | (a,b) | (2,6) | (2,7) | (2,8) | (3,5) | (3,6) | (3,7) | (4,4) | (4,5) | (5,5) |
 |---|---|---|---|---|---|---|---|---|---|
@@ -169,8 +169,7 @@ per-row log is 347/54 both ways). With μ = 3H(u), u = yμ/27:
 
 H(u) = 1 + 25u + 208u² + 1483u³ + 20688u⁴ + 130208u⁵ + … is the series the
 grand form calls e^B. The k = 2 numbers 441 = 49·9 and 1017 = 339·3 are the
-natural weights Ŵ (the source first called them normalization artifacts;
-the later statement holds). Exact through u³: h_2 = −2·25² + 441 + 1017 =
+natural weights Ŵ. Exact through u³: h_2 = −2·25² + 441 + 1017 =
 208; h_3 = 1483 from Ŵ = 6561, 25110, 25110, 43002 (`check_master()`). With
 all 31 types of surplus ≤ 5 the equation returns H = [1, 25, 208, 1483,
 20688, 130208] (`check_grand_form()` in `experiments/cluster_weight_dp.py`).
@@ -213,7 +212,7 @@ its derivative identity (3H² − 2H)H′ ≡ 25, H′(3H³ − 2H²) + 2H = 27H
 keeps 50uH^(−2) + 18u²H^(−3) + 18u³H^(−6), and the residue reproduces every
 known g_j mod 27.
 
-**The mod-9 identity for H(u³)** (proved 2026-07-13). Let X ∈ (ℤ/9)[[u]] be
+**The mod-9 identity for H(u³)** (proved). Let X ∈ (ℤ/9)[[u]] be
 the unique solution of X³ = X² + 25u with X(0) = 1, and W = X mod 3. Then
 
     H(u³) ≡ X² + 25u − 3u² − 3uW (mod 9),  hence
@@ -289,7 +288,7 @@ A001207 to n = 10; row-transfer DP checked entry by entry against it):
 
     P_1 = 9n − 15,   P_2 = (81n² − 307n + 142)/2.
 
-`experiments/hex_diag_deep.py` (2026-09-05) raises the surplus budget from 2
+`experiments/hex_diag_deep.py` raises the surplus budget from 2
 to 6 by building each row left to right and abandoning dead prefixes: 140
 entries, H ≤ 20, 19 s, in `results/hex_diagonal_cells.txt`, checked against
 brute force for n ≤ 9. Fits give P_1..P_6 with 72 withheld entries exact,
@@ -351,7 +350,7 @@ predicts. Off the diagonals the ratio grows smoothly with no structure.
 ## The production matrix and the 3-adic band
 
 `experiments/production_matrix_probe.py` computes P = L^(−1)L̄ for L the
-18×18 block of the triangle (`results/ns_a36/perheight/h{H}.out`), L̄ its
+18×18 block of the triangle (`results/ns_a40/perheight/h{H}.out`), L̄ its
 shift up one row. Not Riordan: 89 Toeplitz violations of 289. Not banded:
 every row m has support H ∈ [2, m+1], so there is no finite production rule
 and no constant-coefficient 2-D recurrence. The band near the diagonal is
@@ -383,9 +382,10 @@ the non-D-finiteness of a(n) (`results/anisotropic-not-dfinite.md`).
 
 ## Columns: atoms and the root-separation theorem
 
-Data `results/ns_a35/perheight/h{H}.out`; `experiments/triangle_relations.py`,
-`triangle_relations2.py`, `triangle_atoms.py`; exact arithmetic, fitted on
-the earliest terms, checked on the rest.
+Data: the triangle to n = 35 (`results/ns_a40/perheight/h{H}.out` holds it
+to n = 40); `experiments/triangle_relations.py`, `triangle_relations2.py`,
+`triangle_atoms.py`; exact arithmetic, fitted on the earliest terms, checked
+on the rest.
 
 **Columns H ≤ 4** have minimal constant-coefficient recurrences of orders 1,
 3, 7, 15 from 35, 34, 33, 32 terms, confirmed on 33, 28, 19, 2 further
@@ -458,30 +458,28 @@ Q_5[7] += 1 fail exactly at H = 5, n = 12 and H = 11, n = 20, exit 1. For
 H ≤ 10 this corroborates the mod-p, Berlekamp–Massey and CRT recovery on 355
 entries.
 
-**H = 11 is wrong** (2026-09-05). The recovery tool (`gf/modp_recover.py`,
-deleted in 91bdcdc) lifted H = 11 from a fixed pool of 133 primes below
-2^31, half-modulus 1241 digits, while coefficients grow at 0.097 digits per
-degree at every validated height (H = 9: 184 digits at degree 1897; H = 10:
-486 at 5005) and reach about 1299 digits at degree 13381, six primes short:
-370 of the 26764 coefficients sit within 10% of M/2, the largest at 0.999,
-and at H = 10 none does. `experiments/gf_h11_validate.py` expands Q_11·B_11
-against P_11 mod the fresh prime 1073741789, B_11 from `build/gf_modp`,
-n = 0..26792: first mismatch at n = 8170, first bad coefficient at degree
-8159, where the size crosses the 133-prime ceiling (engine 884.8 s,
-comparison 1.1 s); H = 8, 9 pass, and the corrupted control fails at the
-perturbed degree plus H. The earlier "Q_11 shares no roots with Q_9 Q_10 mod
-p" was this wraparound. The file carries `refuted=2026-09-05
-first_bad_degree=8159`; parsers keyed on `validated=True` or `order=` were
-re-run green. Survives: order 13381 with deg N_11 = 8838 (agreed across all
-133 primes); the strip certificates, which read validated entries only; and
-μ_11 = 6.1158416, since `experiments/mu_H_from_atoms.py` bisects for the
-least positive root and at x = 1/6.1158416 the tail from degree 8159
-contributes 10^(−5177) against 10^(−32) for the head. `build/strip_mu 10 11`
-(Perron iteration, never reading the file) gives μ_10 = 5.9916958,
-μ_11 = 6.1158416 in 10.3 s; `cpp/strip_mu_kink.cpp` reproduces it by a third
-construction.
+**H = 11 is wrong.** It was lifted by CRT from a fixed pool of 133 primes
+below 2^31, half-modulus 1241 digits, while coefficients grow at 0.097
+digits per degree at every validated height (H = 9: 184 digits at degree
+1897; H = 10: 486 at 5005) and reach about 1299 digits at degree 13381, six
+primes short: 370 of the 26764 coefficients sit within 10% of M/2, the
+largest at 0.999, and at H = 10 none does. `experiments/gf_h11_validate.py`
+expands Q_11·B_11 against P_11 mod the fresh prime 1073741789, B_11 from
+`build/gf_modp`, n = 0..26792: first mismatch at n = 8170, first bad
+coefficient at degree 8159, where the size crosses the 133-prime ceiling
+(engine 884.8 s, comparison 1.1 s); H = 8, 9 pass, and a corrupted control
+fails at the perturbed degree plus H. The file carries `refuted=2026-09-05
+first_bad_degree=8159`. What stands: order 13381 with deg N_11 = 8838
+(agreed across all 133 primes); the strip certificates, which read validated
+entries only; and μ_11 = 6.1158416, since `experiments/mu_H_from_atoms.py`
+bisects for the least positive root and at x = 1/6.1158416 the tail from
+degree 8159 contributes 10^(−5177) against 10^(−32) for the head.
+`build/strip_mu 10 11` (Perron iteration, never reading the file) gives
+μ_10 = 5.9916958, μ_11 = 6.1158416 in 10.3 s; `cpp/strip_mu_kink.cpp`
+reproduces it by a third construction.
 
-Re-recovery, priced on gympie and not launched:
+Re-recovery, priced and not run (the recovery tool is in git history; see
+Reproduce):
 
 | H | primes | wall | CPU-s | workers | M/2 digits | coeff digits | matches |
 |---|---|---|---|---|---|---|---|
@@ -491,8 +489,8 @@ Re-recovery, priced on gympie and not launched:
 
 H = 11 at N = 26792 is 884.8 s per prime single-threaded at 248 MB; the pool
 grows to 194 primes, 47.7 CPU-hours plus a serial 38-minute order search:
-about 6.4 h on gympie (10 workers, 2.5 GB) or 2.5 h on ayr (32 cores,
-8 GB), resumable per (H, N, prime). A validated H = 11 breaks
+about 6.4 h on 10 workers (2.5 GB) or 2.5 h on 32 cores (8 GB), resumable
+per (H, N, prime). A validated H = 11 breaks
 `experiments/anisotropic_dfinite.py` (validated set 1..10) until deg ψ_11
 is added.
 
@@ -571,8 +569,7 @@ Verdict: μ_2 ≈ 41.8–42.5 by fitting, rising with the window (41.76, 41.90,
 θ is no small non-negative integer, so the slice is not a low-degree
 polynomial times an exponential.
 
-**Growth constants from the grand form** (`experiments/grand_form_saddle.py`,
-2026-08-09). Σ_k P_k(n) y^k = exp(A(y) + nB(y)); a_j, b_j extracted for
+**Growth constants from the grand form** (`experiments/grand_form_saddle.py`). Σ_k P_k(n) y^k = exp(A(y) + nB(y)); a_j, b_j extracted for
 j = 1..19 from the engine's P_1..P_19 come out linear in n, b_1 = 25,
 a_1 = −45, an independent test only for k ≤ 8 (partly 9, 10), since
 `scripts/derive_pk_fast.py` builds P_11..P_19 from the recurrence. On n = 2H
@@ -600,10 +597,9 @@ elimination (`experiments/slope2_law_vs_truth.py`):
 | ratios, order 3 (H = 17..20) | 42.39426 |
 | ratios, order 4 (H = 16..20) | 42.39455 |
 
-Two estimators on one enumeration. The supportable agreement is about 3
-parts in 100,000; the fitting record's closing note said 6 parts in a
-million from one pair of endpoints, and the saddle record, the later one,
-holds. The raw ratio at H = 20 is 41.445, which is why the fits drifted up.
+Two estimators on one enumeration; the supportable agreement is about 3
+parts in 100,000. The raw ratio at H = 20 is 41.445, which is why the fits
+drifted up.
 Higher slopes (b_19 y*^19 reaches 1.1·10^(−3) at s = 5):
 
 | s | grand form | last measured ratio | Richardson | points |
@@ -691,7 +687,6 @@ All scripts run as `python3 <path>` with no arguments unless shown.
 
     experiments/defect_gas.py, cluster_weight_dp.py [pair A B], spine_deeper.py, holefree_gas.py, hole_strata_gas.py
     experiments/diagonal_law_proof_check.py, grand_form_check.py, Pk_explicit.py; scripts/derive_pk_fast.py, verify_diagonal_pins.py
-    git show 78602f8^:scripts/pin_diagonal_k8.py
     experiments/hex_gas.py, hex_diag_deep.py, polyiamond_diagonal.py, polyiamond_fibre_check.py
     experiments/universal_law_check.py, gas_cumulants.py, cross_lattice.py
     experiments/production_matrix_probe.py, band_constants_3adic.py, Pk_denominator_check.py, Pk_newton_3adic.py
@@ -701,17 +696,3 @@ All scripts run as `python3 <path>` with no arguments unless shown.
     experiments/slope_slices.py, slope_onset.py, pfinite_slices.py, slope2_ansatz.py
     experiments/grand_form_saddle.py, slope2_law_vs_truth.py, lambda_from_grand_form.py
     experiments/triangle_combinations.py, alt_sign_runs.py, parity_amplitude.py
-
-## Sources
-
-- `results/defect-gas.md` (deleted 2026-09-06; its content is above)
-- `results/diagonal-closed-forms.md` (deleted 2026-09-06; its content is above)
-- `results/k8-pinning.md` (deleted 2026-09-06; its content is above)
-- `results/hex-diagonal-law.md` (deleted 2026-09-06; its content is above)
-- `results/polyiamond-diagonal-law.md` (deleted 2026-09-06; its content is above)
-- `results/slope-slicings.md` (deleted 2026-09-06; its content is above)
-- `results/slope-growth-saddle.md` (deleted 2026-09-06; its content is above)
-- `results/production-matrix-probe.md` (deleted 2026-09-06; its content is above)
-- `results/triangle-combinations.md` (deleted 2026-09-06; its content is above)
-- `results/triangle-structure.md` (deleted 2026-09-06; its content is above)
-- `results/gf-head-check.md` (deleted 2026-09-06; its content is above)

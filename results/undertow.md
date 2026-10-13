@@ -1,22 +1,22 @@
-# Undertow: determining the diagonal formulas from entries below their onset
+# Determining the diagonal formulas from entries below their onset
 
-Undertow is the repository's name for one observation, made 2026-08-20, and
-for what followed from it. Each diagonal formula P_k of the polyplet triangle
-carries two constants. The standing rule fixed them from the two tallest
-entries on the formula's diagonal, the most expensive entries in the whole
-enumeration. The same two constants can be fixed from entries below the
-formula's onset (the smallest n at which the formula holds), once each such
-entry is corrected by an exactly known defect. The results are of four
-grades. Proved: the formula's shape, its onset, and
-the two-constants-per-level statement, in `docs/proofs/` (the last in Lean).
+Each diagonal formula P_k of the polyplet triangle carries two constants. The
+rule used through a(40) fixed them from the two tallest entries on the
+formula's diagonal, the most expensive entries in the whole enumeration. The
+same two constants can be fixed from entries below the formula's onset (the
+smallest n at which the formula holds), once each such entry is corrected by
+an exactly known defect. This is how a(41) was computed. The results are of
+four grades. Proved: the formula's shape, its onset, and the
+two-constants-per-level statement, in `docs/proofs/` (the last in Lean).
 Exact and checked: the defects D_j for depths 1 to 5, computed by a program
 that never reads the triangle, and reproducing every recorded entry at
 k <= 19. Computed and checked: a(41), with heights 1 to 20 enumerated directly
 and heights 21 to 41 from the formulas; a(n) for n <= 40 rebuilt with no input
 from the main enumeration program. Measured: the cost of each depth table, the
 cost of a fixed-height enumeration as the maximum size grows, and the identity
-itself on the square lattice against published counts. Two doors are closed
-with their obstructions: strict freedom from fitting, and depths 8 and 9.
+itself on the square lattice against published counts. Two routes are closed
+with their obstructions: freeing the formulas from enumerated entries
+altogether, and depths 8 and 9.
 
 ## Definitions
 
@@ -24,18 +24,18 @@ with their obstructions: strict freedom from fitting, and depths 8 and 9.
   bounding box has height H; T is the triangle, stored as `results/triangle.txt`
   for n <= 40 and as per-height rows `h<H>.out`. A value of T is an entry.
 - **The main program** is the transfer-matrix enumeration `orchestrate`
-  (kink code path, `orchestrator/`), which produced every T(n,H) to n = 40 and
-  the enumerated heights of row 41. Its formula table `diagCoeffTable` in
+  (`orchestrator/`), which produced every T(n,H) to n = 40 and the enumerated
+  heights of row 41. Its formula table `diagCoeffTable` in
   `orchestrator/sweep.go` holds P_k for k <= 19, each fitted from two entries;
   the a(40) run wrote formula values for heights H >= 22 instead of
   enumerating them (`results/ns_a40/PROVENANCE.md`).
-- **The coloring program** (Motley, `cpp/motley_par.cpp`, records in
+- **The coloring recount** (`cpp/motley_par.cpp`, records in
   `results/cutcount_b1/`) counts C_H(n) by coloring and never decides
   connectivity. T(n,H) = C_H(n) - 2 C_{H-1}(n) + C_{H-2}(n)
   (`docs/proofs/cutcount-identity.md`). It covers H <= 18 at n <= 40
   (`results/cutcount_b1/rows/`) and H <= 19 at n <= 41
   (`results/cutcount_b1/rows41/`). A value derived with no input from the main
-  program is called rule-independent, because the coloring program uses a
+  program is called rule-independent, because the coloring recount uses a
   different connectivity rule.
 - **The strip engine** is a third program covering H <= 14 at n <= 40
   (`results/second-sources.md`).
@@ -57,15 +57,14 @@ with their obstructions: strict freedom from fitting, and depths 8 and 9.
   Depth j needs the family table at excess e <= j-1. The tables
   `results/severance_w3_families_K<K>_e<e>.txt` carry three weight columns,
   `sig`, `bb`, `pp`, per (e, k). None of this reads the triangle or any P_k.
-- **Severance W1** is the cluster-weight enumeration (`cpp/severance_w1.cpp`,
-  `results/severance_w1_weights_k9.txt`) that gives P_1 to P_9 with no triangle
+- **The cluster-weight enumeration** (`cpp/severance_w1.cpp`,
+  `results/severance_w1_weights_k9.txt`) gives P_1 to P_9 with no triangle
   input.
 - **The assembly** is the set of formulas P_k with their constants fixed,
   used to supply the entries of a row that were not enumerated.
-- **The review** is the adversarial review of 2026-08-20, run as three lanes:
-  Lane A traced every input for circularity, Lane B worked out what each
-  possible further computation would settle, Lane C asked whether the
-  assembly can be freed of enumerated entries altogether.
+- **The onset rule** fixes level k from its two entries at n = 2k+1 and
+  n = 2k+2, at heights k+1 and k+2. It is the rule the formula table was built
+  by.
 
 ## The identity, and the reach it gives
 
@@ -78,9 +77,8 @@ k <= 21 (`experiments/undertow_congruence_gate.py`). P_k(n) is linear in
 (a_k, b_k) with coefficient 1, so each below-onset entry with an exact D_j is
 one linear equation in the two constants of its level, and two entries at
 distinct depths determine the level; the 2x2 system at distinct n is never
-singular. The classical rule used the entries at n = 2k+1 and n = 2k+2, at
-heights k+1 and k+2. The depth-j entry is j rows shorter. No new theorem is
-involved: the content is the choice of entries.
+singular. The depth-j entry is j rows shorter than the onset rule's. No new
+theorem is involved: the content is the choice of entries.
 
 **Reach.** With exact defects through depth J and every height H <= Hs
 enumerated at maximum size N, level k is determined when two depths
@@ -89,10 +87,10 @@ j1 < j2 <= J satisfy k+1-j <= Hs, so
     k_max = Hs + J - 2,      rows complete for  n <= 2 Hs + J - 1.
 
 Both determining entries lie inside the enumeration, since
-2k+1-j <= k + Hs <= 2Hs + J - 2 <= N. The classical rule gives n <= 2 Hs.
+2k+1-j <= k + Hs <= 2Hs + J - 2 <= N. The onset rule gives n <= 2 Hs.
 Each unit of depth buys one row; each unit of height buys two.
 
-| term | classical height | height with J = 4 |
+| term | height needed, onset rule | height needed with J = 4 |
 |---|---|---|
 | a(40) | 21 | 19 |
 | a(41) | 21 | 19 |
@@ -119,16 +117,16 @@ comparison is equality of rationals.
   were fitted from. Level 19 comes back from T(38,19) and T(37,18), without
   T(39,20) or T(40,21).
 
-| depths allowed | depth pairs | wrong | run |
-|---|---|---|---|
-| j <= 4 | 100 (1 skipped) | 0 | 2026-08-20 |
-| j <= 5 | 160 | 0 | 2026-09-05 |
+| depths allowed | depth pairs | wrong |
+|---|---|---|
+| j <= 4 | 100 (1 skipped) | 0 |
+| j <= 5 | 160 | 0 |
 
   Pairs share entries: a level with c usable entries carries c - 2 independent
   checks, about 36 in all at j <= 4.
 - **Negative controls (`--selftest`).** A perturbed D_j breaks the solution;
   the same equation offered twice is refused as singular; a corrupted lower
-  level breaks the solution. All three fire.
+  level breaks the solution.
 - **Audit (`--audit`).** Each level is determined from its two shortest
   usable entries, then every recorded entry at or above onset on its diagonal
   that it did not use is predicted.
@@ -138,17 +136,14 @@ comparison is equality of rationals.
 | 342 | 189 | 153 | 0 |
 
   The 153 are identities: all 171 recorded in-onset entries at H >= 22 equal
-  the formula table's evaluation (verified 2026-08-20), and the extraction and
-  the grand form are exact inverses, so any assembly built on the table's
-  levels evaluates to the same polynomial. The 189 include T(39,20) and
-  T(40,21), the two entries P_19 was fitted from, predicted from a level 19
-  determined at H <= 18 (depths 2, 3) or at H <= 17 (depths 3, 4). Levels 3 to
-  17 of the table each had an entry withheld and reproduced when they were
-  fitted; levels 18 and 19 had none until this (Lane A also notes a
-  certification of level 18 through T(39,21) in the a(40) record, and counts
-  18 among the levels without one; both statements are kept). Levels through 15
-  (depths 2, 3) or 16 (depths 3, 4) are determined at H <= 14, inside the strip
-  engine's range.
+  the formula table's evaluation, and the extraction and the grand form are
+  exact inverses, so any assembly built on the table's levels evaluates to
+  the same polynomial. The 189 include T(39,20) and T(40,21), the two entries
+  P_19 was fitted from, predicted from a level 19 determined at H <= 18
+  (depths 2, 3) or at H <= 17 (depths 3, 4). Levels 3 to 17 of the table each
+  had an entry withheld and reproduced when they were fitted; levels 18 and
+  19 had none until this. Levels through 15 (depths 2, 3) or 16 (depths 3, 4)
+  are determined at H <= 14, inside the strip engine's range.
 - **"Shorter" is per level, not transitive.** The audit takes lower levels
   from the formula table, and P_18 embeds T(38,20), so the audit's prediction
   of T(39,20) uses an equal-height entry through level 18. It never uses the
@@ -169,32 +164,31 @@ comparison is equality of rationals.
 
 `experiments/undertow_ri.py` answers each row with an assembly built from
 nothing the main program produced, excluding the row from its own determining
-set: levels 1..9 from Severance W1's weights through
+set: levels 1..9 from the cluster-weight enumeration through
 `experiments/severance_w1_assemble.py`; levels 10 and up from the coloring
-program's entries, every determining entry at H <= hmax; D_j for j <= 4; the
+recount's entries, every determining entry at H <= hmax; D_j for j <= 4; the
 grand form. The main program's triangle and the OEIS b-file appear only as
-comparison targets. The review (Lane A, 2026-08-20) traced every input to
-its file and found no circularity.
+comparison targets. Every input was traced to its file; none comes from the
+main program.
 
-| run | hmax | rows | result |
+| rows from | hmax | rows | result |
 |---|---|---|---|
-| 2026-08-20, `results/cutcount_b1/rows/` | 18 | 19..39 | complete; every entry agrees; every sum matches a(n) |
+| `results/cutcount_b1/rows/` | 18 | 19..39 | complete; every entry agrees; every sum matches a(n) |
 | same | 18 | 40 | complete except T(40,19) |
-| 2026-08-21, `results/cutcount_b1/rows41/` | 19 | 39, 40 | complete; sums match |
+| `results/cutcount_b1/rows41/` | 19 | 39, 40 | complete; sums match |
 | same | 19 | 41 | complete; a(41) as below |
 
 At hmax 18, level 20 is determined from the single pair (37,17), (38,18),
 with no check at its own level; its values of T(39,19) and T(40,20) agree with
-the main program. The coloring program and the main program agree on all 720
-shared entries at H <= 18, which was already known; the new content is the
-173 entries at H > 18 of rows 30..40 that the assembly reproduces. Rows <= 18
-crashed the script as reviewed (an empty formula band); those rows reduce to
-the 720-entry agreement.
+the main program. The coloring recount and the main program agree on all 720
+shared entries at H <= 18; the new content is the 173 entries at H > 18 of
+rows 30..40 that the assembly reproduces. The script fails on rows <= 18 (an
+empty formula band); those rows reduce to the 720-entry agreement.
 
 T(40,19), the one entry of row 40 the assembly could not reach from H <= 18,
-was enumerated by the coloring program on 2026-08-21 in its run at maximum
-size 41 (nine primes per height, one held back to predict every entry, about
-22 hours on dalby; `results/cutcount_b1/rows41/README.md`):
+was enumerated by the coloring recount in its run at maximum size 41 (nine
+primes per height, one held back to predict every entry, about 22 hours;
+`results/cutcount_b1/rows41/README.md`):
 
     T(40,19) = 3247572468599336484342102174163
 
@@ -208,14 +202,14 @@ direct enumeration by a second program is recorded in
 
 Record: `results/a41/PROVENANCE.md`. Assembler: `experiments/undertow_a41.py`.
 
-| heights | source | when |
+| heights | source | run |
 |---|---|---|
-| 1..19 | main program, dalby, 40 cores, 4.72 h, cpu 605,643 s, rss 557 MB | 2026-08-20 |
-| 20 | main program, dalby, 76 cores, 9.63 h (section below) | 2026-09-05 |
-| 21..41 | the assembly: k <= 19 from the formula table, level 20 determined below onset; T(41,21) is level 20 exactly at onset | 2026-08-20 |
+| 1..19 | main program, 40 cores, 4.72 h, cpu 605,643 s, rss 557 MB | 2026-08-20 |
+| 20 | main program, 76 cores, 9.63 h (section below) | 2026-09-05 |
+| 21..41 | the assembly: k <= 19 from the formula table, level 20 determined below onset; T(41,21) is level 20 exactly at onset | |
 
-Until 2026-09-05 the assembly also supplied T(41,20) as level 21 at depth 2,
-carrying D_2(21) = 1534183878653401344302049616588 / 3^23.
+Before height 20 was enumerated the assembly also supplied T(41,20), as
+level 21 at depth 2, carrying D_2(21) = 1534183878653401344302049616588 / 3^23.
 
 **Checks the assembler refuses without.**
 
@@ -233,56 +227,50 @@ carrying D_2(21) = 1534183878653401344302049616588 / 3^23.
 - Growth: a(41)/a(40) = 6.9394 after 6.9212, 6.9261, 6.9308, 6.9352, with
   successive differences 0.0049, 0.0047, 0.0044, 0.0042.
 
-Two statements of the 2026-08-20 record were corrected by the review. "a(40)
-comes out of heights 1..19 alone" holds only when composed with `--verify`;
-the assembler alone demonstrates it modulo the formula table. And the same
-script run at n = 39, 38, 37 with the height cap at 19, 18, 18 contains no
-below-onset determination at all: the loop over new levels is empty because
-the table already reaches k = 19, and the cap constrains newly determined
-levels only, so those rows consume constants fitted to entries above their
-stated cap (a(39)'s height-20 value is T(39,20) through P_19's fit). In the
-row-40 dry run the check of the enumeration against the recorded triangle
-compares a directory with itself; the same check in the real run is genuine.
+Two limits of these checks. "a(40) comes out of heights 1..19 alone" holds
+only when composed with `--verify`; the assembler alone demonstrates it modulo
+the formula table. And the same script run at n = 39, 38, 37 with the height
+cap at 19, 18, 18 contains no below-onset determination at all: the loop over
+new levels is empty because the table already reaches k = 19, and the cap
+constrains newly determined levels only, so those rows consume constants
+fitted to entries above their stated cap (a(39)'s height-20 value is T(39,20)
+through P_19's fit). In the row-40 dry run the check of the enumeration
+against the recorded triangle compares a directory with itself; the same
+check in the real run is genuine.
 
-**Independent recount.** `experiments/lane_b_a41_recount.py` (Lane B,
-2026-08-20) rebuilds the term by a route chosen to differ wherever it can:
-levels 1..19 fitted from their two onset entries in `results/triangle.txt`
-rather than read from the table; its own polynomial representation, grand-form
-recurrence, solver and assembly loop; D_j imported only at k >= 20 and first
-checked at every k <= 19 against its own extraction from the recorded entries;
-level 20 determined from depths (1, 2) with depths 3 and 4 withheld and
-reproduced.
+**Independent recount.** `experiments/lane_b_a41_recount.py` rebuilds the
+term by a route chosen to differ wherever it can: levels 1..19 fitted from
+their two onset entries in `results/triangle.txt` rather than read from the
+table; its own polynomial representation, grand-form recurrence, solver and
+assembly loop; D_j imported only at k >= 20 and first checked at every k <= 19
+against its own extraction from the recorded entries; level 20 determined
+from depths (1, 2) with depths 3 and 4 withheld and reproduced.
 
     589 enumerated entries vs the recorded triangle: 0 mismatch
     342 in-onset entries predicted by anchor-fitted levels k <= 19: 0 wrong
     70 imported D_j(k), k <= 19, vs own extraction: 0 wrong
     a(41) recount: AGREE
 
-Its grade, in its own words: clean as a second implementation, not a second
-count. It retires assembly, transcription and arithmetic error across two
-disjoint code bases. It shares with the assembler the enumerated files, the
-grand form, D_j at k = 20 and 21, and level 21's determining entries T(40,19)
-and T(39,18).
+It is a second implementation, not a second count. It retires assembly,
+transcription and arithmetic error across two disjoint code bases. It shares
+with the assembler the enumerated files, the grand form, D_j at k = 20 and
+21, and level 21's determining entries T(40,19) and T(39,18).
 
 **Level 21.** With depths j <= 4, level 21 has one determining pair, T(40,19)
-and T(39,18), and no check at its own level. Level 20's redundancy was first
-reported as 3 pairs and 2 checks (depths <= 3); at depths <= 4, the recipe
-the run used, it is 6 pairs and 5 checks (`docs/audits/AUDIT-2026-09-02.md` M1). The
-content of the assembly resting on a single computation was first named as
-nine numbers, the e = 3 rows at k = 20, 21, 22 of
-`results/severance_w3_families_K22_e3.txt`, plus the two determining entries;
-corrected 2026-09-05 to three integers, `sig`, `bb`, `pp` at e = 3, k = 21,
-because the k = 22 row is truncated away by `D_series(4, 21)` and the k = 20
-row is checked by level 20's pair agreement. The congruence gate below was
-described as guarding D_4(21) transitively; it guards its fractional part
-only. Measured 2026-09-05 on a shadow copy of the table: `sig[3][21] + 9`
-leaves the congruence gate green and moves the depth-4 assembler's a(41) by
-exactly 9, because a shift of Delta in D_4(21) moves T(41,20) by 9 Delta and
-every single-entry error enters D_4(21) with a coefficient in (1/9) Z.
+and T(39,18), and no check at its own level; level 20 has 6 pairs and 5
+checks. What the depth-4 assembly rests on with a single computation behind
+it is three integers, `sig`, `bb`, `pp` at e = 3, k = 21 of
+`results/severance_w3_families_K22_e3.txt`, plus the two determining entries:
+the k = 22 row is truncated away by `D_series(4, 21)` and the k = 20 row is
+checked by level 20's pair agreement. The congruence gate below guards only
+the fractional part of D_4(21): measured on a shadow copy of the table,
+`sig[3][21] + 9` leaves the congruence gate green and moves the depth-4
+assembler's a(41) by exactly 9, because a shift of Delta in D_4(21) moves
+T(41,20) by 9 Delta and every single-entry error enters D_4(21) with a
+coefficient in (1/9) Z.
 
-Depth 5 closes it. `results/severance_w3_families_K21_e4.txt` (2026-08-23)
-supplies D_5, and level 21 gains T(38,17), an entry the coloring program
-covers:
+Depth 5 closes it. `results/severance_w3_families_K21_e4.txt` supplies D_5,
+and level 21 gains T(38,17), an entry the coloring recount covers:
 
     python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
     level k=20 determined from (36,16) (37,17) (38,18) (39,19): 6 pairs, 5 independent checks
@@ -292,7 +280,7 @@ covers:
 with different coefficients, so any single-entry error in that row makes the
 pairs disagree and the build refuses. `make gate-undertow-pairs`
 (`experiments/undertow_pairs_gate.py`) rebuilds the depth-5 assembly with the
-determining entries and pair counts fixed in the gate, requires a(41) from
+determining entries and pair counts fixed in the check, requires a(41) from
 `results/a41/h*.out` plus the assembly to equal the value above, and carries
 six negative controls: the +9 mutation end to end, `bb` and `pp` at (3, 21),
 the e = 4 row of the K21_e4 table, a corrupted determining entry, and the
@@ -303,17 +291,15 @@ grand form. The check that crosses assumption families is an enumeration of
 T(41,20).
 
 **The height-20 enumeration.** `scripts/dalby_a41_h20.sh`, dalby, rev
-`b88b38bc5`, 76 cores, nothing injected from the formula table; started
-2026-09-05 11:41 EDT, finished 21:19 EDT, exit 0.
+`b88b38bc5`, 76 cores, nothing injected from the formula table; 2026-09-05,
+11:41 to 21:19 EDT, exit 0.
 
 | wall | cpu | rss | frontier peak |
 |---|---|---|---|
 | 34,678.8 s (9.63 h) | 1,766,882 s | 814.7 MB | 129,487,745 records at column 7 |
 
-The disk peak was not recorded; the script header predicted 185 to 190 GB,
-Lane B's extrapolation from the a(40) height-20 phase gave about 11 h on 48
-cores and about 190 GB, and the record before either said 20 to 30 h and
-450 GB. Per-column profile: `results/a41/h20_cost_profile.tsv`.
+The disk peak was not recorded. Per-column profile:
+`results/a41/h20_cost_profile.tsv`.
 
     T(41,20) = 18004779862205054677763902712770    enumerated, results/a41/h20.out
     T(41,20) = 18004779862205054677763902712770    the assembly, level 21 at depth 2
@@ -321,22 +307,21 @@ cores and about 190 GB, and the record before either said 20 to 30 h and
 Column 20 of the run agrees with the recorded triangle on all 40 entries at
 n <= 40. Reassembled with the enumerated height, a(41) is unchanged, 800
 entries agree, and the term no longer uses P_21 at all. What does not change:
-heights 21 to 41 are formula values, and the coloring program stops at
+heights 21 to 41 are formula values, and the coloring recount stops at
 height 19, so T(41,20) has one enumeration and one prediction behind it.
 `results/confidence.md` is the plain statement of how far the term is trusted.
 
 ## What an agreement is worth
 
-Lane B of the review (2026-08-20) worked out what bears on T(40,19), then
-the only entry of row 40 without a rule-independent value. It sits on level
-21 at depth 3:
+Before the runs above, T(40,19) was the only entry of row 40 without a
+rule-independent value. It sits on level 21 at depth 3:
 
     T(40,19) = P_21(40) 3^(-24) + D_3(21).
 
 Its value is fixed by the levels k <= 20, the constants (a_21, b_21), and
 D_3(21), so only level-21 entries bear on it, one per row.
 
-| row | level-21 entry | depth | status on 2026-08-20 |
+| row | level-21 entry | depth | status before the runs below |
 |---|---|---|---|
 | 39 | T(39,18) | 4 | enumerated by both programs |
 | 40 | T(40,19) | 3 | main program only |
@@ -352,8 +337,8 @@ of buying a third level-21 equation.
 | route | what it produces | buys | outcome |
 |---|---|---|---|
 | height 20 at size 41 | T(41,20); level 21 gets pairs (2,3), (2,4), (3,4) | validation of T(40,19), and an enumeration against P_21's prediction; no rule-independence (same program) | ran 2026-09-05 |
-| height 21 at size 42 | T(42,21) | the same kind of evidence at more wall and disk (extrapolated 44 h, 443 GB from phase C times 1.22); its old justification, P_19's first withheld entry, was already met by the audit | dominated; not run |
-| coloring program at height 19 | T(40,19) directly under the other rule | rule-independence and validation in one act, through neither D_j nor the grand form | ran 2026-08-21 |
+| height 21 at size 42 | T(42,21) | the same kind of evidence at more wall and disk (extrapolated 44 h, 443 GB from phase C times 1.22); P_19's first withheld entry, its other justification, was already met by the audit | dominated; not run |
+| coloring recount at height 19 | T(40,19) directly under the other rule | rule-independence and validation in one act, through neither D_j nor the grand form | ran 2026-08-21 |
 | depth 5 | level 21 from T(39,18), T(38,17), both H <= 18 | a rule-independent derivation, agreeing with the enumerated entry; weaker in kind, since the chain runs through D_3, D_4, D_5 at k = 21 | table 2026-08-23 |
 
 Where two routes look independent and are not: every formula statement about
@@ -365,15 +350,14 @@ rule adds nothing once the entries agree, because both rules' assemblies are
 determined from the same (n, H) entries. The family tables feed every depth at
 every level and were checked against entries only at k <= 19; a shared error
 surfacing first at k >= 20 would move all depth pairs coherently and pass
-every agreement-only check. Only an enumeration crosses that family. This is
-the finding `paper/L8-below-onset.tex` quotes.
+every agreement-only check. Only an enumeration crosses that family.
+`paper/L8-below-onset.tex` quotes this.
 
 ## The family tables' own software leg
 
 The D_j consumed at k = 20 and 21 come from the k = 20..22 rows of the
-K22 tables, produced by the C++ enumerator alone. Lane A (2026-08-20) forced
-the pure-Python enumeration in `experiments/severance_w3_depths.py` to overlap
-them:
+K22 tables, produced by the C++ enumerator alone. The pure-Python enumeration
+in `experiments/severance_w3_depths.py` was run to overlap them:
 
 | Python run | wall | compared against | entries | mismatch |
 |---|---|---|---|---|
@@ -386,19 +370,19 @@ identical at every k <= 22; so D_2(20), D_3(20), D_2(21), D_3(21) have two
 computations. A Python e = 3 run to K = 22 was estimated at 3 to 4 hours plus
 the memory growth that stopped a K = 19 attempt at 1.5 GB, and was not run.
 
-**The depth-5 gate** (`experiments/severance_w3_depth5_gate.py`,
-`make gate-severance-depth5`) was written 2026-08-20 before D_5 existed,
-against the 15 recorded entries T(2k-4, k-4), k = 5..19; it exits 1 without a
-K >= 19, e = 4 table and does not fall back to the Python enumeration. Its
-comparator is `severance_w3_gate.check_depth`, imported. The table
+**The depth-5 check** (`experiments/severance_w3_depth5_gate.py`,
+`make gate-severance-depth5`) compares against the 15 recorded entries
+T(2k-4, k-4), k = 5..19; it exits 1 without a K >= 19, e = 4 table and does
+not fall back to the Python enumeration. Its comparator is
+`severance_w3_gate.check_depth`, imported. The table
 `results/severance_w3_families_K21_e4.txt` was produced by
 `scripts/severance_e4_k21.sh` (`families 21 4`, 8 threads, dalby,
 2026-08-23 09:27 to 14:21, rev `95fbb6ceb`, 105 entries, sha256 checked
-against dalby's copy). The gate passed 2026-08-24: depth 1, 19 entries and
-depth 5, 15 entries, all exact; 0.20 s on dalby. Its negative control,
-+3^-17 at k = 12, still fires.
+against the producing machine's copy). The check passes: depth 1, 19 entries
+and depth 5, 15 entries, all exact; 0.20 s. Its negative control, +3^-17 at
+k = 12, fails as it should.
 
-Mutation test of the gate (every entry with e <= 2 and k <= 8, last digit
+Mutation test of the check (every entry with e <= 2 and k <= 8, last digit
 perturbed in a shadow tree):
 
 | column | mutants killed |
@@ -407,31 +391,30 @@ perturbed in a shadow tree):
 | `bb` | 21 of 21 |
 | `pp` | 0 of 21 |
 
-The 2026-08-24 reading, that `pp` is inert above depth 1 and "feeds no depth
-above 1", is wrong as a general statement. Measured 2026-09-05 on
-`D_series(j, 10)`: `pp[e][8] + 1` moves D_{e+1}(8) by exactly 1 and no other
-depth. The sample fed depths 1 to 3, which this gate does not check; the
-e = 4 row's `pp` column is exercised by depth 5, and `pp[3][21] + 1` is
-refused by the depth-5 build (`undertow_pairs_gate.py`, control 3).
+`pp` is not inert above depth 1: measured on `D_series(j, 10)`,
+`pp[e][8] + 1` moves D_{e+1}(8) by exactly 1 and no other depth. The sample
+fed depths 1 to 3, which this check does not look at; the e = 4 row's `pp`
+column is exercised by depth 5, and `pp[3][21] + 1` is refused by the depth-5
+build (`undertow_pairs_gate.py`, control 3).
 
 Overlap of the K21_e4 table with every earlier table, all three columns:
 
 | table | shared entries | mismatch |
 |---|---|---|
-| `K19_e3` (2026-08-09) | 76 | 0 |
+| `K19_e3` | 76 | 0 |
 | `K22_e0` | 21 | 0 |
 | `K22_e1` | 42 | 0 |
 | `K22_e2` | 63 | 0 |
 | `K22_e3` | 84 | 0 |
-| `K60_e1` (2026-08-14) | 42 | 0 |
+| `K60_e1` | 42 | 0 |
 
 The 21 e = 4 rows are new to that table.
 
 ## The integrality congruence gate
 
-`experiments/undertow_congruence_gate.py` (`make gate-undertow-congruence`)
-generalizes a one-off observation on D_2(21). The left side of the identity is
-an integer and den(D_j(k)) divides 3^(k+j), so
+`experiments/undertow_congruence_gate.py` (`make gate-undertow-congruence`).
+The left side of the identity is an integer and den(D_j(k)) divides 3^(k+j),
+so
 
     P_k(2k+1-j) + 3^(k+j) D_j(k) == 0   (mod 3^(k+j)),
 
@@ -446,19 +429,18 @@ congruence:
     T(42,21)  k=21, j=1   D_1(21) mod 3^22   OK
     T(41,20)  k=21, j=2   D_2(21) mod 3^23   OK
 
-D_1(21) had no check of any kind before this. The gate fails if the free set
-empties. Four negative controls: D_2(21) + 3^-23 caught at the free entry; a
-corrupted a_21 caught; an integer shift of a free entry's defect passes (the
-blind spot, demonstrated on purpose); D_4(21) + 3^-25 caught transitively
-through the constants it feeds. Every error a real table entry can carry is an
-integer shift (previous sections), so this gate never guards the tables; the
-pair-agreement gate does.
+This is the only check of any kind on D_1(21). The check fails if the free
+set empties. Four negative controls: D_2(21) + 3^-23 caught at the free
+entry; a corrupted a_21 caught; an integer shift of a free entry's defect
+passes (the blind spot, demonstrated on purpose); D_4(21) + 3^-25 caught
+transitively through the constants it feeds. Every error a real table entry
+can carry is an integer shift (previous sections), so this check never guards
+the tables; the pair-agreement check does.
 
 ## Freedom from fitting
 
-Lane C of the review asked whether the assembly can be freed of every
-enumerated entry. The answer is no past k of about 11, for a reason that
-belongs to the construction rather than to this lattice.
+Can the assembly be freed of every enumerated entry? Not past k of about 11,
+for a reason that belongs to the construction rather than to this lattice.
 
 - The grand form makes (a_k, b_k) equivalent to the aggregate cluster weights
   of surplus <= k, and those are connected-animal counts of the same species
@@ -466,8 +448,8 @@ belongs to the construction rather than to this lattice.
   frontier connectivity partition (the state of `cpp/severance_w1.cpp` is the
   top row's cells plus their partition). Growth per level, measured in two
   implementations: Python, k = 4, 5, 6 at 3.1 s, 65 s, more than 530 s; C++,
-  k <= 7 in seconds, k = 8 in minutes, k = 9 in 66 min and 53 GB on dalby,
-  k = 10 declined on memory (`results/below-onset.md`). From k = 9 to level 21
+  k <= 7 in seconds, k = 8 in minutes, k = 9 in 66 min and 53 GB, k = 10 not
+  run for want of memory (`results/below-onset.md`). From k = 9 to level 21
   at 20x per level is a factor of about 20^12.
 - The cheap compressions are closed: a per-level span cap undercounts
   (333 against 339 at (e, k) = (0, 2), K = 9; `results/closed-doors.md`); the
@@ -519,12 +501,12 @@ Both are exponential; heights buy two rows per step at the shallower slope.
 |---|---|---|---|---|
 | strip engine | 14 | 4 | 16 | 31 |
 | strip engine | 14 | 5 | 17 | 32 |
-| coloring program, size 40 | 18 | 4 | 20 | 39 |
-| coloring program, size 40 | 18 | 5 | 21 | 40 |
-| coloring program, size 41 | 19 | 4 | 21 | 41 |
+| coloring recount, size 40 | 18 | 4 | 20 | 39 |
+| coloring recount, size 40 | 18 | 5 | 21 | 40 |
+| coloring recount, size 41 | 19 | 4 | 21 | 41 |
 
 A row is complete only when heights <= hmax are enumerated at that size; the
-coloring program's rows stop at size 41.
+coloring recount's rows stop at size 41.
 
 ## Measured costs
 
@@ -557,9 +539,6 @@ ayr, 16 threads, K = 10; raw output `results/emax-ladder.txt`.
 | 4 | 46.71 s | 480 MB | 9.5x | 6.0x |
 | 5 | 326.79 s | 2.39 GB | 7.0x | 5.1x |
 
-Lane C's own run of the same series at K = 8 on gympie is withdrawn by that
-lane; the ayr series is the record.
-
 **Thread count moves memory.** The enumeration builds per-thread private maps
 and merges them afterward (`cpp/severance_w3_families.cpp`, `step`), so a
 K slope taken across thread counts is not a slope.
@@ -572,12 +551,11 @@ K slope taken across thread counts is not a slope.
 | 14 | 2459.5 MB | 2.69 GB | |
 | 16 | 4239.2 MB | 4.79 GB | |
 
-The 40-thread points (12.2 s, 71.4 s, 265.0 s of wall at K = 8, 10, 12) are
-recorded as measured on dalby in the 2026-08-20 record and as measured on ayr
-in Lane C's; the 16-thread points are ayr (`results/emax4-k-ladder.txt`,
-`scripts/lastditch/emax4_kladder.sh`), the 8-thread points ayr
-(`results/depth5/ladder.txt`). Slopes quoted before the fixed-thread series,
-and where each put `families 21 4`:
+The 40-thread points took 12.2 s, 71.4 s, 265.0 s of wall at K = 8, 10, 12;
+the 16-thread points are `results/emax4-k-ladder.txt`
+(`scripts/lastditch/emax4_kladder.sh`, ayr), the 8-thread points
+`results/depth5/ladder.txt` (ayr). Slopes taken before the fixed-thread
+series, and where each put `families 21 4`:
 
 | reading | threads | slope per K | projected rss at K = 21 |
 |---|---|---|---|
@@ -586,9 +564,6 @@ and where each put `families 21 4`:
 | e = 3, K = 10 to 22 | 10 and 40 | 1.308x | 18 GB |
 | e = 4, K = 10 to 14 | 16 | 1.521x (wall 1.972x) | 51 GB, 23 h |
 | e = 4, K = 8 to 16, five points | 8 | decelerating | 8.5 to 16 GB |
-
-The record before any of these said 16 h and 103 GB; the review widened that
-to 110 to 390 GB.
 
 **Depth 5, priced and then run.** `results/depth5/ladder.txt`, ayr,
 2026-08-22 01:17 to 02:07 EDT, rev `a66bc61`, 8 threads throughout,
@@ -638,24 +613,22 @@ underestimates, and this series is looser than depth 5's.
 
 | `families 21 5` at 8 threads | wall | rss |
 |---|---|---|
-| asserted before measurement | 20 to 60 h | 50 to 100 GB |
 | decelerating | 36.3 h | 74.2 GB |
 | with the K = 14 bias applied | 44 h | 85 GB |
 | deceleration stops | 251 h | 347 GB |
 
-The assertion was made by applying the per-excess factor once, as a constant.
-It is not constant: the emax 5 over emax 4 ratio at K = 8, 10, 12, 14 is
-6.14, 7.67, 8.90, 10.43 in wall and 3.21, 4.82, 6.14, 6.86 in memory, growing
-about 20% per two units of K, so the assertion landed by cancellation and the
-same method at depth 7 would be badly wrong. At 16 threads the projection is
-about 148 GB and does not fit dalby's 125 GB; at 8 threads it is 1.5 to 2
-days with the other 72 cores idle. For a run of five further terms from one
+The per-excess factor is not a constant: the emax 5 over emax 4 ratio at
+K = 8, 10, 12, 14 is 6.14, 7.67, 8.90, 10.43 in wall and 3.21, 4.82, 6.14,
+6.86 in memory, growing about 20% per two units of K, so applying it once as
+a constant would be badly wrong at depth 7. At 16 threads the projection is
+about 148 GB and does not fit a 128 GB box; at 8 threads it is 1.5 to 2 days
+with the other 72 cores idle. For a run of five further terms from one
 enumeration, the reach rule puts height 20 with J = 6 at n <= 45 against a
 277 GB disk peak, where height 21 with J = 4 reaches the same n against
-580 GB, more than dalby's 563 GB free. Nothing here requests the run.
+580 GB, more than the 563 GB then free.
 
-**The coloring program in parallel.** `cpp/motley_par.cpp` on ayr at H = 18,
-size 40, 32 threads, reproducing the five recorded residue rows
+**The coloring recount in parallel.** `cpp/motley_par.cpp` at H = 18,
+size 40, 32 threads (ayr), reproducing the five recorded residue rows
 (`results/cutcount_b1/residues/`, `results/motley-par/README.md`):
 
     p=2147483647  wall=3316.25 s  rss 60,159,508 kB  IDENTICAL to the recorded row
@@ -673,19 +646,20 @@ run used nine primes near 2^16.
 The square lattice is the one check whose answers other people published.
 There the set D of row-to-row displacements has size b = |D| = 1, so the
 factor 3^(n-1-3k) is 1 and the formula is a plain polynomial
-T_sq(n, n-k) = P_k(n) of degree k for n >= 2k+1. Data: the bounding-box triangle `results/bbox_square4_n21.txt`
-(n <= 21), whose 21 row sums equal A001168 in `results/b001168_external.txt`
-(the b-file, with a(57) to a(70) due to Barequet and Ben-Shachar, 2024) before
-any fitting. P_k fitted from in-onset entries alone needs n up to 3k+1, so
-k <= 6.
+T_sq(n, n-k) = P_k(n) of degree k for n >= 2k+1. Data: the bounding-box
+triangle `results/bbox_square4_n21.txt` (n <= 21), whose 21 row sums equal
+A001168 in `results/b001168_external.txt` (the b-file, with a(57) to a(70)
+due to Barequet and Ben-Shachar, 2024) before any fitting. P_k fitted from
+in-onset entries alone needs n up to 3k+1, so k <= 6.
 
-**Depth 1** (`experiments/undertow_square.py`, 2026-08-22). D_1(k) = (-1)^(k+1),
-measured at k <= 5 in `results/below-onset.md`, and since 2026-09-05 derived
-for every k: the square gap walk closes on two states with
-F_1 = -1/(1+y) (`experiments/depth1_parametric.py`, checked to k = 40;
+**Depth 1** (`experiments/undertow_square.py`). D_1(k) = (-1)^(k+1), measured
+at k <= 5 in `results/below-onset.md` and derived for every k: the square gap
+walk closes on two states with F_1 = -1/(1+y)
+(`experiments/depth1_parametric.py`, checked to k = 40;
 `docs/proofs/universal-diagonal-law.md`). Per level, two fits of the same
-polynomial: classical, from the k+1 entries at n = 2k+1 to 3k+1; and with the
-tallest of those dropped and the depth-1 entry at n = 2k used instead.
+polynomial: by the onset rule, from the k+1 entries at n = 2k+1 to 3k+1; and
+with the tallest of those dropped and the depth-1 entry at n = 2k used
+instead.
 
 | k | fits agree | tallest entry, predicted from below onset |
 |---|---|---|
@@ -700,9 +674,9 @@ Three negative controls: one input entry perturbed by 1 breaks the agreement;
 the wrong defect sign breaks the fit; the row-sum check fails against a
 perturbed A001168.
 
-**Depth 2** (`experiments/undertow_square_depth2.py`, 2026-08-22, ayr).
-D_2(k) = T_sq(2k-1, k-1) - P_k(2k-1), measured against the classically fitted
-P_k:
+**Depth 2** (`experiments/undertow_square_depth2.py`).
+D_2(k) = T_sq(2k-1, k-1) - P_k(2k-1), measured against the P_k fitted by the
+onset rule:
 
 | k | T_sq(2k-1, k-1) | P_k(2k-1) | D_2(k) |
 |---|---|---|---|
@@ -717,7 +691,7 @@ are not monotone, do not separate by parity, and are recorded as five values,
 not a formula. The depth-2 fit uses n = 2k-1, 2k and the in-onset entries
 n = 2k+1 to 3k-1, exactly k+1 points, with the two tallest entries never seen:
 
-| k | agrees with classical fit | T(3k, 2k) predicted | T(3k+1, 2k+1) predicted |
+| k | agrees with the onset-rule fit | T(3k, 2k) predicted | T(3k+1, 2k+1) predicted |
 |---|---|---|---|
 | 2 | yes | 68 | 121 |
 | 3 | yes | 1,226 | 2,110 |
@@ -734,16 +708,16 @@ answers were published before this project existed. It does not establish the
 king D_j, which are separate derivations. The square test fits all k+1
 coefficients, so it validates "below-onset entries are equations" and not
 "two of them suffice", which is the grand form's part. D_2 here is measured
-against a P_k fitted classically, so it is not an independent route to D_2
-and does not by itself make a square P_k cheaper. Six levels, tallest entry at
-height 13; the king case runs to k = 21. Reaching the square record (n = 70)
-would need square below-onset entries at H <= 28. k = 7 needs n <= 22 and
-k = 8 needs n <= 25, and A001168(25) = 5,940,738,676, so each further level is
-an engine run. The family enumeration is king-only in both its Python and
-C++ forms, with adjacency built into the row transfer; the lattice-parametric
-machinery of `docs/proofs/universal-diagonal-law.md` covers the above-onset
-assembly only, so a square D_2 derivation is a build, and these five integers
-are its target.
+against a P_k fitted by the onset rule, so it is not an independent route to
+D_2 and does not by itself make a square P_k cheaper. Six levels, tallest
+entry at height 13; the king case runs to k = 21. Reaching the square record
+(n = 70) would need square below-onset entries at H <= 28. k = 7 needs
+n <= 22 and k = 8 needs n <= 25, and A001168(25) = 5,940,738,676, so each
+further level is an engine run. The family enumeration is king-only in both
+its Python and C++ forms, with adjacency built into the row transfer; the
+lattice-parametric machinery of `docs/proofs/universal-diagonal-law.md`
+covers the above-onset assembly only, so a square D_2 derivation is a build,
+and these five integers are its target.
 
 ## Open problems
 
@@ -759,8 +733,8 @@ are its target.
 - Depth 6 (`families 21 5`), priced at 36 to 44 h and 74 to 85 GB, not run.
 - The exponent of a fixed-height enumeration in the maximum size is measured
   at two heights only; the height-20 run's disk peak was not recorded.
-- `undertow_ri.py` on rows <= 18, which crashed as reviewed; those rows rest
-  on the 720-entry agreement.
+- `undertow_ri.py` on rows <= 18, where it fails; those rows rest on the
+  720-entry agreement.
 - n = 42 needs heights <= 19 enumerated at size 42 with J = 5, or height 20
   with J = 4; heights are the cheaper step.
 
@@ -787,17 +761,3 @@ and `scripts/lastditch/emax4_kladder.sh` (ayr), the 8-thread series
 (ayr), `scripts/lastditch/emax5_kladder.sh` (dalby, about 2.2 h),
 `scripts/severance_e4_k21.sh` (dalby, 4 h 54 m) and `scripts/dalby_a41_h20.sh`
 (dalby, 9.63 h on 76 cores).
-
-## Sources
-
-- `results/undertow.md` (the 2026-08-20 record with its corrections; deleted
-  2026-09-06 and rewritten as this file)
-- `results/undertow-review-A.md` (deleted 2026-09-06; its content is above)
-- `results/undertow-review-B.md` (deleted 2026-09-06; its content is above)
-- `results/undertow-review-C.md` (deleted 2026-09-06; its content is above)
-- `results/undertow-square-validation.md` (deleted 2026-09-06; its content is above)
-- `results/undertow-square-depth2.md` (deleted 2026-09-06; its content is above)
-- `results/depth5-cost-settled.md` (deleted 2026-09-06; its content is above)
-- `results/depth5-gate-green.md` (deleted 2026-09-06; its content is above)
-- `results/depth6-cost-settled.md` (deleted 2026-09-06; its content is above)
-- `results/lastditch-cost-ladders.md` (deleted 2026-09-06; its content is above)

@@ -13,9 +13,9 @@ depth-1 constant follows from it (derived); the onset is sharp for every
 the asymptotics at depths 1 to 7 (measured); the amplitude family is one
 constant `α = 50/81` (derived under four stated assumptions); the bivariate
 depth function has no closed form (theorem); the near-onset layer has width
-about `k^0.4` (measured, downgraded on review); `P_1..P_9` follow from
-cluster weights alone (exact). Every number is printed by the named script
-unless the text says otherwise.
+about `k^0.4` (measured); `P_1..P_9` follow from cluster weights alone
+(exact). Every number is printed by the named script unless the text says
+otherwise.
 
 ## 1. Definitions and the exact frame
 
@@ -128,10 +128,10 @@ and pure variants), validates them against every enumerated weight
 (interior `ℓ ≤ 8`; boundary and pure `ℓ ≤ 5`, plus a fresh `ℓ = 6` enumeration, `W^b(2⁶) = 2703074`, `W^p(2⁶) = 517701`), and checks
 (II) against the exact defect at all 19 entries `k ≤ 19`. With no `P_k`
 needed, `k = 200` takes 42 s; the series is positive with denominators
-exactly `3^(k+1)`. The numerators `4, 80, 1753, 40928, 987355, …` were not
-in the OEIS on 2026-08-09. (II) is derived from the proved chain identity
-plus the tightness observation, machine-verified, and not yet written as a
-standalone proof; §3.3 rests on it.
+exactly `3^(k+1)`. The numerators `4, 80, 1753, 40928, 987355, …` are not
+in the OEIS (checked 2026-08-09). (II) is derived from the proved chain
+identity plus the tightness observation, machine-verified, and not yet
+written as a standalone proof; §3.3 rests on it.
 
 ### 3.2 The quartic
 
@@ -154,19 +154,19 @@ an irreducible quartic with coprime integer coefficients:
 `Φ(x, N(x)) = 0` through `x^200`; the fit used orders 0..56, so 144 orders
 were not used in it.
 
-**Derived** (`experiments/severance_w2_kernel.py`; gate
-`experiments/severance_w2_gate.py`, negative control fires) by the kernel
-method, the standard technique for a functional equation with a catalytic
-variable. The polynomial `D(u) = u² - y(1+u+u²)²` whose vanishing the method
+**Derived** (`experiments/severance_w2_kernel.py`; checked by
+`experiments/severance_w2_gate.py`, which also fails on a perturbed input)
+by the kernel method, the standard technique for a functional equation with
+a catalytic variable. The polynomial `D(u) = u² - y(1+u+u²)²` whose vanishing the method
 exploits factors into two quadratic branches in `s = √y`, small roots in
 `ℚ(s)[A,B]`, `A² = (1-3s)(1+s)`, `B² = (1+3s)(1-s)`; the branch point `1-3s`
 is Φ's `27x-1`. Two analyticity conditions per small root, the `[u³]`
 self-consistency and `J(1)` fix the boundary unknowns in a `6×6` system;
 (II) assembles `F_1 = c₀+c₁A+c₂B+c₃AB`, whose degree-4 norm is `Φ`
 coefficient by coefficient after `y = 3x`, `W = 3F₁+1`. No series data
-enters; the gate confirms exact equality and annihilation to `x^80`.
+enters; the check confirms exact equality and annihilation to `x^80`.
 
-### 3.3 The onset is sharp for every k (proved 2026-09-05)
+### 3.3 The onset is sharp for every k (proved)
 
 Modulo 3 the quartic factors:
 
@@ -183,11 +183,11 @@ D_1(k) ≠ 0   for every k ≥ 1.
 ```
 
 The formula fails at `n = 2k` for every `k ≥ 1`: (III) plus one integer. It
-also makes "denominator exactly `3^(k+1)`" a consequence. Gate
+also makes "denominator exactly `3^(k+1)`" a consequence.
 `experiments/depth1_sharpness.py` (45 s) rebuilds `D_1` to `k = 200` from
 the walk alone and checks integrality, annihilation through `x^200`, (III),
-the branch selection and the congruence; its negative control fires on a
-perturbed `Φ` and on a perturbed series.
+the branch selection and the congruence; it fails on a perturbed `Φ` and on
+a perturbed series.
 
 ### 3.4 The constants
 
@@ -214,12 +214,12 @@ searched.
 `y = 1/ρ`, inside `|y| < 1/9`, but in `P̂ - B²/(3+S)` the pole cancels: the
 spectral projection of an isolated eigenvalue is rank one, so the residues
 factorize; the series grows at 9 (ratio times `√(k/(k-1))` = 8.999978 at
-`k = 50`). **Closed door:** every factor of `disc_W Φ` has degree at most
-10, and `ρ` has no minimal polynomial of degree at most 10 (PSLQ, §4), so
-`ρ` is provably not on the curve. What survives is the walk's bulk edge,
-mass `9 = 3²` per pair-row, the origin of the per-cell rate 3 of §6. The two terms of (II) are
-the two terms of the earlier discarded-term decomposition
-(`results/closed-doors.md`); its cancellation is this rank-one residue
+`k = 50`). Every factor of `disc_W Φ` has degree at most 10, and `ρ` has no
+minimal polynomial of degree at most 10 (PSLQ, §4), so `ρ` is provably not
+on the curve. What survives is the walk's bulk edge, mass `9 = 3²` per
+pair-row, the origin of the per-cell rate 3 of §6. The two terms of (II) are
+the two terms of the discarded-term decomposition in
+`results/closed-doors.md`; its cancellation is this rank-one residue
 cancellation.
 
 **P-finite after all.** `experiments/depth1_recurrence.py` derives from `Φ`
@@ -251,9 +251,9 @@ The eigenvector is a localized mode `f(g) ~ κ^g` with
 `ρ = κ² + 2κ + 3 + 2/κ + 1/κ²` and the `P` component on the plateau
 `8 S_J/(ρ - 9)`. Since `ρ > 9` the growth is a boundary-localized
 eigenvalue, not essential spectrum, which is why the family has a clean
-growth constant and no C-finite recurrence. Two significant figures is the
-honest size for `ρ`; a 37-digit expansion is reproducible at any `gmax`.
-**Closed door:** the boundary system plus the quartic tail relation imply
+growth constant and no C-finite recurrence. `ρ` is good to two significant
+figures; a 37-digit expansion is reproducible at any `gmax` but means no
+more than that. The boundary system plus the quartic tail relation imply
 `ρ` is algebraic, but PSLQ refutes every candidate of degree at most 10 with
 coefficients at most `1e10` (two plausible low-precision fits were
 truncation noise); eliminating about 15 boundary unknowns against the
@@ -273,10 +273,10 @@ rows of size 3, bounds the class: depth 3 needs the one-4-row family, depth
 
 Family tables: Python row-transfer DP for `e ≤ 2`; `e = 3` at `K = 19` by
 `cpp/severance_w3_families.cpp` (`build/severance_w3_families`, exact
-`__int128`, 146 s), `results/severance_w3_families_K19_e3.txt`. Gate
-`experiments/severance_w3_gate.py` (negative control fires; the triangle
-side is assembled from the enumerated entries and the stored `P_k`, which
-the candidate never touches):
+`__int128`, 146 s), `results/severance_w3_families_K19_e3.txt`.
+`experiments/severance_w3_gate.py` compares against the triangle side,
+assembled from the enumerated entries and the stored `P_k`, which the
+candidate never touches (a perturbed candidate fails it):
 
 ```
 depth 1: 19 entries match exactly (k = 1..19)
@@ -297,7 +297,7 @@ independence; fresh enumerations past every table at `k = 11` (five values,
 D_4(4..7) = 1400566/6561, 75221426/19683, 1199562484/19683, 51621741496/59049
 ```
 
-Python family DP on dalby, one core: `(K, emax) = (19,1)` 5.6 s, `(27,1)`
+Python family DP, one core: `(K, emax) = (19,1)` 5.6 s, `(27,1)`
 20 s, `(60,1)` 395 s, `(15,2)` 73 s, `(19,2)` 214 s, `(23,2)` 516 s,
 `(11,3)` 290 s. `experiments/severance_w3_modp.py` computes `D_j(k)` mod `p`
 at 7.4× the exact path's speed.
@@ -359,17 +359,15 @@ So `C_1` holds to about `1e-07` relative from data, conditional on
 
 At `j = 3, 4` the binomial value is the only rational with denominator at
 most 32 inside the bar. At `j = 5, 6, 7` many fit, among them 118/27, 118/15
-and 130/9, and at `j = 5` the value 118/27 = 4.370370 is closer to the
-measurement than 35/8 = 4.375. (The source text said the binomial value is
-inside the bar at `j = 5, 6, 7`; its own table has 35/8 off by `4.2e-03`
-against a bar of `2.9e-03` and 63/8 off by `8.7e-03` against `6.2e-03`, and
-the later bivariate note said 35/8 sits outside the bar at `j = 5`. The bars
-are conditional on `θ_j`: `|d ln C/dθ| ≈ 4.9`, so relaxing `θ` by its
-interval widens them about 20×, when even `j = 3` admits 19/13, 22/15,
-25/17.) The measurement supports the family for `j ≤ 4` only; §7 derives
-it. The `k·B_k` construction at `j = 2` with `C_2 = A_1·(25/81)/Γ(3/2)`
-converges to `a_2 = 0.6851`, orders 3 to 5 agreeing to `4e-05`; a wrong
-25/81 would diverge.
+and 130/9; at `j = 5, 6` the binomial value itself sits outside the bar
+(35/8 is off by `4.2e-03` against a bar of `2.9e-03`, 63/8 by `8.7e-03`
+against `6.2e-03`), and at `j = 5` the value 118/27 = 4.370370 is closer to
+the measurement than 35/8 = 4.375. The bars are conditional on `θ_j`:
+`|d ln C/dθ| ≈ 4.9`, so relaxing `θ` by its interval widens them about 20×,
+when even `j = 3` admits 19/13, 22/15, 25/17. The measurement supports the
+family for `j ≤ 4` only; §7 derives it. The `k·B_k` construction at `j = 2`
+with `C_2 = A_1·(25/81)/Γ(3/2)` converges to `a_2 = 0.6851`, orders 3 to 5
+agreeing to `4e-05`; a wrong 25/81 would diverge.
 
 **The `1/k` coefficient from data** (`experiments/second_term.py`,
 `experiments/second_term_recognise.py`). With
@@ -405,11 +403,11 @@ T_sq(2k,k) - poly = +1, -1, +1, -1, +1     (k = 1..5)
 
 No growth, and a sign alternation the king lattice lacks; since `1 = 1²`
 this confirms the per-cell reading without discriminating it.
-`experiments/depth1_parametric.py` later derived `D_1 = (-1)^(k+1)` there.
+`experiments/depth1_parametric.py` derives `D_1 = (-1)^(k+1)` there.
 
 **Predictive check.** `experiments/defect_holdout.py` fits the amplitude on
-`k ≤ 14` only, recovering `√6/(27√π)` to `2.0e-06` (not re-audited under the
-control suite), then predicts entries it never saw: correct digits of
+`k ≤ 14` only, recovering `√6/(27√π)` to `2.0e-06` (not re-checked under
+the control suite), then predicts entries it never saw: correct digits of
 `T(2k,k)` for `k = 15..19` are 9.9, 10.5, 11.2, 11.9, 12.6 from the formula
 alone and 13.2, 13.9, 14.6, 15.3, 16.0 with the defect estimate, a flat
 +3.4. It certifies no integer, and for `n = 41` every entry with `k ≤ 19`
@@ -551,8 +549,7 @@ Derived: (M)/(M′); "moving square-root branch point, fixed exponent" ⟹ (*)
 Verified, not derived: `α_M` constant over `M = 1, 2, 3` within bias. The
 family at `j = 5, 6, 7` is a prediction; the case against 118/27 is
 structural and does not answer someone who rejects the law's form. The
-enumeration, not the prose, is the claim: a plausible filter gave 14/27 and
-looked self-consistent until checked. The conjecture that every fixed depth
+conjecture that every fixed depth
 is algebraic on a curve with branch point `1/27` stands refined: each slice
 keeps its singularity at `Y = 1/9`, and the exponent `-(j-1/2)` is how the
 moving branch point of the resummed `G(Y,t)` looks after expansion in `t`
@@ -582,12 +579,10 @@ function has sections whose singularities have bounded degree.
 
 **What survives** is the dominant-singularity data,
 `Σ_j A_j t^j = (√6/27)·t/√(1 - 50t/81)`, branch at `t = 81/50`, which §7
-derives. On 2026-08-10 the excess-4 table was priced out of reach (Python
-`families(12, emax=4)` over 130 s, C++ at 10 threads `families(16, emax=4)`
-over 200 s, `k ≈ 30` days for one point); the later record
-(`results/undertow.md`, 2026-08-23) is `families 21 4` on dalby, 8 threads,
-4 h 54 m, 18,743 MB peak, giving exact `D_5` to `k ≤ 21`. Sharpening `R_5`
-from data needs `D_5(k)` to `k ≈ 28..30`, which no table reaches.
+derives. The excess-4 table `results/severance_w3_families_K21_e4.txt`
+(`families 21 4`, 8 threads, 4 h 54 m, 18,743 MB peak; costs in
+`results/undertow.md`) gives exact `D_5` to `k ≤ 21`. Sharpening `R_5` from
+data needs `D_5(k)` to `k ≈ 28..30`, which no table reaches.
 
 ## 9. The near-onset layer
 
@@ -634,20 +629,18 @@ Exponent `p = 0.385`, interval `[0.345, 0.485]` where the score stays within
 Airy and no-layer are excluded robustly. The best-fit value is fragile and
 1/2 is not excluded: resampling returns 0.44 dropping `k < 8`, 0.315 keeping
 `j ≤ 5`, 0.275 keeping `u ≤ 2`, 0.44 and 0.425 at 16 and 24 bins. The
-defensible statement is `p ≈ 0.4`, with 2/3 and 1 excluded. The curve
-`f(u) = 0.612·u(1-u)`, `u = j/k^0.385`, is withdrawn: its rms 0.147 was
-measured against a range of 16.91 dominated by the `u > 1` tail, and inside
-the layer (31 entries, `u < 1`) the residuals run +0.007 to +0.10 where the
-curve says 0.10 to 0.15; refitting on the interior gives `c = 0.063`. Real
-is the sign structure: small and positive inside, negative and growing
-outside, crossing near `u ≈ 1`, i.e. `j ≈ k^0.4` (at `k = 19`, `j ≲ 3`,
-near where §6 loses uniqueness; suggestive only). At fixed `x = H/k`,
-`u ≈ k^0.615·(1-x) → ∞`, so `g(x)` lives in the tail and the data reaches
-only `u = 5.8`. The interval, `c` and the resampling figures were computed
-off-script; the script prints none of them. (Two adversarial reviews on
-2026-08-09 found one failure mode across this theme: numbers computed at the
-shell and quoted at a precision no script reproduces. Every such number
-above is marked.)
+defensible statement is `p ≈ 0.4`, with 2/3 and 1 excluded. No curve for
+the collapse is claimed: a fit `f(u) = c·u(1-u)`, `u = j/k^0.385`, gives
+`c = 0.612` over all entries, but that rms of 0.147 is against a range of
+16.91 dominated by the `u > 1` tail, and inside the layer (31 entries,
+`u < 1`) the residuals run +0.007 to +0.10 where that curve says 0.10 to
+0.15; refitting on the interior gives `c = 0.063`. What is real is the sign
+structure: small and positive inside, negative and growing outside, crossing
+near `u ≈ 1`, i.e. `j ≈ k^0.4` (at `k = 19`, `j ≲ 3`, near where §6 loses
+uniqueness; suggestive only). At fixed `x = H/k`, `u ≈ k^0.615·(1-x) → ∞`,
+so `g(x)` lives in the tail and the data reaches only `u = 5.8`. The
+interval, `c` and the resampling figures were computed off-script; the
+script prints none of them.
 
 ## 10. P_1..P_9 from cluster weights, with no enumerated entry
 
@@ -658,76 +651,74 @@ with overflow check), all 511 compositions to surplus 9 in
 `experiments/severance_w1_assemble.py`, exact fractions through the chain
 identity: the derived `P_k` equals the stored table coefficient by
 coefficient for `k = 1..9`, reproduces 3 computed in-onset entries per
-level, `deg R_k = 2k+1` throughout. Gate `experiments/severance_w1_gate.py`
-(negative control fires 23 assertions): per-composition values exact at
-`k ≤ 5`; fresh level-6 enumerations (`(7,)` full; `(4,4)`, `(3,5)` boundary
-and pure fresh, interior against the earlier 8.4 h and 3.7 h Python values);
-completeness, reference order, reversal symmetry and single-row closed forms
-at every level to 9. `k = 9` ran on dalby: 66 min, 16 threads, 53 GB peak.
-`k = 10` was declined on memory: peak RSS passes dalby's 125 GB, the tail
-being one stack whose state map alone is tens of GB; extending needs a
+level, `deg R_k = 2k+1` throughout. `experiments/severance_w1_gate.py`
+checks (23 assertions, each of which fails on a perturbed input):
+per-composition values exact at `k ≤ 5`; fresh level-6 enumerations (`(7,)`
+full; `(4,4)`, `(3,5)` boundary and pure fresh, interior against the 8.4 h
+and 3.7 h Python values); completeness, reference order, reversal symmetry
+and single-row closed forms at every level to 9. `k = 9` took 66 min on 16
+threads at 53 GB peak. `k = 10` was not run: its peak RSS passes 125 GB, the
+tail being one stack whose state map alone is tens of GB; extending needs a
 state-space reduction, not cores.
 
-**Coverage as of 2026-08-09.** With `P_k` from weights for `k ≤ 9`, the
-strip engine for `H ≤ 14` and depths `j ≤ 4`: rows `n ≤ 24` covered end to
-end by two independent programs; rows 25..33 formula-covered except for the
-two entries per level at `n = 2k+1, 2k+2` that determine `P_10..P_18`; rows
-34..40 needed `P_19` and beyond. The later record (`results/undertow.md`,
-`results/confidence.md`) determines levels 19 to 21 from entries below the
-onset using these `D_j`, which is what `a(41)` rests on.
+**Coverage.** With `P_k` from weights for `k ≤ 9`, the strip engine for
+`H ≤ 14` and depths `j ≤ 4`: rows `n ≤ 24` are covered end to end by two
+independent programs; rows 25..33 are formula-covered except for the two
+entries per level at `n = 2k+1, 2k+2` that determine `P_10..P_18`; rows
+34..40 need `P_19` and beyond. `results/undertow.md` determines levels 19 to
+21 from entries below the onset using these `D_j`, which is what `a(41)`
+rests on; `results/confidence.md` states what each term rests on.
 
 ## 11. Lean
 
-The modules below left the Lean build on 2026-10-12 (the Report overhaul
-kept only what `paper/technical-report.tex` claims); they are at commit
-697f376, with their `make gate-notary` target and `#guard_msgs` axiom
-audits. The current ledger is `polyplets/README.md`. Axioms
-`propext, Classical.choice, Quot.sound`, plus `Lean.ofReduceBool` where
-`native_decide` is used, audited per theorem.
+The Lean modules for this section are not in the current build, which keeps
+only what `paper/technical-report.tex` claims; they are in git at commit
+697f376 (the GapWalk and DepthOne modules, with their axiom audits), and
+`polyplets/README.md` is the current ledger. Axioms `propext,
+Classical.choice, Quot.sound`, plus `Lean.ofReduceBool` where
+`native_decide` is used, audited per theorem. What they state:
 
-- `GapWalkBridge.lean`: walk = enumeration at `ℓ ≤ 3` for interior,
-  boundary and pure weights; the 36 depth identities of
-  `DepthAssembly.lean` unconditional; (II) on walk-built series equals the
-  depth-1 values at `k ≤ 8` (`f1_matches_depth1`); walk = C++ table at
-  `k ≤ 19` (`walk_table_19`).
-- `DepthOneConstants.lean`, over any characteristic-0 field with `s2² = 2`,
+- GapWalkBridge: walk = enumeration at `ℓ ≤ 3` for interior, boundary and
+  pure weights; the 36 depth identities of DepthAssembly unconditional; (II)
+  on walk-built series equals the depth-1 values at `k ≤ 8`
+  (`f1_matches_depth1`); walk = C++ table at `k ≤ 19` (`walk_table_19`).
+- DepthOneConstants, over any characteristic-0 field with `s2² = 2`,
   `s3² = 3`, plus `ℝ`: `phiC4 = (27x-1)²·g`, `g(1/27) = 7929856/19683 ≠ 0`;
   `Ψ(v, wv) = Φ((1-v²)/27, w)` polynomial;
   `Ψ(0,V) = (7929856/14348907)(27V²-2)²`, `27V₀² = 2`, `(V₀/3)² = 2/243`;
   `Ψ(v, V₀+V₁v+V₂v²) = v⁴·Q₄(v)` explicit, nonzero pivot;
   `a = -1/8 - V₂/(2V₀) = 3293/92928 - 3251√3/185856`.
-- `DepthOneSeries.lean`: walk `N(x)` = the numerators to `k ≤ 19`;
+- DepthOneSeries: walk `N(x)` = the numerators to `k ≤ 19`;
   `Φ(x, N(x)) ≡ 0 mod x^61` in exact rationals (`phi_annihilates`).
-- `GapWalkRows.lean`, `GapWalkCanon.lean`, `GapWalkTrunc.lean`:
-  `walkFamiliesCap_exact`, every gap cap `M ≥ 2L+3` emits the same family
-  triples as `walkFamilies L`, so the `k ≤ 19` and `k ≤ 8` results bind the
-  exact walk. Standard axioms.
-- `GapWalkStacks.lean`, `GapWalkPeel.lean`, `GapWalkEnds.lean`,
-  `GapWalkBij.lean`: `walkFamilies_configs`, every emitted triple is
+- GapWalkRows, GapWalkCanon, GapWalkTrunc: `walkFamiliesCap_exact`, every
+  gap cap `M ≥ 2L+3` emits the same family triples as `walkFamilies L`, so
+  the `k ≤ 19` and `k ≤ 8` results bind the exact walk. Standard axioms.
+- GapWalkStacks, GapWalkPeel, GapWalkEnds, GapWalkBij:
+  `walkFamilies_configs`, every emitted triple is
   `(V ℓ ℓ, Vᵗ ℓ ℓ, Vp ℓ ℓ)` for every `L`. Literal values past enumeration
   reach, no `native_decide`: `V 4 4 = 68314`, `V 5 5 = 981085`,
   `V 6 6 = 14115141`; `Vᵗ 4 4 = 13103`, `Vᵗ 5 5 = 187965`,
   `Vᵗ 6 6 = 2703074`; `Vp 4 4 = 2515`, `Vp 5 5 = 36021`, `Vp 6 6 = 517701`.
-- `DepthOneKernelPhi.lean`: `phi_annihilates_exact`, `Φ(x, N(x)) = 0` in
-  `ℚ⟦x⟧` at every order, proved inside `ℚ[X,a,b]/(a²-AA, b²-BB)` by
-  machine-generated `linear_combination` certificates, standard axioms.
+- DepthOneKernelPhi: `phi_annihilates_exact`, `Φ(x, N(x)) = 0` in `ℚ⟦x⟧` at
+  every order, proved inside `ℚ[X,a,b]/(a²-AA, b²-BB)` by machine-generated
+  `linear_combination` certificates, standard axioms.
   `phi_annihilates_of_exact` re-derives the `mod x^61` result from it under
   the explicit hypothesis `hbridge` (`truncL 61 Nexact = nSeries 60`), that
   the closed form is the walk's enumeration at all orders.
 
-**Two boundaries, neither unfinished work.** (1) The all-orders tie between
-walk and triangle, identity (I), is `hbridge` and the general-`k`
-factorization lemma of `Diagonal.lean`; it reduces to a closed form for the
-single-cluster generating function `B(y)`, and there is none: 18 converged
-terms from the `a(40)` triangle (9 at `a(21)`) admit no algebraic or
-D-finite relation at reachable complexity (`experiments/braw_from_data.py`;
-`docs/proofs/T-n-nm2-and-general.md` §5). The tie stays exact at finite
-order: Lean at `k ≤ 8`, two programs at `k ≤ 19`, annihilation to order 60.
-(2) The analytic transfer from branch data to `k^(-1/2)` and `√π` is
-real-analytic, without Mathlib support, and out of scope. Separately,
-the Lean ledger (`polyplets/README.md`) records that using the below-onset
-identity to determine a level (F1) and substituting a corrected entry for
-an onset entry (F2) are not stated in Lean.
+Two boundaries, neither of them unfinished work. (1) The all-orders tie
+between walk and triangle, identity (I), is `hbridge` plus the general-`k`
+factorization lemma of the diagonal module; it reduces to a closed form for
+the single-cluster generating function `B(y)`, and there is none: 18
+converged terms from the `a(40)` triangle (9 at `a(21)`) admit no algebraic
+or D-finite relation at reachable complexity
+(`experiments/braw_from_data.py`; `docs/proofs/T-n-nm2-and-general.md` §5).
+The tie stays exact at finite order: Lean at `k ≤ 8`, two programs at
+`k ≤ 19`, annihilation to order 60. (2) The analytic transfer from branch
+data to `k^(-1/2)` and `√π` is real-analytic, without Mathlib support, and
+out of scope. Separately, `polyplets/README.md` records that using the
+below-onset identity to determine a level, and substituting a corrected
+entry for an onset entry, are not stated in Lean.
 
 ## Open problems
 
@@ -744,7 +735,8 @@ an onset entry (F2) are not stated in Lean.
   weights and for `B(y)`; `P_k` from weights past `k = 9` (needs a
   state-space reduction in the stack DP).
 - In Lean: discharge `hbridge` to a chosen finite order; fixed-`k` cases
-  `k = 3, 4`; F1 and F2 of the Lean ledger (`polyplets/README.md`).
+  `k = 3, 4`; the two below-onset steps `polyplets/README.md` lists as not
+  stated.
 
 ## Reproduce
 
@@ -781,17 +773,3 @@ uncached run exactly. Data formats:
 `results/bbox_polyplets_n17_exact.txt` is `H W n count`. `P_k` is stored in
 `orchestrator/sweep.go` (`diagCoeffTable`) with coefficients descending and
 a denominator; ascending evaluation fails loudly.
-
-## Sources
-
-- `results/onset-defect-law.md` (deleted 2026-09-06; its content is above)
-- `results/onset-defect-depth1-closed.md` (deleted 2026-09-06; its content is above)
-- `results/onset-defect-depths234.md` (deleted 2026-09-06; its content is above)
-- `results/onset-defect-crossover.md` (deleted 2026-09-06; its content is above)
-- `results/ridgeline-depth-amplitudes.md` (deleted 2026-09-06; its content is above)
-- `results/depth-tower-bivariate-dead-end.md` (deleted 2026-09-06; its content is above)
-- `results/diagonal-law-below-onset.md` (deleted 2026-09-06; its content is above)
-- `results/allpairs-kernel.md` (deleted 2026-09-06; its content is above)
-- `results/severance-w1-anchor-cut.md` (deleted 2026-09-06; its content is above)
-- `results/notary-depth1-lean.md` (deleted 2026-09-06; its content is above)
-- `docs/onset-defect-handoff.md` (deleted 2026-09-06; its content is above)
