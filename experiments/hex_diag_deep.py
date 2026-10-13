@@ -144,11 +144,6 @@ def hex_T_all(hmax, budget, halo):
     return out
 
 
-def hex_T(H, budget, halo):
-    """{n: T_hex(n, H)} for n = H .. H + budget (one height; see hex_T_all)."""
-    return hex_T_all(H, budget, halo)[H]
-
-
 def _first_rows(s, halo):
     """Sorted s-cell tuples starting at 0, internal gaps bounded by the halo."""
     res = []
@@ -293,10 +288,10 @@ def main():
 
     if a.converge:
         print(f"== window control: halos {a.halo} and {a.halo + 1} must agree")
+        u, w = hex_T_all(8, a.kmax, a.halo), hex_T_all(8, a.kmax, a.halo + 1)
         for H in range(1, 9):
-            u = hex_T(H, a.kmax, a.halo)
-            assert u == hex_T(H, a.kmax, a.halo + 1), H
-            print(f"  H={H}  {u}  OK")
+            assert u[H] == w[H], H
+            print(f"  H={H}  {u[H]}  OK")
         print("halo-independent  OK")
         return 0
 

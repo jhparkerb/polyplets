@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate MK-DIR4-PERIM: results/subclasses.md (formerly results/subclasses.md) Phase 2a
+"""Gate MK-DIR4-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md, removed) Phase 2a
 acceptance.
 
 cpp/convex_perim_tm.cpp's new dir4 mode filters HV-convex king animals BY

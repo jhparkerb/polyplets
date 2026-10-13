@@ -4,7 +4,8 @@ Called the P-paper coverage measurement for historical reasons: it was built
 when `paper/technical-report.tex` was a P paper, jasonp's own prose, and it is
 one again as of 2026-09-25.
 
-Measured, not assumed. `tests/p_paper_coverage_audit.py` perturbs the last
+Measured, not assumed. `tests/p_paper_coverage_audit.py` (deleted 2026-10-13; the
+gate `tests/gate_p_paper_verifier.py` now runs the same full sweep on every push) perturbs the last
 digit of every numeric literal of four or more digits in a COPY of the `.tex`
 and re-runs the verifier: a literal whose perturbation still passes is one the
 paper prints and no check reads. `tests/gate_p_paper_verifier.py` is the gate
@@ -44,5 +45,4 @@ exposure: 74 of 531.
 
 ## Reproduce
 
-    python3 tests/p_paper_coverage_audit.py     # about 3 minutes
-    make gate-p-paper-verifier                  # the gate, with its own RED control
+    make gate-p-paper-verifier                  # the gate, with its own RED control (the audit script is deleted)

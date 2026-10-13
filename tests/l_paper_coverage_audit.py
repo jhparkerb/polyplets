@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Which numbers in an L paper does verify_l_papers.py actually read?
 
-The P-paper measurement (tests/p_paper_coverage_audit.py) pointed at the L
+The P-paper measurement (tests/p_paper_coverage_audit.py, deleted 2026-10-13:
+its gate, tests/gate_p_paper_verifier.py, runs the full sweep) pointed at the L
 corpus.  It matters more here.  On the P side the question was how much of one
 guarded manuscript is guarded; on the L side only four of the six manuscripts
 have any checks at all, and every one of the six carries a disclosure block
@@ -80,13 +81,12 @@ def literals(src):
 
 
 # TODO(2026-08-24, /simplify): sweep() and context() below are a hand-copied
-# variant of tests/gate_p_paper_verifier.py's, which the SIBLING audit
-# (tests/p_paper_coverage_audit.py) imports rather than copies. The differences
-# are small and parametrizable: a pattern() tolerating {,} thousands
-# separators, the VERIFY_TEX_NAME env var, and no cache shim. Parametrizing the
-# gate's sweep on a pattern-builder plus extra env would let this import it too
-# -- one mutation harness instead of two. Not done here because it edits a gate
-# on the per-push path to serve an unwired audit.
+# variant of tests/gate_p_paper_verifier.py's. The differences are small and
+# parametrizable: a pattern() tolerating {,} thousands separators and the
+# VERIFY_TEX_NAME env var. Parametrizing the gate's sweep on a pattern-builder
+# plus extra env would let this import it -- one mutation harness instead of
+# two. Not done here because it edits a gate on the per-push path to serve an
+# unwired audit.
 def sweep(src, lits, name, tmpdir):
     """Return the literals whose perturbation the verifier does NOT catch."""
     path = os.path.join(tmpdir, "under-test.tex")

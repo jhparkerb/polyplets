@@ -65,21 +65,6 @@ def literals(src):
     return sorted({m.group(0) for m in LITERAL.finditer(masked)})
 
 
-# Running the verifier as a child, optionally under the subprocess-output cache
-# that makes a slow verifier auditable (tests/_audit_subprocess_cache.py).
-_SHIM = ("import sys; sys.path.insert(0, {tests!r}); "
-         "import _audit_subprocess_cache; import runpy; "
-         "runpy.run_path({verifier!r}, run_name='__main__')")
-
-
-def _argv(verifier):
-    if os.environ.get("AUDIT_SUBPROC_CACHE"):
-        return [sys.executable, "-c",
-                _SHIM.format(tests=str(Path(__file__).resolve().parent),
-                             verifier=str(verifier))]
-    return [sys.executable, str(verifier)]
-
-
 # One verifier run is 0.32 s of real work (measured; a bare interpreter is
 # 0.01 s, so this is not startup), and there are 200 of them -- 70 s serial.
 # Sampling the literals is not available: the whole statement is COVERAGE, and a
@@ -96,11 +81,17 @@ def _argv(verifier):
 # common.spawn to grow env= and check=False (the probe needs both VERIFY_TEX and
 # the returncode), which is a change to shared code outside this gate's diff.
 WORKERS = min(8, os.cpu_count() or 4)
+# TODO(2026-10-13, /simplify, measured): of each 0.40 s verifier run, about
+# 0.31 s is the polyplet census and the diagonal refit, which never read the
+# .tex; over 294 probes that is 90 CPU-s of the gate's 136, 11-12 s of its 18 s
+# wall. Computing those once and judging each mutated copy against the cached
+# results needs the verifier split into a prelude and a prose pass; not done
+# under a cleanup pass.
 
 
 def sweep(verifier, src, lits, tmpdir):
     """Return the literals whose perturbation the verifier does NOT catch."""
-    argv = _argv(verifier)
+    argv = [sys.executable, str(verifier)]
 
     # The green control runs alone and first: if the unmutated copy does not
     # pass, no RED result below would mean anything.

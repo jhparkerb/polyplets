@@ -121,7 +121,7 @@ def holdout_check(ab, Dj, sweep_dir):
     return []
 
 
-def run_gate(verbose=True, sweep_dir=SWEEP):
+def run_gate(verbose=True):
     ab, Dj, tri, total = quiet(assemble, JMAX)
     bad = []
     for k, cells in ucg.pin_cells(tri, JMAX, HMAX_PIN).items():
@@ -137,7 +137,7 @@ def run_gate(verbose=True, sweep_dir=SWEEP):
     elif verbose:
         print(f"  a(41) = {total} from the tracked sweep + the depth-5 tower, "
               f"equal to the banked value")
-    hb = holdout_check(ab, Dj, sweep_dir)
+    hb = holdout_check(ab, Dj, SWEEP)
     bad += hb
     if not hb and verbose:
         n, H = HOLDOUT
@@ -166,19 +166,23 @@ def shadow_tables(mutate):
             swd._FAM.clear()
 
 
-def bump(fname, e, k, col, delta):
-    """Add delta to column col (2 = sig, 3 = bb, 4 = pp) of row (e, k)."""
+def bump(fname, key, col, delta):
+    """Add delta to column col of the one row of fname whose leading fields are key
+    (a family table's (e, k), with 2 = sig, 3 = bb, 4 = pp; a sweep file's (n,)).
+    Returns the mutation as a function of the directory holding fname."""
+    want = [str(x) for x in key]
+
     def m(d):
         p = os.path.join(d, fname)
         lines = open(p).read().splitlines()
         hit = 0
         for i, ln in enumerate(lines):
             q = ln.split()
-            if q[:2] == [str(e), str(k)]:
+            if q[:len(want)] == want:
                 q[col] = str(int(q[col]) + delta)
                 lines[i] = " ".join(q)
                 hit += 1
-        assert hit == 1, f"{fname}: row e={e} k={k} matched {hit} lines"
+        assert hit == 1, f"{fname}: row {key} matched {hit} lines"
         open(p, "w").write("\n".join(lines) + "\n")
     return m
 
@@ -197,7 +201,7 @@ def selftest():
         problems.append("GREEN: the tree as it stands fails the gate")
 
     # RED 1: the audit's mutation, measured end to end.
-    with shadow_tables(bump("severance_w3_families_K22_e3.txt", 3, 21, 2, 9)):
+    with shadow_tables(bump("severance_w3_families_K22_e3.txt", (3, 21), 2, 9)):
         ab, Dj, tri, total = quiet(assemble, 4)
         try:
             quiet(ucg.run_gate, ab, Dj, tri, quiet=True)
@@ -220,14 +224,14 @@ def selftest():
 
     # RED 2, 3: the other two exposed integers of the e = 3, k = 21 row.
     for col, name in ((3, "bb"), (4, "pp")):
-        with shadow_tables(bump("severance_w3_families_K22_e3.txt", 3, 21, col, 1)):
+        with shadow_tables(bump("severance_w3_families_K22_e3.txt", (3, 21), col, 1)):
             if refuses(5):
                 print(f"RED {col - 1} GREEN: {name}[3][21]+1 refused at depth 5")
             else:
                 problems.append(f"RED {col - 1}: {name}[3][21]+1 passed")
 
     # RED 4: D_5's own table.
-    with shadow_tables(bump("severance_w3_families_K21_e4.txt", 4, 21, 2, 1)):
+    with shadow_tables(bump("severance_w3_families_K21_e4.txt", (4, 21), 2, 1)):
         if refuses(5):
             print("RED 4 GREEN: the K21_e4 table's e=4 k=21 sig+1 refused")
         else:
@@ -253,17 +257,7 @@ def selftest():
     # RED 6: the swept holdout cell, corrupted in a shadow copy of the sweep.
     with tempfile.TemporaryDirectory() as d:
         shutil.copytree(SWEEP, os.path.join(d, "a41"))
-        p = os.path.join(d, "a41", "h20.out")
-        lines = open(p).read().splitlines()
-        hit = 0
-        for i, ln in enumerate(lines):
-            q = ln.split()
-            if q and q[0] == "41":
-                q[1] = str(int(q[1]) + 1)
-                lines[i] = " ".join(q)
-                hit += 1
-        assert hit == 1, f"h20.out: n = 41 matched {hit} lines"
-        open(p, "w").write("\n".join(lines) + "\n")
+        bump("h20.out", (41,), 1, 1)(os.path.join(d, "a41"))
         ab, Dj, tri, _ = quiet(assemble, JMAX)
         if holdout_check(ab, Dj, os.path.join(d, "a41")):
             print("RED 6 GREEN: swept T(41,20)+1 disagrees with the tower")

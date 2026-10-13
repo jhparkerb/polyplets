@@ -3,9 +3,10 @@
 
 Until now "what is confirmed, by which independent source, covering what share"
 was spread over results/ns_a40/PROVENANCE.md, results/second-sources.md,
-results/symmetry-classes.md, results/second-sources.md and the project handoff file (removed).  Five places
+results/symmetry-classes.md, the strip-engine note (since folded into
+second-sources.md) and the project handoff file (removed).  Five places
 drift, and one of them already did: the strip-coverage-vs-holdout-mass
-confusion recorded in strip-engine.md.
+confusion recorded in results/second-sources.md.
 
 This script is the single source.  It assigns every one of the 820 cells its
 set of corroborating sources from the rules the source notes state, and it
@@ -22,12 +23,12 @@ Source rules, each traceable to the note that establishes it:
   B  brute force / Redelmeier          n <= 22          results/ns_a2*/,
                                                         b-file to n <= 20
   G  decorrelated fixed-height GFs     H <= 10          ns_a40/PROVENANCE.md
-  R  small-height recurrences          H <= 4           strip-engine.md
-  S  strip transfer matrix             H <= 14          strip-engine.md (469
+  R  small-height recurrences          H <= 4           second-sources.md
+  S  strip transfer matrix             H <= 14          second-sources.md (469
                                                         cells, 0 mismatch)
   P  closed forms P_k, credited only where a real sweep also reached the cell
                                        k = n-H <= 18, n >= 2k+1, H <= 21
-                                                        strip-engine.md
+                                                        second-sources.md
                                                         ("honest" rule)
   M  Motley/cutcount, rule-independent H <= MOTLEY_H    motley-h18.md
   F  P_k formula-derived cell, the formula itself holdout-validated elsewhere
@@ -57,6 +58,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import re
 import sys
 from pathlib import Path
 
@@ -167,11 +169,11 @@ SWEEP_H = 21
 # named beside it; if the table stops reproducing one, either the table or the
 # note is wrong and the gate says so rather than letting them drift apart.
 EXPECTED = {
-    "cells_total": (820, "strip-engine.md"),
-    "strip_cells": (469, "strip-engine.md"),
+    "cells_total": (820, "results/second-sources.md"),
+    "strip_cells": (469, "results/second-sources.md"),
     "gf_cells": (355, "ns_a40/PROVENANCE.md"),
-    "honest_pct": (72.2, "strip-engine.md"),
-    "strip_alone_pct": (57.2, "strip-engine.md"),
+    "honest_pct": (72.2, "results/second-sources.md"),
+    "strip_alone_pct": (57.2, "results/second-sources.md"),
     # No share-of-a(n) figures are computed or pinned here.  A cell is
     # corroborated or it is not; a wrong cell ruins a(n) whatever its size, so a
     # percentage of a(n) carries no decision and is not tracked.  Standing
@@ -247,8 +249,8 @@ def analyze(T, motley_h=MOTLEY_H):
     honest_doc = [c for c in cells if exact[c] & {"R", "S", "P"}]
     stats["honest_pct"] = round(100 * len(honest_doc) / len(cells), 1)
     # What the table itself can now say, with every exact source counted.
-    stats["exact_any_pct"] = round(
-        100 * sum(1 for c in cells if exact[c]) / len(cells), 1)
+    stats["exact_any"] = sum(1 for c in cells if exact[c])
+    stats["exact_any_pct"] = round(100 * stats["exact_any"] / len(cells), 1)
     stats["strip_alone_pct"] = round(100 * stats["strip_cells"] / len(cells), 1)
     # Cells, not shares: per row, which cells have no exact recount.
     stats["unsourced_cells"] = {
@@ -278,6 +280,21 @@ def check(stats, verbose=True):
     elif verbose:
         print("  ok  %-24s %-8s (%s)" % ("congruence_only_cells", got, note))
     return bad
+
+
+def listed_congruence_only(text):
+    """The congruence-only cells as the generated table lists them, or None.
+
+    write_table puts the list on a line of its own, indented, nothing else on
+    it; this matches that line whole, so an extra cell cannot hide elsewhere in
+    the file.  The readers of results/provenance-table.md (scripts/residual_cells.py's
+    peer check, paper/verify_technical_report.py) share this parser."""
+    for line in text.splitlines():
+        if re.fullmatch(r"\s+T\(\d{1,2},\d{1,2}\)"
+                        r"(?:,\s*T\(\d{1,2},\d{1,2}\))*\s*", line):
+            return sorted((int(a), int(b)) for a, b in
+                          re.findall(r"T\((\d{1,2}),(\d{1,2})\)", line))
+    return None
 
 
 def write_table(T, a, src, exact, stats):
@@ -310,8 +327,7 @@ def write_table(T, a, src, exact, stats):
              % (stats["cells_total"], stats["strip_cells"], stats["gf_cells"]))
     L.append("- entries with at least one exact second source: **%d of %d "
              "(%.1f%%)** -- counting every exact source now available"
-             % (round(stats["exact_any_pct"] * stats["cells_total"] / 100.0),
-                stats["cells_total"], stats["exact_any_pct"]))
+             % (stats["exact_any"], stats["cells_total"], stats["exact_any_pct"]))
     L.append("- the figures published before Motley and the GF arm, kept for "
              "comparison: **%.1f%%** with the sources of the day, **%.1f%%** "
              "from the strip engine alone"

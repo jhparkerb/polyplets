@@ -48,22 +48,12 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 export G2CXX G2_RESTRICT
 endif
 
-.PHONY: gates gates-deep gates-force timed-% print-% gate-motley-crt gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
-        gate-sig-fold \
-        gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
-        gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-docs-index gate-no-copyright-pdfs \
-        gate-l-paper-verifier gate-p-paper-verifier \
-        gate-residual-cells gate-cutcount-assembly \
-        gate-perimeter-min gate-perimeter-defect \
-        gate-perimeter-min-shard clean install \
-        ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
-        ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
-        ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
-        ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
-        ns-gate-frontier-zstd ns-gate-diag-pins \
-        ns-driver0 \
-        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/verify \
+.PHONY: gates gates-deep gates-force timed-% print-% clean install ns-gates ns-gate-arch \
+        ns-gate-regression ns-gate-fold ns-gate-resume ns-gate-parallel ns-gate-resume-boundaries \
+        ns-gate-u128 ns-gate-holes ns-gate-verify ns-gate-kink ns-gate-kink-column \
+        ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
+        ns-gate-frontier-zstd ns-gate-diag-pins build/ns/orchestrate build/ns/runcat \
+        build/ns/predict build/ns/combine build/ns/verify \
         papers papers-verify papers-clean papers-list lean
 
 # The C++ ns binaries used to be on that .PHONY list. They are real files with
@@ -91,6 +81,8 @@ endif
 GATE_DEEP ?=
 
 GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+# Every gate is phony: the list above is the one place a gate is named.
+.PHONY: $(GATE_TARGETS)
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -197,8 +189,23 @@ DOCS_SRC  = $(wildcard docs/*.md docs/*/*.md docs/*/*/*.md)
 # in this tree -- it has no Makefile prerequisites and builds nothing. 16 s on
 # gympie, serially, on every push including documentation-only ones.
 DEPS_ns-gate-go             = $(GO_SRC)
+# Everything verify_technical_report.py reads: the stamp was fail-open while it
+# listed paper/ alone (a regenerated provenance table or a changed sweep.go
+# constant stayed green until someone edited the paper; found 2026-10-13).
 DEPS_gate-p-paper-verifier  = $(PAPER_SRC) tests/gate_p_paper_verifier.py \
-                              tests/_audit_subprocess_cache.py
+                              scripts/provenance_table.py results/triangle.txt \
+                              experiments/cluster_weight_dp.py experiments/depth1_gap_walk.py \
+                              experiments/severance_w1_assemble.py experiments/severance_w3_depths.py \
+                              experiments/slope2_law_vs_truth.py experiments/undertow_pin.py \
+                              experiments/undertow_ri.py scripts/cutcount_assembly_gate.py \
+                              orchestrator/sweep.go results/ns_a40/triangle.txt \
+                              $(wildcard results/ns_a40/perheight/*) \
+                              $(wildcard results/cutcount_b1/rows41/*) \
+                              results/redelmeier_row22/combined.txt \
+                              results/subgroup_counts.txt results/maxhole.txt \
+                              results/holes_n14.txt results/holes_n18.txt \
+                              $(wildcard results/b0*_upload.txt results/b1*_upload.txt) \
+                              fixtures/b000105.txt fixtures/b006770.txt
 DEPS_gate-l-paper-verifier  = $(PAPER_SRC) tests/gate_l_paper_verifier.py
 DEPS_gate-docs-index        = $(DOCS_SRC) tests/gate_docs_index.py
 DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py

@@ -293,16 +293,7 @@ def check_peer(F: dict, root: Path = ROOT) -> list[str]:
         bad.append("%s: states %s congruence-only cells, computed %d"
                    % (GENERATED_PEER, m.group(1),
                       F["congruence_only.count@%d" % h]))
-    # The generator writes the list on a line of its own, indented, nothing
-    # else on it.  Match that line whole -- picking cells out of the whole file
-    # would let an extra cell hide anywhere in it.
-    listed = None
-    for line in text.splitlines():
-        if re.fullmatch(r"\s+T\(\d{1,2},\d{1,2}\)"
-                        r"(?:,\s*T\(\d{1,2},\d{1,2}\))*\s*", line):
-            listed = sorted((int(a), int(b)) for a, b in
-                            re.findall(r"T\((\d{1,2}),(\d{1,2})\)", line))
-            break
+    listed = PT.listed_congruence_only(text)
     want = sorted(F["congruence_only.cells@%d" % h])
     if listed is None:
         bad.append("%s: cannot find the congruence-only cell list -- the other "

@@ -25,6 +25,8 @@ from math import factorial
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import provenance_table as PT  # noqa: E402  (the provenance table's own generator)
 # The .tex under test.  Overridable ONLY so tests/gate_p_paper_verifier.py can
 # point this at a mutated COPY and prove the checks go red; the real file is
 # jasonp's prose and is never written by anything in this tree.
@@ -211,9 +213,9 @@ else:
 # ---------------- formula claims ----------------
 for n in range(1, 41):
     check(f"T({n},{n}) = 3^(n-1)", col[n][n], 3 ** (n - 1))
-for n in range(4, 41):
+for n in range(3, 41):
     check(f"T({n},{n}-1) = (25n-45)*3^(n-4)",
-          col[n - 1][n], (25 * n - 45) * 3 ** (n - 4))
+          Fr(col[n - 1][n]), Fr(25 * n - 45) * Fr(3) ** (n - 4))
 
 # ---------------- every in-onset diagonal cell vs the closed forms ----
 # The report's "P_k explicitly known for k<=18 ... verified against values
@@ -253,25 +255,30 @@ def qpart(n, k):  # [y^k] exp(sum_{j<k} (a_j+b_j n) y^j)
              for m in range(k + 1)]
     return c[k]
 
-for k in range(1, 19):
+# The engine's wired reach, read from the source of truth; the fit runs to it so
+# that verified_top below is the largest k with a held-out swept cell, not the
+# loop bound.
+sweep_go = (ROOT / "orchestrator/sweep.go").read_text()
+wired = int(re.search(r"const maxDiagKMax = (\d+)", sweep_go).group(1))
+for k in range(1, wired + 1):
     n1, n2 = 2 * k + 1, 2 * k + 2
     v1, v2 = pcell(n1, k) - qpart(n1, k), pcell(n2, k) - qpart(n2, k)
     bk = v2 - v1
     ab[k] = (v1 - bk * n1, bk)
 
 n_real, n_injected = 0, 0
-verified_top = 0  # largest k with a swept (H <= 21) cell its fit did not use
+verified_top = 0  # largest k with a swept (H <= SWEEP_H) cell its fit did not use
 for H in range(2, 41):
     for n in range(H + 1, 41):
         k = n - H
-        if not (1 <= k <= 18) or n < 2 * k + 1:
+        if not (1 <= k <= wired) or n < 2 * k + 1:
             continue          # outside the onset n >= 2k+1: no closed form
         if n in (2 * k + 1, 2 * k + 2):
             continue          # the two fit cells; they define P_k
         ak, bk = ab[k]
         want = qpart(n, k) + ak + bk * n
         check(f"diagonal: T({n},{H}) matches refit P_{k}", pcell(n, k), want)
-        if H <= 21:
+        if H <= PT.SWEEP_H:
             n_real += 1
             verified_top = max(verified_top, k)
         else:
@@ -398,8 +405,6 @@ for k in range(1, 19):
 # verified against values from later rows".  Record: the wired table reaches
 # k = 19, but P_19's only in-onset cells are its two fit cells, so the verified
 # reach is the largest k the diagonal loop above found a held-out swept cell for.
-sweep_go = (ROOT / "orchestrator/sweep.go").read_text()
-wired = int(re.search(r"const maxDiagKMax = (\d+)", sweep_go).group(1))
 check("P_k verified to k <=", said("P_k known", r"explicitly known for \$k\\le(\d+)\$"), verified_top)
 check("P_k wired beyond the verified reach", wired, verified_top + 1)
 
@@ -409,11 +414,13 @@ m = re.search(r"Values for (.*?) were calculated only once", prose)
 if not m:
     failures.append("FAIL abstract once-counted cells: sentence not found")
 else:
-    said_cells = set(re.findall(r"T\((\d+),(\d+)\)", m.group(1)))
-    ptab = (ROOT / "results/provenance-table.md").read_text()
-    pm = re.search(r"only\*\* the mod-4 congruence.*?\n\s*\n\s*(T\(.*?)\n", ptab, re.S)
-    rec_cells = set(re.findall(r"T\((\d+),(\d+)\)", pm.group(1))) if pm else None
-    check("abstract: once-counted cells == provenance table", said_cells, rec_cells)
+    said_cells = {(int(a), int(b)) for a, b in re.findall(r"T\((\d+),(\d+)\)", m.group(1))}
+    # The generated table's own list, through the generator's parser; the
+    # provenance and residual-cells gates hold that table to a recomputation,
+    # so reading it is 0.3 ms where recomputing it here was 0.2 s per probe.
+    rec_cells = PT.listed_congruence_only((ROOT / "results/provenance-table.md").read_text())
+    check("abstract: once-counted cells == provenance table", said_cells,
+          set(rec_cells) if rec_cells is not None else None)
 
 # Results 136-137: P_k can be fixed after the 3k-th row -- because the
 # previous sentence supplies the leading coefficient, so the k in-onset rows
@@ -605,15 +612,8 @@ if sp and ends and tot:
 # split-and-domino 11 each way, double split 2) and end weight 7; a doubled
 # row keeps its 25 / 5 from the n-1 case; two adjacent doubled rows form one
 # compound gadget of weight 339 interior, 66 at an end.
-def t_nm2(n):
-    num = 625 * n * n - 2459 * n + 1134
-    assert num % 2 == 0
-    return num // 2 * 3 ** (n - 7) if n >= 7 else Fr(num, 2) / 3 ** (7 - n)
-
 for n in range(5, 41):
-    check(f"T({n},{n - 2}) == (625n^2-2459n+1134)/2 * 3^(n-7)", Fr(col[n - 2][n]), Fr(t_nm2(n)))
-for n in range(3, 41):
-    check(f"T({n},{n - 1}) == (25n-45) 3^(n-4)", Fr(col[n - 1][n]), Fr(25 * n - 45) * Fr(3) ** (n - 4))
+    check(f"P_2({n}) == (625n^2-2459n+1134)/2", pcell(n, 2), Fr(625 * n * n - 2459 * n + 1134, 2))
 for n in range(5, CENSUS_N + 1):
     t = tally2[n]
     p = lambda e: Fr(3) ** e

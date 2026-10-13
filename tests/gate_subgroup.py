@@ -27,7 +27,6 @@ import sys
 from common import ROOT, Gate, read_bfile
 
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from symcount import (HMIRROR_PLACEMENTS, SUBGROUP_TYPES,  # noqa: E402
                       SYMMETRY_TYPES, _anchor_xmin0, count_symmetry_type)

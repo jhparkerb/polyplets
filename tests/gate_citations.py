@@ -69,7 +69,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # prose. `runs/` and `build/` are deliberate omissions: they are run outputs,
 # not artifacts, and citing them is not a claim that they are in the tree.
 TOP = ("results", "docs", "experiments", "scripts", "tests", "cpp", "core",
-       "polyplets", "papers", "paper", "oeis", "go", "orchestrator")
+       "polyplets", "literature", "paper", "oeis", "orchestrator")
 PATH_RE = re.compile(r"`((?:" + "|".join(TOP) + r")/[^`\s]+)`")
 PLACEHOLDER = set("{}<>*?$:")
 EXEMPT_WORDS = ("deleted", "removed", "planned", "todo", "deliverable",
@@ -101,11 +101,15 @@ EPHEMERAL_RE = re.compile(r"^(runs|build)/|^results/(ns_a\d+|redelmeier_)"
 EXCLUDED_TREES = ("results/ghostship/",)
 
 
-def tracked_markdown():
-    out = subprocess.run(["git", "-C", ROOT, "ls-files", "*.md"],
+def tracked(*patterns):
+    """The tracked files matching the git pathspecs, outside EXCLUDED_TREES."""
+    out = subprocess.run(["git", "-C", ROOT, "ls-files", *patterns],
                          capture_output=True, text=True, check=True).stdout
-    return [f for f in out.split()
-            if not f.startswith(EXCLUDED_TREES)]
+    return [f for f in out.split() if not f.startswith(EXCLUDED_TREES)]
+
+
+def tracked_markdown():
+    return tracked("*.md")
 
 
 def history_paths(rev="HEAD"):
@@ -256,10 +260,7 @@ SYNTHETIC = frozenset((
 
 
 def tracked_sources():
-    out = subprocess.run(["git", "-C", ROOT, "ls-files"],
-                         capture_output=True, text=True, check=True).stdout
-    return [f for f in out.split() if f.endswith(SOURCE_EXTS)
-            and not f.startswith(EXCLUDED_TREES)]
+    return [f for f in tracked() if f.endswith(SOURCE_EXTS)]
 
 
 def dead_source_citations(text, source):
@@ -267,7 +268,7 @@ def dead_source_citations(text, source):
     out = []
     for lineno, line in enumerate(text.split("\n"), 1):
         low = line.lower()
-        if "deleted" in low or "removed" in low or "planned" in low:
+        if any(w in low for w in EXEMPT_WORDS):
             continue
         for m in SOURCE_PATH_RE.finditer(line):
             p = m.group(1).rstrip(".,;:)")
