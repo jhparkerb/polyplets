@@ -156,10 +156,8 @@ carries at least one control that must fail.
 `tests/l_paper_coverage_audit.py` perturbs every numeric literal in a copy and
 re-runs the verifier; `results/l-paper-verifier-coverage.md` is the answer, and
 it is **74 of 531**. L5 and L8 are 0 of 144 and 0 of 69 — not one number either
-paper prints is read by anything. The P-side record is
-`results/p-paper-verifier-coverage.md`; its audit script was deleted 2026-10-13,
-the gate `tests/gate_p_paper_verifier.py` running the same full sweep on every
-push. The L audit is not a gate, deliberately; both say where the exposure is.
+paper prints is read by anything. For the technical report, the gate
+`tests/gate_p_paper_verifier.py` runs the same sweep on every push. The L audit is not a gate, deliberately; both say where the exposure is.
 
 ## Scripts
 

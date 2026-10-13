@@ -1,8 +1,6 @@
 # What the L-paper verifier actually reads
 
-2026-08-23. `tests/l_paper_coverage_audit.py`, the P-paper coverage
-measurement (`results/p-paper-verifier-coverage.md`) pointed at the L corpus.
-Method: perturb the last digit of every numeric literal in a COPY of the
+Measured by `tests/l_paper_coverage_audit.py`. Method: perturb the last digit of every numeric literal in a COPY of the
 `.tex` and re-run `paper/verify_l_papers.py`. A literal whose perturbation
 still passes is one the paper prints and no check reads.
 
@@ -24,8 +22,7 @@ behind it.
 | `L8-below-onset.tex` | 15 | 69 | **0** | 69 |
 | **corpus** | 96 | **531** | **74** | **457** |
 
-74 of 531. For comparison, the technical report is 293 of 294
-(`results/p-paper-verifier-coverage.md`). The whole sweep is **80 seconds** on one
+74 of 531. The whole sweep is **80 seconds** on one
 core, because `verify_l_papers.py` runs in 0.16 s and needs no subprocess cache.
 
 ## The measurement is not vacuous
