@@ -256,12 +256,8 @@ GENERATED_PEER = "results/provenance-table.md"
 # excludes CANONICAL by design (it is generated, not quoted), so a stale
 # tracked copy carries yesterday's counts while the gate reports GREEN.  The
 # fix is to render write_note()'s content to a string in --check and fail on
-# any difference from the tracked file, missing file included; the same
-# regenerate-and-compare over results/provenance-table.md would then supersede
-# check_peer()'s wording-coupled regex, which needs two "went blind" alarms to
-# stay safe and only ever checks the two numbers a regex can find.  That is a
-# change to what --check IS, over freshly-validated code, so it is its own
-# change and not a drive-by.
+# any difference from the tracked file, missing file included, as
+# provenance_table.py --check now does for its own table.
 def tracked_docs() -> list[str]:
     out = subprocess.run(["git", "ls-files", "*.md", "*.tex"], cwd=ROOT,
                          capture_output=True, text=True, check=True)
