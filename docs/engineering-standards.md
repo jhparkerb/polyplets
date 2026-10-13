@@ -1,7 +1,6 @@
 # Engineering standards — catching regressions fast
 
-Adopted 2026-06-29 after the regression sweep in [docs/audits/AUDIT-2026-06-28.md](audits/AUDIT-2026-06-28.md),
-where a working fix sat uncommitted while the deployed engine brute-forced a
+Adopted 2026-06-29 after a regression sweep in which a working fix sat uncommitted while the deployed engine brute-forced a
 closed form for ~16h, and a batch of silent-wrong-answer bugs reached HEAD
 because nothing red-flagged them. These are the small, standing practices that
 turn those classes into immediate, loud failures. Keep them few; keep them

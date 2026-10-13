@@ -8,7 +8,7 @@ import Mathlib.Order.RelClasses
 /-!
 # Staircase polyplets: the column-join is injective at fixed area
 
-`results/subclasses.md` Lemma 3, and B1 of `docs/publication.md`.
+`results/subclasses.md` Lemma 3.
 
 A *staircase polyplet* is a polyplet whose column intervals have both
 boundaries nondecreasing (A225114 in OEIS; the middle block of the HV-convex

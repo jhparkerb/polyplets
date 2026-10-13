@@ -272,7 +272,7 @@ def main():
 
     # --- Lemma 3: the column-join is injective at FIXED (i, j) --------------
     # results/subclasses.md Lemma 3, strengthened to M(i)M(j) <=
-    # M(i+j) (docs/publication.md B1). What the proof turns on is
+    # M(i+j). What the proof turns on is
     # that column areas are positive, so the area-i prefix is unique and no
     # split index has to be carried; the checks below are the join landing in
     # the class, the injectivity, and the inequality on all 700 banked terms.

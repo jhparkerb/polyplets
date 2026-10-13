@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B1 of docs/publication.md: staircase animals are supermultiplicative.
+"""results/subclasses.md Lemma 3: staircase animals are supermultiplicative.
 
 results/subclasses.md Lemma 3 paid a factor (i+j) for the column-join,
 because it recovered the pair (X, Y) from the join plus the index of X's last

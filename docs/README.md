@@ -1,65 +1,44 @@
-# docs/ — what is in here
+# docs/
 
-A map of every other file in this directory, held true by `make gate-docs-index`
-(it fails if a file here is not named below) and by `make gate-citations` (it
-fails if a name below points at nothing). Most of what used to be in this
-directory was merged into the records of group 3 in September 2026; every file
-deleted then is listed, with the commit it is readable at, in
-`docs/consolidation-plan.md`.
+Results are in `results/`. This directory holds the proofs, a description of
+how the computation works, and the notes used to maintain the repository.
+`make gate-docs-index` fails if a file here is not listed below.
 
-Findings live in `results/`. This directory is how the machinery works, what was
-proved, and how the work was run.
-
-## 1. Reference — read these to use or check the repo
+## Proofs
 
 | file | what |
 |---|---|
-| `docs/glossary.md` | terms used across every doc and result note |
-| `docs/engine-design.md` | the 2026-06 build design of the run-file engine; superseded in part, and the as-shipped record is `docs/engine-record.md` |
-| `docs/formats.md` | POLYRUN run files, checkpoints, cost profiles |
-| `docs/observability.md` | the provenance/heartbeat contract every long job obeys |
-| `docs/engineering-standards.md` | red-first tests, fail-closed guards, hooks |
-| `docs/push-gate-tiers.md` | what the push gates cost, and what `make gates-deep` restores |
-| `docs/job-checklist.md` | consult before launching any compute job |
-| `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
-| `polyplets/README.md` | the Lean development: what it proves, what it does not reach, how to check it |
-| `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Lean material |
-
-## 2. `docs/proofs/` — the mathematical record
-
-| file | what |
-|---|---|
-| `docs/proofs/diagonal-law.md` | the closed form for the triangle's diagonals: shape, onset and integrality, a theorem |
-| `docs/proofs/grand-form.md` | the exponential form the diagonal polynomials share, and what pins each level |
-| `docs/proofs/universal-diagonal-law.md` | the same argument run without the king lattice fixed |
-| `docs/proofs/dm-diagonal-law.md` | the diagonal-mirror symmetry triangle |
-| `docs/proofs/cutcount-identity.md` | the cancellation identity the coloring engine evaluates |
-| `docs/proofs/polyplet-upper-bound.md` | λ ≤ 9.3154 with an exact certificate |
+| `docs/proofs/diagonal-law.md` | the closed form for the diagonals of the height triangle: shape, onset and integrality |
+| `docs/proofs/grand-form.md` | the exponential form the diagonal polynomials share, and what determines each one |
+| `docs/proofs/universal-diagonal-law.md` | the same argument for any lattice whose neighbors lie in adjacent rows |
+| `docs/proofs/dm-diagonal-law.md` | the triangle of diagonally symmetric polyplets |
 | `docs/proofs/T-n-nm1.md`, `docs/proofs/T-n-nm2-and-general.md` | the first two diagonals by hand, and the general shape |
+| `docs/proofs/cutcount-identity.md` | the identity behind the second enumerator, which counts by coloring |
+| `docs/proofs/polyplet-upper-bound.md` | λ ≤ 9.3154 with an exact certificate |
 | `docs/proofs/convex-mirage.md` | why the convex subclass does not give what it appears to |
 
-## 3. Publication and record
+## How the computation works
 
 | file | what |
 |---|---|
-| `docs/publication-split.md` | the P/L authorship categories, the disclosure blocks, and the OEIS lineup |
-| `docs/publication.md` | the publication record: strategy, warrant tables, standards, audits, novelty searches, removals |
-| `docs/engine-record.md` | the enumerator's measured history: kernels, scheduling, memory, negatives, per-term costs, a(41) |
-| `docs/consolidation-plan.md` | the 2026-09 consolidation: theme map, and the ledger of deleted records with the commit each is readable at |
-| `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
-| `docs/pre-landing.md` | the go/no-go checklist written before the repository was made public |
-| `docs/audits/` | four dated correctness audits of the engine and the claims, 2026-06-28 through 2026-09-02 |
+| `docs/engine-record.md` | the transfer-matrix enumerator: design, kernels, memory, measured costs per term |
+| `docs/formats.md` | the run, checkpoint and cost-profile file formats |
+| `docs/external-anchors.md` | published values this machinery reproduces that it did not produce |
+| `docs/glossary.md` | the terms used in the code and the notes |
 
-## 4. Campaigns still open, and their entry points
+## Maintaining the repository
 
 | file | what |
 |---|---|
-| `docs/lastditch-campaign.md` | pinning the diagonal tower from below the onset — the route that gave a(41) |
+| `docs/engineering-standards.md` | how the tests are written: a check must be seen to fail before it is trusted |
+| `docs/push-gate-tiers.md` | which checks run on every push, what they cost, and what `make gates-deep` adds |
+| `docs/job-checklist.md` | before launching a long computation |
+| `docs/observability.md` | the start/heartbeat/done log format long jobs write |
+| `docs/lean-environment.md` | the Lean toolchain and how to build `polyplets/` |
 
-## 5. The L papers
-
-"L" papers are "L"LM-generated as opposed to (unwritten) "P" papers that were intended to be human-authored.
+## The machine-written papers
 
 | file | what |
 |---|---|
-| `docs/l-papers-record.md` | the L papers' own record: the contraction that took ten manuscripts to six, and every literature-priority pass behind them |
+| `docs/publication-split.md` | how the machine-written papers in `paper/` are labelled |
+| `docs/l-papers-record.md` | how those papers were produced and reduced from ten to six |

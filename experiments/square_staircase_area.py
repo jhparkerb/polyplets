@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""N1 of docs/publication.md: the square-lattice analogue of Proposition 6.
+"""The square-lattice analogue of Proposition 6.
 
 Proposition 6 (results/subclasses.md) says every class between staircase
 and HV-convex KING animals has growth constant mu = 3.128943269730886...  The
@@ -86,7 +86,7 @@ def main():
         f"staircase ratio {ratio} is not Bender's {BENDER} -- N1's premise fails"
     print("ok   the subclass carries the superclass's exponential growth, so the "
           "square-lattice\n     analogue of Proposition 6 is implicit in the solved "
-          "models (docs/publication.md N1)")
+          "models")
     return 0
 
 

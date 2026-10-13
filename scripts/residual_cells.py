@@ -6,7 +6,6 @@ FOUR mutually inconsistent accounts of "the cells that still have one source":
 
   docs/motley-plan.md (deleted)           row 40's residual band 9 -> 7 -> 5 -> 3
   results/second-sources.md   Ticker Tape's two cells: T(40,19), T(40,23)
-  docs/publication.md      Ticker Tape takes "four of the six"
   the project handoff file (removed)                    the 9 -> 7 -> 5 band "does not reproduce"
 
 Three of the four are right and they disagree because **two different

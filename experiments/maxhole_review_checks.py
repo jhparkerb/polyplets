@@ -3,7 +3,7 @@
 
 Purpose: replace the unreproducible random-sample statistics that the
 2026-07-31 adversarial review found in HolesUpper.lean's module doc
-(docs/reviews/outworks-adversarial.md, MINOR list) with deterministic,
+with deterministic,
 exhaustive counts, and bank the review's independent verifications:
 
   1. Enumerate ALL fixed king animals n = 2..9 (growth method; counts must

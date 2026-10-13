@@ -15,7 +15,7 @@ offsets, prod_j (h_j - h_{j+1} + 1). (The other outer run is this one read
 right to left, so one computation settles both.) Lemma 2 says its count P(n)
 is sub-exponential; this script measures P(n)^(1/n) -> 1.
 
-Also checks Lemma 2's elementary bound (docs/publication.md B2),
+Also checks Lemma 2's elementary bound (results/subclasses.md),
 which replaced Hardy-Ramanujan: P(n) <= (n+1)^2 p(n)^2 and, splitting a
 partition at s = ceil(sqrt n), p(n) <= (n+1)^(s + floor(n/(s+1)) + 1) <=
 (n+1)^(2 sqrt(n) + 2). That inequality is slack by miles, so what is pinned is
@@ -156,7 +156,7 @@ def main():
                   f"  log P(n)/sqrt(n)="
                   f"{math.log(P[n]) / n ** 0.5:.4f}")
 
-    # B2 of docs/publication.md: Lemma 2 with no Hardy-Ramanujan.
+    # Lemma 2 of results/subclasses.md, with no Hardy-Ramanujan.
     # Everything here is exact integer arithmetic -- the exponents are the
     # integers the proof produces, not a float sqrt.
     print(f"\n## Lemma 2's elementary bounds, exact, n <= {args.nmax}")
