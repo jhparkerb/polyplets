@@ -6,8 +6,8 @@
 # TIER-DEGRADED -- NOT first-class exact data.  Do not cite as a banked
 # exact result without re-running on a clean revision.
 #
-# Provenance: assembled 2026-07-31 from rescued dalby telemetry,
-# results/dalby-run-telemetry-202606/holes_n19_ph/h{1..19}.out, by summing
+# Provenance: assembled 2026-07-31 from the per-height run outputs
+# results/holes_perheight/n19/h{1..19}.out, by summing
 # the per-height rows "H n k count" over all H = 1..19.  All 19 heights
 # present exactly once; every h*.log carries event=done result=ok.
 # Engine: tma_holes square8 --holes --per-height (per-height driver), dalby,

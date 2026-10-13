@@ -2278,7 +2278,7 @@ provisional. `a(19) = 151 609 203 011 580`; `A₀(19) = 108 898 235 427 176`,
 | measured fraction decay ρ | 0.97800 (17→18) | **0.97801** (18→19) | +0.00001 |
 
 Nothing changes qualitatively. Cost of more terms, from the per-height logs
-`results/dalby-run-telemetry-202606/holes_n{16,17,18,19}_ph/h*.log`
+`results/holes_perheight/n{16,17,18,19}/h*.log`
 (`tma_holes … --holes --per-height`, 8 threads; `n = 19` also cost 201
 CPU-hours):
 

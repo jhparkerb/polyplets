@@ -1,8 +1,4 @@
 # (branch, path) pairs behind every 'unmerged branch' declaration in this tree.
 # Written by tests/gate_citations.py --write-manifest from a tree that HAS those refs;
 # it is what a clone, which does not, checks the declarations against.
-half-measure tests/gate_confetti.py
-triangle-structure docs/triangle-round4.md
 triangle-structure results/triangle-hunt-cross-lattice.md
-triangle-structure results/triangle-r3-adv-independence.md
-triangle-structure results/triangle-r3-winddown.md
