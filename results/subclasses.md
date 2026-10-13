@@ -9,35 +9,17 @@ multi-directed classes of Bacher, the column-convex and staircase classes with
 their rational generating functions, convex polyplets by area and by
 semiperimeter, the stratifications by edge-component count and by hole count,
 the extremal hole statistics, and the connectivity of the single-cell move
-graph. Grades: the eight collapses of the grid, the four theorems that place
-the classical restrictions on known sequences, the squeeze that gives every
-class between staircase and HV-convex the same growth constant, the maximum
-hole area, and the exponential rarity of hole-free polyplets are proved; the
-term series, growth constants and amplitude ratio are measured, with the digit
-counts stated; every non-D-finiteness statement is an exclusion in a stated
-box, not a proof; the sharp asymptotics of the phase-split series and the
-parity-compression step of the maximum hole count are conjectured. Nothing
-here has been submitted to OEIS.
+graph.
 
-## What is in here
-
-The twenty classes of the directedness-convexity grid are identified below,
-under "The directedness-convexity grid"; that table is the quickest answer to
-"is this class known, and as what".
-
-| section | what it holds |
-|---|---|
-| The directedness-convexity grid | five directedness predicates by four convexity predicates, every class named or shown equal to another |
-| Directed and multi-directed king animals | Bacher's classes, the two controls, A222205 to 200 terms |
-| Column-convex, staircase and grounded families | rational generating functions, and the growth constants they give |
-| Convex polyplets by area and by semiperimeter | the closed forms, their derivations and their checks |
-| Every class between staircase and HV-convex | the squeeze: all of them share one growth constant, proved |
-| When does a subclass have a closed form? | the pattern behind which restrictions are tractable |
-| Component-count and hole stratifications | C(n,c), the hole triangle, the maximum hole area and the rarity of hole-free polyplets |
-| Structure of a typical polyplet | rook and diagonal edges, and the shape at n = 12 |
-| The single-cell move graph | connected for n <= 10, by exhaustion |
-| Machinery retargetable beyond polyplets | what of this carries to other lattices |
-| Open problems | what is conjectured or measured but not proved |
+Status, in brief: the eight collapses of the grid, the four theorems that
+place the classical restrictions on known sequences, the squeeze that gives
+every class between staircase and HV-convex the same growth constant, the
+maximum hole area, and the exponential rarity of hole-free polyplets are
+proved; the term series, growth constants and amplitude ratio are measured,
+with the digit counts stated; every non-D-finiteness statement is an exclusion
+in a stated box, not a proof; the sharp asymptotics of the phase-split series
+and the parity-compression step of the maximum hole count are conjectured.
+Nothing here has been submitted to OEIS.
 
 ## Definitions
 
@@ -107,17 +89,15 @@ identified.
 Five sequences of the grid are absent from OEIS: HV-convex by area, control B
 unfiltered, (dir5, column-convex), (ctrlB, column-convex) and
 (dir4, HV-convex). HV-convex by semiperimeter and (dir4, HV-convex) by
-semiperimeter are two more, counted by a different statistic. Two earlier
-labels were wrong and are corrected here: the multi-directed row is A222205
-(Sloane 2013, from Bacher's paper), not new; and "directed column-convex =
-A007052" was a naming collision, A007052 being column-convex with `b`
-nondecreasing and no cone condition at all.
+semiperimeter are two more, counted by a different statistic. The
+multi-directed row is A222205 (Sloane 2013, from Bacher's paper). A007052 is
+not a directed class: it is column-convex with `b` nondecreasing and no cone
+condition at all (below).
 
 ### Reference values
 
-The table every check of the grid campaign compares against; a mismatch means
-the program is wrong, not the table. Growth column: estimates or exact values
-as stated.
+The values the gates compare against. Growth column: estimates or exact
+values as stated.
 
 | sequence | first terms | growth |
 |---|---|---|
@@ -127,15 +107,15 @@ as stated.
 | column-convex A187077 | 1, 4, 18, 83, 385 | 4.64468 (quartic root) |
 | directed column-convex A007052 | 1, 3, 10, 34, 116, 396 | 2+√2 = 3.41421 |
 | staircase A225114 | 1, 3, 9, 28, 87, 272 | — |
-| **HV-convex by area (novel)** | 1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834 | 3.1289432697308862523 (Phase 2b, 199 digits) |
-| **HV-convex by semiperimeter (novel)** | 1, 2, 9, 36, 154, 668, 2916, 12740 | ~4.13 falling |
+| HV-convex by area (not in OEIS) | 1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834 | 3.1289432697308862523 (199 digits) |
+| HV-convex by semiperimeter (not in OEIS) | 1, 2, 9, 36, 154, 668, 2916, 12740 | ~4.13 falling |
 | multi-directed = A222205 | 1, 4, 20, 110, 636, 3790, 23036, 141946 | 6.475196280297 (12 digits, 400-term series) |
 | cone-anchor control B (bottom row waived) | 1, 4, 20, 106, 576, 3179, 17736, 99748 | — |
-| convex polyomino by area (CONTROL) = A067675 | 1, 2, 6, 19, 59, 176, 502, 1374, 3630, 9312 | 2.3091385933304947311 (Phase 2b, 121 digits) |
-| convex polyomino by semiperimeter A005436 (CONTROL) | 1, 2, 7, 28, 120, 528, 2344 | — |
+| convex polyomino by area (control) = A067675 | 1, 2, 6, 19, 59, 176, 502, 1374, 3630, 9312 | 2.3091385933304947311 (121 digits) |
+| convex polyomino by semiperimeter A005436 (control) | 1, 2, 7, 28, 120, 528, 2344 | — |
 
-Spot value, measured 2026-08-05 on gympie by `python3 experiments/convex_tm.py 128`
-(about 4 minutes), term `n = 128` of HV-convex by area:
+Spot value, `python3 experiments/convex_tm.py 128` (about 4 minutes), term
+`n = 128` of HV-convex by area:
 
 ```
 2509948162052912103766963600364762350348141297853178810057013197
@@ -146,13 +126,12 @@ Spot value, measured 2026-08-05 on gympie by `python3 experiments/convex_tm.py 1
 One Redelmeier pass over all fixed king animals evaluates every class on every
 animal generated (`build/directed_cone_anchor grid 14 8`,
 `cpp/directed_cone_anchor.cpp`; the enumeration is the one validated against
-A006770). Measured 2026-08-05 on gympie, 8 threads, source `git=54440c2-dirty`:
-the sixteen-class run took 302.8 s wall, 2064.9 s cpu, peak RSS 1.9 MB; the
-twenty-class run with the `mdir` row added took 512.1 s wall, 3672.6 s cpu,
-1.9 MB, and left the sixteen original columns unchanged. Data:
-`results/mk_grid20_n14.txt`. Gate: `make gate-king-grid`
-(`tests/gate_king_grid.py`), which also checks the eight equalities that must
-hold and the four that must not.
+A006770). Run 2026-08-05 on gympie, 8 threads: the sixteen-class run took
+302.8 s wall, 2064.9 s cpu, peak RSS 1.9 MB; the twenty-class run with the
+`mdir` row added took 512.1 s wall, 3672.6 s cpu, 1.9 MB, and left the sixteen
+original columns unchanged. Data: `results/mk_grid20_n14.txt`. Gate:
+`make gate-king-grid` (`tests/gate_king_grid.py`), which also checks the eight
+equalities that must hold and the four that must not.
 
 ```
 convexity = none
@@ -296,8 +275,8 @@ column iff no local minimum sits above the global one.
 valley-unimodal: if `b(j−1) > b(j) < b(j+1)`, the row `y = b(j) − 1` is
 occupied in columns `j−1` and `j+1` (king-adjacency gives `b(j) ≤ t(j±1)+1`)
 and empty in column `j`, a gap. Dually `t` is peak-unimodal, and the converse
-holds too, so **HV-convex = column-convex + `b` valley-unimodal + `t`
-peak-unimodal.** With Proposition 1 this says HV-convex ⊂ dir5 outright.
+holds too, so HV-convex = column-convex + `b` valley-unimodal + `t`
+peak-unimodal. With Proposition 1 this says HV-convex ⊂ dir5 outright.
 Staircase (bottoms and tops nondecreasing) is inside HV-convex, and also
 satisfies Proposition 2's condition trivially. Since dir5 ⊆ ctrlB always
 (same cone, larger source set) and dir5 ⊂ multi-directed (Bacher: one source,
@@ -329,11 +308,10 @@ not force directedness (17 against 18 at `n = 3`; 79 against 83 at `n = 4`).
 All eight equalities and all four inequalities hold on the brute-force table
 through `n = 14`.
 
-The meta-finding that every classical restriction lands king animals in known
-territory (compositions, partitions, an existing entry) survives in sharpened
-form: convexity subsumes directedness. HV-convexity implies 5-cone
+In short, convexity subsumes directedness: HV-convexity implies 5-cone
 directedness, staircase implies both cones, column-convexity implies
-multi-directedness.
+multi-directedness. Every classical restriction lands king animals in known
+territory (compositions, partitions, an existing entry).
 
 ### The four classes that do not collapse
 
@@ -385,8 +363,8 @@ is the INVERT transform of A007052; the animals explain why: cut the profile at
 every descent (each is by exactly one row) and the pieces are
 bottoms-nondecreasing column-convex animals, so the class is a sequence of
 A007052 objects. The entry's comments are compositions, closed walks on `K₂`,
-Pisot sequences and words, with no lattice-animal reading. Draft comment,
-staged, jasonp's call:
+Pisot sequences and words, with no lattice-animal reading. Draft OEIS
+comment, not submitted:
 
 > a(n) is the number of column-convex polyplets with n+1 cells (column-convex
 > king-lattice animals: sets of cells of Z² whose columns are each a contiguous
@@ -402,9 +380,9 @@ staged, jasonp's call:
 384934, 1527712, 6029421, 23686066, 92685759; 250 terms in
 `results/mk_ccctrlb_terms_n250.txt`. "Every local minimum of `b` at the global
 minimum" is not a local rule on the profile steps, so the transfer matrix
-carries the height above the running minimum and has `O(n²)` states. Cost on
-gympie: `n = 150` in 5.3 s and 194 MB, `n = 250` in 66.3 s and 938 MB, fixing
-the scaling at `O(n^4.95)` time and `O(n^3.2)` memory; `n = 400` is priced at
+carries the height above the running minimum and has `O(n²)` states. Cost:
+`n = 150` in 5.3 s and 194 MB, `n = 250` in 66.3 s and 938 MB, fixing
+the scaling at `O(n^4.95)` time and `O(n^3.2)` memory; `n = 400` would be
 about 11 minutes and 4 GB and was not run.
 
 - `µ = 3.811527945110`, twelve digits: the raw-ratio cross-check at `N`
@@ -446,22 +424,20 @@ descending part of `b`.
   directly (`experiments/ratio_amplitude.py`, Aitken on the ratio sequence,
   `n = 600` against `n = 700`) it is
   0.462109049209942440035662387700305832841163439729980425 to 54 trusted
-  digits, later 251 by the identity of Proposition 11. PSLQ at 54 digits finds
+  digits, and 251 by the identity of Proposition 11. PSLQ at 54 digits finds
   no integer relation in any in-capacity box (degree ≤ 12 at height ≤ 1e2,
   ≤ 5 at 1e4, ≤ 3 at 1e6, ≤ 2 at 1e8).
 - Not D-finite at order ≤ 24 / degree ≤ 24 and not algebraic at degree ≤ 20 /
   t-degree ≤ 20, the boxes cleared for the unrestricted series.
-- A bijection with the unrestricted class is ruled out, not by different
-  subdominant singularities (that reading of Table B was wrong) but because
-  the 4-cone class splits into a half growing at `µ` and a half growing at
-  2.5145796… with no counterpart on the unrestricted side (Proposition 7).
+- A bijection with the unrestricted class is ruled out: the 4-cone class
+  splits into a half growing at `µ` and a half growing at 2.5145796… with no
+  counterpart on the unrestricted side (Proposition 7).
 
 No OEIS match on nine terms or the six-term prefix.
 
 ### Novelty checks and staged material
 
-Re-checked 2026-08-05 with `experiments/oeis_lookup.py` (oeis.org answers 403
-to some clients; a plain User-Agent gets through): HV-convex by area
+Checked 2026-08-05 with `experiments/oeis_lookup.py`: HV-convex by area
 (1,4,16,61,221,766,2566,8390), HV-convex by semiperimeter
 (1,2,9,36,154,668,2916,12740) and control B unfiltered
 (1,4,20,106,576,3179,17736,99748) all return no match. The multi-directed
@@ -481,15 +457,11 @@ b-files in OEIS format, none submitted:
 | `results/b_hvdir4_upload.txt` | (dir4, HV-convex) | 700 (n = 1..700) |
 | `results/b_ctrlb_unfiltered_upload.txt` | control B unfiltered | 14 (n = 1..14, brute-force bound) |
 
-Draft OEIS comments, staged and jasonp's call, all quoted in this file:
-A055834 (4-cone directed king animals, conjecture-grade), A007052 (directed
-column-convex polyplets with the Temperley derivation), A225114 (staircase
-king animals = skew shapes with no empty rows or columns, with the bijection),
-A018902 (above), and the A187077 correction with its derivation. Earlier
-drafts of the A007052 and A225114 comments are in
-`oeis/draft-comments-subfamilies.txt`; the versions in this file are current.
-`oeis/SUBMISSION.md` records the pacing; the comment-grade edits go in the
-discuss-first wave.
+Draft OEIS comments, none submitted, all quoted in this file: A055834 (4-cone
+directed king animals, conjecture-grade), A007052 (directed column-convex
+polyplets with the Temperley derivation), A225114 (staircase king animals =
+skew shapes with no empty rows or columns, with the bijection), A018902
+(above), and the A187077 correction with its derivation.
 
 ## Directed king animals and the two controls
 
@@ -536,10 +508,10 @@ double count.
 
 | route | what it is | reach |
 |---|---|---|
-| **filter** | Redelmeier untried-set DFS over ALL fixed king animals, O(cells) BFS directedness test applied to every animal generated | n <= 15 |
-| **cone growth** | same DFS with the step set restricted to the cone (bottom row may not grow west), no filter -- each directed animal generated once | n <= 17 |
-| **brute** | from-scratch Python: frozenset growth + explicit translation canonicalisation + dict reachability; shares no code with the C++ | n <= 9 |
-| **closed form** | `D(t) = 1/4 ((1+t)/sqrt(1-6t+t^2) - 1)`, three independent evaluations | n <= 25 |
+| filter | Redelmeier untried-set DFS over all fixed king animals, O(cells) BFS directedness test applied to every animal generated | n <= 15 |
+| cone growth | same DFS with the step set restricted to the cone (bottom row may not grow west), no filter; each directed animal generated once | n <= 17 |
+| brute | from-scratch Python: frozenset growth + explicit translation canonicalisation + dict reachability; shares no code with the C++ | n <= 9 |
+| closed form | `D(t) = 1/4 ((1+t)/sqrt(1-6t+t^2) - 1)`, three independent evaluations | n <= 25 |
 
 The closed form is computed three ways that must agree: the Legendre
 recurrence `(n+1)P_{n+1}(3) = 3(2n+1)P_n(3) − n P_{n−1}(3)` with
@@ -572,13 +544,13 @@ match A006770 through `n = 15`. No b-file for A047781 or A055834 exists in
 `fixtures/`, so the driver hard-codes the published terms with their
 provenance.
 
-Controls, all fail-closed (an empty comparison fails; the divergence checks
-fail if they do not diverge):
+Controls (an empty comparison fails; the divergence checks fail if they do
+not diverge):
 
 | control | what changed | n=1..6 | vs A047781 |
 |---|---|---|---|
-| **A: wrong cone** | 4-step `{N, NE, E, SE}`, source = bottommost of leftmost column | 1, 4, **18**, 85, 413, 2044 | **diverges at n=3, 18 vs 19** |
-| **B: bottom row waived** | same 5-step cone, BFS seeded from *every* bottom-row cell | 1, 4, **20**, 106, 576, 3179 | **diverges at n=3, 20 vs 19** |
+| A: wrong cone | 4-step `{N, NE, E, SE}`, source = bottommost of leftmost column | 1, 4, 18, 85, 413, 2044 | diverges at n=3, 18 vs 19 |
+| B: bottom row waived | same 5-step cone, BFS seeded from every bottom-row cell | 1, 4, 20, 106, 576, 3179 | diverges at n=3, 20 vs 19 |
 | C: no filter | filter removed entirely | 1, 4, 20, 110, 638, 3832 | = A006770, diverges at n=3 |
 
 The `n = 3` split is the single animal `{(0,0), (1,1), (2,0)}`, whose bottom
@@ -600,13 +572,11 @@ term) for the filter route and as A047781 (about 5.83x) for cone growth:
 | brute | Python | 9 | 21.6 s | 21.5 s | -- |
 
 `n = 16` by the filter route is about an hour and `n = 18` by cone growth
-about 40 minutes; neither was run. Scope: this validates the enumeration and
+about 40 minutes; neither was run. This validates the enumeration and
 per-animal predicate machinery (canonical-translate DFS, cell-set bookkeeping,
 sharded parallel decomposition) against an exact formula on a subfamily. It is
 not a check of `a(n)`: the frontier engine shares no code with this tool, and
 directedness discards the connectivity that makes the undirected count hard.
-The binary's stamp reads `ce506bc-dirty` from concurrent unrelated edits; the
-source was unmodified.
 
 ### The 4-cone class, A055834
 
@@ -621,7 +591,7 @@ A055834 data (offset 0) exactly for all `n ≤ 15`, including 36196706 (n=12),
 187938842 (n=13), 978599560 (n=14), 5108177816 (n=15). The entry (Kimberling
 2000) is defined only as the array diagonal `T(2n,n)` of A055830, with no
 combinatorial interpretation; an OEIS search on the terms hits A055834
-uniquely. Draft comment, staged, jasonp's call:
+uniquely. Draft OEIS comment, not submitted:
 
 > Conjecture: for n >= 1, a(n) is the number of n-celled directed
 > polyplets in the four-step cone (directed site animals on the king
@@ -672,9 +642,8 @@ sentinels past the ends).
 A directed animal has one source and no keystone, so directed ⊂
 multi-directed. Proposition 3 of the paper is a bijection with connected heaps
 of segments (heaps with no empty column), which is where the enumeration comes
-from. Two things the repository had assumed are not in the definition: the
-sources are not confined to the global bottom row, and a split bottom row is
-neither necessary nor sufficient.
+from. Note that the sources are not confined to the global bottom row, and a
+split bottom row is neither necessary nor sufficient.
 
 ### Control B is incomparable with multi-directed
 
@@ -689,8 +658,8 @@ animals (`python3 experiments/multidirected_king.py 12 --crosstab 8`):
 | 4 | 106 | 4 | 0 | 0 | 110 | 110 |
 | 5 | 576 | 60 | 0 | 2 | 636 | 638 |
 | 6 | 3179 | 611 | 0 | 42 | 3790 | 3832 |
-| 7 | 17732 | 5304 | **4** | 552 | 23036 | 23592 |
-| 8 | 99670 | 42276 | **78** | 5917 | 141946 | 147941 |
+| 7 | 17732 | 5304 | 4 | 552 | 23036 | 23592 |
+| 8 | 99670 | 42276 | 78 | 5917 | 141946 | 147941 |
 
 Multi-directed but not control B, smallest witness at `n = 4` (four of them):
 
@@ -720,9 +689,9 @@ hits nothing at `(3,2)`, `(3,1)` or `(2,1)`, so condition 2 fails.
 
 | route | what it is | reach |
 |---|---|---|
-| **generating function** | `M = D/(1−B)` from the Nordic decomposition (Theorem 8), exact integer power series | n = 400 in 30 s; n = 200 in 2.1 s |
-| **brute force (C++)** | Redelmeier DFS over ALL fixed king animals, Definition 2 evaluated on each | n = 14, 162.5 s wall / 1290.5 s cpu, 8 threads |
-| **brute force (Python)** | from-scratch frozenset growth, dict reachability, shares no code with either | n = 8 |
+| generating function | `M = D/(1−B)` from the Nordic decomposition (Theorem 8), exact integer power series | n = 400 in 30 s; n = 200 in 2.1 s |
+| brute force (C++) | Redelmeier DFS over all fixed king animals, Definition 2 evaluated on each | n = 14, 162.5 s wall / 1290.5 s cpu, 8 threads |
+| brute force (Python) | from-scratch frozenset growth, dict reachability, shares no code with either | n = 8 |
 
 ```
 S = t(1+S)^2 / (1 - t(1+S))            half-animals, A001003
@@ -782,21 +751,19 @@ the non-D-finite `B`. Consistency with the growth-constant bracket:
 `6.4752 < 6.543`, the certified strip lower bound (`results/growth-constant.md`),
 as multi-directed ⊂ all polyplets requires.
 
-Lower bounds on the polyplet growth constant `λ` from these families, in the
-order they were obtained:
+Lower bounds on the polyplet growth constant `λ` from these families:
 
 | bound | value | form | note |
 |---|---|---|---|
 | directed (lower) | 5.8284 | `3+2√2` (exact algebraic) | fully rigorous |
-| **multi-directed (lower)** | **6.4752** | `1/ρ_M`, `B(ρ_M)=1` | tighter, but numerical |
+| multi-directed (lower) | 6.4752 | `1/ρ_M`, `B(ρ_M)=1` | tighter, but numerical |
 | polyplet λ | ~7.11 | unknown | heuristic only |
-| **Bui certificate (upper)** | **9.3154** | `20000/2147`, exact cert | fully rigorous |
+| Bui certificate (upper) | 9.3154 | `20000/2147`, exact cert | fully rigorous |
 
-These were the first rigorous statements about `λ`; the floor is now the
-certified strip constant 6.543 (`results/growth-constant.md`), and `3+2√2`
-remains the best closed-form bound. The upper bound is
-`docs/proofs/polyplet-upper-bound.md`. Convex polyplets' 3.129 is a valid but
-weak lower bound, of no use for the bracket.
+The current floor is the certified strip constant 6.543
+(`results/growth-constant.md`); `3+2√2` remains the best closed-form bound.
+The upper bound is `docs/proofs/polyplet-upper-bound.md`. Convex polyplets'
+3.129 is a valid but weak lower bound, of no use for the bracket.
 
 ### Tools and controls
 
@@ -809,17 +776,13 @@ weak lower bound, of no use for the bracket.
 
 | control | what changed | n = 1…8 | verdict |
 |---|---|---|---|
-| **mdirbad** | Definition 2's condition 2 (keystone two-sided) dropped | 1, 4, 20, 110, 636, **3792**, 23082, 142596 | diverges at n=6, 3792 vs 3790 |
-| **dir5nb** (control B) | sources = global bottom row instead of local minima of `b` | 1, 4, 20, **106**, 576, 3179, 17736, 99748 | diverges at n=4, 106 vs 110 |
-| **dir5** | Bacher directed (one source, no keystone) | 1, 4, **19**, 96, 501, 2668, 14407, 78592 | strict subset, diverges at n=3 |
+| `mdirbad` | Definition 2's condition 2 (keystone two-sided) dropped | 1, 4, 20, 110, 636, 3792, 23082, 142596 | diverges at n=6, 3792 vs 3790 |
+| `dir5nb` (control B) | sources = global bottom row instead of local minima of `b` | 1, 4, 20, 106, 576, 3179, 17736, 99748 | diverges at n=4, 106 vs 110 |
+| `dir5` | Bacher directed (one source, no keystone) | 1, 4, 19, 96, 501, 2668, 14407, 78592 | strict subset, diverges at n=3 |
 
 `mdirbad` isolates condition 2 and is a strict superset termwise. The gate
 also checks `B(1/µ) = 0.999979 ≈ 1` on the computed `B` series, and that the
-ratio is not drifting to `1/ρ_B`. A latent bug fixed in the process: the
-generation stamps in `directed_cone_anchor.cpp` are `uint32_t` and were
-incremented without a wrap guard; `mdir` burns one generation per keystone per
-animal, so `bump()` now zeroes the marker array on wrap. No recorded run had
-wrapped.
+ratio is not drifting to `1/ρ_B`.
 
 ## Column-convex, staircase and the grounded families
 
@@ -828,12 +791,12 @@ Classifier and checks: `experiments/king_subfamilies.py`.
 | subfamily (king lattice) | first terms | identity |
 |---|---|---|
 | column-convex | 1,4,18,83,385,... | A187077 (Bevan; derivation below) |
-| bargraph (grounded columns) | 2^(n-1) | compositions -- king contact trivializes connectivity |
+| bargraph (grounded columns) | 2^(n-1) | compositions; king contact trivializes connectivity |
 | Ferrers (grounded, monotone) | 1,2,3,5,7,11,... | partitions A000041 (trivially) |
 | stack (grounded, unimodal) | 1,2,4,8,15,27,47,79 | unimodal compositions A001523 |
-| **directed column-convex** | 1,3,10,34,116,396,... | **A007052** -- new interpretation |
-| **staircase (both boundaries monotone)** | 1,3,9,28,87,272,... | **A225114 = skew shapes** -- new, with proof |
-| **4-cone directed column-convex** | 1,4,17,73,314,1351,... | **A018902** -- new interpretation (above) |
+| directed column-convex | 1,3,10,34,116,396,... | A007052, new interpretation |
+| staircase (both boundaries monotone) | 1,3,9,28,87,272,... | A225114 = skew shapes, new, with proof |
+| 4-cone directed column-convex | 1,4,17,73,314,1351,... | A018902, new interpretation (above) |
 
 **Theorem (dcc).** Directed column-convex polyplets (column intervals,
 bottoms nondecreasing) with `n` cells are counted by A007052
@@ -852,7 +815,7 @@ shape; "no empty rows" forces `bottom_{i+1} ≤ top_i + 1`, which is exactly
 king contact, and conversely. 8 terms verified against the entry; the animal
 side is brute-forced to `n = 14` (1, 3, 9, 28, 87, 272, 850, 2659, 8318,
 26025, 81427, 254777, 797175, 2494307, `results/mk_grid20_n14.txt`). Draft
-comment, staged, jasonp's call:
+OEIS comment, not submitted:
 
 > a(n) is also the number of staircase polyplets with n cells: king-lattice
 > animals (sets of cells of Z^2 joined by edge or corner contact, counted up
@@ -883,8 +846,7 @@ the hexagonal lattice, with all fixed polyhexes reproducing A001207 as control,
 gives row-convex polyhexes = A059716 = 1, 3, 11, 42, 162, …, against A187077
 = 1, 4, 18, 83, 385, …. The structural reason: a king row-interval has
 `h+h'+1` placements against the next row, a hexagonal brick-row has `h+h'`.
-The entry carries no derivation. Draft correction comment, staged, jasonp's
-call:
+The entry carries no derivation. Draft correction comment, not submitted:
 
 > The comment "Equivalent to a sequence of row-convex polyhexes (A059716)" is
 > not correct in its plain reading. Row-convex polyhexes are counted by
@@ -912,10 +874,10 @@ Draft formula line for the same edit:
 
 ## Convex polyplets by area
 
-A convex polyplet is an HV-convex king animal. The original finding, with its
-row transfer matrix (state `(left-phase, right-phase, width)`), the first 38
-terms and the first non-D-finiteness verdict (no P-recurrence of order ≤ 6,
-degree ≤ 5, with the convex-polyomino control failing the same test), is
+A convex polyplet is an HV-convex king animal. The row transfer matrix
+(state `(left-phase, right-phase, width)`), the first 38 terms and the first
+non-D-finiteness verdict (no P-recurrence of order ≤ 6, degree ≤ 5, with the
+convex-polyomino control failing the same test) are in
 `docs/proofs/convex-mirage.md`: convexity is the classical tractability lever
 by perimeter and not by area. What follows strengthens every part of it.
 
@@ -928,14 +890,12 @@ by perimeter and not by area. What follows strengthens every part of it.
   HV-convex filter, reproducing A006770 through `n = 10`
   (`experiments/convex_polyplets.py`).
 - `experiments/convex_tm.py`: the row transfer matrix (row intervals,
-  unimodal-envelope phase automaton, unique parse), restored 2026-07-13 after
-  the original tool was lost; regenerates the 38 terms. Its inner offset loop
-  was a box convolution collapsible to `O(1)` sub-intervals per phase target,
-  which took `n = 128` from 110.7 s to 8.3 s with every term unchanged.
+  unimodal-envelope phase automaton, unique parse); its inner offset loop is
+  a box convolution collapsed to `O(1)` sub-intervals per phase target.
 - `cpp/convex_area_tm.cpp` (`build/convex_area_tm N [king]`): the same DP on
   `mpz_class`, identical to the Python at `n = 128` and `n = 200`. `king = 0`
   switches to edge adjacency (`dl` in `[−wp+1, w−1]` instead of `[−wp, w]`,
-  the rule `cpp/convex_perim_tm.cpp` already used for its own control) and
+  the rule `cpp/convex_perim_tm.cpp` uses for its own control) and
   reproduces A067675, fixed convex polyominoes by area.
 - Not in OEIS; no king convex enumeration in the literature, all classical
   convex work being edge-connected. Classical anchors: Bender 2.30914 for
@@ -943,9 +903,9 @@ by perimeter and not by area. What follows strengthens every part of it.
 
 | n | tool | wall_s | peak_rss_mb |
 |---|---|---|---|
-| 100 | convex_tm.py (prefix-sum) | 3.07 | 17.2 |
-| 128 | convex_tm.py (prefix-sum) | 8.31 | — |
-| 200 | convex_tm.py (prefix-sum) | 47.92 | 23.3 |
+| 100 | convex_tm.py | 3.07 | 17.2 |
+| 128 | convex_tm.py | 8.31 | — |
+| 200 | convex_tm.py | 47.92 | 23.3 |
 | 128 | convex_area_tm (C++/GMP) | 0.30 | 6.6 |
 | 200 | convex_area_tm (C++/GMP) | 1.65 | 14.2 |
 | 500 | convex_area_tm (C++/GMP) | 75.6 | 108.4 |
@@ -988,7 +948,7 @@ outside the excluded box.
 The skipped rows test "holds eventually" rather than "holds from `n = 1`".
 The 500-term file reproduces the earlier (6,5) exclusion directly.
 
-The guesser is kept powered by `make gate-convex-dfinite`
+The guesser is calibrated by `make gate-convex-dfinite`
 (`tests/gate_convex_dfinite.py`, about 4 s), four arms:
 
 | arm | series | box | must be | is |
@@ -1057,7 +1017,7 @@ a 137-digit run manufactured a degree-6 "relation" of height `7e11` that way.
 | king | 137 (500-term series) | 20 | 1e5 | none at any degree |
 | control | 121 | 12 | 1e8 | none at any degree |
 | control | 121 | 20 | 1e4 | none at any degree |
-| control | 121 | 20 | 1e8 | hits at degree 15-20, all REJECTED-ARTIFACT (capacity 125-142 vs 121 trusted) |
+| control | 121 | 20 | 1e8 | hits at degree 15-20, all rejected as artifacts (capacity 125-142 vs 121 trusted) |
 
 A worked rejection: the cubic `3219x³ − 7630x² − 18493x + 33955`, offered
 from a 16-digit value of µ, has nearest root
@@ -1068,15 +1028,12 @@ disagreement at the 19th. A degree-3 relation of height `3.4e4` absorbs about
 
 ### The area generating function as a q-series
 
-Imported 2026-08-17 from the Ghost Ship experiment, fourteen unattended
-sessions run against a sandbox cut at `74b2c20` and blind to everything above
-dated 2026-08-05 or later; the record of that experiment is
-the project retrospective (removed from the repository), and its receipts are readable with
-`git show e5e7870:results/ghostship/grading/run-record/sandbox/<path>`
-(abbreviated `GS/` below). The loop independently re-derived the
-semiperimeter series to `s = 200` and its degree-2 algebraicity, matching
-`results/convex_perim_terms_s200.txt` on all 199 shared terms; nothing below
-claims those.
+The derivations in this subsection come from an unattended run on a copy of
+the repository cut at `74b2c20`; its files are kept only in git history, at
+commit `e5e7870` under `results/ghostship/grading/run-record/sandbox/`. That
+run also re-derived the semiperimeter series to `s = 200` and its degree-2
+algebraicity, matching `results/convex_perim_terms_s200.txt` on all 199
+shared terms; nothing below claims those.
 
 **The bivariate box generating function, derived.** From an explicit
 four-phase catalytic functional equation, eliminating the catalytic variable
@@ -1088,41 +1045,39 @@ with no fitting anywhere:
 
 `f(w,h)` = translation classes with bounding box exactly `w × h`. The king
 modification is absorbed by the factor `K = x+y+xy` and the weight
-`(1+x+y)²`. Derivation: `GS/docs/proofs/convex-box-kernel.md`; note
-`GS/results/convex-box.md`. Specializing, the univariate closed form solves
-the quadratic recorded under "Convex polyplets by semiperimeter":
+`(1+x+y)²`. Specializing, the univariate closed form solves the quadratic
+recorded under "Convex polyplets by semiperimeter":
 
     F(t) = [t^2(2 - 10t + 14t^2 - 5t^3 - 4t^4) - t^3 (1+2t)^2 sqrt(1-4t)]
            / ((2+t)(1-4t)^2)
 
-Verified 2026-08-17 from this expression alone in exact `Fraction`
-arithmetic: it reproduces all 200 terms of `GS/king_semiperim_200.txt` and
-hence all 199 of `results/convex_perim_terms_s200.txt`. The discriminant
-factors as `4t⁶ (1−4t)⁵ (1+2t)⁴`, so `√(1−4t)` is the only radical, the same
-radicand as classical convex polyominoes. Asymptotics: `a(s) ~ (s/128) 4^s`,
-next order `−(1/64)(2s+1)C(2s,s)`, term for term the shape of A005436's exact
-formula `(2n+3)4^(n−4) − 4(n−3)C(2n−7,n−4)`. Measured ratio king/A005436:
-1.2440 (s=8), 1.0990 (20), 1.0450 (40), 1.0207 (80), 1.0076 (201), tending
-to 1 roughly as `1 + 1.5/s`; the limit is measured, not proved.
+Verified from this expression alone in exact `Fraction` arithmetic: it
+reproduces all 199 terms of `results/convex_perim_terms_s200.txt`. The
+discriminant factors as `4t⁶ (1−4t)⁵ (1+2t)⁴`, so `√(1−4t)` is the only
+radical, the same radicand as classical convex polyominoes. Asymptotics:
+`a(s) ~ (s/128) 4^s`, next order `−(1/64)(2s+1)C(2s,s)`, term for term the
+shape of A005436's exact formula `(2n+3)4^(n−4) − 4(n−3)C(2n−7,n−4)`.
+Measured ratio king/A005436: 1.2440 (s=8), 1.0990 (20), 1.0450 (40), 1.0207
+(80), 1.0076 (201), tending to 1 roughly as `1 + 1.5/s`; the limit is
+measured, not proved.
 
 **Fixed-height structure.** `f(w,h)` is a polynomial in `w` of degree
 `2h−2` for all `w ≥ 1`: `f(w,2) = 2w² − 1`,
-`f(w,3) = w⁴ + (2/3)w³ − (1/2)w² − (13/6)w + 2`; `h = 4, 5` recorded
-(`GS/out_row_polynomials.txt`). Fixed-height area generating functions are
-rational with cyclotomic denominators: `A_2 = q²(3−q)/(1−q)³`,
+`f(w,3) = w⁴ + (2/3)w³ − (1/2)w² − (13/6)w + 2`; `h = 4, 5` were also
+recorded. Fixed-height area generating functions are rational with
+cyclotomic denominators: `A_2 = q²(3−q)/(1−q)³`,
 `A_3 = q³(7+2q+3q²−4q³+2q⁴)/((1−q)⁴(1−q³))`, `A_4` with denominator
-`(1−q)⁴(1−q³)²(1−q⁴)`; slices sum to the area sequence for `n ≤ 12`
-(`GS/out_area_fixed_height.txt`, `GS/out_area_slices_check.txt`; mechanism
-proved in `GS/docs/proofs/convex-area-q-temperley.md`). Row numerators satisfy
-`N_h(1) = A153337`, proved at generating-function level, plus halving
-identities at `x = −1` (`GS/docs/proofs/row-gf-specializations.md`).
+`(1−q)⁴(1−q³)²(1−q⁴)`; slices sum to the area sequence for `n ≤ 12`; the
+mechanism is a q-Temperley argument proved in that run. Row numerators
+satisfy `N_h(1) = A153337`, proved at generating-function level, plus halving
+identities at `x = −1`.
 
 **Certified constants.** The area generating function is a finite combination
 of four q-adically convergent q-series from the q-deformed functional
 equation, with 50-term predictions checked against an independent transfer
 matrix and a control mode hitting the A067675/A067676 b-files 50/50; 60 exact
-terms in `GS/out_s05_terms60.txt`. The growth constant is `µ = 1/q_c` with
-`q_c` the smallest positive zero of the Temperley denominator
+terms were produced. The growth constant is `µ = 1/q_c` with `q_c` the
+smallest positive zero of the Temperley denominator
 
     K(q) = Sum_m (-1)^m (2 - q^m) q^{m(m+1)/2} / (q;q)_m^2
 
@@ -1130,9 +1085,8 @@ terms in `GS/out_s05_terms60.txt`. The growth constant is `µ = 1/q_c` with
     A  = 0.974452213135004649151329420860243327425...
 
 both certified to 44+ digits by exact-rational interval arithmetic with a
-simple-pole certificate (`GS/out_s10_certify_amplitude.txt`,
-`GS/results/convex-area-asymptotics.md`); control values reproduce the
-published Kotesovec and Klarner–Rivest digits.
+simple-pole certificate; control values reproduce the published Kotesovec and
+Klarner–Rivest digits.
 
 **The exponential spectrum is the reciprocal zero set of K.** The Prony
 spectrum of the unrestricted and staircase series (next section) consists of
@@ -1147,18 +1101,17 @@ mpmath at 60 dps, sign changes on a grid then bisected, both signs scanned):
 | `lambda_4 = -1.25776216033063...` | `q_4 = -0.795062875589391242237668` | `-1.257762160330635483241742` |
 
 Agreement is to every digit printed (14; `λ_1` to 39). `λ_4` is negative and
-comes from a negative zero the positive-axis scan never looked for. The
+comes from a negative zero that a positive-axis scan would miss. The
 subdominant rate `ρ = λ_2/λ_1 = q_1/q_2 = 0.481008794` is thereby a ratio of
 two zeros of `K`; the sharp asymptotic itself is still not proved.
 
 **Two OEIS identifications on the directed-convex subfamily.**
 `a_dir(s) = A014300(s−1)` (nodes of odd outdegree in ordered rooted trees) and
 `d(n,n) = A112029(n−1) = Σ_k C(n−1+k,k)²`, both verified against b-files;
-neither entry carries a polyomino, convex, king or polyplet interpretation
-(`GS/results/directed-convex-king.md`). Absent from OEIS as of 2026-08-17
-(the control query for A005436 hits): the semiperimeter series, the twist
-`2, 5, 20, 81, 344`, the 60-term area series, and directed-convex king by
-area `1, 3, 10, 33, 107, 342`.
+neither entry carries a polyomino, convex, king or polyplet interpretation.
+Absent from OEIS as of 2026-08-17 (the control query for A005436 hits): the
+semiperimeter series, the twist `2, 5, 20, 81, 344`, the 60-term area series,
+and directed-convex king by area `1, 3, 10, 33, 107, 342`.
 
 **Lead, not result: non-D-finiteness of the area generating function.**
 `K(q)` has at least 40 located real zeros in `(0,1)` accumulating at `q = 1`
@@ -1167,24 +1120,24 @@ Gieseking constant; `F(1,1,q)` has poles at these zeros with nonzero residues
 at the first four, and a D-finite generating function has finitely many
 singularities. Two gaps: a rigorous steepest-descent treatment of the
 oscillation near `q = 1`, and nonvanishing of the residue at infinitely many
-zeros (`GS/results/K-oscillation-gieseking.md`).
+zeros.
 
 **Published, do not re-derive.** The area-moment limit law
 `c_r = (r!)²/2^(r+7)`, `E[area^r]/s^(2r) → (r!)²/((2r+1)! 2^r)`, i.e.
 `area/s² → U(1−U)/2`, is Richard, *Limit distributions and scaling
 functions*, arXiv:0704.0716, Table 1 (convex polygons carry the rectangles
 law `β_{1,1/2}`). What survives is area-moment algebraicity for every `r` by
-the same elimination (`GS/docs/proofs/area-moment-kernel.md`) and the
-statement that king and polyomino give the identical law; Enting and
-Guttmann, J. Phys. A 22 (1989), covers the control family.
+the same elimination and the statement that king and polyomino give the
+identical law; Enting and Guttmann, J. Phys. A 22 (1989), covers the control
+family.
 
-**Negative attempt, 2026-08-18.** Whether the descending half's growth
-constant `ν = 2.5145796…` (next section) is `1/(smallest zero of det)`, `det`
-the 2×2 determinant of the s04 solution, could not be tested: `det` built as a
-truncated q-series does not converge (smallest positive zero 1.2433 at 24
-terms, no sign change at 32, 1.1794 at 40 and 48, king and control returning
-identical values). Nothing is concluded; a convergent construction of `det` is
-needed (`experiments/convex_det_zeros.py`).
+**Untested.** Whether the descending half's growth constant `ν = 2.5145796…`
+(next section) is `1/(smallest zero of det)`, `det` the 2×2 determinant of
+the q-series solution, could not be tested: `det` built as a truncated
+q-series does not converge (smallest positive zero 1.2433 at 24 terms, no sign
+change at 32, 1.1794 at 40 and 48, king and control returning identical
+values). A convergent construction of `det` is needed
+(`experiments/convex_det_zeros.py`).
 
 ### Fixed-height area generating functions and root recycling
 
@@ -1217,7 +1170,7 @@ restriction.
 1, 2, 9, 36, 154, 668, 2916, 12740, …; 199 terms (`s = 2..200`) in
 `results/convex_perim_terms_s200.txt`, from `cpp/convex_perim_tm.cpp`
 (`build/convex_perim_tm SMAX [king] [mode]`), the C++/GMP port of
-`experiments/convex_perimeter.py`'s box DP after its `O(W)` inner loop was
+`experiments/convex_perimeter.py`'s box DP with its `O(W)` inner loop
 turned into a difference-array range update. Python and C++ agree at
 `Smax = 30` on both series (king and the A005436 control).
 
@@ -1248,10 +1201,10 @@ The closed form `F(t)` above solves this quadratic.
 
 ### The 4-cone class by semiperimeter
 
-`cpp/convex_perim_tm.cpp` gained a `dir4` mode and a `dir4bad` control
+`cpp/convex_perim_tm.cpp` has a `dir4` mode and a `dir4bad` control
 (`mode` in `{hv, dir4, dir4bad}`, default `hv`; `dir4` requires `king = 1`,
 and `king = 0` forces `hv`). The row-built DP has state (row interval `[l, r]`,
-two unimodality phase flags), so Proposition 2 had to be translated onto it.
+two unimodality phase flags), so Proposition 2 has to be translated onto it.
 For a column `j` left of the bottom row, `b(j)` is the first row `i` with
 `l(i) ≤ j`, a right-continuous inverse of `l` on its descending phase. A row
 where `l` drops by `k ≥ 1` covers `k` new columns with `b` constant across
@@ -1290,12 +1243,11 @@ Run: 74.4 s wall, 1.9 MB (`results/mk_dir4_perim_brute_n14.log`,
 still reproduces A005436's first ten terms. No OEIS match on
 `1,2,9,34,137,553,2237,9038,36435,146511`. Gate: `make gate-mk-dir4-perim`
 (`tests/gate_mk_dir4_perim.py`). Series: 199 terms in
-`results/mk_dir4_perim_terms_s200.txt`, from `build/convex_perim_tm 200 1 dir4`
-on gympie.
+`results/mk_dir4_perim_terms_s200.txt`, from `build/convex_perim_tm 200 1 dir4`.
 
 | run | wall_s | peak_rss_mb |
 |---|---|---|
-| baseline: `hv` (unrestricted) king, s=200 | 1246.4 | 345.5 |
+| `hv` (unrestricted) king, s=200 | 1246.4 | 345.5 |
 | `dir4`, s=200 | 1072.7 | 325.2 |
 
 The restricted run is faster because the same loop carries smaller integers;
@@ -1352,8 +1304,8 @@ CANDIDATE to anything:
 | prec - | same series, box (2,1) | EXCLUDED | rank 6 of 6 |
 | alg + | A005436, algebraic by Delest-Viennot, box (2,8) | CANDIDATE | nullity 1, holds on all 69 withheld rows |
 | alg - | same series, box (2,4) | EXCLUDED | rank 15 of 15 |
-| **null** | **199 terms of the by-area king series** -- same length, rigorously non-D-finite (EXCLUDED at (24,24) on 700 terms) | EXCLUDED in every box where dir4 is a candidate | EXCLUDED, nullity 0, at every box tested here -- both modes, all five scripts |
-| **power** | the unrestricted (D-finite) series in the very boxes that decide dir4 | CANDIDATE | CANDIDATE with the withheld entry fully passing at every box that contains its own order-5 operator; EXCLUDED only at `(2,62)`, whose order 2 is below 5 |
+| null | 199 terms of the by-area king series: same length, non-D-finite (EXCLUDED at (24,24) on 700 terms) | EXCLUDED in every box where dir4 is a candidate | EXCLUDED, nullity 0, at every box tested here, both modes, all five scripts |
+| power | the unrestricted (D-finite) series in the very boxes that decide dir4 | CANDIDATE | CANDIDATE with the withheld entry fully passing at every box that contains its own order-5 operator; EXCLUDED only at `(2,62)`, whose order 2 is below 5 |
 
 The null control is what lets the high-order candidates be trusted: `(17,9)`,
 `(30,4)`, `(48,2)` come back excluded with nullity 0 on a series of identical
@@ -1402,7 +1354,7 @@ the entry carries no asymptotic.
 
 ### The operator comparison
 
-`cpp/middle_kingdom_tm.cpp`'s PROFILE engine carries state `(h, pb, pt)`, the
+`cpp/middle_kingdom_tm.cpp`'s profile engine carries state `(h, pb, pt)`, the
 last column's height and the two unimodality phases, and steps by
 `d = b(j+1) − b(j)` with `s := h − h'` marking where the top turns (`d > s`
 iff `t` rises). Modes `hv` and `hvdir4` differ in one line: the floor on `d`
@@ -1463,8 +1415,7 @@ honeycomb lattice. The square-lattice companion (Leroux, Rassart and
 Robitaille, Adv. Appl. Math. 21 (1998) 343–380) uses a different route. What
 is not theirs: the king lattice (their middle entry is `min(h,h')`, ours
 `min(h,h')+1`), a class with no exact solution, and Propositions 6, 7, 10
-and 11. `paper/L5-convex-polyplets.tex` carries this attribution in three
-places by requirement of `docs/publication-split.md`.
+and 11.
 
 **Lemma 2 (the outer blocks are stacks, hence sub-exponential).**
 `P(n) = A001523(n)`, the number of stacks (weakly unimodal compositions of
@@ -1508,11 +1459,11 @@ mathlib's `Subadditive.tendsto_lim` applied to `−log M`, as
 
     µ  ≥  M(700)^(1/700)  =  3.12340450886853853211…
 
-exact arithmetic on a recorded term. An earlier version of the lemma paid a
-factor `i + j` for the index of `X`'s last column and cited Barequet,
+exact arithmetic on a recorded term. The concatenation argument of Barequet,
 Ben-Shachar and Osegueda, Comput. Geom. 98 (2021) 101790, §2.2
-(`literature/barequet_benshachar_osegueda_2021_concatenation_arguments.pdf`); the
-index is not free information, so neither is needed here.
+(`literature/barequet_benshachar_osegueda_2021_concatenation_arguments.pdf`)
+pays a factor `i + j` for the index of `X`'s last column; the cut at
+cumulative area `i` recovers that index, so no factor is needed here.
 Measured (`experiments/staircase_supermul.py`, 0.6 s): brute force over
 `(h, d)` reproduces `M(1..12)`; over all `i + j ≤ 12` every one of 1182960
 joins lands in the class, the map is injective at fixed `(i, j)` and the
@@ -1561,8 +1512,8 @@ A225114 = 1, 3, 9, 28, ….
 ### The numerics: four series, one constant
 
 Modes `stair` (`d ≥ 0` and `d ≥ s`) and `hvmono` (`d ≥ 0`, `t`
-peak-unimodal), 700 terms each in 0.87 s / 50 MB and 1.28 s / 58 MB on
-gympie (`scripts/mk_stair_growth.sh`; series `results/mk_stair_terms_n700.txt`,
+peak-unimodal), 700 terms each in 0.87 s / 50 MB and 1.28 s / 58 MB
+(`scripts/mk_stair_growth.sh`; series `results/mk_stair_terms_n700.txt`,
 `results/mk_hvmono_terms_n700.txt`; log `results/mk_stair_growth.log`). All
 four series through `experiments/convex_growth.py` at 500 digits of working
 precision:
@@ -1571,7 +1522,7 @@ precision:
 |---|---|---|---|---|
 | staircase (A225114) | 1, 3, 9, 28, 87, 272 | 204 | 0.28932146397165132308 | 0.48100879371 |
 | HV-convex, `b` nondecreasing | 1, 3, 10, 33, 107, 342 | 202 | 0.37545302027992473174 | 0.48100879371 |
-| (dir4, HV-convex) | 1, 4, 15, 53, 177, 567 | 51 | 0.45030318571234118235 | **0.803651401483** |
+| (dir4, HV-convex) | 1, 4, 15, 53, 177, 567 | 51 | 0.45030318571234118235 | 0.803651401483 |
 | HV-convex | 1, 4, 16, 61, 221, 766 | 199 | 0.97445221313500464915 | 0.48100879371 |
 
 The staircase µ at 204 digits reproduces every one of the 199 digits the
@@ -1595,8 +1546,8 @@ Of the four diagonal blocks, exactly two carry exponential weight standalone:
 | block | unrestricted | under the 4-cone condition |
 |---|---|---|
 | `(0,0)` | heights nondecreasing, sub-exponential (Lemma 2) | still sub-exponential |
-| `(1,0)` | staircase, growth **µ = 3.1289…** | untouched |
-| `(0,1)` | mirror staircase, growth **µ** | truncated, growth **2.5146…** |
+| `(1,0)` | staircase, growth µ = 3.1289… | untouched |
+| `(0,1)` | mirror staircase, growth µ | truncated, growth 2.5146… |
 | `(1,1)` | heights nonincreasing, sub-exponential (Lemma 2) | untouched |
 
 The truncated `(0,0)` block stays sub-exponential: with `h' ≥ h` the entry
@@ -1624,7 +1575,7 @@ explicit column intervals `[b, t]` with `b` and `t` nonincreasing and
 on all 700 terms, with three controls required to diverge (dropping the
 4-cone floor returns the mirror staircase A225114; loosening to `d ≥ −2`;
 weighting the climb 2). The 153 is `convex_growth.py`'s figure, set by its
-Aitken-against-Richardson cross-check, the wrong comparison when the
+Aitken-against-Richardson cross-check, a pessimistic comparison when the
 correction is geometric; Prony on the same terms trusts 242. The
 `--compare` figure of 193 digits against the 4-cone series' subdominant is a
 raw agreement of two Aitken extrapolations; measured independently the two
@@ -1656,12 +1607,12 @@ against `k+1`, minus a guard):
 
 | series | `λ_1` | `λ_2` | `λ_3` | `λ_4` |
 |---|---|---|---|---|
-| staircase | **3.12894326973088…** | **1.50504922775900…** | 1.28433727098118… | −1.25776216033063… |
+| staircase | 3.12894326973088… | 1.50504922775900… | 1.28433727098118… | −1.25776216033063… |
 | HV-convex | same | same | same | same |
 | `hvmono` | same | same | same | same |
-| **`D_asc`** | same | same | same | same |
-| block `T` | **2.51457964387872…** | **1.43040460381247…** | 1.24846593371011… | 1.17441805313317… |
-| **`D_desc`** | same | same | same | same |
+| `D_asc` | same | same | same | same |
+| block `T` | 2.51457964387872… | 1.43040460381247… | 1.24846593371011… | 1.17441805313317… |
+| `D_desc` | same | same | same | same |
 | `D` = dir4 | 3.12894326973088… | 2.51457964387872… | 1.50504922775900… | 1.43040460381247… |
 
 `D`'s spectrum is the other two interleaved, and the interleaving continues
@@ -1671,13 +1622,13 @@ against `k+1`, minus a guard):
 
 | claimed coincidence | agree | bearable |
 |---|---|---|
-| `λ_1(D_desc)` = `λ_1(block)` | 246 | **226** |
+| `λ_1(D_desc)` = `λ_1(block)` | 246 | 226 |
 | `λ_2(D_desc)` = `λ_2(block)` | 72 | 64 |
-| `λ_1(D_asc)` = `λ_1(staircase)` | 310 | **284** |
-| `λ_2(D_asc)` = `λ_2(staircase)` | 86 | **76** |
+| `λ_1(D_asc)` = `λ_1(staircase)` | 310 | 284 |
+| `λ_2(D_asc)` = `λ_2(staircase)` | 86 | 76 |
 | `λ_3(D_asc)` = `λ_3(staircase)` | 37 | 32 |
-| `λ_2(D)` = `λ_1(block)` | 236 | **217** |
-| `λ_3(D)` = `λ_2(staircase)` | 78 | **69** |
+| `λ_2(D)` = `λ_1(block)` | 236 | 217 |
+| `λ_3(D)` = `λ_2(staircase)` | 78 | 69 |
 | `λ_4(D)` = `λ_2(block)` | 62 | 55 |
 | `λ_2(staircase)` = `λ_2(HV-convex)` | 85 | 77 |
 
@@ -1743,36 +1694,36 @@ a control that changes one partial numerator and diverges at `n = 6`). A
 proof would supply the meromorphic continuation and spectral gap; the same
 would then be wanted for `T`, which has no entry and no conjectured form.
 
-**The corrected reading of Table B.** Both series carry 0.481008794:
+**What the correction ratios are.** Both series carry 0.481008794:
 
 | series | `d_n/d_(n−1)` | what it is |
 |---|---|---|
 | HV-convex, `hvmono`, staircase | 0.481008794 | `λ_2/λ_1`, the staircase block's own correction |
-| `D_asc` — a subclass of (dir4, HV-convex) | **0.48100879371** | the same one |
+| `D_asc`, a subclass of (dir4, HV-convex) | 0.48100879371 | the same one |
 | `D_desc` and the block `T` | 0.568844421888 | the block's own correction |
-| (dir4, HV-convex) | 0.803651401483 | `ν/µ`, the *extra* exponential in front |
+| (dir4, HV-convex) | 0.803651401483 | `ν/µ`, the extra exponential in front |
 
 The 0.4810 in row two is measured on 4-cone-directed animals directly; as
 `λ_2/λ_1` from that series' spectrum it is `0.48100879370959321158558…`,
 trusted to 76 digits, and the same run trusts that series' `µ` to 200 digits
 against 51 for the unsplit series. The restricted series has an extra
 exponential in front of the shared one, and the diagnostic reports only the
-largest correction present. The bijection is ruled out for a proved reason: it
-would have to account for a half of one side, growing at 2.5146, with no
-counterpart on the other.
+largest correction present. A bijection with the unrestricted class is ruled
+out for a proved reason: it would have to account for a half of one side,
+growing at 2.5146, with no counterpart on the other.
 
 ### The amplitude ratio is a ratio of two explicit feed vectors
 
 Table B's binding constraint was a convergence rate: `D(n)/A(n)` approaches
 its limit at `(ν/µ)^n = 0.8037^n`, `1e−66` at `n = 700`, while
 `D_asc(n)/A(n)` approaches the same limit at `ρ^n`, `1e−222`. Same script and
-discipline (`experiments/ratio_amplitude.py`, raw and Aitken, `n = 600`
+rule (`experiments/ratio_amplitude.py`, raw and Aitken, `n = 600`
 against `700`, minus a 2-digit guard):
 
-| numerator, over `convex_area_terms_n700_king` | raw | Aitken | TRUSTED |
+| numerator, over `convex_area_terms_n700_king` | raw | Aitken | trusted |
 |---|---|---|---|
-| `D` = hvdir4 — Table B's own | 56 | 239 | **54** |
-| `D_asc` = hvdir4asc | 187 | 253 | **185** |
+| `D` = hvdir4, Table B's own | 56 | 239 | 54 |
+| `D_asc` = hvdir4asc | 187 | 253 | 185 |
 
 The first row reproduces Table B's 54 digits and its decimal string. The two
 rows must have the same limit: `D = D_asc + D_desc` with
@@ -1945,23 +1896,22 @@ run.
 
 Novelty: HV-convex king animals are not in OEIS or the literature under any
 name; no source states the squeeze for intermediate classes; Propositions 6,
-7, 10 and 11 have no counterpart found (`docs/publication.md`, items N1–N3).
-A225114's entry, re-fetched 2026-08-05 (`experiments/oeis_lookup.py --full
-id:A225114`), has 24 terms, one comment and the conjectured continued
-fraction, no asymptotic and no growth constant; A001523 confirmed on twelve
-terms. Read-only lookups: `D_asc = 1, 3, 10, 34, 115, 382, 1244, 3993, 12689,
-40065` and `D_desc = 1, 5, 19, 62, 185, 523, 1424, 3776, 9832, 25283` return
-no match; none of the constants `1.4304046`, `1.2484659`, `1.28433727`,
-`−1.25776216`, `1.29770192`, `1.19935960`, `2.53742253` or the `φ` recurrence
-occurs anywhere in the repository's records.
+7, 10 and 11 have no counterpart found. A225114's entry, fetched 2026-08-05
+(`experiments/oeis_lookup.py --full id:A225114`), has 24 terms, one comment
+and the conjectured continued fraction, no asymptotic and no growth constant;
+A001523 confirmed on twelve terms. Read-only lookups: `D_asc = 1, 3, 10, 34,
+115, 382, 1244, 3993, 12689, 40065` and `D_desc = 1, 5, 19, 62, 185, 523,
+1424, 3776, 9832, 25283` return no match; none of the constants `1.4304046`,
+`1.2484659`, `1.28433727`, `−1.25776216`, `1.29770192`, `1.19935960`,
+`2.53742253` or the `φ` recurrence occurs anywhere else in the repository's
+records.
 
-## Reference values of the follow-up campaign (Tables A–D)
+## Reference values, Tables A–D
 
-Measured 2026-08-05 on gympie, `git=54440c2-dirty`; the values every later
-check compares against. A mismatch means the program is wrong, not the table.
+Measured 2026-08-05 on gympie; the values the later checks compare against.
 
 **A. A006770, exclusion boxes on the 40 recorded terms** (`build/prec_guess`,
-input `results/b006770_upload.txt`, prime 2^61−1, seconds per box):
+input `results/b006770_upload.txt`, prime 2^61−1):
 
 | box (J,D) | `prec` verdict | `alg` verdict |
 |---|---|---|
@@ -1983,8 +1933,8 @@ PSLQ at 54 digits: NO relation in any in-capacity box --
   degree <= 12 at height <= 1e2, <= 5 at 1e4, <= 3 at 1e6, <= 2 at 1e8
 ```
 
-The numbers are right; the reading "the two series do not share the
-subdominant" was wrong (see "The corrected reading of Table B").
+The two subdominant ratios are not evidence that the series have different
+subdominant singularities; see "What the correction ratios are" above.
 
 **C. A006770 by the geometric-case growth pipeline**
 (`experiments/convex_growth.py results/b006770_upload.txt`): `d_n/d_(n−1)`
@@ -2009,11 +1959,10 @@ per step, increments shrinking only about 6.5% per step where a clean `1/H²`
 correction predicts `(16/17)² = 11.4%`; identical for `λ = 7.111`. The
 treatment (`experiments/strip_fss.py`) is in `results/growth-constant.md`.
 
-The follow-up campaign's other outcomes live elsewhere: the minimum site
-perimeter of king animals is A235382, `2⌈2√n⌉ + 4`, found by the grid pass's
-min-reduce and verified rather than derived
-(`experiments/min_site_perim_closed_form.py`, `tests/gate_site_perim.py`,
-`results/perimeter.md`).
+A related result lives elsewhere: the minimum site perimeter of king animals
+is A235382, `2⌈2√n⌉ + 4`, found by the grid pass's min-reduce and verified
+rather than derived (`experiments/min_site_perim_closed_form.py`,
+`tests/gate_site_perim.py`, `results/perimeter.md`).
 
 ## When does a subclass have a closed form?
 
@@ -2032,22 +1981,21 @@ cost) rather than enumerate? Two conditions.
    If the predicate forces a comparison, an order relation, a `min`, a `max`
    or a running extremum, the rank is infinite and nothing closes.
 
-The earlier version, "convexity ⇒ one-dimensional profile ⇒ algebraic or
-rational", was falsified in three places inside the repository:
-(ctrlB, column-convex), a profile evolution with rational excluded to order 12
-and D-finite excluded in (12,12); the grounded row, where Ferrers polyplets
-are the partition numbers A000041 (a `q`-series) and stacks A001523 sit beside
-them; and HV-convex by area. The unbounded integer alone disqualifies nothing:
-`K = h + h' + 1` (column-convex) has rank 2, which is why its derivation
-closes on a 2×2 system; `K = h + 2` (4-cone) has rank 1; `min`/`max` coupling
-has neither. Every rank quoted is measured with the area sequence its operator
-generates by `experiments/kernel_rank_probe.py`. The mechanism is visible in
-three places: the unbounded gap between pending blocks in the all-pairs
-cluster family (`results/diagonal-formula.md`, not C-finite); the width in
-the convex-area row transfer matrix, clipped by `min`/`max` onto phase targets
-(not itself a running extremum); and ctrlB's running minimum, the literal
-case. No family has a proof of no closed form; every negative is an exclusion
-box.
+The simpler rule "convexity ⇒ one-dimensional profile ⇒ algebraic or
+rational" fails in three places: (ctrlB, column-convex), a profile evolution
+with rational excluded to order 12 and D-finite excluded in (12,12); the
+grounded row, where Ferrers polyplets are the partition numbers A000041 (a
+`q`-series) and stacks A001523 sit beside them; and HV-convex by area. The
+unbounded integer alone disqualifies nothing: `K = h + h' + 1` (column-convex)
+has rank 2, which is why its derivation closes on a 2×2 system; `K = h + 2`
+(4-cone) has rank 1; `min`/`max` coupling has neither. Every rank quoted is
+measured with the area sequence its operator generates by
+`experiments/kernel_rank_probe.py`. The mechanism is visible in three places:
+the unbounded gap between pending blocks in the all-pairs cluster family
+(`results/diagonal-formula.md`, not C-finite); the width in the convex-area
+row transfer matrix, clipped by `min`/`max` onto phase targets (not itself a
+running extremum); and ctrlB's running minimum, the literal case. No family
+has a proof of no closed form; every negative is an exclusion box.
 
 What passes: directedness (forward cone ⇒ heaps of pieces ⇒ algebraic;
 multi-directed is exactly solved through connected heaps and still
@@ -2064,10 +2012,9 @@ perimeter (A005436 algebraic by Delest–Viennot; HV-convex king animals
 algebraic by semiperimeter, above). What does not: one-dimensional but
 infinite-rank (HV-convex by area, ctrlB, Ferrers, stacks, and staircase, where
 `K = min(h, h') + 1` generates A225114 from `n = 1` and the predicted
-non-rationality was confirmed the same day at (24,24)); not even
-one-dimensional (holes, edge-component count, perimeter, symmetry class,
-parity, contact counts), which are stratified by enumeration and never
-counted.
+non-rationality holds at (24,24)); not even one-dimensional (holes,
+edge-component count, perimeter, symmetry class, parity, contact counts),
+which are stratified by enumeration and never counted.
 
 The area/perimeter split, explained and not: by semiperimeter the counting
 variable is the bounding box `W + H`, so the unbounded state parameter is
@@ -2079,20 +2026,19 @@ class) without the rule predicting it, nor does it explain why the polyomino
 control A067675 fails by area in the same boxes.
 
 None of the countable subclasses composes back to `a(n)`: directed does not
-reduce to undirected, convex does not reduce to all. Parked lead (2026-07-10):
-is there a small set of attributes whose joint value determines a polyplet
-uniquely, a separating rather than partitioning invariant set? Recorded and
-not pursued: the family "every local minimum of `b` within `k` rows of the
-global minimum", between the rational 5-cone class and ctrlB, needs an
-unbounded counter for every finite `k` (a later descent retroactively
-invalidates an earlier local minimum), so every member sits on the wrong side
-of the rule.
+reduce to undirected, convex does not reduce to all. Open: is there a small
+set of attributes whose joint value determines a polyplet uniquely, a
+separating rather than partitioning invariant set? Recorded and not pursued:
+the family "every local minimum of `b` within `k` rows of the global minimum",
+between the rational 5-cone class and ctrlB, needs an unbounded counter for
+every finite `k` (a later descent retroactively invalidates an earlier local
+minimum), so every member sits on the wrong side of the rule.
 
 ## Component-count stratification
 
 `C(n, c)` = fixed polyplets of `n` cells with exactly `c` edge-connected (rook)
 components; a polyplet's edge-components are polyominoes joined only at
-corners. `experiments/component_stratification.py`, 2026-07-10.
+corners. `experiments/component_stratification.py`.
 
 | n\c | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -2116,73 +2062,70 @@ corners. `experiments/component_stratification.py`, 2026-07-10.
 - The distribution peaks near `c ≈ n/2` and is near-symmetric under
   `c ↔ n+1−c` (exact at the edges). `mean_c(n) = Σ_c c·C(n,c)/a(n)` runs
   1, 1.5, 2, 2.5, 3, 3.501, 4.003, 4.506, 5.009 for `n = 1..9`: a typical
-  polyplet is about `n/2` edge-components of about 2 cells each. The framing
-  "`mean_c = (n+1)/2`" is withdrawn: `Σ_c c·C(6,c) = 13416 ≠ 13412 = (7/2)a(6)`.
-  The polyomino fraction `C(n,1)/a(n)` is about 1% at `n = 9` and shrinking.
+  polyplet is about `n/2` edge-components of about 2 cells each. It is not
+  exactly `(n+1)/2`: `Σ_c c·C(6,c) = 13416 ≠ 13412 = (7/2)a(6)`.
 - This fragmentation is the mechanism behind `λ ≈ 7.11 ≫ 4.06`: `a(n)` is
   dominated by corner-assemblies of small pieces. A species-style composition
   `a(n) = f(A001168)` does not close: corner-gluing is geometrically
   constrained (no overlap, specific adjacency, global connectivity), not free.
 - Not in OEIS (row- and antidiagonal-flattened; columns `c = 2` and `c = 3`);
   no literature decomposes king animals by edge-component count.
-  `experiments/tristruct/r3_l1_piece_states.py` reproduces the table for
-  `n ≤ 7` from a piece-tracking DP.
 
 ## Rook and diagonal edges in a typical polyplet
 
-A sampled distribution, retired 2026-07-31 as a closed door: it was collected
-for "cheap core plus sparse correction" decompositions of king adjacency,
-which were all measured dead (`results/closed-doors.md`), so the exact
-`(size, rook-edge-count)` table, a small extension of the `--contacts` flag in
-`cpp/g2_redelmeier.cpp`, is not worth building. The structural fact beneath
-it, zero rook edges iff A001168, is the `bishopConn` check in the same program
-and the identity `C(n,n) = A001168` above.
+A sampled distribution, collected for "cheap core plus sparse correction"
+decompositions of king adjacency, which were all measured dead
+(`results/closed-doors.md`); the exact `(size, rook-edge-count)` table, a
+small extension of the `--contacts` flag in `cpp/g2_redelmeier.cpp`, was
+therefore not built. The structural fact beneath it, zero rook edges iff
+A001168, is the `bishopConn` check in the same program and the identity
+`C(n,n) = A001168` above.
 
 2000 uniform-random `n = 12` polyplets from `build/tma_sample` (seed 42),
 king-adjacent pairs counted by type and stratified by rook-edge count:
 
-| rook edges | count | fraction |
-|---|---|---|
-| 0 (entirely diagonal) | 4 | 0.20% |
-| 1 | 36 | 1.80% |
-| 2 | 89 | 4.45% |
-| 3 | 195 | 9.75% |
-| 4 | 305 | 15.25% |
-| 5 | 366 | 18.30% |
-| 6 | 397 | 19.85% (peak) |
-| 7 | 285 | 14.25% |
-| 8 | 177 | 8.85% |
-| 9 | 93 | 4.65% |
-| 10 | 40 | 2.00% |
-| 11 | 11 | 0.55% |
-| 12 | 2 | 0.10% |
+| rook edges | specimens |
+|---|---|
+| 0 (entirely diagonal) | 4 |
+| 1 | 36 |
+| 2 | 89 |
+| 3 | 195 |
+| 4 | 305 |
+| 5 | 366 |
+| 6 | 397 (peak) |
+| 7 | 285 |
+| 8 | 177 |
+| 9 | 93 |
+| 10 | 40 |
+| 11 | 11 |
+| 12 | 2 |
 
 Unimodal, peaking near the middle of the spanning-tree range, not
 concentrated near 0: rook and diagonal edges occur in comparable amounts in a
 typical polyplet, so an expansion from the pure-diagonal case would need the
-whole histogram. Is the all-diagonal case a dominant term to correct toward?
-No.
+whole histogram. The all-diagonal case is not a dominant term to correct
+toward.
 
 ## Structure of a typical polyplet at n = 12
 
-From the same 2000-specimen sample, 2026-07-07, plus exact facts from the
-enumerations (the catalog `results/polyplet-zoo.md` is folded here; its rows
-on height, symmetry and holes belong to `results/confidence.md`,
+From the same 2000-specimen sample, plus exact facts from the enumerations
+(height, symmetry and hole statistics are in `results/confidence.md`,
 `results/symmetry-classes.md` and the hole sections below):
 
-- Cut vertices: 99.9% of specimens have at least one, mean 6.7 of 12.
-  Biconnected blocks: mean largest block 3.97 cells, mean block 2.39 cells,
-  mean 8.47 blocks per shape. Large polyplets are near the tree-like extreme.
-- Rook-only components: 99.8% are not single polyominoes, mean 6.575 pieces
-  of 12, needing mean 5.575 diagonal glue edges.
+- Cut vertices: all but 2 of the 2000 specimens have at least one, mean 6.7
+  of 12. Biconnected blocks: mean largest block 3.97 cells, mean block 2.39
+  cells, mean 8.47 blocks per shape. Large polyplets are near the tree-like
+  extreme.
+- Rook-only components: all but 4 specimens are not single polyominoes, mean
+  6.575 pieces of 12, needing mean 5.575 diagonal glue edges.
 - The rook↔bishop dual (swap which edges are rook and which diagonal, keeping
   the abstract graph): realized for 1% of specimens and proved impossible for
-  99% by exhaustive search, not budget-limited; the self-dual asymmetric class
-  at `n = 3` is a small-`n` artifact.
+  the other 99% by exhaustive search, not budget-limited; the self-dual
+  asymmetric class at `n = 3` is a small-`n` artifact.
 - Rook and bishop adjacency are an exact isomorphic pair via
   `(p, q) = ((c+r)/2, (c−r)/2)` on one checkerboard color, which is why
-  `rookConn == bishopConn == A001168` exactly; the fraction of either is
-  `A001168(n)/a(n) ~ (4.06/7.11)^n`, measured 0.20% at `n = 12`.
+  `rookConn == bishopConn == A001168` exactly; 4 of the 2000 specimens are of
+  either kind.
 - Edge-perimeter `P = 4n − 2·(rook edges)` is tracked exactly by the
   production transfer matrix (`--perimeter`); its maximum `4n` is attained by
   the zero-rook-edge shapes.
@@ -2195,11 +2138,11 @@ on height, symmetry and holes belong to `results/confidence.md`,
   already or a small extension; every statistic needing global shape knowledge
   (cut vertices, blocks, interior-minus-cut-vertex counts) resists incremental
   tracking in a column pass because it depends on connectivity resolved
-  later, not on the local frontier. Killed the same session, not merely
-  omitted: crossing-partition compression of the frontier, a literal
-  anti-diagonal pass, the three edge-type-layer decompositions (correction not
-  sparse, 96.7%–99.8% disconnected), and #SAT/ASP/ZDD/Gröbner/holographic
-  alternatives to the counting engine (`results/closed-doors.md`).
+  later, not on the local frontier. Also measured dead: crossing-partition
+  compression of the frontier, a literal anti-diagonal pass, the three
+  edge-type-layer decompositions (correction not sparse, 96.7%–99.8% of
+  specimens disconnected), and #SAT/ASP/ZDD/Gröbner/holographic alternatives
+  to the counting engine (`results/closed-doors.md`).
 
 ## Holes
 
@@ -2224,9 +2167,9 @@ translates. His §3.1(f), the spread-out lattice of range `M` in the sup norm,
 is the king lattice at `M = 1`, so it applies directly; his Theorem 2.2 and
 Corollary 3.6 also make the ratio limit `a(n+1)/a(n) → λ` a theorem for king
 animals. The same argument proves the polyomino statement (`P₁` = four
-neighbors), which is therefore not merely believed. Whittington and Soteros's
-1990 survey (`literature/soteros_whittington_1990_rigorous_results_wild_guesses.pdf`,
-§4) does exactly this and records that such gaps can be made quantitative
+neighbors). Whittington and Soteros's 1990 survey
+(`literature/soteros_whittington_1990_rigorous_results_wild_guesses.pdf`, §4)
+does exactly this and records that such gaps can be made quantitative
 (`λ − λ₀ ≥ 0.00003758·λ₀`, Madras et al. 1988). Madras never mentions holes;
 the corollary is ours, the theorem his.
 
@@ -2235,9 +2178,9 @@ Domb–Sykes plus Richardson plus a log-linear fit):
 
 | quantity | growth constant | θ (finite-size) | method |
 |---|---|---|---|
-| a(n) total | **λ ≈ 7.096** | −0.93 (→ universal −1) | Domb-Sykes + Richardson + log-linear fit |
-| A₀(n) hole-free | **λ₀ ≈ 6.94** | −0.93 (same) | same |
-| gap λ − λ₀ | **≈ 0.157** | | |
+| a(n) total | λ ≈ 7.096 | −0.93 (→ universal −1) | Domb-Sykes + Richardson + log-linear fit |
+| A₀(n) hole-free | λ₀ ≈ 6.94 | −0.93 (same) | same |
+| gap λ − λ₀ | ≈ 0.157 | | |
 
 Two facts make `λ₀ < λ` robust at `n ≤ 18`: `log(A₀/a)` against `n` is linear
 to five decimals (second difference about `1e−5` over `n = 12..18`), slope
@@ -2259,27 +2202,26 @@ with finitely-punctured classes sharing `κ` and the exponent rising by one per
 puncture, `a_n^(k) ~ κⁿ n^{k−1}`; their `κ/τ = 0.97743` against our
 `λ₀/λ = 0.97800` is recorded as an observation only.
 
-The `n = 19` term: `results/holes_n19.txt`, assembled from recovered dalby
-telemetry with stamp `git=2c5e3e7-dirty`, which `docs/job-checklist.md` bars
-from first-class recording; all 95 entries with `n ≤ 18` agree exactly with
+The `n = 19` term: `results/holes_n19.txt`, assembled from the per-height
+logs of a run whose source stamp was `git=2c5e3e7-dirty`, so it is
+provisional. All 95 entries with `n ≤ 18` agree exactly with
 `results/holes_n18.txt`, all 55 with `n ≤ 14` with the flood oracle
-`results/holes_n14.txt`, and row sums equal `a(n)` through `n = 19`. Treat as
-provisional. `a(19) = 151 609 203 011 580`; `A₀(19) = 108 898 235 427 176`,
-`A₁(19) = 35 127 667 632 232`; max 11 holes; hole-free fraction 0.7183
-(0.7344 at `n = 18`).
+`results/holes_n14.txt`, and row sums equal `a(n)` through `n = 19`.
+`a(19) = 151 609 203 011 580`; `A₀(19) = 108 898 235 427 176`,
+`A₁(19) = 35 127 667 632 232`; max 11 holes.
 
-| quantity | n≤18 (stored control) | n≤19 (incl. degraded term) | Δ |
+| quantity | n≤18 (stored control) | n≤19 (incl. provisional term) | Δ |
 |---|---|---|---|
 | λ | 7.0958 | 7.0974 | +0.0016 |
-| λ₀ | **6.9389** | **6.9411** | +0.0022 |
+| λ₀ | 6.9389 | 6.9411 | +0.0022 |
 | gap λ − λ₀ | 0.1569 | 0.1563 | −0.0006 |
 | ratio λ₀/λ | 0.97789 | 0.97798 | +0.00009 |
 | θ (both classes) | −0.93 | −0.94 | −0.01 |
-| measured fraction decay ρ | 0.97800 (17→18) | **0.97801** (18→19) | +0.00001 |
+| measured fraction decay ρ | 0.97800 (17→18) | 0.97801 (18→19) | +0.00001 |
 
 Nothing changes qualitatively. Cost of more terms, from the per-height logs
 `results/holes_perheight/n{16,17,18,19}/h*.log`
-(`tma_holes … --holes --per-height`, 8 threads; `n = 19` also cost 201
+(`tma_holes … --holes --per-height`, 8 threads; `n = 19` cost 201
 CPU-hours):
 
 | n | Σ per-height wall | worst single height (critical path) | ratio vs n−1 |
@@ -2287,17 +2229,10 @@ CPU-hours):
 | 16 | 2 490 s (0.7 h) | h16 = 950 s | — |
 | 17 | 12 511 s (3.5 h) | h17 = 4 524 s | ×5.02 |
 | 18 | 52 334 s (14.5 h) | h18 = 17 204 s | ×4.18 |
-| 19 | 220 828 s (61.3 h) | **h19 = 77 818 s (21.6 h)** | ×4.22 |
+| 19 | 220 828 s (61.3 h) | h19 = 77 818 s (21.6 h) | ×4.22 |
 
-| target | Σ per-height wall (est.) | worst height = critical path (est.) |
-|---|---|---|
-| n=19 (measured) | 61 h ≈ 2.6 days | 21.6 h |
-| n=20 | ~258 h ≈ 11 days | ~3.8 days |
-| n=21 | ~1 080 h ≈ 45 days | ~16 days |
-| n=22 | ~4 550 h ≈ 190 days | ~67 days |
-
-`n = 20` is a multi-day dalby campaign and `n = 22` a multi-month one;
-declined.
+Extrapolated: `n = 20` about 258 h total with a 3.8-day critical path,
+`n = 21` about 1 080 h / 16 days, `n = 22` about 4 550 h / 67 days. Not run.
 
 ### The hole-fill identity
 
@@ -2387,8 +2322,7 @@ exactly `a+b+2` cells off the degenerate margin, is king-connected, and
 encloses exactly the box. Choosing `a+b = n−2` with the near-equal
 parity-optimal split achieves `round((n−2)²/8)` for every `n ≥ 4` (`n = 5`
 via the `n = 4` diamond plus one padding cell). Verified `n ≤ 60`
-(`experiments/maxhole_box_construction.py`). Caveat from the adversarial
-review of the Lean formalization (`docs/reviews/outworks-adversarial.md`): the
+(`experiments/maxhole_box_construction.py`). On the degenerate margin the
 ring has `a+b+1` cells when `min(a,b) = 1` with `max(a,b)` even, and is a
 multi-hole animal when `min(a,b) = 1` with `max(a,b) ≥ 3`
 (`experiments/maxhole_review_checks.py`, all `a, b ≤ 12`); the optimizing
@@ -2414,16 +2348,16 @@ attains `u ≥ u_max+1` and symmetrically the other three caps; (5) a king step
 has `|Δu| + |Δv| ≤ 2`, `σ` spans `u` across `ha+1` and `v` across `hm+1`, so
 `|σ| ≥ ha+hm+2` and `n ≥ |σ|`. Maximizing `⌈ha·hm/2⌉` over integers with
 `ha+hm ≤ n−2` gives `M(n)` exactly for every residue. Rigor still owed on
-step 1's contour construction and step 3's winding bookkeeping.
-`polyplets/Polyplets/HolesUpper.lean` (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376) takes (II') as the named hypothesis
-`MoatBound`, mathlib having no discrete-Jordan material, so the Lean bound is
-conditional; `polyplets/Polyplets/Holes.lean` uses the floor form
-`floor_maxhole_formula` (identical to the rounded form, checked to `n = 399`)
-and the diagonal frame `hullBox ∖ boxHole`, which has `a+b+2` cells for all
-`a, b`. Verification: `python3 -m experiments.maxhole_proof_check`.
+step 1's contour construction and step 3's winding bookkeeping. A Lean
+formalization, no longer in the Lean build (last at commit `697f376`), took
+(II') as a named hypothesis `MoatBound`, mathlib having no discrete-Jordan
+material, so that Lean bound was conditional; it used the floor form of the
+formula (identical to the rounded form, checked to `n = 399`) and the diagonal
+frame `hullBox ∖ boxHole`, which has `a+b+2` cells for all `a, b`.
+Verification: `python3 -m experiments.maxhole_proof_check`.
 
-*Superseded routes, recorded.* The multi-hole reduction by filling holes:
-`F′ = F ∪ holes` is hole-free of size `N = n + A`, `A ≤ interior₄(F′)`,
+*Other routes to the multi-hole bound, recorded.* The reduction by filling
+holes: `F′ = F ∪ holes` is hole-free of size `N = n + A`, `A ≤ interior₄(F′)`,
 `n ≥ |shell₄(F′)|`, and the master inequality
 `interior₄(F′) ≤ round((|shell₄(F′)|−2)²/8)` (6,000 random filled animals, 0
 violations, 1,028 tight; solid diamonds exactly tight) would give the bound;
@@ -2436,7 +2370,7 @@ animals plus adversarial families; its sub-lemmas (A-int)
 `|shell₄(J)| ≤ r_u(J) + r_v(J) − 2` per interior component (false for general
 king sets, 0/7,599 with 6,744 tight on interior components) and (Σ)
 `Σ_j max(r_u,j + r_v,j − 2, 1) ≤ |S| − 4` (0/7,645, 885 tight) remain
-unproved (`experiments/maxhole_peeling_check.py`). Refuted en route: the
+unproved (`experiments/maxhole_peeling_check.py`). Refuted: the
 union-range core, the per-component sum `Σ(r_u,j + r_v,j + 2) ≤ |S|` (a
 7-cell example), and (A) for general king-connected sets. The merge lemma (a
 `k ≥ 2`-hole animal admits `W ⊆ F`, `|W| = t`, with `F ∖ W` a king animal of
@@ -2447,17 +2381,17 @@ failures over all `n ≤ 9` (`experiments/maxhole_merge_probe.py`).
 
 | n | multi-hole animals | max A (multi) | M(n) | slack |
 |---|---|---|---|---|
-| 6 | 2 | 2 | 2 | **0** |
+| 6 | 2 | 2 | 2 | 0 |
 | 7 | 42 | 2 | 3 | 1 |
 | 8 | 544 | 3 | 5 | 2 |
 | 9 | 5741 | 4 | 6 | 2 |
 
 What is ours: the question (the polyomino hole literature counts holes,
 Kahle and Roldán, Baralić and Uppal, Guttmann et al., rather than measuring
-their area), the enumeration to `n = 17`, and the reproofs. A paper states
-both halves with the citations. Citations in order: Wang and Wang, SIAM J.
-Appl. Math. 32(4) (1977) 860–870; Sieben, European J. Combin. 29(1) (2008)
-108–117 (`literature/sieben_2008_minimum_site_perimeter.pdf`); Altshuler et al.,
+their area), the enumeration to `n = 17`, and the reproofs. Citations in
+order: Wang and Wang, SIAM J. Appl. Math. 32(4) (1977) 860–870; Sieben,
+European J. Combin. 29(1) (2008) 108–117
+(`literature/sieben_2008_minimum_site_perimeter.pdf`); Altshuler et al.,
 DGCI 2006, LNCS 4245, 17–28 (five authors).
 
 ### Maximum hole count
@@ -2470,14 +2404,13 @@ terms; the lower bound is proved by construction and the upper bound is open.
 | max holes | 0 | 0 | 0 | 1 | 1 | 2 | 2 | 3 | 4 | 4 | 5 |
 | `n − ⌈2√n⌉ + 1` | 0 | 0 | 0 | 1 | 1 | 2 | 2 | 3 | 4 | 4 | 5 |
 
-`n ≤ 9` from `experiments/king_extremal.py --nmax 9` (gympie, about four
-minutes); `n = 10` on ayr, 16 minutes and 8.8 GB; `n = 11` on ayr 2026-08-23
-at jasonp's direction, 4.28 h and 62.7 GB single core over all 39,299,408
-animals, predicted 5, measured 5, the first term the formula had not seen.
-The `n = 11` run re-derives `a(11) = 39,299,408` = A006770. Cost prediction
-was 2 h and 55 GB from a 6.4×-per-term ratio; the real ratio to `n = 11` is
-about 16×, so `n = 12` by this route is not worth it, and a targeted search
-for high-hole animals is the right tool.
+`n ≤ 9` from `experiments/king_extremal.py --nmax 9` (about four minutes);
+`n = 10` on ayr, 16 minutes and 8.8 GB; `n = 11` on ayr, 2026-08-23, 4.28 h
+and 62.7 GB single core over all 39,299,408 animals, predicted 5, measured 5,
+the first term the formula had not seen. The `n = 11` run re-derives
+`a(11) = 39,299,408` = A006770. The time ratio from `n = 10` to `n = 11` is
+about 16×, so `n = 12` by this route is not worth it; a targeted search for
+high-hole animals is the right tool.
 
 *Construction.* The even-parity sublattice `{(i, j) : i + j even}` is
 king-connected by diagonal steps (a square lattice rotated 45° with spacing
@@ -2531,12 +2464,12 @@ for the min-diameter sequence (A000196 and unrelated hits).
 
 From an `n`-animal `A`, lift a non-cut-vertex cell and place it at any empty
 position king-adjacent to the rest; this is the standard cell-move chain, and
-connectivity of its graph on fixed animals is irreducibility, the first gate
-on a uniform sampler. Reformulation that makes it cheap: `A` and `B` are
-adjacent iff they share a common connected `(n−1)`-subanimal, so bucket every
-animal by its legal deletions and union-find
-(`experiments/move_graph_connectivity.py`, single-threaded Python, 2026-08-07,
-gympie, `results/move_graph_20260807.log`):
+connectivity of its graph on fixed animals is irreducibility, the first
+requirement on a uniform sampler. Reformulation that makes it cheap: `A` and
+`B` are adjacent iff they share a common connected `(n−1)`-subanimal, so
+bucket every animal by its legal deletions and union-find
+(`experiments/move_graph_connectivity.py`, single-threaded Python,
+`results/move_graph_20260807.log`):
 
 | n | animals | components | largest | verdict | wall |
 |---|---|---|---|---|---|
@@ -2563,17 +2496,17 @@ Rensburg and Madras, J. Phys. A 30 (1997) 8035–8066, wanted in
 
 ## Machinery retargetable beyond polyplets
 
-An inventory (2026-08-04), not results: novelty unchecked on every item,
-nothing run on a non-king problem except where marked, no competitiveness
-claimed, costs unestimated.
+An inventory, not results: novelty unchecked on every item, nothing run on a
+non-king problem except where marked, no competitiveness claimed, costs
+unestimated.
 
 - **A1. The universal diagonal law** (`docs/proofs/universal-diagonal-law.md`),
   stated for the row-local class and already run on square, hex and king
   (`experiments/universal_law_check.py`, `experiments/hex_gas.py`,
-  `experiments/diagonal_law_proof_check.py`; Lean `polyplets/Polyplets/Universal/`).
-  Not instanced: triangular, the spread-8 neighborhood, `|dx| ≤ 2` lattices,
-  directed and anisotropic variants; the obvious target is the A001168
-  near-diagonal closed forms by the same peeling recursion and modular spine.
+  `experiments/diagonal_law_proof_check.py`). Not instanced: triangular, the
+  spread-8 neighborhood, `|dx| ≤ 2` lattices, directed and anisotropic
+  variants; the obvious target is the A001168 near-diagonal closed forms by
+  the same peeling recursion and modular spine.
 - **A2. The symmetry-companion machine** (`cpp/sym/symtm.cpp`,
   `scripts/derive_related.py`, `results/sym_counts.txt`) for any polyform
   family with a dihedral action; the subgroup-invariant counts are missing on
@@ -2589,30 +2522,29 @@ claimed, costs unestimated.
   the widest reach, for self-avoiding walks and polygons by width, directed
   and convex families, percolation and dimer strips, bounded-height heap
   models.
-- **B3. `polyplets/Polyplets/Northcott.lean`** (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376), a standalone number-theory
-  file: a house bound forces `M(minpoly) ≤ (max 1 B)^deg`, hence unbounded
-  degree for pairwise distinct algebraic integers with a uniform house bound.
-- **C1. The column-step engine** behind the `libenum` seam
-  (`docs/engine-design.md`): commutative-associative reduce, work-stealing
-  orchestrator, spill/merge, CRT counting, checkpoint and cross-architecture
-  recount; retargets needing only a new transition table: SAW/SAP, percolation
-  clusters, Potts/Ising strips, dimers, spanning forests.
+- **B3. A Northcott-type bound**, formerly a standalone Lean file (last at
+  commit `697f376`): a house bound forces `M(minpoly) ≤ (max 1 B)^deg`, hence
+  unbounded degree for pairwise distinct algebraic integers with a uniform
+  house bound.
+- **C1. The column-step engine** behind the `libenum` seam:
+  commutative-associative reduce, work-stealing orchestrator, spill/merge, CRT
+  counting, checkpoint and cross-architecture recount; retargets needing only
+  a new transition table: SAW/SAP, percolation clusters, Potts/Ising strips,
+  dimers, spanning forests.
 - **C2. The measured infrastructure findings** (`docs/engine-record.md`):
   how to saturate a small heterogeneous fleet on a disk-bound enumeration.
-- **C3. Verification methodology** as the deliverable: confidence tiers,
-  fail-closed gates (`docs/engineering-standards.md`), per-term provenance,
-  `docs/observability.md` (adopted wholesale by the `../oeis` sibling), and
-  the computed-table-into-Lean pattern (`scripts/gen_pin.py`, `#guard_msgs`
-  axiom footprints, in-tree `native_decide` bridges).
+- **C3. Verification methodology**: confidence tiers, gates
+  (`docs/engineering-standards.md`), per-term provenance,
+  `docs/observability.md`, and the computed-table-into-Lean pattern
+  (`#guard_msgs` axiom footprints, in-tree `native_decide` bridges).
 - **D1. Statistical physics**: king is the matching lattice of `Z²` for site
   percolation (`p_c` values sum to 1), so perimeter-refined counts plus the
   Sykes–Essam identity give `p_c` against the known 0.40725; finite-size
   scaling of the certified `µ_H` ladder against Yang–Lee predictions.
 - **D2. The repository as primary source** on AI-assisted research, no
-  compute; jasonp's call.
+  compute.
 
-Ranked cheapest first: B2, B1, A1, then C3/D2 as write-ups, then C1 as a real
-port.
+Cheapest first: B2, B1, A1, then C3/D2 as write-ups, then C1 as a real port.
 
 ## Open problems
 
@@ -2630,7 +2562,7 @@ port.
   is algebraic, or even irrational, is open; no integer polynomial of degree
   ≤ 20 at height ≤ 1e8, ≤ 30 at 1e6, or ≤ 12 at 1e15 has it as a root.
 - Whether `ν = 2.5145796…` is the reciprocal of the smallest zero of the
-  `det` of the s04 solution: untested, needs a convergent construction.
+  `det` of the q-series solution: untested, needs a convergent construction.
 - `ρ_M` for A222205 has no minimal polynomial, being defined through the
   non-D-finite series `B`.
 - The A055834 interpretation is conjecture-grade until the 4-cone class has a
@@ -2643,7 +2575,7 @@ port.
   not proved; six out-of-sample terms cost 21 minutes.
 - Maximum hole count: the parity-compression conjecture, the whole remaining
   gap to `maxholes(n) ≤ n − ⌈2√n⌉ + 1`.
-- Maximum hole area in Lean is conditional on `MoatBound`; the union
+- Maximum hole area in Lean was conditional on `MoatBound`; the union
   argument would need the isoperimetric inequality as a hypothesis instead.
 - The peeling lemma and its sub-lemmas (A-int) and (Σ) are verified and
   unproved, no longer needed for `M(n)`.
@@ -2733,7 +2665,7 @@ python3 -m experiments.maxhole_proof_check
 python3 -m experiments.maxhole_sieben_check
 python3 experiments/maxhole_moat_check.py; python3 experiments/maxhole_box_construction.py
 python3 experiments/maxhole_peeling_check.py; python3 experiments/maxhole_merge_probe.py
-python3 experiments/king_extremal.py --nmax 9      # ~4 min; --nmax 10 is 16 min / 8.8 GB, --nmax 11 is 4.3 h / 63 GB (ayr)
+python3 experiments/king_extremal.py --nmax 9      # ~4 min; --nmax 10 is 16 min / 8.8 GB, --nmax 11 is 4.3 h / 63 GB
 python3 experiments/move_graph_connectivity.py
 ```
 
@@ -2745,30 +2677,3 @@ Series and data: `results/mk_{cc,ccdir5,ccdir4,hvdir4,hvdir4asc,hvdir4desc,stair
 `results/a005436_perim_s100.txt`, `results/maxhole.txt`,
 `results/holes_n{14,18,19}.txt`, the `results/b*_upload.txt` files above,
 `results/convex_height_denominators.json`, and the logs named in the text.
-
-## Sources
-
-- `results/middle-kingdom.md` (deleted 2026-09-06; its content is above)
-- `results/middle-kingdom-grid.md` (deleted 2026-09-06; its content is above)
-- `results/middle-kingdom-phase3.md` (deleted 2026-09-06; its content is above)
-- `docs/middle-kingdom-plan.md` (deleted 2026-09-06; its content is above)
-- `docs/middle-kingdom-followups-plan.md` (deleted 2026-09-06; its content is above)
-- `results/mk-dir4-perimeter.md` (deleted 2026-09-06; its content is above)
-- `results/hv-growth-sandwich.md` (deleted 2026-09-06; its content is above)
-- `results/king-subfamilies.md` (deleted 2026-09-06; its content is above)
-- `results/countable-subpopulations-criterion.md` (deleted 2026-09-06; its content is above)
-- `results/convex-polyplets.md` (deleted 2026-09-06; its content is above)
-- `results/convex-anisotropic.md` (deleted 2026-09-06; its content is above)
-- `results/directed-king-animals.md` (deleted 2026-09-06; its content is above)
-- `results/directed-cone-anchor.md` (deleted 2026-09-06; its content is above)
-- `results/multi-directed.md` (deleted 2026-09-06; its content is above)
-- `results/beyond-polyplets.md` (deleted 2026-09-06; its content is above)
-- `results/polyplet-zoo.md` (deleted 2026-09-06; its content is above)
-- `results/component-stratification.md` (deleted 2026-09-06; its content is above)
-- `results/move-graph-connectivity.md` (deleted 2026-09-06; its content is above)
-- `results/rook-bishop-edge-distribution.md` (deleted 2026-09-06; its content is above)
-- `results/king-extremal.md` (deleted 2026-09-06; its content is above)
-- `results/hole-fill-interior-cell-identity.md` (deleted 2026-09-06; its content is above)
-- `results/hole-free-growth-constant.md` (deleted 2026-09-06; its content is above)
-- `results/maxhole-closed-form.md` (deleted 2026-09-06; its content is above)
-- `results/maxhole-proof.md` (deleted 2026-09-06; its content is above)
