@@ -33,9 +33,9 @@ census is priced at two to six months of a 76-core pool per lattice, not run.
 King convention: empty cells king-adjacent to the animal, the percolation
 perimeter of the king lattice, as in `cpp/g2_redelmeier.cpp` (`--siteperim`),
 cross-checked there against Mertens, J. Stat. Phys. 58 (1990) 1095–1108, Table
-IVB; the rook variant is a control that must differ. Measured 2026-08-05 on
-gympie (`git=54440c2-dirty`) by `build/directed_cone_anchor grid 14 8`
-(`cpp/directed_cone_anchor.cpp`): columns 22 and 23 of
+IVB; the rook variant is a control that must differ. Measured by
+`build/directed_cone_anchor grid 14 8` (`cpp/directed_cone_anchor.cpp`;
+2026-08-05, git 54440c2): columns 22 and 23 of
 `results/mk_siteperim_n14.txt`, whose other columns equal
 `results/mk_grid20_n14.txt` and `fixtures/b006770.txt` through `n = 14`.
 `tests/gate_site_perim.py` (`make gate-site-perim`) cross-checks the king
@@ -55,13 +55,12 @@ A027709(n) + 4 = `2⌈2√n⌉ + 4` on all 14 terms, checked integer-exactly
 is the minimal edge perimeter of an n-omino, `2⌈2√n⌉`, and the `+4` is the four
 corner cells of the king ring that rook adjacency never counts. The rook row is
 **A261491** = `⌈2 + √(8n − 4)⌉`, matched by `build/g2 square4 --siteperim` for
-`n = 1..14`. A027710 (balls into 3-colored boxes) is not a perimeter sequence;
-the pairing "A027709/A027710" in earlier planning notes was a mistake. Both
-closed forms are published and verified here only to `n = 14`; A235382's
-comment credits "the students Daring, et al." by an unfetched link. Adding the
-two minima to the grid pass cost, on gympie at 8 threads, wall 512.1 → 689.8 s
-(+34.7%), cpu 3672.6 → 5117.6 s (+39.3%), peak RSS 1.9 MB unchanged: 12 more
-neighbor-offset checks per cell over the 19 there; cpu/wall 7.17 → 7.42.
+`n = 1..14`. Both closed forms are published and verified here only to
+`n = 14`; A235382's comment credits "the students Daring, et al." by an
+unfetched link. Adding the two minima to the grid pass cost, at 8 threads,
+wall 512.1 → 689.8 s (+34.7%), cpu 3672.6 → 5117.6 s (+39.3%), peak RSS
+1.9 MB unchanged: 12 more neighbor-offset checks per cell over the 19 there;
+cpu/wall 7.17 → 7.42.
 
 ## The maximum end
 
@@ -87,12 +86,11 @@ search abandoning a partial animal once `k > kmax` is exact. A candidate's
 `Δk` is itself nondecreasing, so an over-budget candidate is dropped for good:
 about 20x (king `n = 20`, `k ≤ 5`: 2.4e8 nodes to 1.4e7). A row transfer cannot
 replace this, since the defect does not bound the transverse extent of a scan
-(a U with distant arms has `k = 3`). `cpp/perimeter_defect.cpp`, gated by
+(a U with distant arms has `k = 3`). `cpp/perimeter_defect.cpp`, checked by
 `scripts/perimeter_defect_gate.sh` against `build/g2 --siteperim`
 (`results/siteperim_square4_n20.txt`, `results/siteperim_square8_n14.txt`), an
 unpruned control and the `(c, H)` marginals, reaches `n = 70` at `k ≤ 5` on one
-gympie core (913 s square, 2017 s king, 2026-08-07); brute force stops at
-`n = 14` on king.
+core (913 s square, 2017 s king); brute force stops at `n = 14` on king.
 
 ### The king column is the square column re-graded
 
@@ -151,10 +149,10 @@ checked against the king enumeration to `n = 12`. With
 joined by one orthogonal edge, 16 configurations per unordered pair, halved
 when `a = 1` or `a = b`; the census confirms every defect-2 mixed animal has
 this shape. Since `deg R = k − 1` and `deg P(n, k − c, c) ≤ k − 2` for `c ≥ 1`,
-**the king leading coefficient is the square one**; since `R`'s onsets 3, 4, 8,
-12 lie below the class onsets 6, 9, 13, 18, **the king onset is the square
-onset**; since a cycle in `B` forces `k_square ≥ 2c`, `k_king ≥ 3c` and
-**`c ≤ ⌊k/3⌋`** (census maxima 1, 1, 1, 2 at `k = 3..6`).
+the king leading coefficient is the square one; since `R`'s onsets 3, 4, 8,
+12 lie below the class onsets 6, 9, 13, 18, the king onset is the square
+onset; since a cycle in `B` forces `k_square ≥ 2c`, `k_king ≥ 3c` and
+`c ≤ ⌊k/3⌋` (census maxima 1, 1, 1, 2 at `k = 3..6`).
 
 ### The classes
 
@@ -246,8 +244,8 @@ identical on both lattices:
 
     Φ₃ block, k=5:  (40x/27 + 8/3)/Φ₃, identical on both lattices in full
 
-**The leading diagonal of each cyclotomic block is lattice-independent, and
-nothing below it is.** `d = 1` differs from `k = 2` in the `Φ₁` block; the `Φ₂`
+The leading diagonal of each cyclotomic block is lattice-independent, and
+nothing below it is. `d = 1` differs from `k = 2` in the `Φ₁` block; the `Φ₂`
 block's `d = 1` agreement at `k = 3, 5` fails at `k = 6`. The reduction
 explains the `Φ₁` column: `R` has degree `k − 1` and cannot touch `d = 0`. The
 `k = 6` row is in `paper/L6-perimeter-gradings.tex`. Neither leading diagonal
@@ -256,7 +254,8 @@ has a closed form:
 - `Φ₁`: `a_{k+1} = c_k · k! = 2, 4, 12, 39, 136, 2965/6, 66625/36`, integral
   through `k = 4` and then not.
 - `Φ₂`: `b_{k−1} = 5/4, 5/4, 15/8, 5/2` at `k = 3..6`. `5(k−2)!/2^{k−1}` fits
-  three and predicts 15/4 at `k = 6`; measured 5/2 on both lattices. Withdrawn.
+  the first three and predicts 15/4 at `k = 6` against the measured 5/2 on
+  both lattices.
 - `Φ₃`: identical in full at `k = 5`; at `k = 6` only the top coefficient is
   shared, king `(−5920x³ − 19128x² − 18528x − 12656)/243` against square
   `(−5920x³ − 18768x² − 18168x − 12296)/243`.
@@ -268,8 +267,8 @@ checked against OEIS.
 
 ### The `k = 6` censuses and the four predictions they decided
 
-dalby, 2026-08-07 to 08-10, `scripts/dalby_perimeter_defect_pool.sh` (456
-shards, 76-way, `splitS=14`, `git=6473890c`), both merged 456/456 `result=ok`:
+Run by `scripts/dalby_perimeter_defect_pool.sh` (456 shards, 76-way,
+`splitS=14`, git 6473890c, 2026-08-07 to 08-10), every shard `result=ok`:
 
 | lattice | wall | animals | file |
 |---|---|---|---|
@@ -285,13 +284,12 @@ denominator with one factor removed.
 | prediction | outcome |
 |---|---|
 | `onset(6) = 24` | confirmed, both lattices; `deg N − deg D = 39 − 16 = 23` |
-| `Φ₃` exponent `k − 4`, so `Φ₃²` | confirmed; no longer rests on the one point `k = 5` |
+| `Φ₃` exponent `k − 4`, so `Φ₃²` | confirmed |
 | no `Φ₄` before `k = 7` | confirmed: `Φ₁⁷Φ₂⁵Φ₃²` divides exactly, `gcd(N, D) = 1`, minimal |
 | `Φ₂` leading diagonal 15/4 | refuted: 5/2 on both lattices |
 
-The census record counts 22 spare zero coefficients after the division;
-`paper/L6-perimeter-gradings.tex` (2026-08-23, later) says 39, which is
-`deg N`. Both stand here.
+The division leaves 22 spare zero coefficients;
+`paper/L6-perimeter-gradings.tex` says 39, which is `deg N`.
 
 ### An exact identity relating `n`, `H` and `p` on the king lattice
 
@@ -328,20 +326,17 @@ diagonal sticks with `H = n`.
 - **The onset is not the positivity threshold.** The least `n₀` with all forward
   differences nonnegative is strictly below the onset in every class on both
   lattices (`k = 5`: 12 against 18).
-- **A separate `n = 16` king enumeration on dalby** (about 17 CPU-hours) was not
-  worth doing: the pruned enumerator reaches `n = 70` in 2017 s on one core.
-- **The pool script's cost header** predicted about 136 core-hours and 1.8 h
-  wall for king `n = 78` from `time ~ n^7.9`; the run took 42 h wall at 76-way,
-  about 23x. Not calibration for anything (see the `k = 7` pricing).
+- **A separate `n = 16` king brute-force enumeration** (about 17 CPU-hours) is
+  not needed: the pruned enumerator reaches `n = 70` in 2017 s on one core.
 
 ### Novelty
 
-Priority pass of 2026-08-18 (`docs/l-papers-record.md`): the
-identity, the cyclotomic rationality theorem and the degree conjecture are
-Asinowski, Barequet and Zheng's; Barequet and Magal (2023) give square formulae
-to `k = 5`, held by abstract only. The king column, the parity reduction, the
-onset formula, the coefficient triangle, the whole minimum end and the `n/H/p`
-identity were not found anywhere.
+Literature search (`docs/l-papers-record.md`): the identity, the cyclotomic
+rationality theorem and the degree conjecture are Asinowski, Barequet and
+Zheng's; Barequet and Magal (2023) give square formulae to `k = 5`, held by
+abstract only. The king column, the parity reduction, the onset formula, the
+coefficient triangle, the whole minimum end and the `n/H/p` identity were not
+found anywhere.
 
 ## The minimum end
 
@@ -368,11 +363,11 @@ runtime and tested by `make gate-perimeter-min` (`scripts/perimeter_min_gate.sh`
 with removals unbounded on small boxes, a complete brute force there, against
 `build/g2 --siteperim`: 33 and 52 `(n, p)` entries agree on the two square-based
 lattices, 35 on `tri6` (`results/siteperim_tri6_n12.txt`); a control confirms
-the square and king modes differ, and an over-limit frame must fail closed.
+the square and king modes differ, and an over-limit frame is refused.
 
-Censuses (`n p count`, completeness domain in the header, `.log` beside; gympie
-2026-08-07, `scripts/run_perimeter_min.sh`, 10 threads, except king `p ≤ 48` on
-ayr by `scripts/ayr_pmin48.sh`):
+Censuses (`n p count`, completeness domain in the header; run by
+`scripts/run_perimeter_min.sh` at 10 threads, except king `p ≤ 48` by
+`scripts/ayr_pmin48.sh`):
 
 | lattice | reach | files |
 |---|---|---|
@@ -523,9 +518,10 @@ function is `G_tip(x)⁴`.
 
 **A120452 refuted.** The six-term prefix `1, 1, 3, 5, 9, 14` matches A120452,
 which continues 23, 34, 52 and predicts the diamond's `j = 6` term as 1384.
-`W = 13` and `W = 15` (`results/perimmin_free_15_15_0.txt`, `r = 7`, 113 cells)
-both measure **1388**; `4 = 4 × (24 − 23)`, so the tips are independent and only
-the tip series was misidentified.
+`W = 13` and `W = 15` (`results/perimmin_free_13_13_0.txt`,
+`results/perimmin_free_15_15_0.txt`, 85 and 113 cells) both measure **1388**;
+`4 = 4 × (24 − 23)`, so the tips are independent and only the tip series was
+misidentified.
 
 **`φ_m` for index `m` fails at `m = 3`.** The cone spanned by `(1, 0)` and
 `(1, 3)` has order-ideal series `1, 1, 4, 8, 14, 24, 39, 64, 105, 161, 244, 370`;
@@ -564,14 +560,14 @@ all seven. **`D` is A201077**, the eta quotient
 verified against the cone count to `n = 24` and asserted at runtime. A201077
 and A262984 agree on twelve terms and part at the thirteenth, 269 against 268;
 the brute-force count reached eleven, and the column dynamic program extended
-to the bevel gave 269. Three OEIS near-misses in this campaign (A071734,
-A120452, A262984) each fell one term past the comfortable match.
+to the bevel gave 269. Three OEIS near-misses (A071734, A120452, A262984) each
+parted from the measured series one term past the matched prefix.
 
 ### Deep diamonds: `j = 7..12` and the radius rule
 
 The model predicted `j = 7 = 3452`, `j = 8 = 8229`. `j = 8` needs `W = 17`
-(145 cells), past the old 128-cell mask, widened to four words.
-`scripts/dalby_square4_deep.sh`, dalby, done 2026-08-08:
+(145 cells), past the 128-cell mask, which was widened to four words for it.
+`scripts/dalby_square4_deep.sh`, 2026-08-08:
 
 | box | cells | wall | nodes | free removals `j = 0..8` | file |
 |---|---|---|---|---|---|
@@ -594,8 +590,8 @@ reaches radii the C++ cannot afford:
     r=12  W=25   1 4 18 60 187 524 1388 3452 8229 18800 41536  88924 185355
     model        1 4 18 60 187 524 1388 3452 8229 18800 41536  88924 185355
 
-**Radius `r` reproduces the model through `j = r` and undercounts from
-`j = r + 1`**, at every radius; term `j` needs `W = 2j + 1`. With two agreeing
+Radius `r` reproduces the model through `j = r` and undercounts from
+`j = r + 1`, at every radius; term `j` needs `W = 2j + 1`. With two agreeing
 radii as the standard, `j = 8` has five, `j = 9` four, `j = 10` three, `j = 11`
 two, `j = 12` one. `r = 5, 6` are check E of `scripts/perimeter_min_gate.sh`,
 the C++ and this script compared row against row on every run.
@@ -608,7 +604,7 @@ to verify a hit, since extra terms only shrink the match set.
 
 | | series | result |
 |---|---|---|
-| S1 | square diamond free removals `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | no match (all ten measured as of 2026-08-09) |
+| S1 | square diamond free removals `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | no match (all ten measured) |
 | S2 | square even-`W` hull free removals `1, 6, 25, 88, 272, 766, 2012` | no match |
 | S3 | per-tip `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248` | A053993 (`φ₂`); A120452 refuted at the seventh term |
 | S4 | hexagon free removals `1, 6, 27, 98, 315, 918` | `P(x)⁶`; A071734 refuted at the sixth term |
@@ -618,7 +614,7 @@ to verify a hit, since extra terms only shrink the match set.
 
 ## Cost of the censuses
 
-Maximum end, one gympie core (`cpp/perimeter_defect.cpp`):
+Maximum end, one core (`cpp/perimeter_defect.cpp`):
 
 | run | time |
 |---|---|
@@ -626,9 +622,9 @@ Maximum end, one gympie core (`cpp/perimeter_defect.cpp`):
 | king `n = 26`, `k = 5` → `k = 6` | 3.0 s → 29.6 s |
 | king `n = 30`, `k = 5` → `k = 6` | 8.0 s → 94.1 s |
 
-`k = 7` calibration (`scripts/dalby_perimeter_defect_k7_calib.sh`, dalby, 12
-single cores, `git=6473890c`, finished 2026-08-18T23:53Z; the `k = 6` rows are
-controls reproducing the census timings 254/692/1666 s to under 0.1%):
+`k = 7` calibration (`scripts/dalby_perimeter_defect_k7_calib.sh`, 12 single
+cores, git 6473890c, 2026-08-18; the `k = 6` rows are controls reproducing
+the census timings 254/692/1666 s to under 0.1%):
 
 | lattice | k | n=30 | n=34 | n=38 | fitted exponent |
 |---|---|---|---|---|---|
@@ -637,9 +633,10 @@ controls reproducing the census timings 254/692/1666 s to under 0.1%):
 | king | 6 | 254 | 691 | 1665 | 7.95 |
 | king | 7 | 2528 | 8077 | 22386 | 9.23 |
 
-Local slopes `d log t / d log n` are flat over 30–38. The pool script's
-`n^7.9` fits king `k = 6` only and carries no `k` dependence, the source of the
-23x miss; each step in `k` costs about `n^1.3` (king) to `n^1.5` (square). The
+Local slopes `d log t / d log n` are flat over 30–38. A `time ~ n^7.9` model
+fitted to king `k = 6` alone carries no `k` dependence and underpredicted the
+king `n = 78` census by about 23x (1.8 h wall predicted against 42 h at
+76-way); each step in `k` costs about `n^1.3` (king) to `n^1.5` (square). The
 `k = 7 : k = 6` ratio grows as `n^(e7 − e6)`: square 7.9, 9.6, 11.3 and king
 10.0, 11.7, 13.4 at `n = 30, 34, 38`; at `n = 78`, 25x and 29x. Price of a
 `k = 7` census on the 76-way pool, from the `k = 6` runs (42 h king, 23 h
@@ -653,8 +650,7 @@ square) with the fitted exponents:
 | 88 | 107 d | 179 d |
 
 A `k = 7` fit wants about 44 coefficients on onset 31, against `k = 6`'s 32 on
-24, so the range is `n = 85..88`: two to six months per lattice. Planning input
-only; neither approved nor launched.
+24, so the range is `n = 85..88`: two to six months per lattice. Not run.
 
 Minimum end: `scripts/run_perimeter_min.sh` took 571 s and 77 s wall at 10
 threads for the king `p ≤ 40` and square `p ≤ 24` censuses. A `W = 13` diamond
@@ -669,7 +665,7 @@ thread.
 - Is `F(x, y) = Σ_k G_k(x) y^k` rational? The denominator exponents are linear
   in `k` and `deg Ñ_k` grows linearly. The census record lists
   `deg Ñ_k = 0, 1, 3, 5, 7, 11` for `k = 0..5`; `paper/L6-perimeter-gradings.tex`
-  (later) lists `2, 5, 7, 11, 15` for `k = 2..6` as `deg D_k − 1`, and
+  lists `2, 5, 7, 11, 15` for `k = 2..6` as `deg D_k − 1`, and
   `deg D₂ − 1 = 2`. Terms across two denominator regimes do not settle it.
 - Prove the king min-end model and its threshold, both read off data.
 - The hull factorization assumes independent corners, confirmed for the box,
@@ -690,7 +686,7 @@ thread.
     python3 experiments/perimeter_defect_gf.py results/perimdefect_square8_n78_k6.txt --kmax 6
     python3 experiments/perimeter_defect_denominator.py results/perimdefect_square8_n78_k6.txt --k 6
     python3 experiments/perimeter_defect_tail_degree.py
-    python3 experiments/perimeter_defect_features.py       # the reduction and the closed forms, fail-closed
+    python3 experiments/perimeter_defect_features.py       # the reduction and the closed forms
     python3 experiments/perimeter_max_structure.py results/perimdefect_square8_n70_k5.txt --lattice square8
     python3 experiments/perimeter_max_structure.py results/perimdefect_square4_n70_k5.txt --lattice square4
 
@@ -707,7 +703,7 @@ thread.
 
     make build/directed_cone_anchor build/g2
     make gate-site-perim
-    scripts/run_site_perim_n14.sh                           # 689.8 s wall, 8 threads, gympie
+    scripts/run_site_perim_n14.sh                           # 689.8 s wall, 8 threads
     python3 experiments/min_site_perim_closed_form.py
     build/g2 square4 14 --siteperim
     build/g2 square8 9  --siteperim
@@ -717,12 +713,4 @@ Data: `results/perimdefect_square8_n70_k5.txt`, `results/perimdefect_square4_n70
 (`n k c H count`); `results/siteperim_square4_n20.txt`,
 `results/siteperim_square8_n14.txt`, `results/siteperim_tri6_n12.txt`,
 `results/bbox_square4_n21.txt`; the `results/perimmin_*.txt` censuses and hull
-probes with their `.log` files; `results/mk_siteperim_n14.txt`. The `k = 7`
-calibration directory was removed 2026-08-22; its numbers are above.
-
-## Sources
-
-- `results/perimeter-both-ends.md` (deleted 2026-09-06; its content is above)
-- `results/perimeter-defect-diagonals.md` (deleted 2026-09-06; its content is above)
-- `results/perimeter-defect-k7-pricing.md` (deleted 2026-09-06; its content is above)
-- `results/min-site-perimeter.md` (deleted 2026-09-06; its content is above)
+probes; `results/mk_siteperim_n14.txt`.

@@ -5,15 +5,15 @@ connected through shared edges or corners, counted up to translation; a(n) is
 the number with n cells (OEIS A006770). The growth constant is
 λ = lim a(n)^(1/n). It exists by Fekete's lemma applied to
 a(m)a(n) ≤ a(m+n), which is proved in Lean 4 (`polyplets/README.md`).
-This file holds everything the project established about λ and the
-asymptotic form of a(n): a proved two-sided bracket 6.543 ≤ λ ≤ 9.3154, both
-ends exact rational certificates; the strip growth constants μ_H for
-H ≤ 17, certified; a measured estimate λ = 7.110(1) with the exponents
-θ = −1.000(1) and ν_eff = 0.676 at n = 40; and the routes to a better upper
-bound that were tried and closed, each with the obstruction that closed it.
-Grades are stated at each result: proved (a theorem or an exact arithmetic
-check), measured (a computation whose output is a number with the script
-that produced it), or conjectured.
+This file holds what we know about λ and the asymptotic form of a(n): a
+proved two-sided bracket 6.543 ≤ λ ≤ 9.3154, both ends exact rational
+certificates; the strip growth constants μ_H for H ≤ 17, certified; a
+measured estimate λ = 7.110(1) with the exponents θ = −1.000(1) and
+ν_eff = 0.676 at n = 40; and the routes to a better upper bound that were
+tried and closed, each with the obstruction that closed it. Each result is
+graded: proved (a theorem or an exact arithmetic check), measured (a
+computation whose output is a number, with the script that produced it), or
+conjectured.
 
 ## Definitions
 
@@ -43,22 +43,21 @@ that produced it), or conjectured.
 **Theorem (proved).** 6543/1000 ≤ λ ≤ 20000/2147, that is
 6.543 ≤ λ ≤ 9.3154.
 
-The lower end is the certified μ_17 of the strip ladder below (2026-07-31,
-gympie, receipts in `results/strip_mu_certificates.log`). The upper end is an
-exact rational super-solution of a 5930-component convolution system in the
-style of Bui, x = 2147/20000, every inequality checked in exact rational
-arithmetic; the derivation, the elementary bound λ ≤ 5⁵/4⁴, the false starts
-and the slack audit are in `docs/proofs/polyplet-upper-bound.md`, and the
-scheme is formalized in Lean (`polyplets/Polyplets/Upper/`, `polyplets/README.md`). The decimal 9.3154 rounds 9.31532… away from
-the truth; the form 9.3153 that stood until 2026-08-07 claimed 3.2e−5 more
-than the certificate gives and was corrected across the tree.
+The lower end is the certified μ_17 of the strip ladder below (run record in
+`results/strip_mu_certificates.log`). The upper end is an exact rational
+super-solution of a 5930-component convolution system in the style of Bui,
+x = 2147/20000, every inequality checked in exact rational arithmetic; the
+derivation, the elementary bound λ ≤ 5⁵/4⁴, the false starts and the slack
+audit are in `docs/proofs/polyplet-upper-bound.md`, and the scheme is
+formalized in Lean (`polyplets/Polyplets/Upper/`, `polyplets/README.md`).
+The decimal 9.3154 rounds 9.31532… away from the truth.
 
 The state of rigorous knowledge, with grades:
 
 | bound | value | grade | source |
 |---|---|---|---|
 | directed king animals | λ ≥ 3+2√2 ≈ 5.828 | closed form | Bacher |
-| multi-directed king animals | λ ≥ 6.4752 | numerical | Bacher; extended to 6.475196280297 in `results/subclasses.md` (planned) |
+| multi-directed king animals | λ ≥ 6.4752 | numerical | Bacher; extended to 6.475196280297 in `results/subclasses.md` |
 | Fekete floor from a(40) | λ ≥ a(40)^(1/40) = 6.2208 | proved | the enumerated term |
 | strip ladder, H = 17 | λ ≥ 6.543 | exact rational certificate | this file |
 | estimate | λ ≈ 7.110(1) | measured | this file |
@@ -74,8 +73,7 @@ ratio of 1.31. This bracket's ratio is 9.3154/6.543 = 1.42.
 
 Values from power iteration on M(x), double precision, printed to seven
 decimals (measured; H ≤ 14 by the hash-map engines, H = 15..17 by the
-search phase of `cpp/strip_mu_cert.cpp` on the frozen tables, all on
-gympie, 2026-07-10 and 2026-07-31):
+search phase of `cpp/strip_mu_cert.cpp` on the frozen tables):
 
 | H | μ_H | H | μ_H | H | μ_H | H | μ_H |
 |---|---|---|---|---|---|---|---|
@@ -89,7 +87,7 @@ Checks on these values:
 - μ_2 = 1 + √2 exactly, an anchor independent of every program.
 - For H ≤ 11 the values agree with the roots of the fixed-height generating
   functions recomputed at 200 digits to 9–10 significant digits, every digit
-  the certificate receipts record (`experiments/mu_H_precision_audit.py`).
+  the certificate log records (`experiments/mu_H_precision_audit.py`).
   The root computation in `experiments/mu_H_from_atoms.py` loses about 42
   digits to cancellation at H = 11, so it confirms every root at doubled
   working precision and reports the digits confirmed.
@@ -100,7 +98,7 @@ Checks on these values:
   (`experiments/strip_growth_extrapolation.py`). Only the eigenvalue or
   generating-function route gives μ_H.
 
-**The boundary states are non-crossing (measured, 2026-08-01).**
+**The boundary states are non-crossing (measured).**
 `experiments/strip_state_count_model.py` models a boundary state as an
 occupancy of the H rows, each maximal vertical run in one component, plus a
 partition of the runs. Against the enumerated boundary-state counts:
@@ -163,18 +161,18 @@ An exactly checked M(den/num) v ≥ v therefore certifies λ ≥ μ_H ≥ num/de
 | 16 | 6.4984 | 64984 / 10⁴ | 2356778 | 6.498524533 | 4 / 106 | 104.3 | 3 | 225.0 |
 | 17 | **6.543** | 6543 / 10³ | 6536381 | 6.546486999 | 3 / 110 | 134.8 | 6 | 772.7 |
 
-Every row is a receipt in `results/strip_mu_certificates.log` (git revision
-900b4ff, host gympie, 2026-07-31), one line each with vector checksum,
-precision fields and wall time; "states" is the in-edge-reachable boundary
-count, "tries" the number of candidate numerators before one passed, and the
-float column the value the search phase proposed, used nowhere in the proof.
-H = 12, 13 and 14 were certified twice, first by the hash-map binary
-(revision 4ab40fa, walls 393.5 s, 1469.8 s and 5832.8 s) and again by the
-frozen-table binary at the walls shown; same numerator, same state count,
-same minimum ratio to all nine printed digits. H = 2..11 were likewise first
-certified by the hash-map binary (revision ce506bc; H = 11 took 120.9 s).
-H = 16 was first certified at six digits as 6.468300 in 32 tries; the
-four-digit run in the table is the stronger bound.
+Every row is a line in `results/strip_mu_certificates.log` (git revision
+900b4ff, gympie, 2026-07-31), with vector checksum, precision fields and
+wall time; "states" is the in-edge-reachable boundary count, "tries" the
+number of candidate numerators before one passed, and the float column the
+value the search phase proposed, used nowhere in the proof. H = 12, 13 and
+14 were certified twice, first by the hash-map binary (revision 4ab40fa,
+walls 393.5 s, 1469.8 s and 5832.8 s) and again by the frozen-table binary
+at the walls shown; same numerator, same state count, same minimum ratio to
+all nine printed digits. H = 2..11 were likewise first certified by the
+hash-map binary (revision ce506bc; H = 11 took 120.9 s). H = 16 was also
+certified at six digits as 6.468300 in 32 tries; the four-digit run in the
+table is the stronger bound.
 
 The certified value is a floor. At H = 2 it reads 2.4142135 where μ_2 is
 2.4142136 to seven places. From H = 14 upward it falls short of the float
@@ -208,8 +206,8 @@ never absorbed into a tolerance. Three properties make phase 2 sound:
   96-bit vector ceiling, so merges add 0.7 bits.
 
 **Self-tests** (`./build/strip_mu_cert --selftest`, `make gate-strip-cert`,
-also in `make gates`). The checker must be able to say no, so the gate makes
-it:
+also in `make gates`). The checker must be able to say no, so the tests
+make it:
 
 - A. μ_2 = 1 + √2, so 24142/10000 must pass. It does.
 - B. 24143/10000 exceeds μ_2, so it must fail. It does, naming the state and
@@ -235,9 +233,8 @@ denominator frees accumulator headroom: digits 6, 4 and 3 buy widths 100,
 floor and the certificate lands within one unit in the last place of the
 float. At H = 17 the range of 134.8 bits is above the cap at every digits
 setting (digits 1 reaches about 116), so part of the tail is clamped; the
-0.0035 conceded would need at least 192-bit accumulators. An earlier claim
-that the width exceeded the range at every height is refuted by the H = 17
-receipt; it holds through H = 16.
+0.0035 conceded would need at least 192-bit accumulators. The width exceeds
+the range through H = 16 and not at H = 17.
 
 Two measurements of the flooring loss:
 
@@ -248,13 +245,13 @@ Two measurements of the flooring loss:
   indistinguishable from the full-precision run.
 - H = 14 at digits 6 certifies 6.380033 in 3 tries (width 100), and at digits
   5 certifies 6.38003 on the first candidate (width 103); both are stronger
-  than the seven-digit 6.3800149 (adoption cross-check logged to scratch;
-  the published receipt is the seven-digit one). Whichever digits setting is
-  used, one setting per run keeps receipts comparable.
+  than the seven-digit 6.3800149 (the log's entry is the seven-digit one).
+  Whichever digits setting is used, one setting per run keeps the log lines
+  comparable.
 
 **Scope.** What is certified is μ_H ≥ num/den given that M(x) is the strip
 transfer operator. The operator is trusted, not certified: it is the
-production kink transition of `core/kink.h`, exercised by
+transition of the production transfer matrix (`core/kink.h`), exercised by
 `make ns-gate-kink` and `ns-gate-kink-column`, and the μ_H it produces agree
 with the fixed-height generating-function roots for H ≤ 11 to every digit
 recorded. The certificates do not rest on that agreement. The vector
@@ -283,8 +280,7 @@ measured 2.95× per height:
 
 Each height step buys about +0.05 toward λ ≈ 7.11 (μ_16 to μ_17 was
 +0.048), so no reachable H brings the ladder near λ. H = 18 would give
-μ_18 ≈ 6.59. It has not been run; it is a compute decision for jasonp, not a
-laptop job.
+μ_18 ≈ 6.59. It has not been run.
 
 ## The engines
 
@@ -297,11 +293,12 @@ Four programs compute μ_H; the last is the one in use.
 - `cpp/strip_mu8.cpp`: whole-column transitions through the viable-mask
   enumerator of the counting engine. Same μ_H, same 2^H edge wall.
 - `cpp/strip_mu_kink.cpp` (`build/strip_mu_kink`): one application of M(x)
-  is one pass over a column, cell by cell, through the kink transition of
-  `core/kink.h`, with intermediate states merged in a hash map. O(H · states),
-  no 2^H, no edge storage. Reproduces μ_H to every printed digit through
-  H = 11. Hash-map bound, about 3.4× per height; H = 14 took 4851 s
-  (`results/strip_mu_H14.log`). Kept in the tree as the cross-check.
+  is one pass over a column, cell by cell, through the production transfer
+  matrix's transition in `core/kink.h`, with intermediate states merged in a
+  hash map. O(H · states), no 2^H, no edge storage. Reproduces μ_H to every
+  printed digit through H = 11. Hash-map bound, about 3.4× per height; H = 14
+  took 4851 s (`results/strip_mu_H14.log`). Kept in the tree as the
+  cross-check.
 - `cpp/strip_mu_fast.cpp` with `cpp/strip_stage_ops.h`
   (`build/strip_mu_fast`, `make gate-strip-fast`): the per-stage state graph
   is enumerated once by layered breadth-first search and frozen into two
@@ -317,7 +314,7 @@ Four programs compute μ_H; the last is the one in use.
   165 for an `unordered_map` (measured at H = 14: 530 MB against 1.36 GB).
 
 Where the hash-map engine's time went (measured with `sample` and a direct
-instrumented A/B, gympie):
+instrumented A/B):
 
 | H | emits per state | full pass | transition only | map share | ns per emit |
 |---|---|---|---|---|---|
@@ -374,8 +371,8 @@ three stages moves μ_6; dropping one finalize edge moves μ_6 (5.0687009
 against 5.1153245); the exact check passes μ_2 ≥ 2.4142135 and fails
 ≥ 2.4142136; the all-zero vector is refused. `tests/gate_strip_fast.py` then
 compares the two engines at H = 2..8 and brackets every certificate H = 2..8.
-Reverting one line of the copied kink transition makes the gate fail: the
-state counts become 4, 13, 39, 124, 394, 1283, 4250 and every μ_H moves.
+Reverting one line of the copied transition makes the gate fail: the state
+counts become 4, 13, 39, 124, 394, 1283, 4250 and every μ_H moves.
 
 **The implicit-vector idea does not help.** Chan and Rechnitzer (Linear
 Algebra Appl. 555 (2018) 139–156) run far larger transfer matrices by never
@@ -394,7 +391,7 @@ fact above is its precondition, and no such vector has been proposed.
 
 The derivation of λ ≤ 9.3154 and of the elementary λ ≤ 5⁵/4⁴ is in
 `docs/proofs/polyplet-upper-bound.md`: the BFS-frame proof of the elementary
-bound (repaired 2026-08-14; the earlier decision-string proof missed 2 of 20
+bound (a decision-string encoding is not injective: it misses 2 of 20
 animals at n = 3 and 96,065 of 147,941 at n = 8); the two shortcuts that give
 λ ≤ 8 and λ ≤ 256/27 and are non-injective, caught because the same argument
 proves λ_polyomino ≤ 4; the generic twig decomposition at 12.50, 13.00 and
@@ -405,19 +402,18 @@ against brute-force counts, median 1.144, maximum 1.222, growing by about
 +0.022 per term from n = 7 to 8, which is the signature of a non-local
 over-count. The routes below were tried afterward and each is closed.
 
-### Twigs at level 1 give exactly 5⁵/4⁴ (proved, 2026-08-14)
+### Twigs at level 1 give exactly 5⁵/4⁴ (proved)
 
-`experiments/kingtwigs/l1_schemes.py` with argument 8 on dalby, 12.7 s, all
-checks pass.
-The king instantiation of the Klarner–Rivest twig formalism: scan order
-top-to-bottom then left-to-right, root the scan-minimal cell, process opened
-cells FIFO. The frame of a processed cell u with parent d is N(u) minus {d}
-minus the shared set N(u) ∩ N(d); shared sets have 4 cells for an orthogonal
-parent and 2 for a diagonal one, so frames have 3 or 5 slots, and the
-diagonal slot graph is always a 5-path with the chord (1,3). A letter is the
-mask of frame slots u newly opens, weight x^opens · y; an n-cell animal maps
-injectively to n letters of total weight x^(n−1) y^n. Over all 171,138 king
-animals with n ≤ 8: decode∘encode is the identity, codes are pairwise
+`experiments/kingtwigs/l1_schemes.py` with argument 8, 12.7 s, all checks
+pass. The king instantiation of the Klarner–Rivest twig formalism: scan
+order top-to-bottom then left-to-right, root the scan-minimal cell, process
+opened cells FIFO. The frame of a processed cell u with parent d is N(u)
+minus {d} minus the shared set N(u) ∩ N(d); shared sets have 4 cells for an
+orthogonal parent and 2 for a diagonal one, so frames have 3 or 5 slots, and
+the diagonal slot graph is always a 5-path with the chord (1,3). A letter is
+the mask of frame slots u newly opens, weight x^opens · y; an n-cell animal
+maps injectively to n letters of total weight x^(n−1) y^n. Over all 171,138
+king animals with n ≤ 8: decode∘encode is the identity, codes are pairwise
 distinct, the weight identity holds, and the alphabet census is exactly
 (1+x)⁵. With h(x) = (1+x)⁵, a(n) ≤ [x^(n−1)] h(x)^n · O(1), so
 λ ≤ min_b h(b)/b = 4·(5/4)⁵ = 3125/256 = 12.20703125 at b = 1/4, certified
@@ -442,13 +438,14 @@ core-hours for its last 0.9%. Not explored: second-order twig geometries
 Standing square numbers: 4.5252 (Barequet–Shalah), 4.5238 (Bui,
 arXiv 2511.00461); Klarner–Rivest's published 4.6496 is unreproduced.
 
-### Concatenation (quasi-submultiplicativity) cannot be pushed (2026-08-01)
+### Concatenation (quasi-submultiplicativity) cannot be pushed
 
 Barequet, Ben-Shachar and Osegueda (Comput. Geom. 98 (2021) 101790),
 Theorem 1(a): if Z(2n) ≤ c₁ n^c₂ Z(n)² for all n then
-μ ≤ (c₁ (2n)^c₂ Z(n))^(1/n) for every n. Their lower-bound half is
-superseded here (Fekete gives 6.2208, the ladder 6.543). Pricing the upper
-half at n = 40 with F = c₁ (2n)^c₂ (`experiments/concatenation_bound_check.py`):
+μ ≤ (c₁ (2n)^c₂ Z(n))^(1/n) for every n. Their lower-bound half gives less
+than what is known here (Fekete gives 6.2208, the ladder 6.543). Pricing the
+upper half at n = 40 with F = c₁ (2n)^c₂
+(`experiments/concatenation_bound_check.py`):
 
 | F at n = 40 | consequence |
 |---|---|
@@ -496,7 +493,7 @@ beating the record 4.5252 by pure arithmetic, so it does not sit unclaimed.
 The split does port to convex polyplets (`results/subclasses.md`, planned),
 bounding a subclass constant only.
 
-### Band decomposition with bridge credit is unsound (2026-08-07)
+### Band decomposition with bridge credit is unsound
 
 The sketch: cut an animal into horizontal bands of height H, encode each
 band as its left-to-right component shapes and gap lengths, charge each gap
@@ -525,7 +522,7 @@ which contradicts μ_17 < λ. For H ≥ 3 the components of a band are not even
 ordered along x (308, 750 and 332 x-overlapping adjacent pairs at
 H = 3, 4, 5 at n = 8). The vertical-join question itself is not refuted.
 
-### Literature routes checked and ruled out (2026-08-01)
+### Literature routes checked and ruled out
 
 - Chan and Rechnitzer's corner-transfer-matrix upper bounds need a transfer
   matrix built from a local face weight and a symmetric V; connectivity is
@@ -547,12 +544,11 @@ H = 3, 4, 5 at n = 8). The vertical-join question itself is not refuted.
 
 ### Differential approximants: λ = 7.110(1), θ = −1.000(1) (measured)
 
-`experiments/series_da.py` on `results/b006770_upload.txt` (2026-07-11 on 36
-terms, 2026-07-31 on the final 40). The generating function is fitted to a
-first-order ODE Q₀ f + Q₁ f′ = P over a spectrum of polynomial degrees; the
-dominant singularity x_c is a root of Q₁, λ = 1/x_c, and with
-g = Q₀(x_c)/Q₁′(x_c) the exponent is θ = g − 1. Universality predicts θ = −1,
-a logarithmic dominant singularity. Calibration on synthetic
+`experiments/series_da.py` on `results/b006770_upload.txt`. The generating
+function is fitted to a first-order ODE Q₀ f + Q₁ f′ = P over a spectrum of
+polynomial degrees; the dominant singularity x_c is a root of Q₁, λ = 1/x_c,
+and with g = Q₀(x_c)/Q₁′(x_c) the exponent is θ = g − 1. Universality
+predicts θ = −1, a logarithmic dominant singularity. Calibration on synthetic
 a_n = round(n^θ λ^n) recovers (7.11, −1.0), (7.11, −0.5) and (4.06, −1.0)
 exactly, so the method is neither biased toward −1 nor anchored to the
 rescaling constant.
@@ -565,19 +561,19 @@ rescaling constant.
 λ is unchanged at N = 28, 32, 36, 40; θ runs −0.9993, −0.9993, −0.9996,
 −0.9997. λ_median = 7.1102 for rescaling constants 6.8, 7.0, 7.11, 7.3, and
 breaks only at 7.5 (spurious 7.6214). The fourth digit of λ is beyond what
-40 terms resolve. The earlier ratio method with a confluent term (Δ₁ = 1/2
-assumed) gave λ ≈ 7.111 and θ ≈ −1.02 to −1.03; the approximants absorb the
+40 terms resolve. A ratio method with a confluent term (Δ₁ = 1/2 assumed)
+gives λ ≈ 7.111 and θ ≈ −1.02 to −1.03; the approximants absorb the
 correction into the ODE and land on −1.000. They do not determine Δ₁; that
 needs sub-dominant-singularity analysis.
 
 Independent corroboration: `experiments/convex_growth.py` run on
 `results/b006770_upload.txt`, a tool built for series with geometric
-corrections (θ = 0) and carrying no θ ansatz, reports the discriminator d_n/d_(n−1) drifting 0.94519 → 0.95062
-over n = 35..39 instead of settling, reports 0 trusted digits, and gives an
-untrusted μ = 7.1058 (2026-08-05). A tool with no ansatz for θ detects that
-the series is not in the θ = 0 regime.
+corrections (θ = 0) and carrying no θ ansatz, reports the discriminator
+d_n/d_(n−1) drifting 0.94519 → 0.95062 over n = 35..39 instead of settling,
+reports 0 trusted digits, and gives an untrusted μ = 7.1058. A tool with no
+ansatz for θ detects that the series is not in the θ = 0 regime.
 
-### No stretched exponential (measured, 2026-08-07, gympie)
+### No stretched exponential (measured)
 
 Conway, Guttmann and Zinn-Justin (Adv. Appl. Math. 96 (2018) 312–333) found
 1324-avoiders obey B μ^n μ₁^√n n^g with μ₁ = 0.0400(5); differential
@@ -614,7 +610,7 @@ does not. θ → −0.981 from an ansatz free to blame μ₁ corroborates
 methods behind 7.110(1); read as consistent, not competing. Limits: one
 Richardson step, one planted correction structure in the controls.
 
-### θ is the same on the king and square lattices (measured, 2026-08-22)
+### θ is the same on the king and square lattices (measured)
 
 `experiments/theta_universality.py`: one script, one spectrum of 42
 first-order inhomogeneous differential approximants, 40 terms on each side.
@@ -645,14 +641,14 @@ synthetic square-λ series with θ = −1 reads (4.0600, −1.0000). What this
 establishes is agreement to 2e−4 under one method at one length, not that θ
 is exactly −1 nor which universality class either lattice is in.
 
-### The confluent exponent Δ is not resolved at 40 terms (measured, 2026-08-22, ayr)
+### The confluent exponent Δ is not resolved at 40 terms (measured)
 
 `experiments/confluent_universality.py`: the ansatz
 a(n) = B λ^n n^θ exp(c n^(−Δ)) is linear in (ln B, ln λ, θ, c) once Δ is
 fixed, so Δ runs on a grid of 0.005 from 0.10 to 3.0 and the least-squares
-residual picks it. (A first version fitted the linearized 1 + c n^(−Δ) and
-its own control returned 0.290 and 0.860 for planted 0.5 and 1.0; the
-exp form returns 0.500 and 1.010.)
+residual picks it. (The linearized form 1 + c n^(−Δ) returns 0.290 and 0.860
+on its own control for planted 0.5 and 1.0; the exp form returns 0.500 and
+1.010.)
 
 | | terms | Δ | λ | θ | residual |
 |---|---|---|---|---|---|
@@ -702,8 +698,8 @@ and no algorithm, so this corroborates 7.11 independently, though at H ≤ 13
 it is not sharper. On H ≤ 11, full Richardson in 1/H² gives 7.41 and a local
 two-point fit 6.64–6.71, so higher-order corrections matter.
 
-`experiments/strip_fss.py` (2026-08-05) solves ln μ_H = ln λ − a/H − b/H²
-exactly on consecutive triples of the seven-decimal ladder:
+`experiments/strip_fss.py` solves ln μ_H = ln λ − a/H − b/H² exactly on
+consecutive triples of the seven-decimal ladder:
 
 | triple | λ | a | b |
 |---|---|---|---|
@@ -711,35 +707,34 @@ exactly on consecutive triples of the seven-decimal ladder:
 | [13,14,15] | 7.25820 | 1.51121 | 4.11872 |
 | [15,16,17] | 7.22999 | 1.39472 | 4.99006 |
 
-(The script computes a = 1.65350, b = 3.19710 for the first triple, agreeing
+(The script prints a = 1.65350, b = 3.19710 for the first triple, agreeing
 with `numpy` and 50-digit `mpmath`; the table's last digits are display
-rounding from the tool that first produced it and lie 10–25× below the
-noise floor next.) Perturbing each μ_H in a triple by one unit in its
-seventh decimal over all sign combinations gives spreads of λ 6.8e−5 to
-1.1e−4, a 2.2e−4 to 5.0e−4, b 1.3e−3 to 4.0e−3; λ keeps 5–6 significant
-figures, a 3–4, b 3. Against that floor, b climbs by +0.92 and +0.87 across
-the triples (220–700× the floor) and λ drifts −0.020 then −0.014 per height
-step (120–290× the floor), overshooting the differential-approximant 7.1102
-by +0.120 at the top triple. The surface term H(ln λ − ln μ_H) at λ = 7.1102
-is still falling at H = 17 by 0.035053 per step, and its increments shrink
-6.52% per step where a clean 1/H² correction predicts (16/17)² ≈ 11.42%; at
-λ = 7.111 the figures are 0.034940 and 6.54%. A third ansatz
-ln μ_H = ln λ − a/H − c ln(H)/H² gives λ = 7.21575, 7.19121, 7.17462 on the
-same triples (a = 1.10866, 0.99219, 0.90289; c = 3.25956, 3.62540, 3.92824),
-halving the overshoot; three parameters on three points is an exact solve
-and proves nothing about the correction's form.
+rounding and lie 10–25× below the noise floor next.) Perturbing each μ_H in
+a triple by one unit in its seventh decimal over all sign combinations gives
+spreads of λ 6.8e−5 to 1.1e−4, a 2.2e−4 to 5.0e−4, b 1.3e−3 to 4.0e−3; λ
+keeps 5–6 significant figures, a 3–4, b 3. Against that floor, b climbs by
++0.92 and +0.87 across the triples (220–700× the floor) and λ drifts −0.020
+then −0.014 per height step (120–290× the floor), overshooting the
+differential-approximant 7.1102 by +0.120 at the top triple. The surface
+term H(ln λ − ln μ_H) at λ = 7.1102 is still falling at H = 17 by 0.035053
+per step, and its increments shrink 6.52% per step where a clean 1/H²
+correction predicts (16/17)² ≈ 11.42%; at λ = 7.111 the figures are
+0.034940 and 6.54%. A third ansatz ln μ_H = ln λ − a/H − c ln(H)/H² gives
+λ = 7.21575, 7.19121, 7.17462 on the same triples (a = 1.10866, 0.99219,
+0.90289; c = 3.25956, 3.62540, 3.92824), halving the overshoot; three
+parameters on three points is an exact solve and proves nothing about the
+correction's form.
 
-The 2026-08-05 reading of these numbers was that a term between 1/H and
-1/H², most likely logarithmic, is required. The 2026-08-22 analysis below
-withdraws that inference, and the record holds the later reading; the
-practical conclusion of both, that no 1/H² coefficient and hence no central
-charge is readable from this ladder at H ≤ 17, stands.
+These numbers might be read as requiring a term between 1/H and 1/H², most
+likely logarithmic. The sensitivity analysis next shows that they do not;
+what both readings share is that no 1/H² coefficient, and hence no central
+charge, is readable from this ladder at H ≤ 17.
 
-`experiments/strip_fss_lambda_sensitivity.py` (2026-08-22, three negative
-controls): the surface-term diagnostic feeds λ in as a constant, and an
-error δ in ln λ adds H·δ to the surface term, so every increment picks up a
-constant +δ that never decays. The increment ratio at H = 17, solved exactly
-for the exponent q in S(H) = S_∞ + c H^(−q):
+`experiments/strip_fss_lambda_sensitivity.py` (three negative controls): the
+surface-term diagnostic feeds λ in as a constant, and an error δ in ln λ
+adds H·δ to the surface term, so every increment picks up a constant +δ that
+never decays. The increment ratio at H = 17, solved exactly for the exponent
+q in S(H) = S_∞ + c H^(−q):
 
 | λ fed in | dS(17) | ratio | shrink | q |
 |---|---|---|---|---|
@@ -794,17 +789,16 @@ given. Nothing here bears on the certified lower bound.
 
 Data: the full triangle T(n,H), all H, n ≤ 40 (`results/triangle.txt`,
 `results/ns_a40/perheight/`; the n ≤ 36 data in `results/ns_a36/perheight/`
-reproduces every earlier number). Scripts `experiments/nu_exponent.py`,
-`experiments/height_collapse.py`, `experiments/flank_saddle.py` (2026-07-10,
-2026-07-11, refreshed on the final data 2026-07-31).
+reproduces every number below). Scripts `experiments/nu_exponent.py`,
+`experiments/height_collapse.py`, `experiments/flank_saddle.py`.
 
 **The typical height grows sublinearly (measured).** The mean bounding-box
 height weighted by T(n,H) divided by n falls monotonically:
 0.745 at n = 4, 0.488 at n = 18, 0.392 at n = 36, 0.379 at n = 40, with
-mean height 15.17 and mode 14 at n = 40. (An earlier H ≤ 18 slice gave
-0.375 at n = 36 because 9.5% of that row's weight sits above H = 18;
-`python3 experiments/nu_exponent.py 18` reproduces the slice.) Neither fixed
-small height nor n/2.
+mean height 15.17 and mode 14 at n = 40. (Restricted to H ≤ 18,
+`python3 experiments/nu_exponent.py 18`, the n = 36 figure reads 0.375; the
+rows above H = 18 account for the difference.) Neither fixed small height
+nor n/2.
 
 **The extent exponent is not determined by n ≤ 40 (measured).** Four-step
 local slopes d log⟨H⟩ / d log n:
@@ -818,8 +812,8 @@ log-log fit over n = 4..40 gives 0.7009, dominated by small n. The drift per
 four terms is shrinking (0.0027 over 32→36, 0.0022 over 36→40), consistent
 with a slow confluent correction. The standard 2D lattice-animal value is
 0.6407; the measured 0.676 is about 5% off, drifting the right way, with no
-error bar, and no more terms are coming. Decision 2026-07-31: ν is not to be
-used as evidence for or against universality; θ carries that point.
+error bar, and no more terms are coming. ν is not used as evidence for or
+against universality; θ carries that point.
 
 **The height distribution has a limit shape (measured).** Scaling each row
 by its own mean and plotting ⟨H⟩ P_n(H) against H/⟨H⟩ collapses the rows,
@@ -861,7 +855,7 @@ window widens with n as a genuine saddle asymptotic should. The rate
 function is exact modulo the coefficients of H, theorems to k = 5 and fixed
 from data to k = 17.
 
-## Coordination number does not set λ (measured, 2026-08-22)
+## Coordination number does not set λ (measured)
 
 The short-rook lattice has neighborhood (±1,0), (0,±1), (±2,0), (0,±2): the
 wazir plus the dabbaba, a rook that moves one or two squares. It has the
@@ -887,9 +881,9 @@ rook's raw 8.8222 gives λ ≈ 8.974, about ±0.01 from the calibration spread:
 26% above the king at the same coordination number, 18% of the way from the
 king to the q = 8 tree bound (q−1)^(q−1)/(q−2)^(q−2) = 17.65. Local cycle
 structure moves λ; coordination number is not the parameter. This is a
-calibrated estimate, not a bound. The short-rook sequence was not in OEIS on
-2026-08-22 (three query widths returned nothing; the square and king rows
-returned A001168 and A006770 in the same session).
+calibrated estimate, not a bound. The short-rook sequence was not in OEIS
+when looked up (2026-08-22; three query widths returned nothing; the square
+and king rows returned A001168 and A006770 in the same session).
 
 ## Open problems
 
@@ -929,7 +923,7 @@ returned A001168 and A006770 in the same session).
 
     make build/strip_mu_cert
     ./build/strip_mu_cert --selftest                       # the four self-tests; make gate-strip-cert
-    ./build/strip_mu_cert 2 17                             # the certified ladder; receipts append to results/strip_mu_certificates.log
+    ./build/strip_mu_cert 2 17                             # the certified ladder; lines append to results/strip_mu_certificates.log
     scripts/run_strip_mu_cert_h14.sh                       # the H=14 runner (hash-map budget in its header)
     make build/strip_mu_fast && make gate-strip-fast       # the frozen-table engine and its gate, ~10 s
     ./build/strip_mu_fast 2 12                             # the ladder to H=12, ~4 s
@@ -951,7 +945,7 @@ returned A001168 and A006770 in the same session).
     python3 experiments/kingtwigs/l1_schemes.py 8          # level-1 twigs, ~13 s
     python3 experiments/concatenation_bound_check.py       # the F table and the comb
     python3 experiments/band_charge_probe.py 8             # band decomposition, ~40 s
-    python3 experiments/nu_exponent.py                     # mean height and nu_eff (argument 18 for the old slice)
+    python3 experiments/nu_exponent.py                     # mean height and nu_eff (argument 18 for the H<=18 slice)
     python3 experiments/height_collapse.py                 # the collapse and moments
     python3 experiments/flank_saddle.py                    # the tall flank at n=40
     python3 experiments/lambda_atlas_probe.py --nmax 9     # the short rook, ~12 min
@@ -959,22 +953,3 @@ returned A001168 and A006770 in the same session).
 The upper-bound scripts are listed in `docs/proofs/polyplet-upper-bound.md`;
 `paper/L3-lambda-bounds.tex` is the paper on the bracket and
 `paper/verify_l_papers.py` checks its printed numbers.
-
-## Sources
-
-- `results/strip-growth-lambda-bounds.md` (deleted 2026-09-06; its content is above)
-- `results/strip-mu-certificates.md` (deleted 2026-09-06; its content is above)
-- `results/strip-mu-fast.md` (deleted 2026-09-06; its content is above)
-- `results/strip-mu-engine-resumption.md` (deleted 2026-09-06; its content is above)
-- `results/strip-fss-lambda-sensitivity.md` (deleted 2026-09-06; its content is above)
-- `results/series-analysis-da.md` (deleted 2026-09-06; its content is above)
-- `results/theta-universality.md` (deleted 2026-09-06; its content is above)
-- `results/confluent-universality.md` (deleted 2026-09-06; its content is above)
-- `results/stretched-exponential-test.md` (deleted 2026-09-06; its content is above)
-- `results/concatenation-upper-bound.md` (deleted 2026-09-06; its content is above)
-- `results/bridge-credit-closed.md` (deleted 2026-09-06; its content is above)
-- `results/king-twigs-l1.md` (deleted 2026-09-06; its content is above)
-- `results/lambda-atlas-probe.md` (deleted 2026-09-06; its content is above)
-- `results/nu-exponent.md` (deleted 2026-09-06; its content is above)
-- `results/height-distribution-collapse.md` (deleted 2026-09-06; its content is above)
-- `docs/open-problem-lambda-bracket.md` (deleted 2026-09-06; its content is above)
