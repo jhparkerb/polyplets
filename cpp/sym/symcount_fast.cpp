@@ -347,7 +347,8 @@ int main(int argc, char** argv) {
   }
   SymType type = makeType(pos[0]);
   const int maxn = std::atoi(pos[1].c_str());
-  if (maxn < 1 || maxn > 40) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
+  // Grid and counts are sized from maxn; u64 counts hold I(K)(n) ~ lambda^(n/4) far past 64.
+  if (maxn < 1 || maxn > 64) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
 
   int nthreads = pos.size() == 3 ? std::atoi(pos[2].c_str()) : 0;
   if (nthreads <= 0) {
