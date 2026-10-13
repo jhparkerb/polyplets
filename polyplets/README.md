@@ -60,7 +60,7 @@ Every one has H ≤ 20, so every one was enumerated, none was generated from
 a P_k. Their independent checks:
 
 - levels 3 … 12 and T(27,14), 21 cells: confirmed by the independent strip
-  transfer matrix (H ≤ 14, n ≤ 36; `results/second-sources.md`), and the row
+  transfer matrix (H ≤ 14; `results/second-sources.md`), and the row
   totals through n = 22 by a second enumeration (Redelmeier);
 - the 11 cells beyond the strip transfer matrix's reach, computed by the main
   transfer matrix on several machines and revisions:
@@ -175,8 +175,8 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125
 | `EnumData` | the 638 and 3,832 boards of `boards 5` and `boards 6` as literals, checked against the enumeration in five kernel runs; `T 5 3`, `T 6 4` |
 | `Checks` | validation facts nothing consumes (built, never imported) |
 
-The generic development the report's proofs run through, and the other
-L-paper modules:
+The generic development the report's proofs run through, and the modules
+cited by the machine-written papers L1, L3 and L5 in `paper/`:
 
 | module | paper | what |
 |---|---|---|

@@ -3,8 +3,8 @@
     a(41) = 393811462683918679824582849262105
 
 Computed on dalby in two enumeration runs and one assembly, the first term
-past a(40) and the first computed without enumerating heights 20 and 21 at
-the outset.
+for which the closed forms were fixed from entries below their onset, so that
+height 21 was never enumerated.
 
 ## How
 
@@ -49,7 +49,8 @@ only at k ≤ 19; the checks below are about that.
 - a(41)/a(40) = 6.9394, after 6.9212, 6.9261, 6.9308, 6.9352; the
   successive differences 0.0049, 0.0047, 0.0044, 0.0042 shrink.
 - The method: 18 levels re-derived exactly from below-onset cells, and 189
-  enumerated cells reproduced from shorter cells with 0 wrong; a(n) comes
+  enumerated cells (342 predictions in all, 153 of them formula values)
+  reproduced from shorter cells with 0 wrong; a(n) comes
   out independent of the rule for every n ≤ 39 (`results/undertow.md`).
 - Re-assembly with the enumerated height 20
   (`python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41`):
@@ -78,8 +79,8 @@ Because it never touches the wired table, the agreement also says
 This is a second implementation, not a second source: it retires assembly,
 transcription, fencing and arithmetic error across two codebases, but
 shares with the main route the D_j at k = 20, 21, the pinning cells
-T(40,19) and T(39,18), and the grand-form theorem (which is proved in
-Lean, so shared theorem rather than shared risk).
+T(40,19) and T(39,18), and the grand-form theorem (whose content is proved in Lean through the
+staircase route, so a shared theorem rather than a shared risk).
 
 ### One real, weak check on D_2(21)
 
@@ -121,8 +122,8 @@ level 21 gains T(38,17), a cell the coloring recount also covers:
 with different coefficients, so any single-entry error in that row makes
 the three pairs disagree and `build()` refuses. Also at depth 5:
 `undertow_pin.py --verify --jmax=5` re-derives 18 levels exactly over 160
-depth pairs, 0 wrong; `--audit --jmax=5` predicts 342 enumerated cells from
-shorter cells, 0 wrong.
+depth pairs, 0 wrong; `--audit --jmax=5` predicts 342 cells from shorter
+cells, 189 of them enumerated, 0 wrong.
 
 `make gate-undertow-pairs` (`experiments/undertow_pairs_gate.py`) rebuilds
 the depth-5 assembly with the pin cells and pair counts fixed, requires

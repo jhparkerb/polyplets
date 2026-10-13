@@ -7,7 +7,8 @@ formula holds. This file records what happens below it. Results and grades:
 a column's below-onset content is `k+1` integers (proved); the depth-1
 defect comes from cluster families alone, with an algebraic quartic
 generating function derived by the kernel method (proved on the walk side,
-verified at 19 exact triangle entries, in Lean at all orders), and every
+verified at 19 exact triangle entries, and formalized in Lean at all orders
+at commit 697f376, no longer in the build), and every
 depth-1 constant follows from it (derived); the onset is sharp for every
 `k` (proved, mod 3); depths 2, 3, 4 close the same way (exact, 74 entries);
 the asymptotics at depths 1 to 7 (measured); the amplitude family is one

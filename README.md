@@ -8,7 +8,7 @@ repository extends the sequence to
 
     a(40) = 56749893611764175164545926946127
 
-and has a provisional value of a(41).
+and has a value of a(41) that rests partly on closed forms (see below).
 
 ## Results
 
@@ -16,8 +16,9 @@ and has a provisional value of a(41).
   a(41) = 393811462683918679824582849262105 in `results/a41/`.
   [`results/confidence.md`](results/confidence.md) says what evidence stands
   behind each term; in short, a(1)–a(22) were computed twice by unrelated
-  programs, and every entry behind a(23)–a(39) was recomputed by a second
-  program or follows from a closed form fitted to that program's own output.
+  programs; every entry behind a(23)–a(39) was either recomputed by a second
+  program or follows from a closed form fitted to that program's own output,
+  which is agreement between formulas rather than a second enumeration.
 - **A closed form for the tall part of the count.** If T(n,H) counts polyplets
   with n cells and bounding-box height H, then for H > n/2,
   T(n,H) = P_{n−H}(n)·3^(3H−2n−1) with P_k a polynomial of degree k and
@@ -26,7 +27,8 @@ and has a provisional value of a(41).
   in Lean ([`polyplets/README.md`](polyplets/README.md)). This is what made
   the large terms affordable: the tall heights never have to be enumerated.
 - **The growth constant** λ = lim a(n)^(1/n) satisfies 6.543 ≤ λ ≤ 9.3154,
-  both ends proved by exact computation, and is about 7.110
+  both ends from computations in exact rational arithmetic whose certificates
+  are in the repository, and is about 7.110
   ([`results/growth-constant.md`](results/growth-constant.md)).
 - **Extensions of five related sequences**: free (A030222), one-sided
   (A030233), bilateral (A030234) and asymmetric (A030235) polyplets, and free
@@ -44,7 +46,7 @@ correct. What the repository offers instead is independent recomputation, of
 whole terms up to n = 22 and of individual entries beyond, plus checks against
 structure that is known by proof. `results/provenance-table.md` lists, for each
 of the 820 entries T(n,H) with n ≤ 40, which independent computations agree
-with it. Three entries were computed only once.
+with it. Three entries were enumerated by only one program.
 
 The Lean development proves the shape of the closed form and its range from
 the definitions, using only Lean's standard axioms. Fixing the polynomials P_k

@@ -35,8 +35,8 @@ altogether, and depths 8 and 9.
   (`docs/proofs/cutcount-identity.md`). It covers H <= 18 at n <= 40
   (`results/cutcount_b1/rows/`) and H <= 19 at n <= 41
   (`results/cutcount_b1/rows41/`). A value derived with no input from the main
-  program is called rule-independent, because the coloring recount uses a
-  different connectivity rule.
+  program is called rule-independent, because the coloring recount never
+  decides connectivity at all.
 - **The strip engine** is a third program covering H <= 14 at n <= 40
   (`results/second-sources.md`).
 - **Level k = n - H.** The diagonal formula (`docs/proofs/diagonal-law.md`)

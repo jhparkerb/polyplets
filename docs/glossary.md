@@ -35,6 +35,16 @@ families.
 (`docs/proofs/diagonal-law.md`). "Level `k`" means the diagonal `k = n − H`;
 "onset" is `n = 2k+1`; "below onset" is `n ≤ 2k`.
 
+**level, depth, onset, defect** — Level `k` is the diagonal `H = n − k` of
+the triangle, governed by `P_k`. Its onset is `n = 2k+1`, the smallest `n`
+where the diagonal law holds. Depth `j` counts steps below the onset; the
+defect `D_j(k)` is the exact amount by which the law fails there
+(`results/below-onset.md`).
+
+**fit, holdout** — The two constants of `P_k` are fitted from two enumerated
+entries; a holdout is a further enumerated entry not used in the fit, which
+the formula must reproduce.
+
 **fixed / one-sided / free** — Shapes distinct up to translation only
 ([A001168](https://oeis.org/A001168)); rotations also identified
 ([A000988](https://oeis.org/A000988)); rotations and reflections both
@@ -100,11 +110,17 @@ about n = 22 here. Its role is as an independent check (`build/g2`).
 
 **second source, two-source** — A value computed by two programs sharing no
 code; "rule-independent" means the two programs also use different
-connectivity rules. The tiers are in `results/confidence.md`.
+connectivity rules. `results/confidence.md` says which terms have which.
 
 **signature** — A transfer-matrix state: one boundary line's occupancy plus
 the connectivity among its occupied cells through the swept region. The
 number of signatures, not of shapes, sets time and memory.
+
+**provenance tags** — The letters in `results/provenance-table.md`: B
+Redelmeier, G fixed-height generating functions, R small-height recurrences,
+S strip transfer matrix, P closed forms on enumerated heights, F closed forms
+above them, M coloring recount, U closed forms refitted to the coloring
+recount, C the mod-2/mod-4 subgroup congruence.
 
 **T(n, H)** — The number of fixed polyplets with `n` cells whose bounding box
 has height exactly `H`; `a(n) = Σ_H T(n,H)`. The table is
@@ -132,7 +148,7 @@ literature's or OEIS's where one exists.
 | a transfer-matrix method that uses coloring instead of tracking connectivity | the coloring recount; `cpp/motley_par.cpp`, `results/cutcount_b1/` | the Fortuin–Kasteleyn / Potts spin representation of q^{components} |
 | Redelmeier enumeration | `g2` (`cpp/g2_redelmeier.cpp`); brute force; the fleet run | Redelmeier 1981 |
 | Burnside congruences | the subgroup census, a(n) mod 4, `results/symmetry-classes.md` | Burnside's lemma; D4 orbit sizes |
-| double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); tiers T1, T2, T2⁻ in `README.md` and `results/confidence.md` | — |
+| double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); see `results/confidence.md` | — |
 | joiner, domino, split | the doubled row; the pair weight 25 = 16 + 9 (`docs/proofs/T-n-nm1.md`, `results/diagonal-formula.md`) | — |
 | holes | hole count k; the Euler-characteristic coordinate (`cpp/tma/euler.h`); flood fill (`g2 --holes`) | the A(n,k) hole triangle, staged |
 | one-sided, free, bilateral, asymmetric, non-polyominoes | the companions; the symmetry corpus `results/sym_counts.txt` | A030233, A030222, A030234, A030235, A194596 |

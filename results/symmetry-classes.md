@@ -79,23 +79,22 @@ a(n). The n = 33 strip run:
 |---|---|---|
 | 24.0 h | 6.71 million core-seconds | 126.2 GB at S = 28 |
 
-n = 34 was not run. Grades follow A006770: n <= 22 by two programs sharing
-no code; n = 23..33 by one program with cross-checks (T2); A030233(34)
-inherits a(34)'s grade (T2-). The four sequences that need D are
-formula-assisted at n = 33 (T3), in the OEIS staging as comments only.
+n = 34 was not run. The evidence for these terms is that for the A006770
+terms of the same size (`results/confidence.md`). The four sequences that
+need D are formula-assisted at n = 33, in the OEIS staging as comments only.
 
 The values for n = 20..32 (n = 20..34 for A030233) are the b-files
 `results/b0*_upload.txt`, checked by `make gate-bfiles`; the staging is
 `oeis/A03022*.txt` and `oeis/A194596.txt`. The terms in no b-file:
 
-| sequence | n | value | grade |
+| sequence | n | value | status |
 |---|---|---|---|
-| A030222 free | 33 | 9328935247555296909698722 | T3 |
-| A030234 bilateral | 33 | 5909238725043 | T3 |
-| A030235 asymmetric | 33 | 9328935247549387670973679 | T3 |
-| A194596 free-non-polyomino | 33 | 9328935102907028734392020 | T3 |
-| A030233 one-sided | 33 | 18657870495104684580672401 | T2 |
-| A030233 one-sided | 34 | 128829209605977867230343869 | T2- |
+| A030222 free | 33 | 9328935247555296909698722 | formula-assisted |
+| A030234 bilateral | 33 | 5909238725043 | formula-assisted |
+| A030235 asymmetric | 33 | 9328935247549387670973679 | formula-assisted |
+| A194596 free-non-polyomino | 33 | 9328935102907028734392020 | formula-assisted |
+| A030233 one-sided | 33 | 18657870495104684580672401 | computed |
+| A030233 one-sided | 34 | 128829209605977867230343869 | computed |
 
 ### D(33), the formula-assisted entry
 

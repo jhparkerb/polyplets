@@ -14,8 +14,8 @@ each term.
 |---|---|
 | a(1)–a(22) | two programs with no shared counting logic agree on the whole term |
 | a(23)–a(39) | every entry of the height triangle is either recounted by a second program or given by a closed form whose constants come from that program's own entries |
-| a(40) | the same for the 19 lowest heights; the 21 taller entries come from closed forms fitted to the second program's entries, which is agreement between formulas, not a second enumeration |
-| a(41) | as a(40), with height 20 enumerated once and equal to the formula's prediction; heights 21–41 are formula |
+| a(40) | heights 1–19 recounted by a second program; heights 20 and 21 enumerated by the main program only; heights 22–40 from the closed forms. Heights 20–40 are also reproduced by closed forms refitted to the second program's entries, which is agreement between formulas, not a second enumeration |
+| a(41) | heights 1–19 recounted by a second program; height 20 enumerated by the main program only, and equal to the closed form's prediction; heights 21–41 from closed forms |
 
 ## How the terms were computed
 
@@ -60,8 +60,8 @@ T(33,18), T(35,19), T(37,20) and T(39,21) exactly.
 **Fits from below.** Below the range where the closed form holds, the
 deviation from it is itself computable (`results/below-onset.md`). That turns
 short, cheap entries into equations for the same constants. Every level
-k = 2..19 re-derived this way agrees with the level used, and 342 enumerated
-entries are predicted from shorter ones with no error. These fits share their
+k = 2..19 re-derived this way agrees with the level used, and 189 enumerated
+entries are predicted from shorter ones with no error (`results/undertow.md`). These fits share their
 correction tables with the main route, so they are a consistency check, not an
 independent one.
 
@@ -76,8 +76,8 @@ published square-lattice count A(67) in 2026 (arXiv:2610.10632).
 - Not that a(23)–a(40) are confirmed by two programs as whole terms. That
   frontier is n = 22.
 - Not that every entry has two enumerations. Three entries, T(39,20),
-  T(40,20) and T(40,21), were enumerated once, and carry only the mod-4
-  congruence and agreement with the closed forms
+  T(40,20) and T(40,21), were enumerated by only one program, and carry only
+  the mod-4 congruence and agreement with the refitted closed forms
   <!--q:congruence_only.count@19=3--><!--q:congruence_only.cells@19=(39,20),(40,20),(40,21)-->.
   `results/provenance-table.md` lists the evidence for every entry.
 - Not that the strip transfer matrix is fully independent; it shares the

@@ -57,17 +57,3 @@ The coloring recount covers `h ≤ H` from below; the closed-form band covers `h
 ## Where this stops
 
 Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM in any memory layout tried (`results/second-sources.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/grand-form.md`) — is ten levels past the k ≤ 9 reached so far.
-
-
-## How to quote these numbers
-
-Mark the claim inline with the fact it quotes; the gate verifies count **and** cell list:
-
-```
-<!--q:congruence_only.count@18=6-->
-<!--q:row40_residual.cells@18=T(40,19),T(40,20),T(40,21),T(40,22),T(40,23)-->
-```
-
-A residual claim with no marker fails the gate. A line that states no checkable number declares `<!--q:prose-->`, and that declaration is checked too — a `prose` line containing a number is rejected.
-
-Facts available: `congruence_only.{count,cells}@H`, `row40_residual.{count,cells}@H`, `retires.{count,cells}@H`, `row40_retires.{count,cells}@H`, `closure_n@H`, for H = 16..21.

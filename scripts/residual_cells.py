@@ -541,21 +541,6 @@ def write_note(F: dict):
              "cluster weights (`docs/proofs/grand-form.md`) — is ten levels past "
              "the k ≤ 9 reached so far.\n")
 
-    L.append("\n## How to quote these numbers\n")
-    L.append("Mark the claim inline with the fact it quotes; the gate verifies "
-             "count **and** cell list:\n")
-    L.append("```")
-    L.append("<!--q:congruence_only.count@18=6-->")
-    L.append("<!--q:row40_residual.cells@18=T(40,19),T(40,20),T(40,21),"
-             "T(40,22),T(40,23)-->")
-    L.append("```")
-    L.append("\nA residual claim with no marker fails the gate. A line that "
-             "states no checkable number declares `<!--q:prose-->`, and that "
-             "declaration is checked too — a `prose` line containing a number "
-             "is rejected.\n")
-    L.append("Facts available: `congruence_only.{count,cells}@H`, "
-             "`row40_residual.{count,cells}@H`, `retires.{count,cells}@H`, "
-             "`row40_retires.{count,cells}@H`, `closure_n@H`, for H = 16..21.\n")
     OUT.write_text("\n".join(L))
 
 
