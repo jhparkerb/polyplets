@@ -72,9 +72,9 @@ Let `t` be the sum over empty adjacent cells of (animal neighbors − 1).
     k = 2c + t − (deg/2 − 2)(n − 1),
 
 `2c + t` on the square lattice, `2c + t − 2(n − 1)` on the king lattice. The
-square form does not carry over: a king diagonal stick has `c = 0`,
-`t = 2(n − 1)`, `k = 0`. The square form is Asinowski, Barequet and Zheng's
-`k = e + 2f` (`f` circuit rank, `e` total excess;
+square form does not carry over: a king diagonal stick has `c = 0`, `t = 2(n −
+1)`, `k = 0`. The square form is Asinowski, Barequet and Zheng's `k = e + 2f`
+(`f` circuit rank, `e` total excess;
 `literature/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`).
 No count depends on the identity.
 
@@ -101,16 +101,16 @@ polyomino `B` of the same size. With `h` the number of holes of `B`,
 
     k_king(A) = k_square(B) + c(B) + h(B).
 
-*Proof.* With `S` the 3×3 box, `p = |A ⊕ S| − n` and `pmax = 4n + 4`, so
-`k = 5n + 4 − |A ⊕ S|`. Cells of `A`'s parity in `A ⊕ S` are `B` and its edge
-neighbors in the `(u, v)` frame, `n + p₄(B)` of them. Cells of the other parity
-are in bijection with the grid vertices of the `(u, v)` lattice (an odd cell's
-four orthogonal neighbors are the four cells at one vertex) and lie in `A ⊕ S`
+*Proof.* With `S` the 3×3 box, `p = |A ⊕ S| − n` and `pmax = 4n + 4`, so `k = 5n
++ 4 − |A ⊕ S|`. Cells of `A`'s parity in `A ⊕ S` are `B` and its edge neighbors
+in the `(u, v)` frame, `n + p₄(B)` of them. Cells of the other parity are in
+bijection with the grid vertices of the `(u, v)` lattice (an odd cell's four
+orthogonal neighbors are the four cells at one vertex) and lie in `A ⊕ S`
 exactly when one of those four is in `B`: `Vert(B)` of them. Euler on the cell
 complex of `B` (`V − E + F = 1 − h`, `F = n`, `E = 4n − a`, `a` the adjacent
-pairs) gives `Vert(B) = 3n − a + 1 − h`; substitute with `k_square = 2n + 2 − p₄`
-and `c = a − n + 1`. Checked on 489,603 same-parity animals to `n = 13`, `k ≤ 6`
-(`experiments/perimeter_defect_features.py`).
+pairs) gives `Vert(B) = 3n − a + 1 − h`; substitute with `k_square = 2n + 2 −
+p₄` and `c = a − n + 1`. Checked on 489,603 same-parity animals to `n = 13`, `k
+≤ 6` (`experiments/perimeter_defect_features.py`).
 
 Feature costs (features interfere only within Chebyshev distance 2, which is
 what the onsets measure):
@@ -298,15 +298,15 @@ is exactly
 
     k_min(n, H) = ⌈(n − H)/(H − 1)⌉        H ≥ 2,
 
-zero violations, equality attained in all 672 `(n, H)` entries present at
-`k ≤ 5`, `n ≤ 40` (`results/king_joint_nhp_n9.txt`,
-`results/king_triple_classes_n9.txt`, `experiments/perimeter_vs_height_defect.py`).
-Equivalently `H ≥ (n + k)/(k + 1)`, and the same for the width; `k = 0` forces
-`H = W = n` (the diagonal sticks), `k = 1` forces both dimensions
-`≥ (n + 1)/2`. On the square lattice `k_min(n, H) = 0` for `H ∈ {1, n}` and 1
-between: the square defect-0 animals are the horizontal and vertical sticks, at
-opposite ends of the height range, while both king defect-0 animals are
-diagonal sticks with `H = n`.
+zero violations, equality attained in all 672 `(n, H)` entries present at `k ≤
+5`, `n ≤ 40` (`results/king_joint_nhp_n9.txt`,
+`results/king_triple_classes_n9.txt`,
+`experiments/perimeter_vs_height_defect.py`). Equivalently `H ≥ (n + k)/(k +
+1)`, and the same for the width; `k = 0` forces `H = W = n` (the diagonal
+sticks), `k = 1` forces both dimensions `≥ (n + 1)/2`. On the square lattice
+`k_min(n, H) = 0` for `H ∈ {1, n}` and 1 between: the square defect-0 animals
+are the horizontal and vertical sticks, at opposite ends of the height range,
+while both king defect-0 animals are diagonal sticks with `H = n`.
 
 ### Closed doors, maximum end
 
@@ -355,15 +355,16 @@ Near-minimal animals fill their bounding hull up to a few cells, so
 `cpp/perimeter_min.cpp` enumerates isoperimetric hulls and removes small
 subsets, at `Σ_r C(M, r)` cost. The square lattice is worked in the rotated
 frame `u = x + y`, `v = x − y`, where a diamond is a parity-restricted box; a
-hull is a range on each of a list of linear functionals, `u, v` (a rectangle)
-or `u, v, u + v` for `tri6` (a hexagon, no parallelogram in any linear frame).
+hull is a range on each of a list of linear functionals, `u, v` (a rectangle) or
+`u, v, u + v` for `tri6` (a hexagon, no parallelogram in any linear frame).
 Completeness rests on hypothesis (H1), every animal's perimeter is at least its
 filled hull's, so deficit `i` means at most `i` removals. (H1) is asserted at
-runtime and tested by `make gate-perimeter-min` (`scripts/perimeter_min_gate.sh`)
-with removals unbounded on small boxes, a complete brute force there, against
-`build/g2 --siteperim`: 33 and 52 `(n, p)` entries agree on the two square-based
-lattices, 35 on `tri6` (`results/siteperim_tri6_n12.txt`); a control confirms
-the square and king modes differ, and an over-limit frame is refused.
+runtime and tested by `make gate-perimeter-min`
+(`scripts/perimeter_min_gate.sh`) with removals unbounded on small boxes, a
+complete brute force there, against `build/g2 --siteperim`: 33 and 52 `(n, p)`
+entries agree on the two square-based lattices, 35 on `tri6`
+(`results/siteperim_tri6_n12.txt`); a control confirms the square and king modes
+differ, and an over-limit frame is refused.
 
 Censuses (`n p count`, completeness domain in the header; run by
 `scripts/run_perimeter_min.sh` at 10 threads, except king `p ≤ 48` by
@@ -523,8 +524,8 @@ which continues 23, 34, 52 and predicts the diamond's `j = 6` term as 1384.
 `4 = 4 × (24 − 23)`, so the tips are independent and only the tip series was
 misidentified.
 
-**`φ_m` for index `m` fails at `m = 3`.** The cone spanned by `(1, 0)` and
-`(1, 3)` has order-ideal series `1, 1, 4, 8, 14, 24, 39, 64, 105, 161, 244, 370`;
+**`φ_m` for index `m` fails at `m = 3`.** The cone spanned by `(1, 0)` and `(1,
+3)` has order-ideal series `1, 1, 4, 8, 14, 24, 39, 64, 105, 161, 244, 370`;
 `φ₃` is A053992 = `1, 1, 3, 6, 11, 18, 31, 49, 78, …`, and the index-3 series is
 not in OEIS. Andrews' `φ_k` are two-rowed, and index-`m` cones stop being unique
 up to `GL₂(Z)` at `m = 3` (Hirzebruch–Jung), so there is no single index-3 cone
@@ -663,10 +664,10 @@ thread.
   proof (`docs/proofs/universal-diagonal-law.md`) because a single-cell row is a
   cut; the perimeter defect supports no such cut.
 - Is `F(x, y) = Σ_k G_k(x) y^k` rational? The denominator exponents are linear
-  in `k` and `deg Ñ_k` grows linearly. The census record lists
-  `deg Ñ_k = 0, 1, 3, 5, 7, 11` for `k = 0..5`; `paper/L6-perimeter-gradings.tex`
-  lists `2, 5, 7, 11, 15` for `k = 2..6` as `deg D_k − 1`, and
-  `deg D₂ − 1 = 2`. Terms across two denominator regimes do not settle it.
+  in `k` and `deg Ñ_k` grows linearly. The census record lists `deg Ñ_k = 0, 1,
+  3, 5, 7, 11` for `k = 0..5`; `paper/L6-perimeter-gradings.tex` lists `2, 5, 7,
+  11, 15` for `k = 2..6` as `deg D_k − 1`, and `deg D₂ − 1 = 2`. Terms across
+  two denominator regimes do not settle it.
 - Prove the king min-end model and its threshold, both read off data.
 - The hull factorization assumes independent corners, confirmed for the box,
   the hexagon, the diamond and the `C²D²`, `D⁴` square hulls; no general
@@ -708,9 +709,11 @@ thread.
     build/g2 square4 14 --siteperim
     build/g2 square8 9  --siteperim
 
-Data: `results/perimdefect_square8_n70_k5.txt`, `results/perimdefect_square4_n70_k5.txt`,
-`results/perimdefect_square8_n78_k6.txt`, `results/perimdefect_square4_n78_k6.txt`
-(`n k c H count`); `results/siteperim_square4_n20.txt`,
-`results/siteperim_square8_n14.txt`, `results/siteperim_tri6_n12.txt`,
-`results/bbox_square4_n21.txt`; the `results/perimmin_*.txt` censuses and hull
-probes; `results/mk_siteperim_n14.txt`.
+Data: `results/perimdefect_square8_n70_k5.txt`,
+`results/perimdefect_square4_n70_k5.txt`,
+`results/perimdefect_square8_n78_k6.txt`,
+`results/perimdefect_square4_n78_k6.txt` (`n k c H count`);
+`results/siteperim_square4_n20.txt`, `results/siteperim_square8_n14.txt`,
+`results/siteperim_tri6_n12.txt`, `results/bbox_square4_n21.txt`; the
+`results/perimmin_*.txt` censuses and hull probes;
+`results/mk_siteperim_n14.txt`.

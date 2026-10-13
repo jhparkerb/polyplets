@@ -124,15 +124,15 @@ D_1(k) = [y^k] ( P̂(y) - B(y)² / (3 + S(y)) ).                        (II)
 ```
 
 `experiments/depth1_gap_walk.py` computes the three families by the walk of
-`experiments/allpairs_kernel.py` (new start and end vectors for the boundary
-and pure variants), validates them against every enumerated weight
-(interior `ℓ ≤ 8`; boundary and pure `ℓ ≤ 5`, plus a fresh `ℓ = 6` enumeration, `W^b(2⁶) = 2703074`, `W^p(2⁶) = 517701`), and checks
-(II) against the exact defect at all 19 entries `k ≤ 19`. With no `P_k`
-needed, `k = 200` takes 42 s; the series is positive with denominators
-exactly `3^(k+1)`. The numerators `4, 80, 1753, 40928, 987355, …` are not
-in the OEIS (checked 2026-08-09). (II) is derived from the proved chain
-identity plus the tightness observation, machine-verified, and not yet
-written as a standalone proof; §3.3 rests on it.
+`experiments/allpairs_kernel.py` (new start and end vectors for the boundary and
+pure variants), validates them against every enumerated weight (interior `ℓ ≤
+8`; boundary and pure `ℓ ≤ 5`, plus a fresh `ℓ = 6` enumeration, `W^b(2⁶) =
+2703074`, `W^p(2⁶) = 517701`), and checks (II) against the exact defect at all
+19 entries `k ≤ 19`. With no `P_k` needed, `k = 200` takes 42 s; the series is
+positive with denominators exactly `3^(k+1)`. The numerators `4, 80, 1753,
+40928, 987355, …` are not in the OEIS (checked 2026-08-09). (II) is derived from
+the proved chain identity plus the tightness observation, machine-verified, and
+not yet written as a standalone proof; §3.3 rests on it.
 
 ### 3.2 The quartic
 
@@ -156,16 +156,16 @@ an irreducible quartic with coprime integer coefficients:
 were not used in it.
 
 **Derived** (`experiments/severance_w2_kernel.py`; checked by
-`experiments/severance_w2_gate.py`, which also fails on a perturbed input)
-by the kernel method, the standard technique for a functional equation with
-a catalytic variable. The polynomial `D(u) = u² - y(1+u+u²)²` whose vanishing the method
-exploits factors into two quadratic branches in `s = √y`, small roots in
-`ℚ(s)[A,B]`, `A² = (1-3s)(1+s)`, `B² = (1+3s)(1-s)`; the branch point `1-3s`
-is Φ's `27x-1`. Two analyticity conditions per small root, the `[u³]`
-self-consistency and `J(1)` fix the boundary unknowns in a `6×6` system;
-(II) assembles `F_1 = c₀+c₁A+c₂B+c₃AB`, whose degree-4 norm is `Φ`
-coefficient by coefficient after `y = 3x`, `W = 3F₁+1`. No series data
-enters; the check confirms exact equality and annihilation to `x^80`.
+`experiments/severance_w2_gate.py`, which also fails on a perturbed input) by
+the kernel method, the standard technique for a functional equation with a
+catalytic variable. The polynomial `D(u) = u² - y(1+u+u²)²` whose vanishing the
+method exploits factors into two quadratic branches in `s = √y`, small roots in
+`ℚ(s)[A,B]`, `A² = (1-3s)(1+s)`, `B² = (1+3s)(1-s)`; the branch point `1-3s` is
+Φ's `27x-1`. Two analyticity conditions per small root, the `[u³]`
+self-consistency and `J(1)` fix the boundary unknowns in a `6×6` system; (II)
+assembles `F_1 = c₀+c₁A+c₂B+c₃AB`, whose degree-4 norm is `Φ` coefficient by
+coefficient after `y = 3x`, `W = 3F₁+1`. No series data enters; the check
+confirms exact equality and annihilation to `x^80`.
 
 ### 3.3 The onset is sharp for every k (proved)
 

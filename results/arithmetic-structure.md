@@ -181,19 +181,18 @@ times Λ⁸ is the monic degree-9 curve
 
     E81(Λ,u) = Λ⁹ − Λ⁸ − 25uΛ⁶ − 36u²Λ⁵ − 45u²Λ⁴ − 72u³Λ² − 27u⁴ ≡ 0 (mod 81),
 
-differentiated for Λ', and (A3) enters as εp = Λ⁶ + 15uΛ⁴ + 27u²Λ³ + 27u²Λ² + 27u³,
-dp = Λ⁸ + 50uΛ⁶ + 72u²Λ⁵ + 54u²Λ⁴ + 45u³Λ² + 54u⁴. Cross-multiplying (every
-cleared factor has constant term 1) leaves a polynomial of degree 32 in Λ
+differentiated for Λ', and (A3) enters as εp = Λ⁶ + 15uΛ⁴ + 27u²Λ³ + 27u²Λ² +
+27u³, dp = Λ⁸ + 50uΛ⁶ + 72u²Λ⁵ + 54u²Λ⁴ + 45u³Λ² + 54u⁴. Cross-multiplying
+(every cleared factor has constant term 1) leaves a polynomial of degree 32 in Λ
 whose exact division by E81 has a remainder divisible by 81 in every
-coefficient: sufficient, not necessary, since the ideal of relations of Λ
-mod 81 exceeds (E81). Each step is also checked as a series to order 122
-mod 81, and [v^k]S equals the exact P_k(3k−2) for k = 3..17. Weakest links:
-(A3) at orders k ≥ 18, the exposure the mod-27 proofs also carry; then (A2).
-Against deficit 2 the object grew mildly (degree in Λ 21 → 32, divisor
-7 → 9) and the method changed nowhere; each further deficit costs the next
-3-adic level of the master equation. The family k = 3..14 at
-(n,H) = (3k−2, 2k−2) has T mod 3 = 2, 0, 1 repeating, as predicted; k ≤ 11
-enumerated, k = 12..14 computed from P_k.
+coefficient: sufficient, not necessary, since the ideal of relations of Λ mod 81
+exceeds (E81). Each step is also checked as a series to order 122 mod 81, and
+[v^k]S equals the exact P_k(3k−2) for k = 3..17. Weakest links: (A3) at orders k
+≥ 18, the exposure the mod-27 proofs also carry; then (A2). Against deficit 2
+the object grew mildly (degree in Λ 21 → 32, divisor 7 → 9) and the method
+changed nowhere; each further deficit costs the next 3-adic level of the master
+equation. The family k = 3..14 at (n,H) = (3k−2, 2k−2) has T mod 3 = 2, 0, 1
+repeating, as predicted; k ≤ 11 enumerated, k = 12..14 computed from P_k.
 
 ### Sleeve zeros
 

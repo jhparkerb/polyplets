@@ -317,12 +317,12 @@ territory (compositions, partitions, an existing entry).
 
 `cpp/middle_kingdom_tm.cpp` (`build/middle_kingdom_tm`) counts bottom profiles
 directly, with state (column height, unimodality phases), or (column height,
-height above the running minimum, phase) for `ctrlB`; modes
-`cc ccmono ccdir5 ccdir4 ccctrlb hv hvdir4 hvmono stair hvdir4asc` and the
-controls `ccdir4bad ccctrlbbad hvdir4ascbad`. It reproduces the brute-force
-table for all six column-convex classes through `n = 14`, and its `hv` mode
-reproduces all 700 terms of the independent row transfer matrix
-`build/convex_area_tm` (`make gate-middle-kingdom`, `tests/gate_middle_kingdom.py`).
+height above the running minimum, phase) for `ctrlB`; modes `cc ccmono ccdir5
+ccdir4 ccctrlb hv hvdir4 hvmono stair hvdir4asc` and the controls `ccdir4bad
+ccctrlbbad hvdir4ascbad`. It reproduces the brute-force table for all six
+column-convex classes through `n = 14`, and its `hv` mode reproduces all 700
+terms of the independent row transfer matrix `build/convex_area_tm` (`make
+gate-middle-kingdom`, `tests/gate_middle_kingdom.py`).
 
 | class | first terms | µ | generating function |
 |---|---|---|---|
@@ -392,7 +392,8 @@ about 11 minutes and 4 GB and was not run.
   `µ × 0.895759813791 = 3.41421356237 = 2+√2` to twelve digits: the
   subdominant singularity of this class is the dominant one of
   `(dir5, column-convex)`, as dir5 ⊂ ctrlB predicts.
-- Not rational: no constant-coefficient recurrence of order ≤ 12 (rank 13 of 13).
+- Not rational: no constant-coefficient recurrence of order ≤ 12 (rank 13 of
+  13).
 - Not D-finite in order ≤ 12 / degree ≤ 12, nor order ≤ 14 / degree ≤ 8.
 - Not algebraic in degree ≤ 8 / t-degree ≤ 14, nor degree ≤ 6 / t-degree ≤ 20.
 - PSLQ on `µ`: no integer relation of degree ≤ 4 at height ≤ 10⁵; the
@@ -724,8 +725,8 @@ equal to A006770 through `n = 14`.
 | 13 | 1405276324 | 415382397 | 602013085 | 1692931066 |
 | 14 | 8956020294 | 2333445468 | 3463412836 | 11208974860 |
 
-`m(n) = A006770(n)` for `n ≤ 4`; the first two non-multi-directed animals
-appear at `n = 5`. Full list `n = 1…200`: `results/multidirected_terms_n200.txt`.
+`m(n) = A006770(n)` for `n ≤ 4`; the first two non-multi-directed animals appear
+at `n = 5`. Full list `n = 1…200`: `results/multidirected_terms_n200.txt`.
 
 ### Growth constant
 
@@ -744,12 +745,12 @@ m(400)/m(399) = 6.475196280297     Aitken-extrapolated: 6.475196280297
 ```
 
 `µ = 6.475196280297`. `M` has a simple pole, so `m(n) ~ Cµⁿ` with no
-subexponential factor, and the ratios converge geometrically at rate
-`ρ_M/ρ_B = 0.9448`. This confirms and extends Bacher's numerical `6.475…`; it
-stays numerical, with no minimal polynomial, because `ρ_M` is defined through
-the non-D-finite `B`. Consistency with the growth-constant bracket:
-`6.4752 < 6.543`, the certified strip lower bound (`results/growth-constant.md`),
-as multi-directed ⊂ all polyplets requires.
+subexponential factor, and the ratios converge geometrically at rate `ρ_M/ρ_B =
+0.9448`. This confirms and extends Bacher's numerical `6.475…`; it stays
+numerical, with no minimal polynomial, because `ρ_M` is defined through the
+non-D-finite `B`. Consistency with the growth-constant bracket: `6.4752 <
+6.543`, the certified strip lower bound (`results/growth-constant.md`), as
+multi-directed ⊂ all polyplets requires.
 
 Lower bounds on the polyplet growth constant `λ` from these families:
 
@@ -1281,19 +1282,18 @@ q_4 = 4 -100t +1029t^2 -5446t^3 +14407t^4 -10250t^5 -32039t^6 +43974t^7
 ```
 
 Five-digit coefficients are themselves evidence: the non-minimal `(19,3)`
-P-recurrence for the same object has coefficients of about 60 digits. The box
-is minimal both ways: `(4,21)` excluded, degree 3 excluded to t-degree 48,
-degree 2 to 65, rational to 98. `find_prec` finds an exact P-recurrence in the
-box `(19, 3)`, 80 unknowns, trained on 84 rows and predicting all 96
-remaining, with 0 failures on re-substitution over `Q`
-(`experiments/dir4_perim_find_prec.py`, `results/dir4_perim_find_prec.log`);
-`(19,2)` and `(18,3)` are excluded. The exclusion frontier, the smallest order
-at which each degree stops being excluded, is
-`(27,2) (19,3) (17,4) (15,5) (15,6) (14,7) (14,8) (13,9) (13,10) (13,11) (13,12)`;
-degrees 0 and 1 are excluded to orders 70 and 65. The identity is verified on
-the 199 terms in hand, not proved past `s = 200`; the cheapest strengthening
-is `build/convex_perim_tm 206 1 dir4` (about 21 minutes), six terms predicted
-before computed, not run.
+P-recurrence for the same object has coefficients of about 60 digits. The box is
+minimal both ways: `(4,21)` excluded, degree 3 excluded to t-degree 48, degree 2
+to 65, rational to 98. `find_prec` finds an exact P-recurrence in the box `(19,
+3)`, 80 unknowns, trained on 84 rows and predicting all 96 remaining, with 0
+failures on re-substitution over `Q` (`experiments/dir4_perim_find_prec.py`,
+`results/dir4_perim_find_prec.log`); `(19,2)` and `(18,3)` are excluded. The
+exclusion frontier, the smallest order at which each degree stops being
+excluded, is `(27,2) (19,3) (17,4) (15,5) (15,6) (14,7) (14,8) (13,9) (13,10)
+(13,11) (13,12)`; degrees 0 and 1 are excluded to orders 70 and 65. The identity
+is verified on the 199 terms in hand, not proved past `s = 200`; the cheapest
+strengthening is `build/convex_perim_tm 206 1 dir4` (about 21 minutes), six
+terms predicted before computed, not run.
 
 Controls for a positive verdict, where the risk is a guesser that says
 CANDIDATE to anything:
@@ -1345,7 +1345,8 @@ let `C` be any class with
 
     staircase  ⊆  C  ⊆  HV-convex.
 
-Then `lim C(n)^(1/n)` exists and equals `lim A(n)^(1/n) = µ = 3.128943269730886…`.
+Then `lim C(n)^(1/n)` exists and equals `lim A(n)^(1/n) = µ =
+3.128943269730886…`.
 
 (dir4, HV-convex), (dir5, HV-convex), (ctrlB, HV-convex) and
 (mdir, HV-convex) are such classes, and so is anything else between the two
@@ -1404,18 +1405,17 @@ so it takes at most `n + 1` values, and
 
     A(n)  ≤  2 (n+1)^2  ·  sum_{i+j+l=n}  P(i) M(j) P(l),     P(0) = M(0) = 1.   (*)
 
-*Attribution.* Gouyou-Beauchamps and Leroux, *Enumeration of symmetry classes
-of convex polyominoes on the honeycomb lattice*, FPSAC 2004
-(arXiv:math/0403168, `literature/gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf`),
+*Attribution.* Gouyou-Beauchamps and Leroux, *Enumeration of symmetry classes of
+convex polyominoes on the honeycomb lattice*, FPSAC 2004 (arXiv:math/0403168,
+`literature/gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf`),
 §2.3, decompose a convex polyomino into blocks by the growth phases of its two
-profiles, with the extreme blocks identified as stack polyominoes and the
-middle blocks as staircase polyominoes with `H02 = Pa = H20`. That is Lemma 1,
-Lemma 2's identification and Proposition 9 for convex polyominoes on the
-honeycomb lattice. The square-lattice companion (Leroux, Rassart and
-Robitaille, Adv. Appl. Math. 21 (1998) 343–380) uses a different route. What
-is not theirs: the king lattice (their middle entry is `min(h,h')`, ours
-`min(h,h')+1`), a class with no exact solution, and Propositions 6, 7, 10
-and 11.
+profiles, with the extreme blocks identified as stack polyominoes and the middle
+blocks as staircase polyominoes with `H02 = Pa = H20`. That is Lemma 1, Lemma
+2's identification and Proposition 9 for convex polyominoes on the honeycomb
+lattice. The square-lattice companion (Leroux, Rassart and Robitaille, Adv.
+Appl. Math. 21 (1998) 343–380) uses a different route. What is not theirs: the
+king lattice (their middle entry is `min(h,h')`, ours `min(h,h')+1`), a class
+with no exact solution, and Propositions 6, 7, 10 and 11.
 
 **Lemma 2 (the outer blocks are stacks, hence sub-exponential).**
 `P(n) = A001523(n)`, the number of stacks (weakly unimodal compositions of
@@ -1655,15 +1655,14 @@ prefix area. Fekete gives `lim T_1(n)^(1/n) = sup_n T_1(n)^(1/n)`, and
 
 *Proof.* `D_asc ≥ M` termwise: a staircase animal has `d ≥ 0` and `d ≥ s` at
 every step, so it never enters `(0,1)`, which needs `d ≤ 0` and `d < s`. With
-`D_asc ≤ D` and Proposition 6, `lim D_asc(n)^(1/n) = µ`. For `D_desc`,
-Lemma 1's factorization with `T` in place of `M` gives
-`D_desc(n) ≤ 2(n+1)^2 Σ_(i+j+l=n) P0(i) T(j) P1(l) ≤ 2(n+1)^4 E(n)^2 C_ε (ν+ε)^n`,
-so `limsup D_desc(n)^(1/n) ≤ ν`. Conversely, take a `T`-run of area `m` whose
-first column is `[0, h−1]` and prepend the column `[0, h]`: the joining step
-has `d = 0 ≤ 0` and `s = 1 > d`, so it enters `(0,1)`, the run's own steps
-keep it there, and the result is a (dir4, HV-convex) animal of area
-`m + h + 1`. With `h = 1`, `D_desc(n) ≥ T_1(n−2)`, so
-`liminf D_desc(n)^(1/n) ≥ ν` by Lemma 4. ∎
+`D_asc ≤ D` and Proposition 6, `lim D_asc(n)^(1/n) = µ`. For `D_desc`, Lemma 1's
+factorization with `T` in place of `M` gives `D_desc(n) ≤ 2(n+1)^2 Σ_(i+j+l=n)
+P0(i) T(j) P1(l) ≤ 2(n+1)^4 E(n)^2 C_ε (ν+ε)^n`, so `limsup D_desc(n)^(1/n) ≤
+ν`. Conversely, take a `T`-run of area `m` whose first column is `[0, h−1]` and
+prepend the column `[0, h]`: the joining step has `d = 0 ≤ 0` and `s = 1 > d`,
+so it enters `(0,1)`, the run's own steps keep it there, and the result is a
+(dir4, HV-convex) animal of area `m + h + 1`. With `h = 1`, `D_desc(n) ≥
+T_1(n−2)`, so `liminf D_desc(n)^(1/n) ≥ ν` by Lemma 4. ∎
 
 So `ν` is the growth constant of an explicitly counted half of the series,
 not an artifact of extrapolation. What is not proved is the step to Table B's
@@ -1756,8 +1755,8 @@ Brute-forced (`experiments/descent_block_oracle.py --mirror 14`, log
 | via `(0,1)` | 0 | 1 | 6 | 26 | 100 | … | 1333383 | 4184875 |
 | via neither | 1 | 2 | 4 | 9 | 21 | … | 10448 | 19970 |
 
-**Proposition 10 (the staircase eigenvector is a three-term recurrence).**
-Let `T(x)` be the staircase block's operator, `T(x)_{h,h'} = x^{h'}(min(h,h')+1)`
+**Proposition 10 (the staircase eigenvector is a three-term recurrence).** Let
+`T(x)` be the staircase block's operator, `T(x)_{h,h'} = x^{h'}(min(h,h')+1)`
 for `h, h' ≥ 1`, and let `φ` solve
 
     φ(0) = 1,  φ(1) = 2,  φ(h) = (2 − x^{h−1}) φ(h−1) − φ(h−2)   (h ≥ 2).
@@ -1826,8 +1825,9 @@ the `D_desc` and "via neither" parts being `o(µ^n)`. ∎
 
 The hypothesis is strictly weaker than Conjecture 8. `r` is a ratio of two
 `q`-series in `q = 1/µ`, both computed by `O(hmax)` prefix-sum recurrences
-(`experiments/amplitude_feed_vectors.py`; log `results/amplitude_feed_vectors.log`;
-constants `results/amplitude_ratio_constants.txt`):
+(`experiments/amplitude_feed_vectors.py`; log
+`results/amplitude_feed_vectors.log`; constants
+`results/amplitude_ratio_constants.txt`):
 
     w  · φ  =  1.29770192341040021939895011278…
     w4 · φ  =  1.19935960397018718067118376153…
@@ -2147,31 +2147,32 @@ From the same 2000-specimen sample, plus exact facts from the enumerations
 ## Holes
 
 A hole is a bounded 4-component of the complement (the convention fixed in
-`results/closed-doors.md`, under the matching-pair convention). `A_k(n)`
-counts polyplets with `k` holes; the exact table to `n = 18` is
-`results/holes_n18.txt`, produced by `tma_holes square8 18 --holes` on ayr
-(x86, 44 h single core, commit `8e41a63`), reproduced identically on dalby
+`results/closed-doors.md`, under the matching-pair convention). `A_k(n)` counts
+polyplets with `k` holes; the exact table to `n = 18` is
+`results/holes_n18.txt`, produced by `tma_holes square8 18 --holes` on ayr (x86,
+44 h single core, commit `8e41a63`), reproduced identically on dalby
 (`results/holes_n18.dalby.txt`), single-engine at `n = 18` and cross-checked
-against `g2 --holes` at small `n` by `tests/gate_holes.py` and `tests/gate_g2.py`.
+against `g2 --holes` at small `n` by `tests/gate_holes.py` and
+`tests/gate_g2.py`.
 
 ### Hole-free polyplets are exponentially rare
 
 **Theorem (Madras 1999, corollary).** `λ₀ < λ` strictly, and the hole-free
-fraction `A₀(n)/a(n)` decays exponentially. Madras's pattern theorem
-(*A pattern theorem for lattice clusters*, Ann. Comb. 3 (1999) 357–384,
-`literature/madras_1999_pattern_theorem_lattice_clusters.pdf`, Theorem 2.1): for a
-proper pattern `P = (P₁, P₂)` of sites required present and absent, clusters
-containing at most `εn` translates are exponentially rare. Take `P₁` = the
-eight neighbors of a cell, `P₂` = the cell: hole-free animals contain zero
-translates. His §3.1(f), the spread-out lattice of range `M` in the sup norm,
-is the king lattice at `M = 1`, so it applies directly; his Theorem 2.2 and
-Corollary 3.6 also make the ratio limit `a(n+1)/a(n) → λ` a theorem for king
-animals. The same argument proves the polyomino statement (`P₁` = four
-neighbors). Whittington and Soteros's 1990 survey
+fraction `A₀(n)/a(n)` decays exponentially. Madras's pattern theorem (*A pattern
+theorem for lattice clusters*, Ann. Comb. 3 (1999) 357–384,
+`literature/madras_1999_pattern_theorem_lattice_clusters.pdf`, Theorem 2.1): for
+a proper pattern `P = (P₁, P₂)` of sites required present and absent, clusters
+containing at most `εn` translates are exponentially rare. Take `P₁` = the eight
+neighbors of a cell, `P₂` = the cell: hole-free animals contain zero translates.
+His §3.1(f), the spread-out lattice of range `M` in the sup norm, is the king
+lattice at `M = 1`, so it applies directly; his Theorem 2.2 and Corollary 3.6
+also make the ratio limit `a(n+1)/a(n) → λ` a theorem for king animals. The same
+argument proves the polyomino statement (`P₁` = four neighbors). Whittington and
+Soteros's 1990 survey
 (`literature/soteros_whittington_1990_rigorous_results_wild_guesses.pdf`, §4)
-does exactly this and records that such gaps can be made quantitative
-(`λ − λ₀ ≥ 0.00003758·λ₀`, Madras et al. 1988). Madras never mentions holes;
-the corollary is ours, the theorem his.
+does exactly this and records that such gaps can be made quantitative (`λ − λ₀ ≥
+0.00003758·λ₀`, Madras et al. 1988). Madras never mentions holes; the corollary
+is ours, the theorem his.
 
 Measured (`experiments/holefree_growth.py` on `results/holes_n18.txt`;
 Domb–Sykes plus Richardson plus a log-linear fit):
@@ -2182,25 +2183,25 @@ Domb–Sykes plus Richardson plus a log-linear fit):
 | A₀(n) hole-free | λ₀ ≈ 6.94 | −0.93 (same) | same |
 | gap λ − λ₀ | ≈ 0.157 | | |
 
-Two facts make `λ₀ < λ` robust at `n ≤ 18`: `log(A₀/a)` against `n` is linear
-to five decimals (second difference about `1e−5` over `n = 12..18`), slope
+Two facts make `λ₀ < λ` robust at `n ≤ 18`: `log(A₀/a)` against `n` is linear to
+five decimals (second difference about `1e−5` over `n = 12..18`), slope
 `−0.0222` per cell, `ρ = 0.9779`; and the measured decay 0.97800 equals the
-fitted `λ₀/λ = 0.97789` to four decimals. Quote the ratio `ρ = λ₀/λ ≈ 0.978`
-and the exponential decay, not the third digit of `λ₀`: the same pipeline
-returns `λ ≈ 7.096` against the true 7.110, so the method carries about 0.014
-of error at this reach, which the gap survives elevenfold. Both classes share
-`θ ≈ −0.93`; mean hole count per cell climbs 0.0132 → 0.0160 → 0.0176 at
-`n = 10, 14, 18`, so holes are extensive; `A₁` and `A₂` approach `λ` from
-finite size (`A₁`'s ratio still descending through 7.08). Madras's own §5
-poses the shape of this measurement as an open problem (pure exponential decay
-of a pattern-avoiding fraction with no power-law factor, ratio equal to the
-ratio of growth constants), so the measurement is a data point on a stated
-problem. Guttmann, Jensen, Wong and Enting (J. Phys. A 33 (2000) 1735–1764,
+fitted `λ₀/λ = 0.97789` to four decimals. Quote the ratio `ρ = λ₀/λ ≈ 0.978` and
+the exponential decay, not the third digit of `λ₀`: the same pipeline returns `λ
+≈ 7.096` against the true 7.110, so the method carries about 0.014 of error at
+this reach, which the gap survives elevenfold. Both classes share `θ ≈ −0.93`;
+mean hole count per cell climbs 0.0132 → 0.0160 → 0.0176 at `n = 10, 14, 18`, so
+holes are extensive; `A₁` and `A₂` approach `λ` from finite size (`A₁`'s ratio
+still descending through 7.08). Madras's own §5 poses the shape of this
+measurement as an open problem (pure exponential decay of a pattern-avoiding
+fraction with no power-law factor, ratio equal to the ratio of growth
+constants), so the measurement is a data point on a stated problem. Guttmann,
+Jensen, Wong and Enting (J. Phys. A 33 (2000) 1735–1764,
 `literature/guttmann_jensen_wong_enting_2000_punctured_polygons_polyominoes.pdf`)
 give `κ = 3.9709` for hole-free square polyominoes against `τ = 4.062591(9)`,
 with finitely-punctured classes sharing `κ` and the exponent rising by one per
-puncture, `a_n^(k) ~ κⁿ n^{k−1}`; their `κ/τ = 0.97743` against our
-`λ₀/λ = 0.97800` is recorded as an observation only.
+puncture, `a_n^(k) ~ κⁿ n^{k−1}`; their `κ/τ = 0.97743` against our `λ₀/λ =
+0.97800` is recorded as an observation only.
 
 The `n = 19` term: `results/holes_n19.txt`, assembled from the per-height
 logs of a run whose source stamp was `git=2c5e3e7-dirty`, so it is
@@ -2437,11 +2438,11 @@ been found by the exhaustive runs to `n = 11` if one existed that small.
 
 ### Extremal diameter and articulation points
 
-Exhaustive over all fixed king animals to `n = 9` (`experiments/king_extremal.py`,
-four controls: A006770 reproduced; a 6-cell line has diameter 5 and 4
-articulation points; a 3×3 block has neither articulation points nor holes;
-the 8-cell ring has one hole). Diameter is the king graph's longest shortest
-path; articulation points are cut vertices.
+Exhaustive over all fixed king animals to `n = 9`
+(`experiments/king_extremal.py`, four controls: A006770 reproduced; a 6-cell
+line has diameter 5 and 4 articulation points; a 3×3 block has neither
+articulation points nor holes; the 8-cell ring has one hole). Diameter is the
+king graph's longest shortest path; articulation points are cut vertices.
 
 | n | animals | min diam | max diam | max artic | max holes |
 |---|---|---|---|---|---|
@@ -2669,7 +2670,8 @@ python3 experiments/king_extremal.py --nmax 9      # ~4 min; --nmax 10 is 16 min
 python3 experiments/move_graph_connectivity.py
 ```
 
-Series and data: `results/mk_{cc,ccdir5,ccdir4,hvdir4,hvdir4asc,hvdir4desc,stair,hvmono}_terms_n700.txt`,
+Series and data:
+`results/mk_{cc,ccdir5,ccdir4,hvdir4,hvdir4asc,hvdir4desc,stair,hvmono}_terms_n700.txt`,
 `results/mk_ccctrlb_terms_n250.txt`, `results/mk_dir4_descblock_n700.txt`,
 `results/mk_grid20_n14.txt`, `results/multidirected_terms_n200.txt`,
 `results/convex_area_terms_n{500,700_king,700_poly}.txt`,

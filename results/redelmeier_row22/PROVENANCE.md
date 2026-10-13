@@ -6,9 +6,12 @@ counting logic with the transfer-matrix engine. The work was split into
 24,000 shards by measured all-core throughput and run on three machines
 from 2026-07-11 13:41 EDT:
 
-- dalby (ARM, 80 workers): shards [0, 14300), 427,936 s, done 2026-07-16 15:44 EDT
-- ayr (x86, 32 workers): shards [14300, 19460), 418,454 s, done 2026-07-16 13:07 EDT
-- gympie (Apple, 10 workers): shards [19460, 24000), 440,628 s, done 2026-07-16 19:17 EDT
+- dalby (ARM, 80 workers): shards [0, 14300), 427,936 s, done 2026-07-16 15:44
+  EDT
+- ayr (x86, 32 workers): shards [14300, 19460), 418,454 s, done 2026-07-16 13:07
+  EDT
+- gympie (Apple, 10 workers): shards [19460, 24000), 440,628 s, done 2026-07-16
+  19:17 EDT
 
 Gathered by `scripts/g2_fleet_gather.sh 22 24000` and summed by
 `scripts/g2_combine.sh`, which fails if any shard is missing; all 24,000

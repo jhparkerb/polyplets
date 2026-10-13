@@ -57,11 +57,11 @@ at those heights (`results/cutcount_b1/PROVENANCE.md`).
 compared with an entry enumerated later: P_15, P_16, P_17 and P_18 predicted
 T(33,18), T(35,19), T(37,20) and T(39,21) exactly.
 
-**Fits from below.** Below the range where the closed form holds, the
-deviation from it is itself computable (`results/below-onset.md`). That turns
-short, cheap entries into equations for the same constants. Every level
-k = 2..19 re-derived this way agrees with the level used, and 189 enumerated
-entries are predicted from shorter ones with no error (`results/undertow.md`). These fits share their
+**Fits from below.** Below the range where the closed form holds, the deviation
+from it is itself computable (`results/below-onset.md`). That turns short, cheap
+entries into equations for the same constants. Every level k = 2..19 re-derived
+this way agrees with the level used, and 189 enumerated entries are predicted
+from shorter ones with no error (`results/undertow.md`). These fits share their
 correction tables with the main route, so they are a consistency check, not an
 independent one.
 

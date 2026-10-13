@@ -569,14 +569,15 @@ Verdict: μ_2 ≈ 41.8–42.5 by fitting, rising with the window (41.76, 41.90,
 θ is no small non-negative integer, so the slice is not a low-degree
 polynomial times an exponential.
 
-**Growth constants from the grand form** (`experiments/grand_form_saddle.py`). Σ_k P_k(n) y^k = exp(A(y) + nB(y)); a_j, b_j extracted for
-j = 1..19 from the engine's P_1..P_19 come out linear in n, b_1 = 25,
-a_1 = −45, an independent test only for k ≤ 8 (partly 9, 10), since
-`scripts/derive_pk_fast.py` builds P_11..P_19 from the recurrence. On n = 2H
-the surplus is k = H: the slope-2 line is the onset line, where the relative
-defect is about e^(−1.55k) (`results/below-onset.md`), so slice and formula
-share their exponential growth. With k = κH, κ = s − 1, the saddle of
-(1+κ)B(y) − κ ln y at y·B′(y) = κ/(1+κ) gives (1/H) ln T → (1−2κ) ln 3 + φ(κ):
+**Growth constants from the grand form** (`experiments/grand_form_saddle.py`).
+Σ_k P_k(n) y^k = exp(A(y) + nB(y)); a_j, b_j extracted for j = 1..19 from the
+engine's P_1..P_19 come out linear in n, b_1 = 25, a_1 = −45, an independent
+test only for k ≤ 8 (partly 9, 10), since `scripts/derive_pk_fast.py` builds
+P_11..P_19 from the recurrence. On n = 2H the surplus is k = H: the slope-2 line
+is the onset line, where the relative defect is about e^(−1.55k)
+(`results/below-onset.md`), so slice and formula share their exponential growth.
+With k = κH, κ = s − 1, the saddle of (1+κ)B(y) − κ ln y at y·B′(y) = κ/(1+κ)
+gives (1/H) ln T → (1−2κ) ln 3 + φ(κ):
 
     μ_s = 3^(1−2κ) · exp(φ(κ)).
 

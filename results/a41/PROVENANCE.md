@@ -75,12 +75,12 @@ grand-form, solver and assembly code. It never reads `undertow_a41.py`.
     a(41) recount = 393811462683918679824582849262105  -- AGREE
 
 Because it never touches the wired table, the agreement also says
-`diagCoeffTable` is consistent with a fresh fit to its own onset anchors.
-This is a second implementation, not a second source: it retires assembly,
-transcription, fencing and arithmetic error across two codebases, but
-shares with the main route the D_j at k = 20, 21, the pinning cells
-T(40,19) and T(39,18), and the grand-form theorem (whose content is proved in Lean through the
-staircase route, so a shared theorem rather than a shared risk).
+`diagCoeffTable` is consistent with a fresh fit to its own onset anchors. This
+is a second implementation, not a second source: it retires assembly,
+transcription, fencing and arithmetic error across two codebases, but shares
+with the main route the D_j at k = 20, 21, the pinning cells T(40,19) and
+T(39,18), and the grand-form theorem (whose content is proved in Lean through
+the staircase route, so a shared theorem rather than a shared risk).
 
 ### One real, weak check on D_2(21)
 

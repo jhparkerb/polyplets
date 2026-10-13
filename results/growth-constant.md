@@ -577,11 +577,12 @@ ansatz for θ detects that the series is not in the θ = 0 regime.
 
 Conway, Guttmann and Zinn-Justin (Adv. Appl. Math. 96 (2018) 312–333) found
 1324-avoiders obey B μ^n μ₁^√n n^g with μ₁ = 0.0400(5); differential
-approximants are blind to that factor. `experiments/stretched_exponential_fit.py`
-(about 20 s) fits ln a(n) = ln B + n ln λ + √n ln μ₁ + θ ln n on sliding
-4-point windows in 60-digit arithmetic, with one Richardson step assuming
-f(n) = f_∞ − A/n. Controls: exact-form data recovers the planted μ₁ to 55
-digits; planted under a confluent correction 1 + 1/n:
+approximants are blind to that factor.
+`experiments/stretched_exponential_fit.py` (about 20 s) fits ln a(n) = ln B + n
+ln λ + √n ln μ₁ + θ ln n on sliding 4-point windows in 60-digit arithmetic, with
+one Richardson step assuming f(n) = f_∞ − A/n. Controls: exact-form data
+recovers the planted μ₁ to 55 digits; planted under a confluent correction 1 +
+1/n:
 
 | planted μ₁ | Richardson recovers | θ recovers |
 |---|---|---|

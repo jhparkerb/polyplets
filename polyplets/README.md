@@ -121,30 +121,30 @@ so `IsDiagonalPoly.natDegree_eq`: the degree is exactly k). With the leading
 coefficient known, k rows (2k+1 … 3k) determine P_k by Lagrange
 (`isDiagonalPoly_of_coeff_of_eval_Icc`).
 
-The staircase (`Staircase/`). `Staircase/Series.lean` is a convolution toolkit; `Staircase/Mu.lean`
-defines the multiplier sequence μ from the weights and its inverse ν;
-`WalkTop.lean` proves `d_staircase`: `d k (H+1) = Σ_i μ_i·d (k−i) H` for
-H ≥ k+1, one strong induction from the first peeling identity;
-`Staircase/Diagonal.lean` transports it to the diagonals (`T_staircase`). On this,
-`Staircase/Climb.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
-the climb's coordinates; `climb_step` passes from levels < k to level k given
+The staircase (`Staircase/`). `Staircase/Series.lean` is a convolution toolkit;
+`Staircase/Mu.lean` defines the multiplier sequence μ from the weights and its
+inverse ν; `WalkTop.lean` proves `d_staircase`: `d k (H+1) = Σ_i μ_i·d (k−i) H`
+for H ≥ k+1, one strong induction from the first peeling identity;
+`Staircase/Diagonal.lean` transports it to the diagonals (`T_staircase`). On
+this, `Staircase/Climb.lean` climbs: `IsDiagonalPolyH k P` is the law of level k
+in the climb's coordinates; `climb_step` passes from levels < k to level k given
 the two cells; `climb k` runs it from `climb_zero` (P_0 = 1) to level k ≤ 18
-given the enumerated cells of levels 3 … k, the kernel supplying levels 1
-and 2 (so P_1 and P_2 hold outright: `T_sub_one`, `T_sub_two`), and
-`isDiagonalPoly_Pk` reads off
-the diagonal law with the concrete `Pk k` of `DiagonalPolys.lean`. The 19 polynomials in
-`DiagonalPolys.lean` are the engine's (`orchestrator/sweep.go`, extracted to
-`pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
-the cell evaluations in `Staircase/Climb`.
+given the enumerated cells of levels 3 … k, the kernel supplying levels 1 and 2
+(so P_1 and P_2 hold outright: `T_sub_one`, `T_sub_two`), and
+`isDiagonalPoly_Pk` reads off the diagonal law with the concrete `Pk k` of
+`DiagonalPolys.lean`. The 19 polynomials in `DiagonalPolys.lean` are the
+engine's (`orchestrator/sweep.go`, extracted to `pin-data.md` by
+`scripts/extract_pin_data.py`); a wrong coefficient fails the cell evaluations
+in `Staircase/Climb`.
 
 Symmetry (`Symmetry.lean`): the dihedral group acts by apply-then-anchor;
 `R90`, `R180`, `Hm`, `Dm` are the fixed-point counts, `Free`, `OneSided`,
 `Bilateral` the orbit counts, and the three identities are Burnside.
 
-Growth (`UpperBound`, `Fekete`, `Growth`): `a_le_choose : a n ≤ C(5n, n)`
-by a decision-tree encoding, supermultiplicativity by concatenation with cut
-recovery, and Fekete's lemma once (`Fekete.lean`, a structure) gives the
-limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125/256` and
+Growth (`UpperBound`, `Fekete`, `Growth`): `a_le_choose : a n ≤ C(5n, n)` by a
+decision-tree encoding, supermultiplicativity by concatenation with cut
+recovery, and Fekete's lemma once (`Fekete.lean`, a structure) gives the limit
+λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125/256` and
 `lambda_gt_of_a_40 : 6.22 < λ` given a(40) as a hypothesis.
 
 ## Modules

@@ -2,8 +2,9 @@
 
 The papers this project **reads**. Nothing here is ours.
 
-The papers this project **writes** are one letter away, in [`paper/`](../paper/).
-If you came here looking for a manuscript, that is where it is.
+The papers this project **writes** are one letter away, in
+[`paper/`](../paper/). If you came here looking for a manuscript, that is where
+it is.
 
 - `INDEX.txt` — every PDF, with where it came from, when, and what it is cited
   for. A file that is not in the index has not been read.

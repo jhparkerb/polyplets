@@ -572,18 +572,17 @@ subset excluded) and not every choice stays connected: two adjacent coarse
 cells filled with their outer columns only leave fine cells three columns
 apart.
 
-The correspondence
-`a(n) = Σ_{coarse A} #{fillings of A totaling n cells with connected contact graph}`
-is exact, a bijection, and a restatement: the coarse animal has between `n/4`
-and `n` cells, so `a(n)` appears on its own right-hand side (the `m = n` term
-is one cell per block, four choices each), and the fiber is the same problem
-one scale down. Dropping the contact constraint gives
-`A(x) ≤ A((1+x)^4 − 1)` coefficientwise, whose consequence for `λ`,
-`u ≤ 4u + 6u² + 4u³ + u⁴`, holds for every positive `u`. The clique gift is a
-level-1 accident: `4 × 4` blocks are not cliques, and their internal linkage
-regenerates the partition state. Fillings where contact is automatic give
-injections, hence concatenation-style lower bounds on `λ`, which is where the
-certified 6.543 already comes from (`results/growth-constant.md`).
+The correspondence `a(n) = Σ_{coarse A} #{fillings of A totaling n cells with
+connected contact graph}` is exact, a bijection, and a restatement: the coarse
+animal has between `n/4` and `n` cells, so `a(n)` appears on its own right-hand
+side (the `m = n` term is one cell per block, four choices each), and the fiber
+is the same problem one scale down. Dropping the contact constraint gives `A(x)
+≤ A((1+x)^4 − 1)` coefficientwise, whose consequence for `λ`, `u ≤ 4u + 6u² +
+4u³ + u⁴`, holds for every positive `u`. The clique gift is a level-1 accident:
+`4 × 4` blocks are not cliques, and their internal linkage regenerates the
+partition state. Fillings where contact is automatic give injections, hence
+concatenation-style lower bounds on `λ`, which is where the certified 6.543
+already comes from (`results/growth-constant.md`).
 
 ### 3.3 The fattening bijection
 
@@ -946,11 +945,11 @@ for a row-local lattice with drift set `D` is `b = |D|`. With `μ = b·H` and
 
     H(u) = 1 + Σ_c Ŵ_c u^(k_c) H^(−(k_c + l_c)),     Ŵ_c = W_c · b^(2k_c − l_c − 1)
 
-and since `F(n,u) = C(u) · H(u)^n`, the cumulant slopes are
-`A_k = [u^k] log H`. `cluster_weight(D, sizes)` in `experiments/gas_cumulants.py`
-is already parametric. The `A_k` in the universal-law proof came from a
-drift-parametric dynamic program over the triangle; this route reaches them
-from the weights alone, sharing no code path.
+and since `F(n,u) = C(u) · H(u)^n`, the cumulant slopes are `A_k = [u^k] log H`.
+`cluster_weight(D, sizes)` in `experiments/gas_cumulants.py` is already
+parametric. The `A_k` in the universal-law proof came from a drift-parametric
+dynamic program over the triangle; this route reaches them from the weights
+alone, sharing no code path.
 
 | lattice | b | Ŵ inputs | `log H` | recorded slopes |
 |---|---|---|---|---|
@@ -1008,9 +1007,9 @@ nothing about the other two.
 
 **Hex `A_4` by a second route.** `experiments/hex_diag_deep.py` generates
 `T_hex(n, n−k)` for `k ≤ 6`, `H ≤ 20`, in 19 s
-(`results/hex_diagonal_cells.txt`); fitting `T_hex(n, n−k) = P_k(n) · 2^(n−1−3k)`
-gives `P_1 … P_6` with 72 entries outside the fit all exact, and linear
-cumulants:
+(`results/hex_diagonal_cells.txt`); fitting `T_hex(n, n−k) = P_k(n) ·
+2^(n−1−3k)` gives `P_1 … P_6` with 72 entries outside the fit all exact, and
+linear cumulants:
 
 | k | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
@@ -1147,13 +1146,13 @@ arithmetic.
   neighborhood of a random cell; whether rescaled occupancy has a limit shape
   (it should not). Blocked on the absence of a uniform sampler past
   enumeration scale.
-- **Universality.** Lattice animals are conjecturally in the Yang–Lee edge
-  class in `d − 2` dimensions, the origin of `θ = −1`. The central-charge fit
-  to the strip constants is closed: the approach to `λ` is not analytic in
-  `1/H` at `H ≤ 17`, the surface term still falling at `H = 17` with
-  increments shrinking about 6.5% per height where `1/H²` demands about
-  11.4% (`results/growth-constant.md`). Whether the king lattice is in the
-  same class as the square lattice is open (`experiments/theta_universality.py`).
+- **Universality.** Lattice animals are conjecturally in the Yang–Lee edge class
+  in `d − 2` dimensions, the origin of `θ = −1`. The central-charge fit to the
+  strip constants is closed: the approach to `λ` is not analytic in `1/H` at `H
+  ≤ 17`, the surface term still falling at `H = 17` with increments shrinking
+  about 6.5% per height where `1/H²` demands about 11.4%
+  (`results/growth-constant.md`). Whether the king lattice is in the same class
+  as the square lattice is open (`experiments/theta_universality.py`).
 - **Extremal questions.** Minimum site perimeter is closed: the data hit
   A235382 = A027709(n) + 4 on every measured term and the closed form is
   published (`results/perimeter.md`). Diameter, articulation points and hole
