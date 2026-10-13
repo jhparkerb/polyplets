@@ -57,8 +57,9 @@ ran. `C_14` needs about 38 GB; `C_15` would need over 200 GB.
 
 Redelmeier confirms whole rows only to `n = 22`; the strip's cost grows as
 about `2^H` whatever the count, so it confirms columns `H ≤ 14` at every `n`
-to 40. When a(40) was first computed, the closed forms `P_k`, `k ≤ 18`, had 30
-fit entries, 19 inside the strip's reach and 11 outside: T(28,15), T(29,15),
+to 40. When a(40) was first computed, the closed forms `P_k`, `4 ≤ k ≤ 18`, had 30
+fit entries, 19 inside the strip's reach and 11 outside (the Lean development
+counts level 3's two cells as well, hence its 32): T(28,15), T(29,15),
 T(30,16), T(31,16), T(32,17), T(33,17), T(34,18), T(35,18), T(36,19),
 T(37,19), T(38,20). The coloring recount at `H ≤ 19` later recounted all but
 T(38,20).

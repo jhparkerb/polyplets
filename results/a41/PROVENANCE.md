@@ -40,8 +40,8 @@ only at k ≤ 19; the checks below are about that.
 ## Checks
 
 - The Nmax-41 enumeration also produces every row n ≤ 40 at every height
-  it covers; 800 cells (heights 1..20) agree with `results/triangle.txt`,
-  0 disagree. `undertow_a41.py` refuses the n = 41 row unless they match and
+  it covers; all 800 positions with n ≤ 40 and H ≤ 20 (610 of them nonzero)
+  agree with `results/triangle.txt`, 0 disagree. `undertow_a41.py` refuses the n = 41 row unless they match and
   at least 200 cells were compared.
 - A separate assembly with row 40 excluded from its own pinning set
   reproduces 21 cells of row 40, 0 wrong, and the row re-sums to a(40).
@@ -117,6 +117,8 @@ level 21 gains T(38,17), a cell the coloring recount also covers:
     level k=21 pinned from [(38,17), (39,18), (40,19)] (tallest H=19), 3 pair(s), 2 independent check(s)
     sweep vs banked triangle: 760 cells agree, 0 disagree
     a(41) = 393811462683918679824582849262105
+
+(That run read heights 1..19 only: 760 = 19 × 40 positions.)
 
 `pp[3][21]` enters D_4(21) but not D_5(21), and `sig`, `bb` enter the two
 with different coefficients, so any single-entry error in that row makes

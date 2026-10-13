@@ -7,7 +7,7 @@
 # Proved 2026-09-05 by experiments/gf_h11_validate.py: Q_11*B_11 != P_11 mod a
 # fresh prime, first mismatch at n=8170. Do not use the H=11 P or Q. Its head
 # (n <= 40) and its smallest positive root are unaffected -- see
-# results/gf-head-check.md.
+# experiments/gf_head_check.py.
 # Format per height:  P: <numerator coeffs, low->high>
 #                     Q: <denominator coeffs, low->high, Q[0]=1>
 
