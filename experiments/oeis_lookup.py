@@ -2,7 +2,7 @@
 """Read-only OEIS lookup by term list -- the novelty check, nothing else.
 
 results/subclasses.md Phase 3 needs a novelty verdict per grid cell, and
-the repo's practice is that submission is jasonp's call, gated on the viva.
+the repo's practice is that submission is jasonp's call.
 This script therefore ONLY reads: it GETs oeis.org/search?fmt=json and prints
 what came back. It has no write path of any kind.
 

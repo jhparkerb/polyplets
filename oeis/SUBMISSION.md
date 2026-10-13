@@ -4,9 +4,8 @@
 (`oeis/wave2/README.md`, `oeis/README.md`, `results/oeis-candidates.md`)
 keep their per-item detail but their status sections defer here.
 
-**Nothing is submitted by Claude, ever.** jasonp pushes every button
-([[publishing-is-jasonps-call]]); submission is further gated on his viva
-([[oeis-submission-viva-gate]]) and the human steps in the checklist below.
+**Nothing is submitted by Claude, ever.** jasonp pushes every button, after
+the human steps in the checklist below.
 
 ---
 
@@ -148,16 +147,15 @@ it requires trusting prose.
 
 ## 3. Human steps before ANY submission (mechanical checklist)
 
-1. **Viva** passes jasonp's own bar (local process; docs/viva-state.md).
-2. **Own-words pass**: jasonp rewrites every staged %C in his own words
+1. **Own-words pass**: jasonp rewrites every staged %C in his own words
    (AI-sounding prose is itself a live rejection trigger; Claude
    meaning-checks against the data only). The staged text is a FACT SOURCE,
    not submission copy.
-3. **Signature dates**: every `_Jason H Parker_` date → the actual day of
+2. **Signature dates**: every `_Jason H Parker_` date → the actual day of
    submission on oeis.org (Heinz precedent; README rule 2). Currently staged
    as Jul 16 2026 (A030234/A030235/A194596 entry files may still carry
    Jul 05/Jun 21 — bump at submission).
-4. **DATA lines**: %S/%T/%U may be extended from the b-file at submission
+3. **DATA lines**: %S/%T/%U may be extended from the b-file at submission
    time (convention: fill ~3 lines); staged entries deliberately keep the
    live-OEIS DATA.
 5. **Superseeker debts**: Wave 2 #3; Wave 3 A and B; Wave 4 sym classes.

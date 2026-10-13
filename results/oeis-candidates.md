@@ -1,12 +1,11 @@
-# OEIS candidates — staged, DEFERRED (viva + jasonp's button)
+# OEIS candidates — staged, DEFERRED (jasonp's button)
 
 > These are **Wave 3** of the master plan in `oeis/SUBMISSION.md` (2026-07-16),
 > which decides overall scope and order. A Superseeker pass for A and B is
 > still owed before submission (they were model-checked only).
 
-Date: 2026-07-10. Everything needed to file these the moment the viva clears and
-jasonp decides to submit. Do NOT submit before then (docs/viva-*, policy memories
-publishing-is-jasonps-call / oeis-submission-viva-gate). Curated to 2 strong +
+Date: 2026-07-10. Everything needed to file these the moment jasonp decides to
+submit. Do NOT submit before then. Curated to 2 strong +
 1 optional — NOT a flood.
 
 Standard prep still required per policy: %C own-words / pink-box, Superseeker
