@@ -31,11 +31,12 @@ when its entries are composed from the closed forms `P_k` of the diagonals
 holds from its **onset** `n ≥ 2k + 1`. **Utilization** is
 `cpu_s / (wall_s × cores)`; **effective cores** is `cpu_s / wall_s`. The two
 transitions are selected by the `--kernel` option and are called the **column
-kernel** and the **kink kernel** below. Machines: dalby is an 80-core ARM
-Neoverse-N1 (Ampere Altra) with 125 GB RAM and two NVMe drives in a RAID1
-mirror, one thread per core, one socket; ayr is a 32-core x86-64 AMD
-Threadripper 2990WX with 78 GB; gympie is an Apple Silicon laptop with 10
-performance cores.
+kernel** and the **kink kernel** below. The run records name three machines:
+dalby, an 80-core ARM Neoverse-N1 (Ampere Altra) with 125 GB RAM and two NVMe
+drives in a RAID1 mirror, one thread per core, one socket; ayr, a 32-core
+x86-64 AMD Threadripper 2990WX with 78 GB; and gympie, an Apple Silicon laptop
+with 10 performance cores. In prose they are the ARM server, the 32-core
+server and the laptop.
 
 ## What is in here
 
@@ -175,8 +176,8 @@ frontier states (flat across `H = 4..14`).
 
 ### 2.2 The measured price of the choice
 
-Serial, one core, gympie, 2026-07-02, a probe since removed from the tree.
-Identical per-`n` counts at every size were the built-in check.
+Serial, one core, on the laptop. Identical per-`n` counts at every size were
+the built-in check.
 
 | H | maxn | column kernel | kink kernel | ratio | column records | kink transitions | intermediate / frontier |
 |---|---|---|---|---|---|---|---|
@@ -211,8 +212,7 @@ at `maxn = 18` with no injection against the published a(1..18).
 ### 2.3 Parallelizing the kink kernel
 
 Two ways to run the stage-by-stage transition across many workers were priced
-before the production version was built (2026-07-02; the probes have since been
-removed, the numbers are these).
+before the production version was built.
 
 **Private per-shard stage DP, rejected.** Shard the sources by key, run the
 full `H`-stage DP privately per shard, merge only end-of-column states.
@@ -263,11 +263,11 @@ fixed cost of dispatch, process start, sync and merge round-trip.
 
 The round trip floors at 6–30 ms with no plateau above it, so `H` barriers per
 column add well under a second of fixed cost at `H = 16` against savings of
-100–300× in barrier volume. Source files: `results/ns_a27/cost_profile_dalby.tsv`,
-`results/ns_a26/cost_profile.tsv`. At `H = 17`, `maxn = 33`, about 17 stages
-by about 30 columns is about 500 barriers per height and 5,000–10,000 per
-term, which at 6–30 ms each is two to three minutes against multi-hour peak
-columns.
+100–300× in barrier volume. Source files:
+`results/ns_a27/cost_profile_dalby.tsv`, `results/ns_a26/cost_profile.tsv`. At
+`H = 17`, `maxn = 33`, about 17 stages by about 30 columns is about 500 barriers
+per height and 5,000–10,000 per term, which at 6–30 ms each is two to three
+minutes against multi-hour peak columns.
 
 ### 2.4 Which transition produced which term
 
@@ -297,8 +297,8 @@ Heights are mutually independent, which is the axis overlap uses.
 
 ### 3.1 Where the wall clock lives
 
-Per-column telemetry of a(34) (`results/ns_a34/cost_profile_dalby.tsv`; dalby,
-80 cores, no overlap, kink kernel, 2026-07-07):
+Per-column telemetry of a(34) (`results/ns_a34/cost_profile_dalby.tsv`; the
+ARM server, 80 cores, no overlap, kink kernel):
 
     TOTAL wall_s = 13300.4   cpu_s = 210666.1   util = 19.8%
 
@@ -324,7 +324,7 @@ middle of one height, not in the final tail, and cross-height scheduling could
 touch at most a few percent of wall.
 
 Inside a fat column the idle is the stage sequence concentrating work. At
-`maxn = 33`, `H = 17`, column 5 (dalby, 2026-07-08):
+`maxn = 33`, `H = 17`, column 5 (the ARM server):
 
 | round | frontier in | map wall s | map cpu s | average cores active |
 |---|---|---|---|---|
@@ -352,14 +352,14 @@ range-partitioned data, saturates with a few workers, and is all-to-all, so a
 single column cannot absorb all cores during merge or during the map straggler
 tail; overlap fills that gap with another height's map.
 
-- gympie, 6 cores, `maxn = 18`, the column kernel (2026-06): overlap cut wall
+- The laptop, 6 cores, `maxn = 18`, the column kernel: overlap cut wall
   from 30.0 s to 24.5 s, about 18%, with checkpoint skipping ruled out
   (sequential with checkpoints off was still 30.2 s). Diminishing returns past
   depth about 2; overlapping all heights marginally best. Launching the tallest
   height first was a no-op when all heights fit concurrently (ascending 25.3 s,
   descending 25.3 s); it bites only when the overlap depth is capped below the
   height count.
-- dalby, `maxn = 34`, `--heights 16,17`, kink kernel (2026-07-07):
+- The ARM server, `maxn = 34`, `--heights 16,17`, kink kernel:
 
 | | wall | cpu s | utilization |
 |---|---|---|---|
@@ -372,7 +372,7 @@ tail; overlap fills that gap with another height's map.
 `H = 17` alone, a 21% wall cut with identical cpu-seconds. Overlap packs work,
 it does not redo it. Peak RSS for the pair was 2.7 GB.
 
-- dalby, `maxn = 30`, enumerating `H = 3..15`:
+- The ARM server, `maxn = 30`, enumerating `H = 3..15`:
 
 | `--overlap-heights` | wall | cpu s | utilization | a(30) |
 |---|---|---|---|---|
@@ -398,9 +398,8 @@ which is why the deployed depth is all owned heights, not 2.
 ### 3.3 Partition balance
 
 A benchmark on one real fat `H = 18` stage (16 M records, the real
-`kinkStageTransition` and `combine`, dalby, 80 cores, 2026-07-09; the
-benchmark program has since been removed) measured effective cores under two
-partitions of the same data:
+`kinkStageTransition` and `combine`, the ARM server, 80 cores) measured
+effective cores under two partitions of the same data:
 
 | partition | effective cores of 80 |
 |---|---|
@@ -413,10 +412,10 @@ lifted about 11× by balancing it; the record-level parallelism was already in
 the data.
 
 Built as `BalancedCutsMulti` (true record-quantile partitioning replacing
-per-file fixed-count sampling) and confirmed on a real height run (dalby,
-`--heights 15 --maxn 30`, `--kernel kink --counter u128 --cores 80
+per-file fixed-count sampling) and confirmed on a real height run (the ARM
+server, `--heights 15 --maxn 30`, `--kernel kink --counter u128 --cores 80
 --ram 1073741824 --unit-mult 8 --merge-mult 1 --steal-grain 0.05
---persistent-workers`, old `aa4bbd29` against new `60dd2cde`, 2026-07-09):
+--persistent-workers`, old `aa4bbd29` against new `60dd2cde`):
 
 | column | old effective cores | new effective cores |
 |---|---|---|
@@ -440,7 +439,7 @@ Two more measurements that settled the design. Files on tmpfs (`/dev/shm`)
 against NVMe for the identical `H = 15`, `maxn = 30` run: 204 s against
 190–193 s, so file I/O was about 7% of wall at that scale and a clean-slate
 in-process rewrite could recover at most that. A reduce-primitive benchmark
-(since removed) on about 16 M records emitted by the real transition, stages
+on about 16 M records emitted by the real transition, stages
 1, 5, 9, 12 and 16, over-partition factor 4–128: radix-partitioned private
 hash aggregation ran at 0.83–1.05× the speed of the parallel sort-merge
 (median about 0.91; sort-merge about 3.45 s, hash 3.6–4.2 s). Short 22-byte
@@ -454,17 +453,17 @@ existing process-and-file substrate was kept.
 Stealing as first built fired zero steals at every scale, for three
 independent reasons, each fixed and each measured:
 
-1. **Progress stride.** The progress callback fired only every
-   `2^14 = 16,384` source records, and a unit with `processed = 0` was
-   ineligible; at `maxn = 20` each of 8 units held about 11.8 K records, and
-   at a(24)/a(25) scale (`H = 16` frontier about 4.7 M records, 256 units) a
-   unit holds about 18.4 K, about 1.1 strides. The stride is now 1,024
-   (`kProgressStrideMask` in `core/mapreduce.h`, compile-time limit 4,096); a
-   microbenchmark put the check at 0.7–0.85 ns per record at every stride
-   from `2^14` down to `2^6`. On an isolated `H = 13` column with a confirmed
-   2× per-unit compute imbalance (gympie, `maxn = 20`, column kernel): steals
-   0 → 15; wall 151.4 s → 98.5 s over 3 repetitions; cpu-seconds 618.8
-   against 618.5; sampled core occupancy 51.3% → 68.7%.
+1. **Progress stride.** The progress callback fired only every `2^14 = 16,384`
+   source records, and a unit with `processed = 0` was ineligible; at `maxn =
+   20` each of 8 units held about 11.8 K records, and at a(24)/a(25) scale (`H =
+   16` frontier about 4.7 M records, 256 units) a unit holds about 18.4 K, about
+   1.1 strides. The stride is now 1,024 (`kProgressStrideMask` in
+   `core/mapreduce.h`, compile-time limit 4,096); a microbenchmark put the check
+   at 0.7–0.85 ns per record at every stride from `2^14` down to `2^6`. On an
+   isolated `H = 13` column with a confirmed 2× per-unit compute imbalance (the
+   laptop, `maxn = 20`, column kernel): steals 0 → 15; wall 151.4 s → 98.5 s
+   over 3 repetitions; cpu-seconds 618.8 against 618.5; sampled core occupancy
+   51.3% → 68.7%.
 2. **Overlap and stealing coexist.** Stealing had been statically disabled
    whenever `OverlapHeights > 1`. A dynamic `activeHeights` count, re-checked on
    every steal decision, allows stealing once a height is the pool's sole
@@ -472,7 +471,7 @@ independent reasons, each fixed and each measured:
 3. **The 2 s throttle.** An unconditional 2 s throttle on progress reports
    meant units finishing faster than 2 s never registered any progress, so the
    `processed > 0` gate blocked them permanently. With the first progress
-   report firing immediately (dalby, `H = 17` isolated, 2026-07-08): before,
+   report firing immediately (the ARM server, `H = 17` isolated): before,
    "steals = 0 for 173 s"; after, 9,468 steals in a 3,523.9 s run with
    identical output. Merge had no rebalancing mechanism at all; adding the
    same stop-key machinery to `mergeRunFiles` and a queue-plus-steal merge
@@ -482,7 +481,7 @@ independent reasons, each fixed and each measured:
 Three further eligibility changes (a wall-time fallback in `stealEligible`; a
 reference pace from finished units only; a 2× overshoot fallback in
 `remaining()` for the open-ended last key range) are correct and tested but
-moved nothing measurable on their own (dalby, a(34) `H = 17` column 3:
+moved nothing measurable on their own (the ARM server, a(34) `H = 17` column 3:
 24.7% → 25.1% → 25.0% → 24.0%), because they sit downstream of the throttle.
 
 A stop-flag check inside a record's own transition was priced on the column
@@ -504,8 +503,8 @@ the largest single range was 0.1% of the column's merge wall. Fixed per-process
 overhead: wall barely correlates with output records (Pearson `r = 0.24`); a
 range with 1,206 records takes about 0.035 s and one with 31,745 records about
 0.09 s; most of each about 37 ms range is process start and file opens.
-`--merge-mult` had silently followed `--unit-mult`. dalby, `maxn = 30`, all
-heights overlapped:
+`--merge-mult` had silently followed `--unit-mult`. The ARM server, `maxn = 30`,
+all heights overlapped:
 
 | `--merge-mult` | wall | cpu s | utilization | a(30) |
 |---|---|---|---|---|
@@ -547,8 +546,9 @@ lengths.
 
 ### 3.6 The orchestrator's own overheads
 
-- **GC churn.** `GODEBUG=gctrace=1` on dalby, `maxn = 30`: 8,063 GC cycles in
-  about 305 s against an 8 MB heap goal, about 5% of CPU by Go's own account.
+- **GC churn.** `GODEBUG=gctrace=1` on the ARM server, `maxn = 30`: 8,063 GC
+  cycles in about 305 s against an 8 MB heap goal, about 5% of CPU by Go's own
+  account.
 
 | `GOGC` | wall | cpu s | a(30) |
 |---|---|---|---|
@@ -569,9 +569,9 @@ lengths.
   one merge process per pool slot alive for the run, reading request lines from
   stdin (`worker/map_worker.cpp`, `worker/merge_worker.cpp`,
   `orchestrator/workerpool.go`; `tests/engine/gate_persistent_worker.cpp` drives
-  the real binaries through one process against the one-shot path). dalby,
-  `maxn = 30`: 282.5 s / 7,755.3 cpu-s → 265.0 s / 7,155.8 cpu-s, 6.2% and 7.7%,
-  zero orphaned processes after normal exit and after a real SIGTERM.
+  the real binaries through one process against the one-shot path). The ARM
+  server, `maxn = 30`: 282.5 s / 7,755.3 cpu-s → 265.0 s / 7,155.8 cpu-s, 6.2%
+  and 7.7%, zero orphaned processes after normal exit and after a real SIGTERM.
 - **All of these at production scale**, `maxn = 33`: wall 6,803.2 s against
   6,842.7 s, 0.6% faster. The fixes are real at small and medium scale and
   shrink to noise once one height's own floor swallows the budget;
@@ -623,7 +623,8 @@ Decompositions priced and rejected, each against a measurement in this file:
 - **Barrier-free cross-stage streaming**: needs distributed termination
   detection that collapses into the barrier it avoids, or reintroduces the
   silent undercount.
-- **Local wavefront tiling**: no such dependency exists in `kinkStageTransition`.
+- **Local wavefront tiling**: no such dependency exists in
+  `kinkStageTransition`.
 - **Cross-machine stealing.** The big machine is reachable only over a
   sub-MB/s uplink and the column merge is all-to-all, 0.4–1 GB per column.
 - **GPU or SIMD.** Set aside for hardware fit: no compute GPU on the big
@@ -632,9 +633,9 @@ Decompositions priced and rejected, each against a measurement in this file:
 ### 3.8 System-level profile
 
 A full run under `vmstat`, `iostat`, `mpstat`, `pidstat` and `/proc/pressure`
-sampling (dalby, rev `5fadde3`, `--maxn 24 --heights 1-15 --cores 80 --ram
-1073741824 --unit-mult 4 --overlap-heights 15 --steal-grain 0.05`, column
-kernel, 2026-06-30; the script has since been removed). Wall 2,283.3 s, peak
+sampling (the ARM server, rev `5fadde3`, `--maxn 24 --heights 1-15 --cores 80
+--ram 1073741824 --unit-mult 4 --overlap-heights 15 --steal-grain 0.05`, column
+kernel). Wall 2,283.3 s, peak
 RSS 614 MB, `H = 15` the dominant height. The figure is
 `results/dalby-perf-audit.png`.
 
@@ -667,20 +668,20 @@ RSS 614 MB, `H = 15` the dominant height. The figure is
 
 External process sampling at 1 Hz and 0.1 Hz (`scripts/profile_concurrency.py`)
 is unusable below production scale: 96.6% of samples read zero map workers
-during the dominant height of a `maxn = 26` run, because unit runtimes are
-under 100 ms and `ps` itself costs as much. Exact in-process intervals
-(`POLY_UNIT_LOG=1`, `start_unix` per unit, `scripts/analyze_unit_concurrency.py`)
-replaced it. Repeated two-minute toy benchmarks were abandoned as too noisy in
-favor of one 20–25 minute `maxn = 29` reference run. A same-code sequential
-baseline is taken before any speedup is believed: the first all-heights
-overlap run at `maxn = 30` appeared to stop enumerating at `H = 15` instead of
-`H = 17` and looked like data loss; it was the closed-form coverage having
-grown (`P_13` and `P_14` had entered the formula table, so `H = 15` is the
-tallest enumerated height at `maxn = 30`).
+during the dominant height of a `maxn = 26` run, because unit runtimes are under
+100 ms and `ps` itself costs as much. Exact in-process intervals
+(`POLY_UNIT_LOG=1`, `start_unix` per unit,
+`scripts/analyze_unit_concurrency.py`) replaced it. Repeated two-minute toy
+benchmarks were abandoned as too noisy in favor of one 20–25 minute `maxn = 29`
+reference run. A same-code sequential baseline is taken before any speedup is
+believed: the first all-heights overlap run at `maxn = 30` appeared to stop
+enumerating at `H = 15` instead of `H = 17` and looked like data loss; it was
+the closed-form coverage having grown (`P_13` and `P_14` had entered the formula
+table, so `H = 15` is the tallest enumerated height at `maxn = 30`).
 
 ## 4. The C++ hot path
 
-### 4.1 Map profile (column kernel, gympie, 2026-06)
+### 4.1 Map profile (column kernel, the laptop)
 
 Static audit of `map_shard_file` in `core/mapreduce.h`: the successor build
 `succ.counts.assign` is the sole per-successor heap allocation; the transition
@@ -699,7 +700,7 @@ two transients: the `buf` vector doubling (up to 2× live objects, 3× during th
 copy) and millions of tiny `counts` mallocs.
 
 Dynamic profile, `-DPOLY_PROFILE` phase timers in `core/profile.h`, `maxn = 16`
-and 18, gympie, `--ram 2 GB`, weighted over the 20 hottest `H = 12` columns:
+and 18, the laptop, `--ram 2 GB`, weighted over the 20 hottest `H = 12` columns:
 
 | phase | share |
 |---|---|
@@ -724,7 +725,7 @@ Memory: `buf.capacity() / buf.size()` up to 1.92 at the spill point;
 doubling and fragmentation overhead, and 1.54× at a 16 MB budget where fixed
 overhead dominates. So `--ram` is a faithful peak-RSS proxy at GB scale (±10%).
 
-### 4.2 Map body profile (u128, `maxn = 24`, `H = 13`, 2026-07-02)
+### 4.2 Map body profile (u128, `maxn = 24`, `H = 13`)
 
 `map_shard_file`, 3,405 samples: `s8::viableRec` (the recursive viable-mask
 generator, which prunes 76% of leaves) about 91%; `stepColumnSquare8` low
@@ -735,7 +736,7 @@ of `viableRec` measured about 0%, so the cost is the number of nodes descended.
 The only map-CPU lever left was a tighter completion bound, which section 5
 closes.
 
-### 4.3 Merge ledger (2026-06)
+### 4.3 Merge ledger
 
 `merge_worker` calls the streaming `mergeRunFiles` in `core/runfile.h`, which
 holds `K` readers (one `FILE*` with a stdio buffer of about 4 KB each), a heap
@@ -759,7 +760,7 @@ CPU split over 123 standalone column merges (`maxn = 18`, mean `K = 5.8`,
 2.36 combines per output record. The merge is combine-bound and combine was
 allocation-bound.
 
-### 4.4 What shipped and what was rejected (2026-06, gympie)
+### 4.4 What shipped and what was rejected (the laptop)
 
 Acceptance for anything touching sort, merge or combine: identical output on
 a(14), a(16) and a(18) `--compare`.
@@ -788,9 +789,9 @@ byte-wise FNV-1a, 10.6× on the hash (1.0 → 10.6 GB/s) with no global build
 flags, about 5% of compute, but a checksum format change consumed by 7 Go files
 and 2 C++ headers.
 
-### 4.5 Block-buffered run-file I/O (2026-07-22)
+### 4.5 Block-buffered run-file I/O
 
-Profiling the persistent workers on gympie (`H = 15`, `maxn = 30`, 10 cores,
+Profiling the persistent workers on the laptop (`H = 15`, `maxn = 30`, 10 cores,
 macOS `sample`) found about 90% of busy samples inside stdio:
 `RunFileReader::next` issued one locked `fread` per field, in the worst case
 one per varint byte (about 120 calls per record), and `RunFileWriter::append`
@@ -805,7 +806,7 @@ which also removes the per-byte `ZSTD_decompressStream` calls.
 → 99.8 s (3.36×), cpu 2,899 → 764 cpu-s (3.8×). Validation: full `make
 ns-gates`; a fresh a(20) run with `combine --compare`; a full a(26)
 production-shape run (kink, u128, overlap, formula-table diagonals, 23.7 s on
-gympie) matching `results/ns_a26/triangle.txt` on a(20)–a(26). The post-fix
+the laptop) matching `results/ns_a26/triangle.txt` on a(20)–a(26). The post-fix
 profile is balanced (reader about 303, writer about 293, transition about 150,
 sort and moves about 250 samples), with no dominant slice left. Section 6.1 is
 what this became on the 80-core machine.
@@ -813,7 +814,7 @@ what this became on the 80-core machine.
 ### 4.6 Dedup collisions and window width
 
 Do deeper stages cost more per unique key because more predecessors
-canonicalize to the same successor? Benchmark (since removed), best of 7
+canonicalize to the same successor? Benchmark, best of 7
 trials, 65,625 records per unit (one `H = 17` unit's share of a 21 M frontier
 at 320 units), against the real `deduplicateRun` and `combine`:
 
@@ -848,7 +849,7 @@ so it is plausibly looser. A king cell can merge several components at once,
 so the naive `(c − 1)` cells for `c` components is not even a valid lower
 bound, and an over-tight bound silently prunes valid states.
 
-An oracle (since removed) computed the true minimum completion cost of every
+An oracle computed the true minimum completion cost of every
 signature by value iteration over the production transition on the full
 signature universe per height, then re-ran the enumeration with the perfect
 prune, `n / H ≈ 1.8` throughout (the production top-height ratio; a(29)
@@ -876,7 +877,7 @@ the rightward extension both need. Not built.
 
 ## 6. Memory and disk
 
-### 6.1 Reader fan-in (dalby, 2026-07-23)
+### 6.1 Reader fan-in (the ARM server)
 
 The 3.36× of section 4.5 did not reproduce on the 80-core machine:
 `scripts/bench_util.sh` `H = 15`, `maxn = 30` gave 336 s wall and 20,106
@@ -885,20 +886,20 @@ baseline of 140.9 s and 4,554 cpu-s. Not frequency (cores at 3.0 GHz under
 load), not a stale binary (revision stamps checked).
 
 The mechanism, measured: system-wide `perf` put about 33% of all box cycles in
-`__arch_copy_to_user` under page-cache reads, mostly in merge workers, and
-about 10% in anonymous-page zeroing on the map side; `/proc/PID/io` showed
-342 GB of logical reads in 20 s (about 17 GB/s) against a run directory of
-about 350 MB, a read amplification of 10³–10⁴; `strace` on a map worker showed
-every unit opening every input range file of the previous round (header read,
-on-disk `.idx` binary search, buffer setup) though a unit's range overlaps 1–2
-of the 74–80 files: about 640 units × 80 files ≈ 51 K open-and-seek sequences
-per round, about 25 M per run, about 0.45 ms each; `gdb` stack samples attributed
+`__arch_copy_to_user` under page-cache reads, mostly in merge workers, and about
+10% in anonymous-page zeroing on the map side; `/proc/PID/io` showed 342 GB of
+logical reads in 20 s (about 17 GB/s) against a run directory of about 350 MB, a
+read amplification of 10³–10⁴; `strace` on a map worker showed every unit
+opening every input range file of the previous round (header read, on-disk
+`.idx` binary search, buffer setup) though a unit's range overlaps 1–2 of the
+74–80 files: about 640 units × 80 files ≈ 51 K open-and-seek sequences per
+round, about 25 M per run, about 0.45 ms each; `gdb` stack samples attributed
 the rest to request lines of about 25 KB read one byte per `underflow` through
 `std::getline(std::cin)`, and every reader's fixed 256 KB buffer crossing
 glibc's mmap threshold, so each of about 18 M reader instances paid an
-mmap-zero-munmap cycle. The 10-core laptop never showed it: 10 cores × mult
-8 = 80 units against 640, and about 10 merge ranges against 74, a units ×
-inputs pair count about 59× smaller, under macOS's per-byte stdio cost.
+mmap-zero-munmap cycle. The 10-core laptop never showed it: 10 cores × mult 8 =
+80 units against 640, and about 10 merge ranges against 74, a units × inputs
+pair count about 59× smaller, under macOS's per-byte stdio cost.
 
 Four format-neutral fixes, each followed by the full gate suite and an a(26)
 production-shape run (a(1)–a(20) exact, a(21) and a(26) exact): per-unit input
@@ -910,7 +911,7 @@ seek; 512 B stdio buffers on header and `.idx` handles, so a peek costs about
 16 KB rather than 285 KB); arena-sized reader buffers plus bulk request reads
 through POSIX `getline(3)`.
 
-| build (dalby, `bench_util.sh`, `H = 15`, `maxn = 30`) | wall | cpu s |
+| build (the ARM server, `bench_util.sh`, `H = 15`, `maxn = 30`) | wall | cpu s |
 |---|---|---|
 | before | 336–344 s | 20–21 K |
 | plus pruning and merge cap | 204.6 s | 10.3 K |
@@ -923,7 +924,7 @@ A performance result measured on one machine is a result about that machine;
 the engine is rebuilt and re-benchmarked on the target machine after every
 edit.
 
-### 6.2 The saturated mirror (2026-07-23/24)
+### 6.2 The saturated mirror
 
 Live `iostat` during a(38)'s `H = 20`: the RAID1 device `md3` at 100%
 utilization, about 755 MB/s of writes and 720 MB/s of reads concurrently,
@@ -958,7 +959,7 @@ paying zstd with no disk problem to solve. The frame-size curve on identical
 live a(39) `H = 20` records (5.72 M records, plain 158.8 B per record,
 `experiments/reframe_measure.cpp`, `POLY_FRONTIER_ZSTD_BLOCK`):
 
-| frame, records | B per record | ratio | gympie bench wall / cpu |
+| frame, records | B per record | ratio | laptop bench wall / cpu |
 |---|---|---|---|
 | plain | 158.8 | 1.00× | 486 s / 6.0 K |
 | 64 | 109.8 | 1.45× | 684 s / 7.1 K |
@@ -966,12 +967,12 @@ live a(39) `H = 20` records (5.72 M records, plain 158.8 B per record,
 | 512 | 89.0 | 1.78× | 778 s / 8.5 K |
 | 1,024 | 87.5 | 1.81× | killed early at 1.8× merge cpu |
 
-U-shaped: below about 256 records per-frame overhead dominates, above it
-seek overshoot times fan-in does; 256 beats 64 on both axes and is the default
-(a(39) itself ran at 64). dalby A/B at the 64-frame configuration: bench
+U-shaped: below about 256 records per-frame overhead dominates, above it seek
+overshoot times fan-in does; 256 beats 64 on both axes and is the default (a(39)
+itself ran at 64). A/B on the ARM server at the 64-frame configuration: bench
 105.6 s / 3.9 K → 119.3 s / 5.1 K with the levers on (+13% wall, the
-no-disk-benefit regime). The production win was at the tallest height: a(39)
-`H = 20` columns about 3,500–3,600 s against a(38)'s about 5,400–5,600 s at the
+no-disk-benefit regime). The production win was at the tallest height: a(39) `H
+= 20` columns about 3,500–3,600 s against a(38)'s about 5,400–5,600 s at the
 same 127–128 M frontier, 1.5×, from tmpfs map outputs and compressed merge
 traffic together; a(39) took 11.1 h against a(38)'s 15.8 h one term lower.
 
@@ -1017,10 +1018,10 @@ later ran on NVMe. The varint format's −60% writes plausibly shrink the
 before trying it again. The 7% of section 3.3 is for a much smaller run
 (`H = 15`, `maxn = 30`) that never touched the disk regime of section 6.2.
 
-### 6.5 Disk does not scale like CPU (dalby, 40 cores, rev `7429268b1`, 2026-08-24)
+### 6.5 Disk does not scale like CPU
 
-`scripts/dalby_nmax_disk.sh` measured the peak run-directory size, sampled
-every 10 s with spill kept:
+`scripts/dalby_nmax_disk.sh` (the ARM server, 40 cores, rev `7429268b1`)
+measured the peak run-directory size, sampled every 10 s with spill kept:
 
 | H | Nmax 40 | Nmax 42 | Nmax 45 | factor 40 → 45 | 40 → 44, interpolated |
 |---|---|---|---|---|---|
@@ -1052,8 +1053,7 @@ recombined by the Chinese remainder theorem. The production engine that
 computed a(23)–a(41) counts in native 64- or 128-bit words (section 1);
 modular counting survives in the tree only in the coloring recount
 (`results/second-sources.md`), a different program. The production counts were
-never reconstructed from primes. The measurements below (2026-06-25, benchmark
-since removed) are what settled that.
+never reconstructed from primes. The measurements below are what settled that.
 
 The transfer matrix is 0/1, so a step is `dst[n] += src[n]` with both operands
 already below `p`. There are no multiplications, so Barrett and Montgomery
@@ -1087,7 +1087,7 @@ Moduli needed, `k = ceil(L / usable bits)` with usable bits 7.97 (p = 251),
 | a(26) | 66.4 | 9 | 5 | 3 | — |
 | a(28) | 71.9 | 10 | 5 | 3 | — |
 
-Reduction style and width, gympie, single thread, scalar, working set about
+Reduction style and width, the laptop, single thread, scalar, working set about
 290 MB, in millions of row-adds per second:
 
 | width | no reduce (ceiling) | `% p` | conditional subtract | deferred | GB/s, deferred |
@@ -1103,16 +1103,16 @@ from 14.0 to 31.4, 2.24×. Small counters never reach their bandwidth advantage
 in scalar code: u8 stalls at 1.8 GB/s and is slower than u32 while needing 3–4×
 the moduli; only SIMD (vectorized add and min-subtract) makes them memcpy-bound.
 
-The governing probe on the real engine (`N = 15`, `H = 12`, single thread,
-gympie): u64 exact 55.4 s, mod-p one prime 50.6 s. Removing the entire modular
+The governing probe on the real engine (`N = 15`, `H = 12`, single thread, the
+laptop): u64 exact 55.4 s, mod-p one prime 50.6 s. Removing the entire modular
 layer moves the time by under 10%, so enumeration is 85–90% of a pass and the
 count arithmetic 10–15%. Hence the pass count is the primary multiplier: three
 independent passes pay the enumeration three times (about 2.7× the wall of one
-interleaved pass carrying three residues per state), and the reduction-style
-win acts on the 10–15% slice (about 5% of wall). The production engine uses
-native words; the coloring recount uses u32 primes just under 2³¹
-(2147483647, 2147483629, 2147483587) carried interleaved in one enumeration
-with deferred reduction.
+interleaved pass carrying three residues per state), and the reduction-style win
+acts on the 10–15% slice (about 5% of wall). The production engine uses native
+words; the coloring recount uses u32 primes just under 2³¹ (2147483647,
+2147483629, 2147483587) carried interleaved in one enumeration with deferred
+reduction.
 
 The `u128` ceiling: `orchestrator/runref.go` refuses `u128` above `maxn` 48
 on the final row sum alone, while intermediate multi-component counts exceed
@@ -1164,7 +1164,7 @@ accident, not a deliberate edit of both. The b-file headers record the OEIS
 revision and date checked (`b006770.txt`: revision 44, 2026-05-30);
 `scripts/fixture_oeis_recheck.py` re-verifies over the network, not as a gate.
 
-## 9. The Redelmeier program's throughput (dalby, 2026-07-10/11)
+## 9. The Redelmeier program's throughput
 
 `build/g2` is the independent Redelmeier enumerator used to confirm rows by a
 second algorithm (`results/redelmeier_row22/PROVENANCE.md`).
@@ -1215,13 +1215,14 @@ Fleet throughput, single core, `N = 15`, clang builds:
 | gympie | Apple Silicon | 10 | 27.1 s | 3.00× | 30 |
 | fleet | | 122 | | | 151 |
 
-The single-core shares over-predicted ayr: under all-core load its
-Threadripper reaches memory over Infinity Fabric for half its cores and ran at
-0.92× dalby per core (1.275 against 1.386 shards per hour per core), gympie at
-2.62×. The row-22 run (`scripts/g2_fleet_launch.sh 22 12 24000`, launched
-2026-07-11) was rebalanced 2.9 h in to contiguous ranges dalby [0, 14300), ayr
-[14300, 19460), gympie [19460, 24000) with about 1% of shards redone, and
-completed 2026-07-16 (box walls 427,974 s, 418,525 s, 440,745 s), with
+The single-core shares over-predicted the 32-core server: under all-core load
+its Threadripper reaches memory over Infinity Fabric for half its cores and
+ran at 0.92× the ARM server per core (1.275 against 1.386 shards per hour per
+core), the laptop at 2.62×. The row-22 run (`scripts/g2_fleet_launch.sh 22 12
+24000`, launched 2026-07-11) was rebalanced 2.9 h in to contiguous ranges
+[0, 14300) on the ARM server, [14300, 19460) on the 32-core server and
+[19460, 24000) on the laptop, with about 1% of shards redone, and completed
+2026-07-16 (box walls 427,974 s, 418,525 s, 440,745 s), with
 a(21) = 6954084405510437 and a(22) = 47255332844367680 equal to the
 transfer-matrix values. Rows 18 and 19 had validated the pure-count path
 across three compilers and instruction sets (a(18) = 22471158811164,
@@ -1253,8 +1254,8 @@ all-core load before allocating shares.
 - **Indirect sort, radix sort, in-place left extension, a counts pool, a
   per-successor arena**: sections 4.4 and 4.2.
 - **Smaller modular counters**: slower per pass and more passes (section 7).
-- **PGO** on `build/g2`: worse than `-O3`; `-mcpu=native` or `-mcpu=neoverse-n1`:
-  a wash for both compilers and both programs.
+- **PGO** on `build/g2`: worse than `-O3`; `-mcpu=native` or
+  `-mcpu=neoverse-n1`: a wash for both compilers and both programs.
 - **tmpfs run directories past a(34)**: out of memory (section 6.4).
 - **The 4-bit signature pack**: after varint the key is about 20% of record
   bytes and spills are compressed, so about 10% of bytes for a format risk.
@@ -1302,7 +1303,8 @@ enumerated half on 40 cores cost about what a(37) did on 80 (605,643 against
 ### 11.2 a(40), three phases
 
 `maxn = 40` with full overlap does not fit 125 GB (section 6.3), so a(40) ran
-2026-07-25..28 on dalby alone as `FRONTIER_LEVERS=1 scripts/term.sh 40`:
+2026-07-25..28 on the ARM server alone as `FRONTIER_LEVERS=1 scripts/term.sh
+40`:
 
 | phase | heights | cores | wall | cpu s | RSS max |
 |---|---|---|---|---|---|
@@ -1319,16 +1321,16 @@ entry.
 
 ### 11.3 How a(41) was reached
 
-Level `k` of the diagonal formulas needs two entries at or above its onset,
-the two tallest entries on its diagonal; for `P_19` those were `T(39,20)` and
+Level `k` of the diagonal formulas needs two entries at or above its onset, the
+two tallest entries on its diagonal; for `P_19` those were `T(39,20)` and
 `T(40,21)`, the latter being a(40)'s 36.4-hour phase C. The grand form
-(`docs/proofs/grand-form.md`, its content proved in Lean) makes each level carry exactly
-two new constants, so any two independent linear equations determine it, and
-the below-onset defect identity (`results/below-onset.md`) supplies such
-equations from entries `j` rows shorter than the onset, with the defect
-`D_j(k)` computed from cluster-weight families that read neither the triangle
-nor the formula table. Nothing new was proved; the content is the choice of
-determining entries.
+(`docs/proofs/grand-form.md`, its content proved in Lean) makes each level carry
+exactly two new constants, so any two independent linear equations determine it,
+and the below-onset defect identity (`results/below-onset.md`) supplies such
+equations from entries `j` rows shorter than the onset, with the defect `D_j(k)`
+computed from cluster-weight families that read neither the triangle nor the
+formula table. Nothing new was proved; the content is the choice of determining
+entries.
 
 So a(41) was two jobs (`results/a41/PROVENANCE.md`): heights 1–19 enumerated at
 `Nmax 41` (`--kernel kink --counter u128 --cores 40 --overlap-heights 19
@@ -1343,8 +1345,9 @@ on every entry; for heights 20 and up, the formulas are a second
 implementation fed the same defect tables, not a second enumeration.
 
 The one enumeration that crosses assumption families for `T(41,20)`, the
-`H = 20` run at `Nmax 41`, ran 2026-09-05 (`scripts/dalby_a41_h20.sh`, dalby, rev
-`b88b38bc5`, 76 cores, `--max-diag-k -1`): 9.63 h, and the enumerated entry
+`H = 20` run at `Nmax 41`, ran 2026-09-05 (`scripts/dalby_a41_h20.sh`, the ARM
+server, rev `b88b38bc5`, 76 cores, `--max-diag-k -1`): 9.63 h, and the
+enumerated entry
 equals the formulas' prediction, 18004779862205054677763902712770. The frontier
 peaked at 129,487,745 records at column 7; columns 6–8 each took about 2,300 s
 at about 126,000 cpu-s (`results/a41/h20_cost_profile.tsv`). a(41) is heights
@@ -1423,7 +1426,9 @@ Benchmarks and profiles:
     build/g2 square8 15                            # the Redelmeier profile target
     scripts/g2_fleet_launch.sh 22 12 24000 ; scripts/g2_combine.sh runs/g2row_N22 22 24000
 
-Data: `results/ns_a26/cost_profile.tsv`, `results/ns_a27/cost_profile_dalby.tsv`,
-`results/ns_a32/cost_profile_dalby.tsv`, `results/ns_a34/cost_profile_dalby.tsv`,
-`results/a41/h20_cost_profile.tsv`, `results/dalby-perf-audit.png`,
-`results/ns_a27/perheight/`, `results/ns_a26/triangle.txt`.
+Data: `results/ns_a26/cost_profile.tsv`,
+`results/ns_a27/cost_profile_dalby.tsv`,
+`results/ns_a32/cost_profile_dalby.tsv`,
+`results/ns_a34/cost_profile_dalby.tsv`, `results/a41/h20_cost_profile.tsv`,
+`results/dalby-perf-audit.png`, `results/ns_a27/perheight/`,
+`results/ns_a26/triangle.txt`.
