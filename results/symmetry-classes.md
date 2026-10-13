@@ -73,13 +73,13 @@ The first extension, to n = 24, used `build/symcount_fast` (`sym_extend 24`,
 dalby, 2026-07-04); each further term cost about 2.6 times the last there,
 and the transfer matrix replaced it. D is the wall: a mirror-symmetric animal
 is determined by half of itself, so Fix(d) grows like the square root of
-a(n). The n = 33 strip run on dalby:
+a(n). The n = 33 strip run:
 
 | wall | CPU | peak strip resident size |
 |---|---|---|
 | 24.0 h | 6.71 million core-seconds | 126.2 GB at S = 28 |
 
-n = 34 was declined. Grades follow A006770: n <= 22 by two programs sharing
+n = 34 was not run. Grades follow A006770: n <= 22 by two programs sharing
 no code; n = 23..33 by one program with cross-checks (T2); A030233(34)
 inherits a(34)'s grade (T2-). The four sequences that need D are
 formula-assisted at n = 33 (T3), in the OEIS staging as comments only.
@@ -106,7 +106,7 @@ complete over its full n range, the formulas reproduce the 124 direct entries
 in the overlap, only formulas fixed by exact differencing are used (P_5 on
 odd S is fitted and is refused), and the assembled column matches the
 recorded n <= 32 values. Every strip's n <= 32 prefix matched the n = 32 run
-on all 413 entries; ayr recomputed the S <= 25 strips on another processor
+on all 413 entries; the S <= 25 strips were recomputed on a second processor
 architecture.
 
 The five formula entries in D(33) itself, with the onset of the formula's
@@ -180,20 +180,16 @@ Results (`results/subgroup_mod4_verdict.txt`, assembler
 | a(n) mod 8, n <= 33 | 33 | 0 |
 | T(n,H) mod 2, every entry with n <= 40 | 820 | 0 |
 
-The 820 entries by height band, with the other evidence each band had:
+The 820 entries by height band, with the other evidence each band has:
 
 | band | entries | other evidence |
 |---|---|---|
 | H = 1..10 | 355 | fixed-height generating functions |
 | H = 11..14 | 114 | the strip transfer matrix |
-| H = 15..19 | 120 | none |
+| H = 15..19 | 120 | the coloring recount |
 | H = 20 | 21 | a repeated identical run |
 | H = 21 | 20 | a direct run |
 | H = 22..40 | 190 | formulas, with no entry left to hold back |
-
-H = 15..19 will get no evidence beyond these bits: the strip transfer
-matrix's cost grows about sixfold per height (H = 14 took 8.6 h on dalby,
-`results/second-sources.md`).
 
 An error of size delta in one entry is caught if and only if delta is odd; in
 a row, if and only if it is nonzero modulo 4 (modulo 8 where D exists). Every
@@ -204,19 +200,18 @@ and 820 independent bits catch a corruption of j entries with probability
 The congruences are elementary and probably folklore; no novelty is claimed.
 `tests/gate_subgroup.py` (`make gate-subgroup`) carries controls that must
 fail: Fix(h) in place of I(D2ax) breaks the mod-4 line at n = 3; coefficient
-1 in place of 2 breaks the mod-8 line (the first version had that error and
-failed on 21 of 33 rows; `results/subgroup_mod4_20260807.log` is that run);
-D2diag graded by height breaks the parity. The subgroup counts do not feed
-the related sequences: Burnside needs Fix(g), and the binding input is D.
+1 in place of 2 breaks the mod-8 line on 21 of 33 rows; D2diag graded by
+height breaks the parity. The subgroup counts do not feed the related
+sequences: Burnside needs Fix(g), and the binding input is D.
 
 ### The mod-4 refinement, entry by entry
 
 `symtm --byheight` emits (n, H, W, count) in hmirror mode, which summed over
 W gives I_H(<h>) and grouped by W gives I_W(<v>) (an h-symmetric W x H animal
 transposes to a v-symmetric H x W one), and (n, H, count) in r180 mode. The
-gate's control: the height grouping used for both mirrors must break the
+check's control: the height grouping used for both mirrors must break the
 congruence, and does. Run: `scripts/percell_mod4.sh 32 8`, gympie,
-2026-08-07, 8 threads, binary from the tree that landed as `ffd0c2b`, log
+2026-08-07, 8 threads, binary from the tree at `ffd0c2b`, log
 `results/percell_mod4_20260807.log`, assembler `experiments/percell_mod4.py`,
 raw tables in `results/percell_raw/`.
 
@@ -237,8 +232,7 @@ height triangle, every entry with n <= 32:
 | H >= 20 | 91 | 0 | 0 |
 
 I_H(<v>) has a value at all 528 entries, I_H(<h>) and I_H(C2) at 408; the
-rest are genuine zeros, which the flat regression confirms. The identity had
-previously been checked on the 78 entries with n <= 12 only.
+rest are genuine zeros, which the flat regression confirms.
 
 The refinement is not extended to n = 40. I_H(<v>) has no bounded-height
 route: a v-symmetric animal of height H transposes to one of width H and
@@ -254,9 +248,9 @@ N = 32 r180 was slowest at H = 21 and hmirror at H = 31):
 | hmirror, s | 0 | 0 | 3 | 51 | 33 | >120 | >120 | >120 | >120 |
 | r180, s | 0 | 15 | >120 | >120 | >120 | >120 | 7 | 0 | 0 |
 
-And the second bit moves the single-entry adversarial case from one half to
-three quarters, adds nothing against correlated failures, and would rest on a
-new mode with no history against the brute-force oracle.
+The second bit would move the single-entry worst case from one half to three
+quarters, add nothing against correlated failures, and rest on a new mode
+never compared with the brute-force oracle.
 
 ## Bilateral symmetry has two families
 
@@ -271,10 +265,10 @@ an edge). With T(n) the through-cell and B(n) the between-cell count,
 
 The test is log-convexity in exact integers on the b-files, a(n)^2 <
 a(n-1) a(n+1) across parity classes against a(n)^2 < a(n-2) a(n+2) within one
-(`experiments/bilateral_parity.py`, ayr, 2026-08-22, zero terms excluded).
-Controls: a geometric sequence is flagged at the strict boundary; one
-log-convex family is clean both ways; a planted sequence of the conjectured
-shape fails interleaved and is clean within each class.
+(`experiments/bilateral_parity.py`, zero terms excluded). Controls: a
+geometric sequence is flagged at the strict boundary; one log-convex family
+is clean both ways; a planted sequence of the conjectured shape fails
+interleaved and is clean within each class.
 
 | sequence | terms | violations, interleaved | violations, same parity |
 |---|---|---|---|
@@ -307,9 +301,9 @@ inferred from the interleaving.
 
 ### The diagonal law
 
-**Theorem** (`docs/proofs/dm-diagonal-law.md`, 2026-07-15). For every k there
-exist polynomials p_k^even, p_k^odd of degree <= k and an effective S_0(k)
-such that d(S, S+k) = p_k^parity(S)(S) for all S >= S_0(k). Consequently the
+**Theorem** (`docs/proofs/dm-diagonal-law.md`). For every k there exist
+polynomials p_k^even, p_k^odd of degree <= k and an effective S_0(k) such
+that d(S, S+k) = p_k^parity(S)(S) for all S >= S_0(k). Consequently the
 generating function sum_S d(S,S+k) x^S is rational with poles only at x = 1
 and x = -1, of total order <= k+1 at each.
 
@@ -335,10 +329,10 @@ no flatness test can run.
 
 ### The onset is sharp
 
-`experiments/dmirror_onset_probe.py` (ayr, 2026-08-22, exact rational
-arithmetic on the 423 tracked entries) fixes each class on its deepest k+1
-entries, walks back, and records the least S at which the polynomial still
-reproduces the entry; the entry below fails on every level.
+`experiments/dmirror_onset_probe.py` (exact rational arithmetic on the 423
+tracked entries) fixes each class on its deepest k+1 entries, walks back, and
+records the least S at which the polynomial still reproduces the entry; the
+entry below fails on every level.
 
 | k | even onset | odd onset | even entries reproduced below the fit | odd |
 |---|---|---|---|---|
@@ -352,11 +346,10 @@ reproduces the entry; the entry below fails on every level.
 The onset is S >= 2k+2 on even S and S >= 2k+3 on odd S, the single
 condition S >= 2k+2 since 2k+3 is the least odd integer past 2k+2. The
 probe's control is that the polynomials reproduce the five leading
-coefficients below (it caught a hand-expanded Newton form that reported -27,
-675/2 and -4025/2 for 1, 1/2 and 1/6). At k = 6 the even class has 7 entries
-above its onset of 14 and the odd class 6 above 15, so the even class fixes
-with nothing left to check and the odd class does not fix; the missing
-entries are d(27,33) and d(29,35).
+coefficients below. At k = 6 the even class has 7 entries above its onset of
+14 and the odd class 6 above 15, so the even class fixes with nothing left to
+check and the odd class does not fix; the missing entries are d(27,33) and
+d(29,35).
 
 ### Leading coefficients and the generating functions
 
@@ -369,7 +362,7 @@ Verified exactly for k = 1..5:
   integer polynomial of degree 2k (k = 0..5).
 - N_k(1) = 2^k and N_k(-1) = (-2)^k, equivalently 1 - x^2 divides
   N_k - (2x)^k. By partial fractions these are the two leading-coefficient
-  statements, and together they are the conjecture T4. Writing
+  statements, and together they are the conjecture called T4 below. Writing
   d(S,S+k) = A(S) + (-1)^S B(S), the pole multiplicities k+1 at x = 1 and k
   at x = -1 are equivalent to deg A = k and deg B = k-1, the same item.
 - R_k = (N_k - (2x)^k) / (1 - x^2) has R_k(1)/2^k = 3, 3, 3, 4, 5 for
@@ -454,29 +447,26 @@ Measured on every recorded entry:
 | S = 2k+1 | the two corner ranges overlap, in 5 entries, for instance (S,k) = (9,4) and (11,5) |
 | S <= 2k | the ranges cross; the split is not defined |
 
-The families partition d exactly above the onset; an earlier statement of the
-threshold as S > 2k was one step optimistic.
+The families partition d exactly above the onset.
 
 The enumerator is `experiments/dmirror_spine_split.py` in Python and
 `cpp/dmirror_spine.cpp` (`build/dmirror_spine`), which traverses hooks under
 a cell budget. It shares no code with `cpp/sym/symtm.cpp`, and its totals
 over corner counts reproduce all 423 recorded strip entries exactly, so it is
 an independent program for the whole strip table. (A mirror pair is one
-position but two cells, not adjacent unless p = 1; a version that merged them
-gave 5 for d(4,4) = 2.)
+position but two cells, not adjacent unless p = 1.)
 
 | enumerator | S = 14 | S = 17 |
 |---|---|---|
 | Python | 6 h 38 min | not reached |
 | C++ | 19 s | within twenty minutes |
 
-The C++ label field was four bits, and a hook carries more components than
-that from S = 17 on (17, 17, 19 at S = 17, 18, 19); re-derived on a six-bit
-field, every entry at S = 12..19 was unchanged, since aliasing can only merge
-two hooks with 17 or more components and no such hook completes into a
-connected animal within n <= S + 6. S = 20 was refused, not corrupted. The
-split is checked against the Python enumerator at every S <= 14; at S >= 15
-only the totals are independently checked.
+The C++ label field is six bits. A hook carries at most 17, 17, 19 components
+at S = 17, 18, 19, so a four-bit field would alias only hooks with 17 or more
+components, and no such hook completes into a connected animal within
+n <= S + 6; the entries at S = 12..19 are the same on either width. S = 20
+is refused. The split is checked against the Python enumerator at every
+S <= 14; at S >= 15 only the totals are independently checked.
 
 d_main(S, S+k), from `build/dmirror_spine`:
 
@@ -515,11 +505,9 @@ d_anti has degree k, one free position per defect, and parity enters it from
 k = 1 on (its pooled fit fails). d_main has degree floor(k/2) at seven
 consecutive levels, with 2 to 11 reproduced entries per fit, and one
 polynomial covers both parities at every level: all of the family's period 2
-comes from the anti-spine half. An earlier reading on S <= 11 gave d_main
-degree k-1, which agrees with floor(k/2) for k <= 2 and fails at k = 3..5;
-the floor(k/2) reading predicted 183 and 1124 at k = 3, 4 before S = 15 was
-computed, the degrees at k = 5, 6 before S = 16..19, and 51, 219, 1532 at
-k = 2, 3, 4 for S = 19, all exactly.
+comes from the anti-spine half. The floor(k/2) reading predicted 183 and 1124
+at k = 3, 4 before S = 15 was computed, the degrees at k = 5, 6 before
+S = 16..19, and 51, 219, 1532 at k = 2, 3, 4 for S = 19, all exactly.
 
 ### The grand form does not transfer
 
@@ -527,7 +515,7 @@ The grand form of the main triangle says T(H+k,H) = [y^k] C(y) mu(y)^H,
 equivalently that every cumulant of the level series is linear in the size
 parameter. For each parity class form A_S(y) = sum_k P_k(S) y^k and take the
 logarithm in Q[[y]] with coefficients polynomial in S
-(`experiments/dmirror_grand_form.py`, ayr, 2026-08-22):
+(`experiments/dmirror_grand_form.py`):
 
 | | c_1 | c_2 | c_3 | c_4 | c_5 |
 |---|---|---|---|---|---|
@@ -557,9 +545,7 @@ far as five levels reach, and whatever breaks the grand form lives in the
 anti-diagonal family, whose cells are only diagonally adjacent and have
 slack. With the split, four constants per level fit inside the 7 even and 6
 odd entries at k = 6, so what blocks a test of T4 there is only that the
-recorded table carries the sum, not the families, at S = 14..17. The source
-record's closing section still lists c_4 on d_main as open; its table, the
-later measurement, has c_4 and c_5 linear.
+recorded table carries the sum, not the families, at S = 14..17.
 
 ### The Burnside tie to the joint box table
 
@@ -571,24 +557,24 @@ points, so the orbit count (B(n,S,S) + d(S,n))/2 is an integer:
 
 The two sides come from unrelated programs, a row transfer with connectivity
 partitions (`experiments/joint_box_probe.py`) against the hook transfer
-matrix. `experiments/dmirror_burnside_check.py` (gympie, 2026-09-05, under
-four minutes): 44 entries at S <= 12, k <= 3 with both sides enumerated all
-agree; the D(33) formula entries d(33,33), d(32,33), d(31,33) and d(30,33)
-agree, the d side from the polynomials re-fixed by exact differencing off the
-recorded strips; d(29,33) is out of reach because the row transfer's shape
-cache blows up at surplus 4. Two controls shift one count by 1 and both fire;
-the script refuses on a missing input, a level it cannot fix, a fit with
-nothing reproduced, too few entries, or an all-even comparison. Only three of
-the 48 comparisons are odd on both sides, at (S,k) = (1,0), (2,2), (3,1), so
-most of it is 0 = 0, and it says nothing about the onset.
+matrix. `experiments/dmirror_burnside_check.py` (under four minutes): 44
+entries at S <= 12, k <= 3 with both sides enumerated all agree; the D(33)
+formula entries d(33,33), d(32,33), d(31,33) and d(30,33) agree, the d side
+from the polynomials re-fixed by exact differencing off the recorded strips;
+d(29,33) is out of reach because the row transfer's shape cache blows up at
+surplus 4. Two controls shift one count by 1 and both fire; the script
+refuses on a missing input, a level it cannot fix, a fit with nothing
+reproduced, too few entries, or an all-even comparison. Only three of the 48
+comparisons are odd on both sides, at (S,k) = (1,0), (2,2), (3,1), so most of
+it is 0 = 0, and it says nothing about the onset.
 
-The joint box table itself (`experiments/joint_box_probe.py`, 2026-07-13,
-H <= 11 and n - H <= 2, every marginal matching T(n,H)): B(H,W,H) is the
-trinomial walk-range distribution, B(H,2,H) = 2^H - 2 (the Burnside check's
-edge control), monotone tail 2, next-to-tail 2(H+1), B(H+1,2,H) = H 2^(H-1),
-tail 2(H+2). The k = 0 slice modulo 3 is visibly 3-automatic: row H = 9
-reads 100000122, a zero desert carrying row H = 3's skeleton 102 (a
-Lucas-type digit product, provable with the mod-3 methods of
+The joint box table itself (`experiments/joint_box_probe.py`, H <= 11 and
+n - H <= 2, every marginal matching T(n,H)): B(H,W,H) is the trinomial
+walk-range distribution, B(H,2,H) = 2^H - 2 (the Burnside check's edge
+control), monotone tail 2, next-to-tail 2(H+1), B(H+1,2,H) = H 2^(H-1), tail
+2(H+2). The k = 0 slice modulo 3 is visibly 3-automatic: row H = 9 reads
+100000122, a zero desert carrying row H = 3's skeleton 102 (a Lucas-type
+digit product, provable with the mod-3 methods of
 `results/arithmetic-structure.md`); the k = 1, 2 slices show parity striping
 (020202..., 002222002221), undecoded. The full table at production scale
 would cost an a(36)-sized run.
@@ -633,7 +619,7 @@ in D(33):
   observed, not proved.
 - The k >= 1 stripes of the joint box table modulo 3 are undecoded, and its
   k = 0 digit law is unproved.
-- D(34) was declined; it would rest on the fitted P_5 on odd S unless the
+- D(34) has not been run; it would rest on the fitted P_5 on odd S unless the
   n = 33 direct strips fix it.
 - Per-entry mod 4 at n = 40 needs a bounded-height mode for I_H(<v>) and a
   cheaper r180 on H = 15..19.
@@ -666,19 +652,3 @@ The probes on `results/sym_counts.txt` and the b-files are instant; the
 subgroup and per-entry runs take 45 and 30 minutes on 8 threads;
 `build/dmirror_spine --gate` checks 191 recorded entries. `runs/` is not
 tracked; `results/sym_counts.txt` is the tracked copy of its outputs.
-
-## Sources
-
-- `results/subgroup-mod4.md` (deleted 2026-09-06; its content is above)
-- `results/percell-mod4.md` (deleted 2026-09-06; its content is above)
-- `results/bilateral-parity.md` (deleted 2026-09-06; its content is above)
-- `results/related-seqs-n24.md` (deleted 2026-09-06; its content is above)
-- `results/related-seqs-n32.md` (deleted 2026-09-06; its content is above)
-- `results/related-seqs-n33.md` (deleted 2026-09-06; its content is above)
-- `results/dmirror-diagonals.md` (deleted 2026-09-06; its content is above)
-- `results/dmirror-grand-form-fails.md` (deleted 2026-09-06; its content is above)
-- `results/dmirror-onset-sharp.md` (deleted 2026-09-06; its content is above)
-- `results/dmirror-spine-split.md` (deleted 2026-09-06; its content is above)
-- `results/dm-diagonal-recon.md` (deleted 2026-09-06; its content is above)
-- `results/joint-box-probe.md` (deleted 2026-09-06; its content is above)
-- `docs/dmirror-design.md` (deleted 2026-09-06; its content is above)

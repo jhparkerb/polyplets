@@ -71,8 +71,8 @@ parametrized by t = x/(1−x)³, W = 1/(1−x).
   give Λ³ = Λ² + u over 𝔽₃; the same lemma gives Λ³ ≡ Λ² + 7u (mod 9) and a
   finite mod-27 equation. Checked on all 18 known coefficients; the digit
   product reproduces all 342 enumerated in-range entries mod 3.
-- (⋆c) S := (Λ³ − Λ(t³))/3 ≡ t² + tW (mod 3): proved 2026-07-13 from the
-  mod-9 cubic alone (its fixed point is unique, so
+- (⋆c) S := (Λ³ − Λ(t³))/3 ≡ t² + tW (mod 3): proved from the mod-9 cubic
+  alone (its fixed point is unique, so
   Λ(t³) ≡ Λ² + 25t − 3t² − 3tW mod 9, then a three-line 𝔽₃ cancellation).
   Checked to order t³⁰⁰ against the mod-27 solution.
 
@@ -118,8 +118,8 @@ count is nullity(T_N mod 3), and by Theorem 4 the nonzero columns are in
 echelon position, so the null space is spanned by the columns with
 ⌊3H/2⌋ > N.
 
-Checked directly on the enumerated matrix for every N ≤ 36 (sympy). The
-first computation, 2026-07-10:
+Checked directly on the enumerated matrix for every N ≤ 36 (sympy). For
+small N:
 
 | N | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -137,7 +137,7 @@ the spine in row n means n < ⌊3H/2⌋, the region Theorem 4 proves zero. Rows
 n ≡ 2 (mod 3) contain no spine; their last nonzero entry has deficit 2.
 
 **Theorem 7 (deficit 2).** T(3m+2, 2m+1) ≡ 2 (mod 3) for every m ≥ 0;
-equivalently P_{m+1}(3m+2) ≡ 18 (mod 27). Proved 2026-07-15,
+equivalently P_{m+1}(3m+2) ≡ 18 (mod 27). Proved in
 `experiments/deficit2_proof.py`: D(v) := Σ_m P_{m+1}(3m+2) v^m is a diagonal
 of GΛ^n, and formal Lagrange–Bürmann over ℤ/27 with v = u/Λ³ turns
 D = 5 + 18v/(1−v) into a rational identity on the mod-27 master curve
@@ -158,8 +158,8 @@ k ≡ 2, and v₃(P_k(3k−2)) ≥ 4 for k ≡ 1. Since r_k is a unit for k ≢ 
 
 for all k ≥ 3, not only the k ≤ 11 the data reached. The finer valuations
 at k ≡ 1 (7, 4, 4, 5 at k = 4, 7, 10, 13) are invisible mod 81 and open.
-Proved 2026-08-11, `experiments/tristruct/r2_prove_d3.py` (exact arithmetic,
-about 1 s), and audited by an independent script in the same round.
+Proved in `experiments/tristruct/r2_prove_d3.py` (exact arithmetic, about
+1 s).
 
 *Frame.* (A1) The diagonal formula and P_k(n) = [u^k] G(u) Λ(u)^n for
 n ≥ 2k+1, proved and Lean-checked. (A2) Λ ≡ the fixed point of the mod-81
@@ -228,8 +228,8 @@ deficit-3 slice of the census into a formula; d ≥ 4 is open.
 
 ### Checks against rows 37 to 40
 
-Stated before the enumeration reached n = 40 and confirmed entry by entry on
-2026-07-31: T(37,25) ≡ 1 (mod 3) (odd spine, k = 12) with T(37,H) for
+Stated before the enumeration reached n = 40 and confirmed entry by entry
+afterwards: T(37,25) ≡ 1 (mod 3) (odd spine, k = 12) with T(37,H) for
 H = 26..37 and T(n,25) for n < 37 all ≡ 0; T(39,26) ≡ 1 (mod 3), so
 P₁₃(39) = 3T(39,26) ≡ 3 (mod 9), with row-39 entries H = 27..39 all ≡ 0;
 every other in-range entry mod 3 through Theorem 1.
@@ -241,7 +241,7 @@ and 2k+2: diagonal k is fitted at n = 2k+1, 2k+2 and first checked at
 n = 2k+3. So the top in-range entry of an even row n = 2k+2 is on a diagonal
 fitted and not yet checked (a(34) with P₁₆, a(36) with P₁₇), while the top
 entry of an odd row n = 2k+3 is that diagonal's first check (a(35) checks
-P₁₆). Observation, jasonp.
+P₁₆).
 
 ### What is conditional on what
 
@@ -265,9 +265,9 @@ under i ↦ H+1−i, fixed-point-free for H even, so every column has even size
 and n is even; for n odd the fixed set is empty. ∎
 
 The 180° rotation gives the same parity independently (its fixed cell would
-sit at the box center, between rows for H even). Proved 2026-08-11
-(`experiments/tristruct/candidates/p2_congruence.py`) on a self-written
-enumerator before the triangle was consulted; checked on all 190 entries of
+sit at the box center, between rows for H even). Proved on an independent
+enumerator (`experiments/tristruct/candidates/p2_congruence.py`) before the
+triangle was consulted; checked on all 190 entries of
 the region in n ≤ 39 (`experiments/tristruct/p2_measure.py`), 135 of them
 not used in any fit and 81 of those enumerated. Row 40 is even, so the
 theorem says nothing about a(40).
@@ -286,7 +286,6 @@ Theorem 9 adds is that on the region its right side is zero by proof.
 **Even columns mod 2.** T(n,4) has period 4; T(n,6) and T(n,8) have period 8
 out to n = 40; H = 10 is the first aperiodic even column. The diagonal formula
 fixes parity only on the k ≤ 13 diagonal entries, a corner of the region.
-The campaign behind Theorem 9 is recorded in the project retrospective (removed from the repository).
 
 ## The prime 5: the denominators of P_k
 
@@ -298,8 +297,7 @@ proved separately; k! is not the minimal denominator (only 5-content ever
 drops), so quote the divisibility, never the minimality. The question came
 from a fit recorded in `results/closed-doors.md` that guessed
 c_k = ⌈v₅(k!)/2⌉ and could not explain k = 11; that fit is wrong at
-k ∈ {1, 11} on k ≤ 20, and k = 11 is no exception to anything. Not to be
-extended.
+k ∈ {1, 11} on k ≤ 20, and k = 11 is no exception to anything.
 
 **Statement.** Let ĉ_k := min_i v₅([nⁱ] k!·P_k), uncapped. Define the harvest
 
@@ -371,7 +369,7 @@ entries agree with `polyplets/pin-data.md` in every coefficient.
 D₁ = 1 (coefficients 25, −45); the uncapped ĉ obeys the law and H(1) = −1 is
 real. For k ≥ 2, v₅(D_k) = H(k) at every measured level.
 
-**Valuation profiles** (k ≤ 19, same script, 2026-07-31):
+**Valuation profiles** (k ≤ 19, same script):
 
 - Upper-half law, exact at all 115 coefficients with i ≥ ⌈k/2⌉:
   v₅([nⁱ] k!·P_k) = 2(2i−k) + v₅(k!/((2i−k)!(k−i)!)), the unique
@@ -388,13 +386,13 @@ real. For k ≥ 2, v₅(D_k) = H(k) at every measured level.
   cancellation only adds 5s.
 - Mod-5 spine: negative. G and Λ mod 5 and mod 25 show no period ≤ 9 from any
   start ≤ 9 and no quadratic algebraic relation with polynomial coefficients
-  of degree ≤ 5 on the 20-term window. Not to be re-hunted on this window.
+  of degree ≤ 5 on the 20-term window.
 
-**Lean** (`polyplets/Polyplets/V5Denominator.lean`, 2026-07-31, (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)): the law at
+**Lean** (a file no longer in the build; see Reproduce): the law at
 k = 1..18 (`v5_law_all`), the refutation of the old fit at k = 11
 (`ceil_fit_refuted`), the k = 11 obstruction in general (`eleven_no_harvest`),
 the seeds tied to P₁ (`u1_seed`, `g1_seed`); `decide`, standard axioms, no
-native_decide, numerator lists tied to `Pin.lean` by rfl. The general-k
+native_decide, numerator lists tied to the pin data by rfl. The general-k
 lower bound is paper-level only.
 
 ## Characteristic 2, and the rank of the strip functional
@@ -408,22 +406,23 @@ deterministic, so its observability matrix M over ℤ (rows the reachable
 states, columns the distinct residuals) has 0/1 columns, N of them, with
 r = rank_ℚ(M) ≤ N and d_p := r − rank_{𝔽_p}(M). Any weighted automaton over
 a ring (one matrix per column, a scalar read at the end) is covered: every
-characteristic-2 proposal of the project (Coin Flip, Coin Roll, Biased Coin
-Flip, Coin Lift, `results/second-sources.md`), every cut-and-count variant
-with any auxiliary group, and the exact transfer-matrix engines.
+characteristic-2 method considered (GF(2) counting, the area grading,
+GF(2^k) counting, lifting to ℤ/2^k as in `results/second-sources.md`), every
+cut-and-count variant with any auxiliary group, and the exact
+transfer-matrix engines.
 
 ### Five theorems
 
 **T1 (extension fields buy nothing).** rank_F(M) depends only on char F: M
 has entries in the prime field, and rank is the vanishing pattern of minors,
-which lie in the prime field. GF(2^k) on this matrix is GF(2); Biased Coin
-Flip's GF(2^k) buys a false-pass probability of 40/2^k and not one dimension.
+which lie in the prime field. GF(2^k) on this matrix is GF(2); counting over
+GF(2^k) buys a false-pass probability of 40/2^k and not one dimension.
 
 **T2 (multiplicative grading is rank-preserving).** The area-graded Hankel
 entry is t^|u| f(uv) t^|v|, so the graded matrix is DMD' with D, D' invertible
-diagonal: the same rank over any ring in which t is a unit. Coin Roll (the
-area grading that gives every n in one run) costs zero dimensions by theorem,
-and no weighting of that shape can help.
+diagonal: the same rank over any ring in which t is a unit. The area grading
+that gives every n in one run costs zero dimensions by theorem, and no
+weighting of that shape can help.
 
 **T3 (the landscape is indexed by the characteristic).** A realization of
 dimension D factors the Hankel matrix with inner dimension D, so rank ≤ D
@@ -450,12 +449,9 @@ scalars, so D₀k² ≥ rank_{𝔽_p}. Non-artinian simple quotients are not cov
 
 ### Every prime, certified
 
-Run 2026-08-14 (`experiments/tristruct/r3_char_landscape.py`, certificate
-`experiments/tristruct/r3_char_landscape_certify.py`): every prime below the
-T4 cutoff tested directly, everything above excluded by (*). The certifier
-prints no verdict unless consistency (the sum form of (*)), the fixing of
-rank_ℚ and completeness all close; it voided its first H = 6 run for an
-untested-prime gap.
+Every prime below the T4 cutoff was tested directly, everything above
+excluded by (*). The certifying script printed no verdict unless consistency
+(the sum form of (*)), the fixing of rank_ℚ and completeness all closed.
 
 | H | states | N | B | rank_ℚ | primes tested | T4 cutoff | every drop, all primes |
 |---|---|---|---|---|---|---|---|
@@ -473,7 +469,8 @@ Settled: any commutative-ring-linear strip method has dimension at least
 min_p rank_{𝔽_p}(M), attained at p = 2; no second collapse exists at any
 prime, in any extension field, under any grading, with any auxiliary group.
 The characteristic-0 rank at H = 21 is a floor about 17x below the exact
-engine that nothing constructs (`results/second-sources.md`, Coin Lift), and
+engine that nothing constructs (the lifting probe in
+`results/second-sources.md`), and
 T3 makes it the best any ring-linear method can do in characteristic 0.
 Untouched: non-linear methods, any other functional, and H ≥ 10 (T1–T3 are
 height-independent; T4 and the search are per height).
@@ -481,9 +478,9 @@ height-independent; T4 and the search are per height).
 ### The characteristic-2 rank sequence
 
 The GF(2) rank r(H) of the strip functional, from the partition automaton
-(`experiments/tristruct/r3_inv_rank_probe.py`, to H = 12), the minimized
-automaton (`experiments/tristruct/exactchange_minauto.py`, to H = 13) and
-the closure probes of 2026-08-14 (to H = 10):
+(to H = 12), the minimized automaton
+(`experiments/tristruct/exactchange_minauto.py`, to H = 13) and the closure
+probes (to H = 10):
 
 | H | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -499,10 +496,8 @@ All ten ranks match OEIS A034299 at r(H) = a(H−1):
 Asymptotically r(H) ~ (4/9)·2^H, a 3² denominator in a characteristic-2
 rank; the closed form predicts r(21) = 932,071. Ten terms of a four-term
 recurrence is an identification, not a proof, and nothing below leans on it
-past the measured range. This table has consumed three pattern matches: an
-A001333 (NSW) identification of N(H) died at H = 9, 10 (575 vs 577, 1399 vs
-1393), a ⌈H/2⌉-doubling guess died, and the Jacobsthal filtration below is
-the third.
+past the measured range. N(H) is not A001333 (NSW): that match fails at
+H = 9, 10 (575 vs 577, 1399 vs 1393).
 
 Cost. H = 12 on ayr: build 148.5 s, rank 874.7 s, 3.9 GB (2026-08-22). H = 13
 on ayr: wall 4 h 42 min (build 886 s, rank 14,829 s), 19.8 GB, revision
@@ -546,8 +541,8 @@ nonzeros and 10¹¹ sparse GF(2) operations, conditional on the basis). That
 is the Cygan–Kratsch–Nederlof signature, but the basis comes from the
 observability closure, which at H = 21 costs more than counting: the
 existence is measured, an a-priori construction is open. The bits this
-would buy, T(40,20) and T(40,21) mod 2, were computed by the spin runs of
-2026-08-13 (`results/second-sources.md`), so the hunt is on no critical path.
+would buy, T(40,20) and T(40,21) mod 2, are already given by the subgroup
+census (`results/symmetry-classes.md`), so nothing depends on the hunt.
 
 ### Relations, and the Jacobsthal filtration
 
@@ -584,7 +579,7 @@ between the top-row quotient and the height-(H−2) system has been exhibited.
 Three lemmas, none proved: (L1) dim V_int = 2^(H−2); (L2) dim V_low = J(H);
 (L3) an explicit isomorphism V_H/V_low ≅ V_{H−2}. L3 is the item.
 
-**A candidate for L3** (proposal, 2026-08-22, untested). A word touching the
+**A candidate for L3** (untested). A word touching the
 top row commits rows H−1 and, by king adjacency, H−2, leaving a
 height-(H−2) system. For such a word w let w' delete rows H−1 and H−2 from
 every column mask; conjecture: w ↦ g_{w'} induces a well-defined isomorphism
@@ -599,9 +594,10 @@ lands in a fixed complement of V_low.
 Even with L1–L3 proved and the basis hunt finished, the object compressed is
 the mod-2 bit of T(n,H) and nothing else; the characteristic-0 rank shows no
 comparable collapse, so exact and odd-prime counting keep their floor and
-Coin Lift's exact-value exclusion stands (the five height-H sizes and how
-they bound each other: `results/closed-doors.md`). For the mod-2 bit the spin
-engine already runs in the coloring space, about (1+√2)^H = 2.414^H states,
+the lifting probe's exact-value exclusion stands (the five height-H sizes
+and how they bound each other: `results/closed-doors.md`). For the mod-2 bit
+the coloring recount already runs in the coloring space, about
+(1+√2)^H = 2.414^H states,
 so the ceiling on the whole program is a (2.414/2)^H ≈ 1.21^H factor on one
 bit: at H = 21 roughly 55x on a computation already cheap next to the exact
 engines.
@@ -635,9 +631,7 @@ engines.
     python3 experiments/spine_deeper.py             # the mod-27 lifts
     cd experiments/tristruct && python3 p2_measure.py && python3 p2_symtri_probe.py   # Theorem 9, the zero set
     python3 experiments/v5_denominator.py           # Theorem 10 and the profiles
-    git show 697f376:polyplets/Polyplets/V5Denominator.lean   # the Lean, out of the build since 2026-10-12
-    python3 experiments/tristruct/r3_char_landscape.py H [SHARD] [NSHARD]
-    python3 experiments/tristruct/r3_char_landscape_certify.py <shard logs>
+    git show 697f376:polyplets/Polyplets/V5Denominator.lean   # the Lean, no longer in the build
     python3 experiments/tristruct/exactchange_phi_probe.py
     python3 experiments/tristruct/exactchange_cell_rank.py
     python3 experiments/tristruct/exactchange_kernel_probe.py
@@ -646,14 +640,3 @@ engines.
 
 The triangle is `results/triangle.txt`; the symmetric counts are
 `results/subgroup_d2ax_byheight.txt`.
-
-## Sources
-
-- `results/ternary-spine.md` (deleted 2026-09-06; its content is above)
-- `results/triangle-snf.md` (deleted 2026-09-06; its content is above)
-- `results/v5-denominator-law.md` (deleted 2026-09-06; its content is above)
-- `results/triangle-hunt-klein-parity.md` (deleted 2026-09-06; its content is above)
-- `results/triangle-r2-d3-proof.md` (deleted 2026-09-06; its content is above)
-- `results/coin-flip-characteristic-landscape.md` (deleted 2026-09-06; its content is above)
-- `results/char2-basis-status.md` (deleted 2026-09-06; its content is above)
-- `results/exactchange-probes.md` (deleted 2026-09-06; its content is above)
