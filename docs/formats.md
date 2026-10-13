@@ -129,7 +129,7 @@ Format: one directive per line, no blank-line terminator.
 
 **Version history.** Version 1 had no `htri`. Resume from a version-1 checkpoint
 therefore cannot reconstruct a whole per-height row, so a mid-height resume with
-`--per-height-out` is refused outright (AUDIT-2026-07-30 O2); a version-1
+`--per-height-out` is refused outright; a version-1
 checkpoint at `col=-1` or at a completed height (empty `frontier`) still resumes.
 The version is stamped rather than inferred from the presence of `htri` lines,
 because the row is sparse-encoded — a legitimately all-zero partial row from a

@@ -36,8 +36,7 @@ purpose, lost provenance.** Don't launch until every box is checked.
      Before launching, read the *deployed* binary's stamped `GIT_REV` and confirm
      it is **(a) clean** — no `-dirty` suffix (a `-dirty` stamp means uncommitted
      changes that won't survive the run) — **and (b) actually contains the change
-     you intend to run.** (b) is the one that bit us: the **A1 incident**
-     (AUDIT-2026-06-28) was a correct fix sitting *uncommitted* on one host while
+     you intend to run.** (b) is the one that bit us: in June 2026 a correct fix sitting *uncommitted* on one host while
      a remote box ran a clean-but-*stale* binary with the old behavior. After any
      engine edit: commit, then rebuild+redeploy on the target box (a stale binary
      silently ignores new flags/fixes), then re-read the rev. A clean stamp that
