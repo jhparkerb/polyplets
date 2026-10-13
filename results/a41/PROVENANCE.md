@@ -2,9 +2,13 @@
 
     a(41) = 393811462683918679824582849262105
 
-Computed on dalby in two enumeration runs and one assembly, the first term
-for which the closed forms were fixed from entries below their onset, so that
-height 21 was never enumerated.
+Computed in two enumeration runs on an 80-core server and one assembly. It is
+the first term for which the closed forms were fixed from entries below their
+onset (the onset of level k = n − H is n = 2k+1; see `docs/glossary.md` for
+level, depth, defect and fit), so that height 21 was never enumerated. The
+enumeration runs need that server; the assembly, which recomputes a(41) from
+the stored per-height output, runs in under a second on a laptop (the
+`undertow_a41.py` command under Checks).
 
 ## How
 

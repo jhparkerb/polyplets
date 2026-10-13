@@ -56,15 +56,20 @@ Lean files say which.
 ## Reproducing
 
     make                     # builds what each check needs and runs the checks
-    scripts/term.sh 26       # recomputes a(1)..a(26), checking each against the stored values
+    scripts/term.sh 26       # computes a(1)..a(26), checking a(1)..a(25) against the stored values
 
 On a 32-core machine `make` takes about 7 minutes and `scripts/term.sh 26`
-about 23 seconds. The large terms took days on machines with hundreds of
-gigabytes of memory and disk; `results/ns_a40/PROVENANCE.md` records how
-a(40) was run. Two unrelated algorithms on small values:
+about 23 seconds. `scripts/term.sh` enumerates the short heights and takes
+the tall ones from the closed forms. The large terms took days on machines
+with hundreds of gigabytes of memory and disk; `results/ns_a40/PROVENANCE.md`
+records how a(40) was run. Two unrelated algorithms, with no closed forms
+involved:
 
     build/g2 square8 12      # Redelmeier enumeration, a(1)..a(12)
-    scripts/term.sh 12       # the transfer matrix, the same terms
+    make gate-kink-oracle    # the transfer matrix enumerating every height, a(1)..a(18)
+
+The second takes about a minute on 8 cores and compares its sums with the
+published a(1)..a(18).
 
 ## Layout
 

@@ -21,9 +21,9 @@ each term.
 
 a(n) is the sum over heights H of T(n,H), the number of polyplets with n cells
 whose bounding box has height H. The production program is a column-by-column
-transfer matrix that computes every T(n,H) for a given maximum n; each run
-recomputes the whole triangle and reproduces every earlier term
-(`docs/engine-record.md`).
+transfer matrix that computes T(n,H) for every n up to a given maximum; each
+run enumerates every height below the closed-form range described next, and
+reproduces every earlier term (`docs/engine-record.md`).
 
 The tall heights are not enumerated. Above H > n/2 the triangle satisfies
 T(n,H) = P_{n−H}(n)·3^(3H−2n−1), where P_k is a polynomial of degree k with
