@@ -11,7 +11,8 @@ characteristic-landscape theorems and the 5-adic lower bound are
 unconditional; the mod-3 theorems rest on the proved diagonal formula plus
 congruences derived from the cluster expansion and checked against data to
 k = 17; everything else is measured and marked so. Full proofs of Theorems 1
-to 6 are in `paper/L1-diagonal-law.tex`, Part II.
+to 6 are written out in `paper/L1-diagonal-law.tex`, Part II, a paper written
+by a language model (`paper/README.md`).
 
 ## Definitions
 
@@ -264,10 +265,8 @@ under i ↦ H+1−i, fixed-point-free for H even, so every column has even size
 and n is even; for n odd the fixed set is empty. ∎
 
 The 180° rotation gives the same parity independently (its fixed cell would
-sit at the box center, between rows for H even). Proved on an independent
-enumerator (`experiments/tristruct/candidates/p2_congruence.py`) before the
-triangle was consulted; checked on all 190 entries of
-the region in n ≤ 39 (`experiments/tristruct/p2_measure.py`), 135 of them
+sit at the box center, between rows for H even). Checked on all 190 entries
+of the region in n ≤ 39 (`experiments/tristruct/p2_measure.py`), 135 of them
 not used in any fit and 81 of those enumerated. Row 40 is even, so the
 theorem says nothing about a(40).
 
@@ -343,7 +342,7 @@ over and every order-1 object is taxed at least what the harvest pays
 (g₁ = −45 costs 1, so H(11) = max(v₅(4!), v₅(5!) − 1) = 0; u₁ = 25 costs 2);
 from k = 12 the leftover parks in a free order-2 slot. So ĉ₁₁ = 2, and the
 dock lands on the whole class k ≡ 1 (mod 10). The old fit diverges from the
-law at k ∈ {1, 11, 21, 25, 26, 27, 28, 29, 31, 35, …} (k ≤ 40; the script
+formula at k ∈ {1, 11, 21, 25, 26, 27, 28, 29, 31, 35, …} (k ≤ 40; the script
 prints the set to 120; from 25 on the cause is ⌊k/2⌋!-versus-half drift, not
 the bracket). First unmeasured divergence: ĉ₂₁ = 4 − 1 = 3 where the fit says
 2; it needs P₂₀, P₂₁, that is rows n ≥ 41 or ab initio cluster weights to
@@ -365,29 +364,29 @@ j = 10 because u₁ = 25 blocks j ≤ 9); P₁..P₁₈ re-derived from enumerat
 entries agree with `polyplets/pin-data.md` in every coefficient.
 
 **Bookkeeping.** D_k = k!/5^{min(ĉ_k, v₅(k!))}, so the k = 1 row caps to
-D₁ = 1 (coefficients 25, −45); the uncapped ĉ obeys the law and H(1) = −1 is
-real. For k ≥ 2, v₅(D_k) = H(k) at every measured level.
+D₁ = 1 (coefficients 25, −45); the uncapped ĉ obeys the formula and H(1) = −1
+is real. For k ≥ 2, v₅(D_k) = H(k) at every measured level.
 
 **Valuation profiles** (k ≤ 19, same script):
 
-- Upper-half law, exact at all 115 coefficients with i ≥ ⌈k/2⌉:
+- Upper-half formula, exact at all 115 coefficients with i ≥ ⌈k/2⌉:
   v₅([nⁱ] k!·P_k) = 2(2i−k) + v₅(k!/((2i−k)!(k−i)!)), the unique
   minimal-valuation configuration (2i−k order-1 slots, k−i order-2 slots)
   carrying everything. Lean `upper_half_law`, k ≤ 18. At large k the same
   care as the bracket is needed (25 | m₂(m₂−1) first bites near m₂ ≈ 25).
 - The i = 0 column: [n⁰] k!·P_k = k!·g_k, so v₅ = v₅(k!) + v₅(g_k).
 - Valuations to t = 19: v₅(u_t) is 2 at t = 1, 3 at t = 17, else 0; v₅(g_t)
-  is 1 at t ∈ {1, 3, 4, 7, 12, 17}, else 0. No law for these supports ("t ≡ 2
+  is 1 at t ∈ {1, 3, 4, 7, 12, 17}, else 0. No pattern for these supports ("t ≡ 2
   mod 5" for {7, 12, 17} fails as a value pattern, g₂ ≡ 2 mod 5).
 - 23 mid-band coefficients sit strictly above the configuration bound even
   with the exact u/g tables fed in: cross-configuration cancellations, all +1
-  except (k,i) = (18,6) and (19,6) at +2. The floor law survives because
+  except (k,i) = (18,6) and (19,6) at +2. The lower bound survives because
   cancellation only adds 5s.
 - Mod-5 spine: negative. G and Λ mod 5 and mod 25 show no period ≤ 9 from any
   start ≤ 9 and no quadratic algebraic relation with polynomial coefficients
   of degree ≤ 5 on the 20-term window.
 
-**Lean** (a file no longer in the build; see Reproduce): the law at
+**Lean** (a file no longer in the build; see Reproduce): the formula at
 k = 1..18 (`v5_law_all`), the refutation of the old fit at k = 11
 (`ceil_fit_refuted`), the k = 11 obstruction in general (`eleven_no_harvest`),
 the seeds tied to P₁ (`u1_seed`, `g1_seed`); `decide`, standard axioms, no
@@ -498,10 +497,10 @@ recurrence is an identification, not a proof, and nothing below leans on it
 past the measured range. N(H) is not A001333 (NSW): that match fails at
 H = 9, 10 (575 vs 577, 1399 vs 1393).
 
-Cost. H = 12 on ayr: build 148.5 s, rank 874.7 s, 3.9 GB (2026-08-22). H = 13
-on ayr: wall 4 h 42 min (build 886 s, rank 14,829 s), 19.8 GB, revision
-95fbb6c (2026-08-23); the run asserts every earlier rank and the brute-force
-anchors at H = 2, 3 before printing the new one. H ≤ 12 has two
+Cost. H = 12: build 148.5 s, rank 874.7 s, 3.9 GB. H = 13: wall 4 h 42 min
+(build 886 s, rank 14,829 s), 19.8 GB, revision 95fbb6c; the run asserts
+every earlier rank and the brute-force anchors at H = 2, 3 before printing
+the new one. H ≤ 12 has two
 implementations agreeing; H = 13 has the minimized automaton alone and does
 not count as confirmed until a second implementation (a cross-automaton
 random-word equality test) reproduces it.
@@ -528,8 +527,8 @@ N(H) ~ 2.48^H against (4/9)·2^H, not a tension.
 
 The column-level automaton needs one r×r matrix per column mask, 2^H − 1 of
 them, which cannot be stored; an algorithm reads one cell at a time. The
-cell-level functional's GF(2) rank
-(`experiments/tristruct/exactchange_cell_rank.py`) is 32, 93, 210, 516 at
+cell-level functional's GF(2) rank (the probe scripts behind this subsection
+and the next are no longer in the tree) is 32, 93, 210, 516 at
 H = 4..7 against column rank 6, 15, 27, 58, ratio 5.3, 6.2, 7.8, 8.9: it
 looks like Θ(H·2^H) (four points, ratio still rising), about 2×10⁷ at
 H = 21, so the compression where an algorithm would live is about 6x, not
@@ -545,8 +544,8 @@ census (`results/symmetry-classes.md`), so nothing depends on the hunt.
 
 ### Relations, and the Jacobsthal filtration
 
-Layer 2 is the relations among the N(H) distinct φ values, dimension N − r
-(`experiments/tristruct/exactchange_kernel_probe.py`). No weight-3 relations
+Layer 2 is the relations among the N(H) distinct φ values, dimension N − r.
+No weight-3 relations
 exist at any measured height (a sum-free-like family; not the matchings
 shape). Weight-4 relations exist but do not span (H = 8: 93 of 127; H = 10:
 748 of 946; the raw weight-4 counts the probe prints are 3x inflated, span
@@ -607,7 +606,7 @@ engines.
   determinant their sum; the mod-9 and mod-27 lifts are the natural attack.
 - The deficit-d unit formulas for d ≥ 4 (Theorems 2, 3, 7, 8 are d = 0, 1,
   2, 3), each costing the next 3-adic level of the master equation; the finer
-  valuations at deficit 3, k ≡ 1 (mod 3); a law for the sleeve zeros.
+  valuations at deficit 3, k ≡ 1 (mod 3); a rule for the sleeve zeros.
 - The three mod-27 congruences are measured, not proved.
 - Equality in Theorem 10 for general k, and its lower bound in Lean.
 - "Only if" in Theorem 11 beyond H = 10.
@@ -631,11 +630,8 @@ engines.
     cd experiments/tristruct && python3 p2_measure.py && python3 p2_symtri_probe.py   # Theorem 9, the zero set
     python3 experiments/v5_denominator.py           # Theorem 10 and the profiles
     git show 697f376:polyplets/Polyplets/V5Denominator.lean   # the Lean, no longer in the build
-    python3 experiments/tristruct/exactchange_phi_probe.py
-    python3 experiments/tristruct/exactchange_cell_rank.py
-    python3 experiments/tristruct/exactchange_kernel_probe.py
     python3 experiments/tristruct/exactchange_doubling_probe.py
-    python3 experiments/tristruct/exactchange_minauto.py 13   # ayr; H = 12 about 17 min and 3.9 GB, H = 13 4 h 42 min and 19.8 GB
+    python3 experiments/tristruct/exactchange_minauto.py 13   # H = 12 about 17 min and 3.9 GB, H = 13 4 h 42 min and 19.8 GB
 
 The triangle is `results/triangle.txt`; the symmetric counts are
 `results/subgroup_d2ax_byheight.txt`.

@@ -67,8 +67,8 @@ def motzkin(n):
     first RED control below a tautology: it checks sum_b C(H+1,2b)*Cat(b)
     against motzkin(H+1), so with motzkin DEFINED as that sum, both sides ran
     the same code and the control could not fail. The recurrence is a second
-    route (same one experiments/tristruct/r3_inv_rank_probe.py uses), so the
-    identity is now actually being tested. The division is exact at every n.
+    route, so the identity is now actually being tested. The division is
+    exact at every n.
     """
     if n <= 1:
         return 1

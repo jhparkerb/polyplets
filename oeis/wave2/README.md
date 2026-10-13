@@ -5,8 +5,8 @@
 > together with the hole triangle draft in `oeis/`).
 
 Staged drafts in OEIS internal format (`%I %S %T %U %N %C %F %H %e %Y %K %O %A`)
-plus a b-file per sequence. **Nothing here is submitted.** jasonp pushes the actual
-submission to oeis.org; Claude only preps and stages.
+plus a b-file per sequence. **Nothing here is submitted.** jasonp alone
+submits to oeis.org.
 
 All four are king-move polyplet (A006770) statistics, 4-connected-background
 ("topological-dual") hole convention. Established cross-reference identities (NOT
@@ -28,7 +28,7 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 - Terms 1,4,20,109,622,...,16503616943998 for n=1..18.
 - Source: `oeis/draft-A0-holefree.txt` + `oeis/b-draft-A0-holefree.txt` (master).
   Backing data is column k=0 of the hole triangle (`oeis/b-draft-hole-triangle.txt`).
-- Provenance: column transfer matrix (thread #28), byte-identical to per-animal
+- Provenance: column transfer matrix (`cpp/tma`), byte-identical to per-animal
   background flood (n<=14); row sums == A006770; n=15..18 cross-ISA confirmed
   (clang/ARM vs gcc/x86). Largest CONFIRMED n = 18.
 - Novelty: Superseeker CLEAR (2026-06-19), full T001-T115 transform battery.
@@ -46,7 +46,7 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 - Definition: fixed n-cell polyplets whose minimal bounding box is square (w == h).
 - Provenance: generated 2026-06-22 by Redelmeier enumeration (`build/g2 square8 N --per-box`),
   binning each fixed polyplet by bounding-box (w,h) and summing the w==h diagonal. n=1..14
-  on gympie; n=15,16 via a 20-worker `--split` run on ayr (scripts/bbox_split.sh,
+  on the laptop; n=15,16 via a 20-worker `--split` run (scripts/bbox_split.sh,
   bbox_combine.py). The FULL (w,h) marginal was verified term-by-term == A006770(n)
   through n=16 (the engine's own gate). Explicit enumeration, so terms get exponentially
   harder; n>=17 (3.3e12 animals) wants a wider/longer split. Largest CONFIRMED n = 16.

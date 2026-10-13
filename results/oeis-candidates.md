@@ -1,22 +1,14 @@
-# OEIS candidates — staged, DEFERRED (jasonp's button)
+# OEIS candidates: three new sequences, not submitted
 
-> These are **Wave 3** of the master plan in `oeis/SUBMISSION.md` (2026-07-16),
-> which decides overall scope and order. A Superseeker pass for A and B is
-> still owed before submission (they were model-checked only).
+Scope and order of any submission are decided in `oeis/SUBMISSION.md`, where
+these are the third wave. Nothing here has been submitted; a Superseeker pass
+for A and B is still owed. The %C text below is a fact source, not
+submission copy.
 
-Date: 2026-07-10. Everything needed to file these the moment jasonp decides to
-submit. Do NOT submit before then. Curated to 2 strong +
-1 optional — NOT a flood.
-
-Standard prep still required per policy: %C own-words / pink-box, Superseeker
-sanity check, jasonp pushes the button.
-
----
-
-## Candidate A (strong): T(n,H) height triangle
+## Candidate A: the height triangle T(n,H)
 
 **Definition.** `T(n,H)` = number of fixed polyplets (king-connected animals,
-A006770) with `n` cells and bounding-box height **exactly** `H`. Triangle read by
+A006770) with `n` cells and bounding-box height exactly `H`. Triangle read by
 rows, `n >= 1`, `1 <= H <= n`.
 
 **Data (rows n=1..8):**
@@ -38,26 +30,20 @@ Flattened: 1, 1,3, 1,10,9, 1,27,55,27, 1,68,248,240,81, …
 - Main diagonal `T(n,n) = 3^{n-1}` = **A000244** (king chain). NOT A025192.
 - Column `H=1` = all-1s (horizontal bars).
 - Sub-diagonals `T(n,n-k)` have closed forms `P_k(n)·3^n`, deg `P_k = k`,
-  e.g. `T(n,n-1)=5(5n-9)3^{n-4}`; the defect ideal gas (leading coeff
-  `25^k/(3^{3k+1}k!)`). See results/diagonal-formula.md. Do NOT submit the
-  sub-diagonals separately — they are derivable diagonals of this triangle.
+  e.g. `T(n,n-1)=5(5n-9)3^{n-4}`, leading coefficient `25^k/(3^{3k+1}k!)`
+  (`results/diagonal-formula.md`). The sub-diagonals are not to be submitted
+  separately: they are derivable diagonals of this triangle.
 
-**Regenerate / extend:** `results/ns_a36/perheight/h{H}.out` gives `T(n,H)` for
-H<=18, all n<=36 (main a36 engine). Or `build/g2 --per-box`. Independently
-cross-checked by the strip second source (results/second-sources.md) over
-H<=14 **and n<=36** — the banked strip run's reach. Cells with H>14, and all
-cells at n=37..40, are not strip-covered as banked (an N=40 extension run was
-launched 2026-07-30).
+**Regenerate / extend:** `results/triangle.txt` holds `T(n,H)` for all
+`n <= 40`; `results/provenance-table.md` says which independent computations
+agree with each entry. `build/g2 --per-box` recomputes small `n`.
 
-Confirmed NOT in OEIS (sonnet-checked 2026-07-10: no height-refined triangle of
-A006770 exists).
+Not in OEIS as of 2026-07-10 (no height-refined triangle of A006770).
 
----
-
-## Candidate B (strong): C(n,c) component triangle
+## Candidate B: the component triangle C(n,c)
 
 **Definition.** `C(n,c)` = number of fixed polyplets with `n` cells whose
-edge-connected (rook) components number **exactly** `c` (the pieces are
+edge-connected (rook) components number exactly `c` (the pieces are
 polyominoes joined only at corners). Triangle read by rows, `1 <= c <= n`.
 
 **Data (rows n=1..9):**
@@ -80,41 +66,33 @@ polyominoes joined only at corners). Triangle read by rows, `1 <= c <= n`.
   c=1 = single edge-component (a polyomino); c=n = all cells edge-isolated =
   diagonal-contact-only = polyomino on the 45°-rotated sublattice (bijection).
 - Near-symmetric under `c <-> n+1-c`; mean component count `≈ (n+1)/2`.
-- Related prior art: **A364928** (Achterberg, corner-connected polyominoes) —
-  records the c=n bijection in the FREE case only; this fixed triangle is new.
+- Related prior art: **A364928** (Achterberg, corner-connected polyominoes)
+  records the c=n bijection in the FREE case only.
 
 **Regenerate / extend:** `experiments/component_stratification.py`
-(reproduces A006770 through n=10, validating). Run to higher n to extend.
+(reproduces A006770 through n=10). Run to higher n to extend.
 
-Confirmed NOT in OEIS (triangle + interior columns c=2,c=3; sonnet 2026-07-10).
+Not in OEIS as of 2026-07-10 (triangle, and interior columns c=2, c=3).
 
----
-
-## Candidate C (optional, lower priority): convex polyplets
-
-**PRIMARY SOURCE: `docs/proofs/convex-mirage.md`** (prior, deeper — has 38 terms,
-growth μ≈3.129, and the non-D-finite-by-area finding). Use its data, not the 10
-terms below.
+## Candidate C (lower priority): convex polyplets by area
 
 **Definition.** Number of fixed **HV-convex** king-connected animals (every row
 and every column a contiguous run; king-connected). Strictly larger than convex
 polyominoes (diagonal joins allowed, e.g. `{(0,0),(1,1)}`).
 
-**Data (38 terms in convex-mirage; first 10):** `1, 4, 16, 61, 221, 766, 2566,
-8390, 26982, 85834, 271174, 853111, …`.
+**Data:** `1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111,
+…`; 700 terms in `results/b_hvconvex_area_upload.txt`, with the growth
+constant, the non-D-finiteness exclusion boxes and the derivation in
+`results/subclasses.md`.
 
 **Keywords:** nonn.  **Offset:** 1.
 **Cross-refs:** A006770 (superset), A067675 (convex polyominoes, subset).
-**Comment for submission:** non-D-finite by area (Convex Mirage); growth ~3.129.
-**Regenerate:** convex-mirage's row-transfer-matrix (reaches 38); the brute
-`experiments/convex_polyplets.py` here only cross-checks the first ~10.
-Confirmed NOT in OEIS.
+**Comment for submission:** no P-recurrence of order <= 24 and degree <= 24
+on 700 terms; growth constant 3.128943269730886….
+Not in OEIS.
 
----
+## Not submitting
 
-## Explicitly NOT submitting
-
-The five anti-diagonal sequences `T(n,n-k)` (k=1..5) — derivable diagonals of
-Candidate A; their closed forms belong in A's comments, not as separate entries.
-Submitting them would be the OEIS flood jasonp flagged. (Values + closed forms:
-results/diagonal-formula.md.)
+The five anti-diagonal sequences `T(n,n-k)` (k=1..5) are derivable diagonals
+of Candidate A; their closed forms belong in A's comments, not as separate
+entries (values and closed forms: `results/diagonal-formula.md`).

@@ -117,8 +117,9 @@ it requires trusting prose.
    architectures, 24000 disjoint shards, ~120 h wall per box, completed
    Jul 16 2026; `results/redelmeier_row22/`) vs the transfer-matrix engine.
    The strongest kind of evidence a computational extension can offer.
-2. **Every run re-derives all previous terms** as a by-product (the triangle
-   recomputation), so each submission's b-file is internally re-verified, and
+2. **Every run recomputes the enumerated heights of all previous terms** as a
+   by-product (the tall heights come from the closed forms, not from
+   enumeration; `results/confidence.md`), and
    a(1)–a(18) match the values OEIS serves today, line for line (checked
    live 2026-07-30: A006770 has no author-uploaded b-file, so
    oeis.org/A006770/b006770.txt is auto-synthesized from the entry's DATA
@@ -139,18 +140,14 @@ it requires trusting prose.
 5. **Cross-ISA recounts** (ARM/clang vs x86/GCC byte-identical at a(34);
    split-architecture at a(36)) and **fault-injection-tested gates** (planted
    errors are caught; the checks fail on wrong programs).
-6. **Everything regenerates**: engines, gates, per-term provenance ledgers, and
-   a self-contained checker live in the repo; the full computational report
-   (`paper/polyplets-report.tex`, "Fixed polyplets through a(40)") documents
-   methods, validation architecture, and limits, including an explicit
-   author's note on AI use (§"Author's note").
+6. **Everything regenerates**: engines, checks, per-term provenance records
+   and a self-contained checker live in the repo, and the technical report
+   (`paper/technical-report.tex`) documents methods and limits.
 
 ## 3. Human steps before ANY submission (mechanical checklist)
 
-1. **Own-words pass**: jasonp rewrites every staged %C in his own words
-   (AI-sounding prose is itself a live rejection trigger; Claude
-   meaning-checks against the data only). The staged text is a FACT SOURCE,
-   not submission copy.
+1. **Own-words pass**: jasonp rewrites every staged %C in his own words.
+   The staged text is a fact source, not submission copy.
 2. **Signature dates**: every `_Jason H Parker_` date → the actual day of
    submission on oeis.org (Heinz precedent; README rule 2). Currently staged
    as Jul 16 2026 (A030234/A030235/A194596 entry files may still carry
@@ -158,20 +155,19 @@ it requires trusting prose.
 3. **DATA lines**: %S/%T/%U may be extended from the b-file at submission
    time (convention: fill ~3 lines); staged entries deliberately keep the
    live-OEIS DATA.
-5. **Superseeker debts**: Wave 2 #3; Wave 3 A and B; Wave 4 sym classes.
-   jasonp sends (body `lookup <terms>`, subject blank, 1/hour;
-   [[oeis-superseeker-format]]).
-6. **A-number resolution order**: hole triangle before its columns (Wave 2);
+4. **Superseeker debts**: Wave 2 #3; Wave 3 A and B; Wave 4 sym classes.
+   jasonp sends (body `lookup <terms>`, subject blank, one per hour).
+5. **A-number resolution order**: hole triangle before its columns (Wave 2);
    fill every `Axxxxx?` placeholder consistently once real numbers are
    assigned.
-7. **AI-disclosure answer ready**: one paragraph, jasonp's words, shaped like
-   the paper's §"Author's note: use of AI" — exactly what AI did (algorithm
-   design, implementation, drafting, run orchestration) and exactly what the
-   author did (goals, design and verification decisions, machine ownership and
-   operation, inspection, responsibility for correctness), plus the checkable
-   verification protocol of §2. The A396719 precedent shows a precise answer
-   defuses the probe; evasion sinks entries.
-8. **Repo visibility**: %H links require the repo (github.com/jhparkerb/polyplets)
+6. **AI-disclosure answer ready**: one paragraph, jasonp's words: what the
+   machine did (algorithm design, implementation, drafting, run orchestration)
+   and what the author did (goals, design and verification decisions,
+   machine ownership and operation, inspection, responsibility for
+   correctness), plus the checkable verification protocol of §2. Editors ask;
+   the A396719 precedent shows a precise answer suffices and evasion sinks
+   entries.
+7. **Repo visibility**: %H links require the repo (github.com/jhparkerb/polyplets)
    or a compiled paper at a stable URL to be publicly reachable — jasonp
    decides what to publish and links accordingly. If neither is public at
    submission time, drop the %H links rather than link dead URLs.
@@ -213,5 +209,3 @@ it requires trusting prose.
 - **2026-07-17 green board**: full `make ns-gates` suite GREEN (incl. the
   newly-wired gate-g2); the paper's self-contained claim checker passes
   412/412; the paper compiles warning-free.
-- Engine audits: `docs/audits/AUDIT-2026-06-28.md`, `docs/audits/AUDIT-2026-07-13.md` (all fixes
-  red-first-tested; no banked value affected).

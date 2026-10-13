@@ -237,6 +237,44 @@ under one height, against a cost growing about 2.9× per height. The factor
 of `H` between column rank and cell rank is the whole difference between a 6×
 win and a 20× one, and between either and the floor of section 1.2.
 
+**The collapse does not lift.** Does the small rank over GF(2) survive
+lifting to `ℤ/2^k`, giving an exact route to the entries the coloring
+recount did not reach? A test of the form "the `ℤ/4` free rank jumps" cannot
+decide it: an invariant factor is a unit mod 4 iff it is odd iff it survives
+mod 2, so that rank is the GF(2) rank identically. The deciding quantity is
+`μ_k(H) = #{invariant factors d_i with v_2(d_i) < k}`, the minimal number of
+generators over `ℤ/2^k`, with `μ_1` the GF(2) rank and `μ_∞` the rank over
+`ℚ`.
+
+| H | states | μ_1 = GF(2) | μ_2 = ℤ/4 | μ_3 = ℤ/8 | μ_4 | rank mod p | μ_2/μ_1 |
+|---|---|---|---|---|---|---|---|
+| 4 | 20 | 6 | 6 | 6 | 6 | 6 | 1.000 |
+| 5 | 50 | 15 | 17 | 17 | 17 | 17 | 1.133 |
+| 6 | 126 | 27 | 35 | 35 | 35 | 35 | 1.296 |
+| 7 | 322 | 58 | 86 | 88 | 88 | 88 | 1.483 |
+| 8 | 834 | 112 | 194 | 204 | 204 | 204 | 1.732 |
+| 9 | 2,187 | 229 | 459 | 500 | 501 | 501 | 2.004 |
+
+`μ_2/μ_1` grows every height and at `H = 9` the second bit has spent the
+whole factor of 2; `μ_4` is the generic rank at every height. The collapse
+is the degeneracy `x + x = 0` and nothing more. At p = 3, `μ_1` is 6, 17, 35,
+87, 201, 488 against the generic 6, 17, 35, 88, 204, 501; at p = 5 and 7 the
+rank is generic at every `H ≤ 8`; extension fields of characteristic 2
+change no rank. `μ_∞` reproduces the mod-p ranks by an independent
+computation over `ℤ`. The probe checked `μ_1` against the GF(2) ranks 6, 15,
+27, 58, 112, 229 and a second, independently written GF(2) elimination,
+`μ_K` against the mod-p rank wherever both exist, and that a stencil with
+one diagonal dropped moves the profile (6 to 11 at `H = 4`; 15, 17, 17 to
+24, 25, 25 at `H = 5`).
+
+**The mod-2 subgroup bit and the CRT reconstruction do not compose.** Once
+the primes give the exact integer, the parity is a check on a value already
+known, which is how the provenance table uses it (tag C). Nine primes near
+`2^16` give a modulus of about `2^144`; adjoining 2 adds 0.7%.
+Reconstructing modulo a product smaller than the value and using parity
+plus a size bound would need the value bracketed within a factor of two,
+which nothing supplies.
+
 ### 1.6 The reach-merged frontier: a congruence, proved and counted to H = 21
 
 Two frontier states are equivalent when they carry the same multiset of
@@ -1188,7 +1226,7 @@ arithmetic.
   give quasi-supermultiplicativity, a different inequality. Never attempted:
   total positivity of the transfer matrix, or an injection
   `A_{n−1} × A_{n+1} → A_n × A_n`, none known for lattice animals.
-- **Ratio log-concavity, theorem.** `r(n) = a(n)/a(n−1)` satisfies
+- **Ratio log-concavity.** `r(n) = a(n)/a(n−1)` satisfies
   `r(n)² > r(n−1) r(n+1)` for all `n = 3..39` in exact arithmetic; the witness
   at `n = 3` is `20³ · 1 = 8000 > 7040 = 4³ · 110` on Lean-proved terms
   (`ratio_not_logConvex`). The picture is `r(n) ≈ λ(1 − 1/n)`; the all-`n`
@@ -1205,7 +1243,7 @@ arithmetic.
   low-order constant-coefficient recurrence, and ten terms of a sequence that
   cannot be extended support no growth-rate reading. The degrees stand as the
   irreducibility certificates behind `results/anisotropic-not-dfinite.md`.
-- **The growth law of the Hankel floor** (1.2): 2.43 is a fit over eight
+- **The growth rate of the Hankel floor** (1.2): 2.43 is a fit over eight
   points, the quotients still wander, and `H = 12` costs about 17 days
   single-core.
 - **An explicit char-2 basis** for the column-level collapse, the largest
@@ -1225,14 +1263,14 @@ arithmetic.
 
 ## What would move them
 
-- **Correspondence.** Gill Barequet, one question: is it known that
-  finite-type convolution bounds cannot reach `λ`? The slack check
+- **Questions not asked of anyone who would know.** Whether finite-type
+  convolution bounds are known to be unable to reach `λ`: the slack check
   (`experiments/king_slack.py`) found the 9.3154 certificate's over-count
-  diffuse and compounding at +0.022 per cell, the signature of a non-local
-  over-count no finite context can see. Guttmann or Jensen: the anisotropic
-  theorem's novelty, and the `θ = −1.000(1)` correction structure. Tremblay
-  and Vernay held the prior a(18) record and their enumerator is public
-  (`github.com/J-Vernay/discrete-figures`); it has not been run here.
+  diffuse and compounding at +0.022 per cell, which no finite context can
+  see. Whether the anisotropic theorem is new, and what the `θ = −1.000(1)`
+  correction structure means. The enumerator behind the prior a(18) record
+  is public (`github.com/J-Vernay/discrete-figures`) and has not been run
+  here.
 - **Papers** (`literature/MISSING.md`): Conway 1995 on the finite-lattice method
   for percolation series, Conway and Guttmann 1995, Enting 1980. The first
   decides whether the four-direction bounding-box decomposition is a

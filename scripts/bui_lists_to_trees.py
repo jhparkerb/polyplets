@@ -8,7 +8,8 @@ import re, sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 from gen_bui_cert_emit import emit_tree  # shared emitter
 
-ROOT = '/Users/jasonp/src/polyominoes/polyplets/Polyplets/Upper'
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                    'polyplets', 'Polyplets', 'Upper')
 
 def parse_list(src, name):
     """Concatenate the private chunk lists `name<k>` in order."""

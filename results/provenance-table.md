@@ -13,7 +13,7 @@ differs from the regeneration.
 | G | decorrelated fixed-height GFs | H <= 10 | full |
 | R | small-height recurrences | H <= 4 | full |
 | S | strip transfer matrix | H <= 14 | shares the union-find rule |
-| P | closed forms P_k on really-swept cells | k <= 18, n >= 2k+1, H <= 21 | full where credited |
+| P | closed forms P_k on enumerated cells | k <= 18, n >= 2k+1, H <= 21 | full |
 | F | closed forms P_k above the swept heights; the formula is checked on swept cells, the entry itself is not recounted | k <= 18, n >= 2k+1, H > 21 | formula-level |
 | M | the coloring recount, a second enumerator that counts by coloring cells and never decides connectivity | H <= 19 | full |
 | U | the closed forms of `docs/proofs/diagonal-law.md` with their constants fixed from the coloring recount's own entries | H > 19, rows 20-40, measured per entry | formula-level: shares the depth tables with P and F; agrees with the main computation at every tagged entry |
@@ -22,13 +22,13 @@ differs from the regeneration.
 ## Coverage
 
 - cells: **820**; strip covers **469**; fixed-height GFs **355**
-- entries with at least one exact second source: **628 of 820 (76.6%)** -- counting every exact source now available
+- entries with at least one exact second source: **628 of 820 (76.6%)**
 - cells with no exact recount, whose value came from a closed form that is itself holdout-validated elsewhere: **189**
 - cells carrying **only** the mod-4 congruence — no exact recount, no closed form: **3**
 
   T(39,20), T(40,20), T(40,21)
 
-  Each is a cell whose value has one enumeration. That is the statement; a(n) is no better than its worst cell, so how large these cells are is not a fact about how much of a(n) is trustworthy and is deliberately not reported.
+  Each has one enumeration; a(n) is no better than its worst cell.
 - cells with no exact recount that the refitted closed forms reproduce (tag U): **192** of the 192, the 189 formula-derived cells and the 3 above included. This is a check at the level of the formulas, not a second enumeration.
 
 ## Row 40, cell by cell

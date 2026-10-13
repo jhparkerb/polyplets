@@ -4,7 +4,7 @@
 # and record the Mathlib imports it reports in polyplets/build/mi/<Module>.imports.
 # Serial; each run loads all of Mathlib (~1 min). Apply with
 # scripts/lean-apply-min-imports.py.
-cd /Users/jasonp/src/polyominoes/polyplets || exit 1
+cd "$(dirname "${BASH_SOURCE[0]}")/../polyplets" || exit 1
 D=build/mi; mkdir -p $D
 if [ $# -gt 0 ]; then mods="$*"; else
   mods=$(cd Polyplets && find . -name '*.lean' | sed 's#^\./##; s#\.lean$##; s#/#.#g' | sort)

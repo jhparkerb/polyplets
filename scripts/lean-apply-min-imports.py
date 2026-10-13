@@ -4,7 +4,7 @@ output: keep the module's `import Polyplets.*` lines, replace its Mathlib
 imports by the set `#min_imports` reported (polyplets/build/mi/<Module>.imports).
 Modules with no report are left alone. Prints a one-line diff summary per module."""
 import os, re, sys
-ROOT = '/Users/jasonp/src/polyominoes/polyplets'
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'polyplets')
 os.chdir(ROOT)
 mods = sys.argv[1:]
 if not mods:

@@ -2,9 +2,10 @@
 
 Purpose: make sure we credit prior work and do NOT claim as ours anything that is
 classical. Verdict up front: **the transfer-matrix machinery, the C-finiteness of
-fixed-height rows, and the rational generating functions are all classical.** Our
-only genuine new contributions are the specific *values* a(19) of A006770 and its
-companions Free(19)/OneSided(19) — not the methods or the structural observations.
+fixed-height rows, and the rational generating functions are all classical.** The
+new contributions are the specific *values* (a(19) onward of A006770 and its
+companions) — not the methods or the structural observations below. Written at
+a(19); the claims about what is classical are unchanged.
 
 ## What is classical (must cite, must NOT claim)
 
@@ -53,10 +54,10 @@ companions Free(19)/OneSided(19) — not the methods or the structural observati
   "believed not D-finite," not "proven."
 
 ## What IS ours
-- The value a(19) = 151,609,203,011,580 (A006770), computed and confirmed.
-- Free(19) = 18,951,156,321,090 (A030222) and OneSided(19) = 37,902,303,297,525.
-- The specific verification protocol (two independent algorithms + the cross-check
-  battery). The *protocol* is engineering, not mathematics; novelty is the values.
+- The values: a(19) = 151,609,203,011,580 (A006770) and onward,
+  Free(19) = 18,951,156,321,090 (A030222), OneSided(19) = 37,902,303,297,525.
+- The verification protocol (two independent algorithms plus the cross-checks)
+  is engineering, not mathematics; the novelty is the values.
 
 ## Framing rule for the paper
 Present the transfer matrix as "the standard finite-lattice / transfer-matrix

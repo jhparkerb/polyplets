@@ -22,7 +22,7 @@ are named in ALLOWED below with their reasons.  Any new unguarded literal
 fails this gate, so the coverage cannot silently drop when the paper gains a
 number.
 
-jasonp's prose is never written.  The verifier takes VERIFY_TEX purely so this
+The report itself is never written to.  The verifier takes VERIFY_TEX so this
 gate can point it at a temporary copy; `paper/technical-report.tex` is opened
 read-only here and by everything else in the tree.
 

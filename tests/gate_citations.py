@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """Gate CITATIONS: every repo path a document cites must exist.
 
-Written 2026-08-06 after two citation defects in two days. One was a paper
-mis-read (a 1998 PDF written off as a scan without opening it); the other was
-`results/subclasses.md` citing `results/cloud-investigation-2026-07-07.md`,
-a file that has never existed in this repo -- the name belongs to an entry in
-Claude's memory directory, and `docs/engine-record.md` cites it
-correctly as `[[cloud-investigation-2026-07-07]] in memory`. A memory note is
-not a repo artifact and cannot be cited by a paper. The same sweep turned up
-`results/pgo-no-go` and `results/reach-scaling-and-resourcing.md`, two more
-memory names written as paths.
-
 The check: pull every backticked repo-ish path out of every tracked markdown
 file and classify it.
 
@@ -27,24 +17,14 @@ file and classify it.
              and the claim is VERIFIED when ref X is present locally
   MISSING    none of the above -- FAILS the gate
 
-The history class is deliberately scoped to HEAD and not to `--all`. Until
-2026-08-18 it used every local ref, which made the verdict depend on which
-branches the checker's clone happened to have: 65 citations across 25 campaign
-records resolved on gympie's 50 local refs and dangled in a clone of master,
-which is what a reader gets.
-
-MISSING is the class that catches a name that never existed, which is what a
-memory-name-as-path always is.
+The history class is scoped to HEAD and not to `--all`, so the verdict does
+not depend on which branches the checker's clone happens to have.
 
 The second check is on markdown LINKS -- `[text](path)` -- and is stricter than
 the one on backticked paths: a link is clickable, so a reader who follows one
 to a file that is not there gets nothing at all, and no exemption word on the
 line changes that.  There is no history class for a link either; a deleted file
-is a fine thing to name in prose and a broken thing to link to.  Added
-2026-09-06, when README.md's own "why believe the number" paragraph linked
-`docs/engine-record.md`, merged into `docs/engine-record.md` a commit
-earlier -- the front door's first outbound link, and the backtick check passed
-it as history.
+is a fine thing to name in prose and a broken thing to link to.
 
 RED control: a synthetic document citing `results/definitely-not-here.md` must
 land in MISSING, and one citing it on a line that says "deleted" must not. A
@@ -52,8 +32,7 @@ second control covers the branch class: a file declaring a branch that does not
 carry the cited path must not thereby exempt it, when that branch is present.
 
 The third check is on SOURCE files -- module docstrings and Lean headers cite
-documents, and the consolidation left 588 of those pointing at merged-away
-records.  Same rule as the prose check: repoint it, or say deleted.
+documents too.  Same rule as the prose check: repoint it, or say deleted.
 
 Usage: python3 tests/gate_citations.py [--verbose]
 """

@@ -549,7 +549,7 @@ Derived: (M)/(M′); "moving square-root branch point, fixed exponent" ⟹ (*)
 
 Verified, not derived: `α_M` constant over `M = 1, 2, 3` within bias. The
 family at `j = 5, 6, 7` is a prediction; the case against 118/27 is
-structural and does not answer someone who rejects the law's form. The
+structural and does not answer someone who rejects the family's form. The
 conjecture that every fixed depth
 is algebraic on a curve with branch point `1/27` stands refined: each slice
 keeps its singularity at `Y = 1/9`, and the exponent `-(j-1/2)` is how the
@@ -707,7 +707,7 @@ Classical.choice, Quot.sound`, plus `Lean.ofReduceBool` where
   the explicit hypothesis `hbridge` (`truncL 61 Nexact = nSeries 60`), that
   the closed form is the walk's enumeration at all orders.
 
-Two boundaries, neither of them unfinished work. (1) The all-orders tie
+Two boundaries. (1) The all-orders tie
 between walk and triangle, identity (I), is `hbridge` plus the general-`k`
 factorization lemma of the diagonal module; it reduces to a closed form for
 the single-cluster generating function `B(y)`, and there is none: 18

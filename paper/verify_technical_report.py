@@ -605,8 +605,8 @@ if sp and ends and tot:
         check(f"census n={n}: T({n},{n - 1}) by enumeration", sum(t.values()), col[n - 1][n])
 
 
-# T(n,n-2) = (625n^2 - 2459n + 1134)/2 * 3^(n-7), n >= 5 (jasonp's 2026-09-05
-# decision C5 in paper/technical-report-gaps.md; docs/proofs/T-n-nm2-and-general.md).
+# T(n,n-2) = (625n^2 - 2459n + 1134)/2 * 3^(n-7), n >= 5
+# (docs/proofs/T-n-nm2-and-general.md; listed in paper/technical-report-gaps.md).
 # The closed form on every banked cell, and each of its seven pieces against
 # the enumeration for n = 5..8.  A triple has interior weight 49 (tromino 25,
 # split-and-domino 11 each way, double split 2) and end weight 7; a doubled

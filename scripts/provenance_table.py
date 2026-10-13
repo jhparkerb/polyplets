@@ -299,7 +299,7 @@ def render_table(T, a, src, exact, stats):
     L.append("| G | decorrelated fixed-height GFs | H <= 10 | full |")
     L.append("| R | small-height recurrences | H <= 4 | full |")
     L.append("| S | strip transfer matrix | H <= 14 | shares the union-find rule |")
-    L.append("| P | closed forms P_k on really-swept cells | k <= 18, n >= 2k+1, H <= 21 | full where credited |")
+    L.append("| P | closed forms P_k on enumerated cells | k <= 18, n >= 2k+1, H <= 21 | full |")
     L.append("| F | closed forms P_k above the swept heights; the formula is "
              "checked on swept cells, the entry itself is not recounted | "
              "k <= 18, n >= 2k+1, H > %d | formula-level |" % SWEEP_H)
@@ -317,7 +317,7 @@ def render_table(T, a, src, exact, stats):
     L.append("- cells: **%d**; strip covers **%d**; fixed-height GFs **%d**"
              % (stats["cells_total"], stats["strip_cells"], stats["gf_cells"]))
     L.append("- entries with at least one exact second source: **%d of %d "
-             "(%.1f%%)** -- counting every exact source now available"
+             "(%.1f%%)**"
              % (stats["exact_any"], stats["cells_total"], stats["exact_any_pct"]))
     L.append("- cells with no exact recount, whose value came from a closed "
              "form that is itself holdout-validated elsewhere: **%d**"
@@ -329,10 +329,8 @@ def render_table(T, a, src, exact, stats):
         L.append("")
         L.append("  " + ", ".join("T(%d,%d)" % c for c in sorted(co)))
         L.append("")
-        L.append("  Each is a cell whose value has one enumeration. That is the "
-                 "statement; a(n) is no better than its worst cell, so how "
-                 "large these cells are is not a fact about how much of a(n) "
-                 "is trustworthy and is deliberately not reported.")
+        L.append("  Each has one enumeration; a(n) is no better than its "
+                 "worst cell.")
     tu = stats["tower_reproduced_unsourced"]
     L.append("- cells with no exact recount that the refitted closed forms "
              "reproduce (tag U): **%d** of the %d, the %d formula-derived "

@@ -6,7 +6,7 @@ invokes, so after replacing `import Mathlib` a module can fail with
 corresponding Mathlib tactic module when missing; unused ones are pruned by
 `lake exe shake` afterwards. Usage: lean-tactic-imports.py [Module ...]."""
 import os, re, sys
-ROOT = '/Users/jasonp/src/polyominoes/polyplets'
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'polyplets')
 os.chdir(ROOT)
 TACTICS = {
     r'\b(ring|ring_nf|ring1)\b': 'Mathlib.Tactic.Ring',

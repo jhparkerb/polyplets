@@ -5,9 +5,8 @@
 detail and the pre-submission checklist.
 
 Staged drafts in OEIS **internal format** (`%I %S %T %U %N %C %D %H %F %e %Y %K %O %A %E`).
-**Nothing here is submitted.** These are reviewable, staged drafts; jasonp pushes the
-actual submission to oeis.org — Claude prepares and stages, never submits to an external
-service. Normal care for outward-facing steps; no signoff ceremony.
+**Nothing here is submitted.** These are staged drafts; jasonp alone submits
+to oeis.org.
 
 ## Submission-status flags
 - `draft-gf-orders.txt`, `draft-atom-degrees.txt` — **NOT READY**: the report
@@ -46,10 +45,10 @@ staged change against all four before jasonp submits:
 
 ## Provenance legend (for commit messages / %C)
 - **flood** — per-animal 4-connected-background flood fill, exact, n ≤ 14.
-- **engine** — column transfer matrix with Euler/hole accounting (`cpp/tma`,
-  thread #28), exact; validated byte-identical to the flood (n ≤ 14) and k-sums
+- **engine** — column transfer matrix with Euler/hole accounting (`cpp/tma`),
+  exact; validated byte-identical to the flood (n ≤ 14) and k-sums
   match A006770. Reaches n ≈ 16–18 (exact counts), higher via mod-p for GFs.
-- **cross-ISA** — independently reproduced on ayr (gcc/x86) vs gympie (clang/ARM).
+- **cross-ISA** — independently reproduced on x86 (gcc) and ARM (clang).
 - **confirmed** (a(n), A006770) — two architecture-decorrelated Redelmeier
   enumerations + an algorithm-independent transfer-matrix recount agree.
 
@@ -59,17 +58,15 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
 `%E` extension credits carry this name; the original `%A` authors of extended entries
 (Sloane, Cook, Wilson, Melik, ...) are preserved.
 
-## Status (2026-07-16, post a(22) two-algorithm confirmation)
+## Status
 | file | status |
 |---|---|
-| A006770 (fixed) | **see `SUBMISSION.md`** — staged to a(40) and moving; this table went stale at a(35) and no longer tracks it |
-| A030233 (one-sided) | staged: b-file to a(34) (promoted with A006770(34); Burnside arithmetic re-verified, R90(34)=0 structural); no conjectured comment left (reach cap) |
-| A030222/A030234/A030235/A194596 | staged: b-files to n=32 (T2); n=33 as conjectured %C comments (T3, D(33) hybrid) |
-| draft hole triangle T(n,k) | new (4-bg convention), exact through n=18, rows 15-18 cross-ISA confirmed |
+| A006770 (fixed) | staged to a(40); `SUBMISSION.md` has the detail |
+| A030233 (one-sided) | staged: b-file to a(34); Burnside arithmetic re-verified, R90(34)=0 structural; no conjectured comment |
+| A030222/A030234/A030235/A194596 | staged: b-files to n=32; n=33 as conjectured %C comments (D(33) rests on a fitted quasi-polynomial) |
+| draft hole triangle T(n,k) | new (4-connected-background convention), exact through n=18, rows 15-18 cross-ISA confirmed |
 | draft GF orders / atom degrees | Superseeker-novel; NOT READY (see flags) |
 | draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, plain-search novel; D4 breakdown of A030222 to n=19, validated (classes sum to A030222/A030234) |
-
-Submission is jasonp's, gated on the readiness process in the project handoff file (removed).
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**
@@ -86,7 +83,7 @@ Submission is jasonp's, gated on the readiness process in the project handoff fi
   prefix 0,0,0,1,1,2,3,5,6 matched 16 unrelated short sequences -- now **disambiguated by
   extension to 16 terms** (0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25) via `maxhole_split` (C++
   Redelmeier+flood, 4-connected-background primary convention).
-- **Lifetime-3 byproducts (results/lifetime3-proof.md), Superseeker 2026-06-21 -- BOTH NOVEL.**
+- **Lifetime-3 byproducts, Superseeker 2026-06-21 -- BOTH NOVEL.**
   (a) atom degrees `1 2 4 9 29 68 181 462 1254 3289` (deg N_H) and (b) GF orders
   `1 3 7 15 42 106 278 711 1897 5005` (deg Q_H) each returned no match from
   superseeker-reply@oeis.org -- the complete run (direct lookup + the full T001-T115
@@ -99,7 +96,6 @@ Submission is jasonp's, gated on the readiness process in the project handoff fi
   still to run before submission. Derivation (`scripts/symmetry_classes.py`) is validated:
   the 8 classes sum to A030222(n) and the five reflection classes to A030234(n) for all
   n <= 19 (the latter is the proven bilateral = (H+D)/2 identity).
-- (Lesson from A030233: always search before claiming novelty.)
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
 drafting and are attributed to their original authors in the `%A`/`%E` lines.

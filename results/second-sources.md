@@ -248,146 +248,32 @@ run consumes has nothing to check it: for a(39), level 18 predicts T(39,21)
 with no comparison entry. The below-onset fitting of `results/undertow.md`
 lowers the required height from `(n+2)/2` to `(n−3)/2`.
 
-## Memory model of the coloring engine
+The coloring engine's memory is about 8,100 bytes per frontier state with
+the exact 256-bit payload and 130 after the changes `results/motley-par/README.md`
+describes (residue passes, a flat arena, releasing consumed chunks); states
+grow about 3.1× per height (72,487,711 at H = 18, 224,529,648 at H = 19), so
+H = 19 ran in 61.6 GB and H = 21 would need the better part of a terabyte.
+The H = 19 run retired three entries that had only a congruence check,
+(38,19), (39,19) and (40,19)
+<!--q:retires.count@19=3--><!--q:retires.cells@19=(38,19),(39,19),(40,19)-->,
+and gave row 40 its entries T(40,19) and T(40,23)
+<!--q:row40_retires.cells@19=T(40,19),T(40,23)-->.
 
-Measured on the calibration run (dalby, one thread, exact 256-bit payload):
-
-| H | states | wall s | peak RSS MiB | bytes per state |
-|---|---|---|---|---|
-| 14 | 891,074 | 1,618.6 | 6,924.6 | 8,149 |
-| 15 | 2,624,197 | 5,134.5 | 20,382.8 | 8,144 |
-| 16 | 7,832,667 | 16,475.2 | 60,827.4 | 8,143 |
-
-Marginal slope `H = 15 → 16`: 8,142 bytes per state. The payload model,
-41 area slots × 3 coefficient streams × 32 bytes × 2 buffers = 7,872 bytes,
-accounts for it to 3%; the remaining ~270 bytes are container overhead
-(`unordered_map` node plus one heap vector per state). Measured states over
-the census: 2.286, 2.298, 2.308, 2.318, 2.327 at `H = 12..16`, rising about
-0.011 per height.
-
-| H | 17 | 18 | 19 | 20 | 21 |
-|---|---|---|---|---|---|
-| states, projected (±20%) | 23.7 M | 72.8 M | 226 M | 709 M | 2.25 B |
-| states, measured | 23,681,423 | 72,487,711 | 224,529,648 | — | — |
-
-Budget: 125 GB, about 121 available. `C_16(40) = 1.42·10^32`
-(`2^106.8`) with a falling per-height ratio (1.44, 1.36), so `C_21(40)`
-projects to `2^108`–`2^111`, inside a wrapping 128-bit word; the `A_n(1)`
-check is compared against a Pascal row in the same wrapping ring.
-
-Changes, each a factor on bytes per state, cumulative in the order listed;
-peak RSS in GB:
-
-| change | factor | bytes/state | H17 | H18 | H19 | H20 | H21 | top H |
-|---|---|---|---|---|---|---|---|---|
-| measured baseline | — | 8,142 | 193 | 593 | 1,839 | 5,772 | 18,322 | — |
-| A: 256-bit to 128-bit payload (exact by the same ring argument) | 1.9× | 4,206 | 100 | 306 | 950 | 2,982 | 9,465 | 17 |
-| B: the `A_n(1)` check as its own pass (3 streams to 2; wall up a half) | 1.5× | 2,894 | 69 | 211 | 654 | 2,052 | 6,513 | 17 |
-| F: flat arena, open-addressed index (overhead ~270 to ~57 bytes) | 1.1× | 2,681 | 64 | 195 | 606 | 1,901 | 6,033 | 17 |
-| C: residue passes at 32 bits (4 primes plus one predicted; values `< 2^112`) | 4× over A | 713 | 17 | 52 | 161 | 505 | 1,605 | 18 |
-| D: 16 bits, 8 primes | 8× over A | 385 | 9 | 28 | 87 | 273 | 866 | 19 |
-| E: 8 bits, 16 primes | 16× over A | 221 | 5 | 16 | 50 | 157 | 497 | 19 |
-| G: release each consumed chunk, `MADV_DONTNEED` (peak 2× to ~1.2× the working set; unmeasured when planned) | 1.7× | 130 | 3 | 9 | 29 | 92 | 293 | 20 |
-
-Each height demands, off the baseline, H17 1.6×, H18 4.9×, H19 15.2×,
-H20 47.7×, H21 151×. `H = 21` never fits: the payload floor caps the list at
-about 41× (at one byte per slot-coefficient the payload is still 164 bytes and
-the keys 57), so it is out-of-core or nothing, for the one entry T(40,21).
-
-Measured afterward: `H = 17` after A, projected 100 GB, measured 95.0;
-`H = 18` after C, projected 52 GB, measured 65.9, the container overhead being
-909.7 bytes per state against the 57 assumed; `H = 19` with F, G and 16-bit
-residues in the parallel engine, projected 59 GB, measured 61.6. The release
-path measured 0.53× the peak of the same run without it.
-
-**`H = 19` on the single-thread engine**, priced from the first four `H = 18`
-passes at 79,039 s and 65.9 GB, with the ×3.209 wall and ×2.984 RSS per height:
-about 253,700 s (70.5 h) per pass, nine passes, 634 h ≈ 26 days (about 40 with
-change B), peak about 197 GB against 125. What `H = 19` buys does not depend on
-how it was run: two entries of row 40, T(40,19) and T(40,23)
-<!--q:row40_retires.cells@19=T(40,19),T(40,23)-->, and two terms, a(36) and
-a(37); it retires three congruence-only entries, (38,19), (39,19) and (40,19)
-<!--q:retires.count@19=3--><!--q:retires.cells@19=(38,19),(39,19),(40,19)-->.
-The parallel engine ran it in 50,745 s of wall over nine passes.
-
-**Not levers**, measured with `experiments/cutcount/cutcount_b1_probe.cpp`
-(the rule plus an occupancy census, checked by reproducing
-`results/cutcount_b1/rows/C9.out`):
-
-- Ranged-area payload (store only `[n_lo, n_hi]` per state): mean nonzero span
-  at the peak column 36.4, 35.9, 35.4 of 41 slots at `H = 8, 9, 10`, a gain of
-  1.127×, 1.143×, 1.160×. The nonzero count equals the span, so sparse storage
-  is dead too.
-- Fewer columns: the state set saturates at column 2 of 41 at every `H`
-  measured; column count is a wall lever only.
-- Evaluating in the area variable: the true degree in `x` is `H · W = 861`,
-  not 40; the 41-slot vector is the truncation to `n ≤ 40`, and evaluation
-  cannot truncate. Cyclic aliasing mod `x^41 − 1` fails the same way.
-- Truncating the width from `W = 41` to `42 − H`: sound for the second
-  difference when all three heights use the same `W`, but a time lever (~2× at
-  `H = 21`), not a memory one.
-- Top-bottom mirror symmetry (~2× on states, the one factor that would move
-  `H = 21`): the flip commutes with a column-at-a-time transfer but not with
-  the row-at-a-time scan the engine uses. Unpriced.
-
-## Closed doors
-
-**The characteristic-2 collapse does not lift.** Does the small rank of the
-Hankel observability matrix over GF(2) survive lifting to `ℤ/2^k`, giving an
-exact route to the uncovered entries? A test of the form "the `ℤ/4` free rank
-jumps" cannot decide it: an invariant factor is a unit mod 4 iff it is odd iff
-it survives mod 2, so that rank is the GF(2) rank identically. The deciding
-quantity is `μ_k(H) = #{invariant factors d_i with v_2(d_i) < k}`, the minimal
-number of generators over `ℤ/2^k`, with `μ_1` the GF(2) rank and `μ_∞` the
-rank over `ℚ`.
-
-| H | states | μ_1 = GF(2) | μ_2 = ℤ/4 | μ_3 = ℤ/8 | μ_4 | rank mod p | μ_2/μ_1 |
-|---|---|---|---|---|---|---|---|
-| 4 | 20 | 6 | 6 | 6 | 6 | 6 | 1.000 |
-| 5 | 50 | 15 | 17 | 17 | 17 | 17 | 1.133 |
-| 6 | 126 | 27 | 35 | 35 | 35 | 35 | 1.296 |
-| 7 | 322 | 58 | 86 | 88 | 88 | 88 | 1.483 |
-| 8 | 834 | 112 | 194 | 204 | 204 | 204 | 1.732 |
-| 9 | 2,187 | 229 | 459 | 500 | 501 | 501 | 2.004 |
-
-`μ_2/μ_1` grows every height and at `H = 9` the second bit has spent the whole
-factor of 2; `μ_4` is the generic rank at every height. The collapse is the
-degeneracy `x + x = 0` and nothing more. At p = 3, `μ_1` is 6, 17, 35, 87,
-201, 488 against the generic 6, 17, 35, 88, 204, 501; at p = 5 and 7 the rank
-is generic at every `H ≤ 8`; extension fields of characteristic 2 change no
-rank. `μ_∞` reproduces the mod-p ranks by an independent computation over `ℤ`,
-so the rational rank equals the mod-p rank wherever measured. The probe
-checked `μ_1` against the GF(2) ranks 6, 15, 27, 58, 112, 229 and a second,
-independently written GF(2) elimination, `μ_K` against the mod-p rank wherever
-both exist, and that a stencil with one diagonal dropped moves the profile
-(6 to 11 at `H = 4`; 15, 17, 17 to 24, 25, 25 at `H = 5`). The uncovered
-entries therefore have no cheap exact closer.
-
-**The mod-2 subgroup bit and the CRT reconstruction do not compose.** CRT is
-not partial: once the primes give the exact integer, the parity is a check on
-a value already known, which is how the provenance table uses it (tag C). Nine
-primes near `2^16` give a modulus of about `2^144`; adjoining 2 adds 0.7%.
-Reconstructing modulo a product smaller than the value and using parity plus a
-size bound is not excluded, but needs the value bracketed within a factor of
-two, which nothing supplies. `scripts/provenance_table.py` derives the
-recount's reach from the row sets that assemble to the triangle rather than
-from a hand-set constant.
+Two exact routes to the uncovered entries were tested and closed; the record
+is in `results/closed-doors.md` (the characteristic-2 collapse does not lift
+to ℤ/2^k, and the mod-2 subgroup bit cannot shorten the CRT reconstruction).
 
 ## Proving the rule
 
 The rule is 80 lines (`slot`, `canon`, `gather`, `shifted`, `successors`) and
-does not change as the engine gets faster. Tier 1, the cancellation identity,
-is proved in `docs/proofs/cutcount-identity.md`; four points to keep straight
-in any restatement: the identity is exact in `ℤ[q]`, not a mod-`q^2`
-phenomenon; a subset carries a sum over configurations, not one product of
-birth factors; `b` counts live labels, not live components; and the
-window-reach lemma (king adjacency reaches at most `H + 1` cells back in scan
-order) belongs to this tier. Tier 2, that the dynamic program realizes the
-sum, is delimited in the proof's §7, invariant work of the kind
-`polyplets/Polyplets/Defs.lean` already carries (`kingAdj`, `KingConnected`,
-`kingConnected_iff_reachable`). Tier 3, the bridge to the binary, is never
-provable; its check is the Lean model evaluated on small boards against the
-C++ at `H ≤ 6`, as `polyplets/Polyplets/Compute.lean` does for `T n H`.
+does not change as the engine gets faster. The cancellation identity it rests
+on is proved in `docs/proofs/cutcount-identity.md`, exactly in `ℤ[q]`, with
+the window-reach lemma (king adjacency reaches at most `H + 1` cells back in
+scan order). That the dynamic program realizes the sum is not proved; what
+such a proof would need is set out in that note's §6. That the binary
+realizes the program is not provable; its check is the Lean model evaluated
+on small boards against the C++ at `H ≤ 6`, as
+`polyplets/Polyplets/Compute.lean` does for `T n H`.
 
 ## Open problems
 
@@ -396,7 +282,7 @@ C++ at `H ≤ 6`, as `polyplets/Polyplets/Compute.lean` does for `T n H`.
 - Top-bottom mirror symmetry of the strip, the one 2× that would move
   `H = 21`, is unpriced.
 - `C_15` of the strip transfer matrix, over 200 GB, has not been run.
-- Tiers 2 and 3 above, and formalizing the identity
+- The two unproved steps above, and formalizing the identity
   (`docs/proofs/cutcount-identity.md` §9).
 
 ## Reproduce

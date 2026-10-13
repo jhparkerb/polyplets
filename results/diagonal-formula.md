@@ -14,7 +14,7 @@ generating functions, and the negative results on every other slicing.
 Grades: proved, derived (exact algebra on enumerated weights), measured
 (exact arithmetic on the enumerated triangle), or estimated.
 
-## The law
+## The formula
 
 Write k = n − H for the surplus of cells over the height. The **onset** of a
 diagonal formula is the least n from which it holds; below onset the formula
@@ -248,7 +248,7 @@ many weights entering that modulus (five integers mod 27).
 
 ## Holes
 
-The hole-free triangle has its own law with hole-free weights: pair row
+The hole-free triangle has its own diagonal formula, with hole-free weights: pair row
 25 → 24 (the one holed configuration is the minimal diamond, a gap pair
 bridged below and above), triple 49 → 47, stacked pairs 339 → 304, boundary
 5, 7 unchanged and 62 for stacked pairs. The master equation and residue give
@@ -262,7 +262,7 @@ hole-making configurations (`experiments/holefree_gas.py`).
 
 With a hole marker z (pair row 24 + z, triple 47 + 2z, stacked pairs
 304 + 33z + 2z², boundary 5, 7, 62 + 4z), the marked equation gives the
-stratified laws, exact on all 26 enumerated hole-resolved entries (j ≤ k ≤ 2,
+stratified formulas, exact on all 26 enumerated hole-resolved entries (j ≤ k ≤ 2,
 H ≤ 7; `experiments/hole_strata_gas.py`):
 
     P_1(n,z) = (24n − 42) + z(n − 3),
@@ -297,7 +297,8 @@ leading coefficients 9^k/k!, and
     P_3 = (243n³ − 1548n² + 1897n + 56)/2,
     P_4 = (2187n⁴ − 20574n³ + 46657n² − 4502n − 67336)/8.
 
-P_3 agrees with the drift-parametric DP of the universal-law proof; P_4 is
+P_3 agrees with the drift-parametric DP of
+`docs/proofs/universal-diagonal-law.md`; P_4 is
 the second route to the hex cumulant A_4 = 3915/4. Single-row weights are
 (s+1)² for solid runs only (9 = 3² at s = 2); gap pairs weigh zero, since
 hex up and down neighbors {x−1, x} cannot bridge a gap. Mod 2 the master
@@ -400,7 +401,8 @@ characteristic polynomials, the atoms:
     q_3 = x⁴ − 4x³ + 2x² − 1
     q_4 = x⁹ − 5x⁸ + 2x⁷ + 8x⁶ − 6x⁵ − 12x⁴ + 4x³ + 2x² − 3x − 1
 
-Degrees 1, 2, 4, 9, 29, 68, 181, 462, 1254, 3289 (novel by Superseeker).
+Degrees 1, 2, 4, 9, 29, 68, 181, 462, 1254, 3289 (not in the OEIS;
+checked with Superseeker).
 Since T(n,H) = C_H(n) − 2C_(H−1)(n) + C_(H−2)(n), the column characteristic
 polynomials factor as p_H = q_H q_(H−1) q_(H−2) (verified H = 2, 3, 4; atoms
 pairwise coprime): orders 3 = 2+1, 7 = 4+2+1, 15 = 9+4+2, 42 = 29+9+4,
@@ -679,7 +681,7 @@ symmetry-refined triangles, perimeter- or component-refined statistics.
   at 18 terms (`docs/proofs/T-n-nm2-and-general.md` §5).
 - Symbolic closure of T(3m+2, 2m+1) ≡ 2 (mod 3).
 - Higher-coordination lattices; the polyiamond pair weight as a gadget.
-- The slope-2 slice: a law of degree ≥ 8 or onset past H = 8, and θ.
+- The slope-2 slice: a recurrence of degree ≥ 8 or onset past H = 8, and θ.
 - Series acceleration of B(y) for λ; re-recovery of G_11.
 
 ## Reproduce

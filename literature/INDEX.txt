@@ -28,6 +28,7 @@ Polyomino/animal enumeration:
   1106.1078.pdf                            Luther & Mertens, Counting lattice animals in high dimensions, arXiv:1106.1078 (2011).
   cond-mat_0301468.pdf                     Jensen, A parallel algorithm for the enumeration of self-avoiding polygons on the square lattice, arXiv:cond-mat/0301468 (2003).
   counting_polyominoes_revisited.pdf       Barequet & Ben-Shachar, Counting polyominoes, revisited (TOPP problem 37 line of work).
+  (no local copy)                          Barequet & Ben-Shachar, Counting polyominoes, revisited: corrigendum and addendum, arXiv:2610.10632 (2026). Corrects A(67); the error was found by the mod-4 congruence in results/symmetry-classes.md.
   shirakawa_n59.pdf                        Enumeration of polyominoes up to size n=59 (per PDF title).
   barequet_moffie_2007_jensen_complexity.pdf  Barequet & Moffie, On the complexity of Jensen's algorithm for counting fixed polyominoes (2007).
   barequet_rote_twisted_cylinders.pdf      Barequet, Moffie, Ribo & Rote, Counting polyominoes on twisted

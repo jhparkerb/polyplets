@@ -292,7 +292,7 @@ Three pairs agreeing is agreement between fits that share D_j(20..21) and the
 grand form. The check that crosses assumption families is an enumeration of
 T(41,20).
 
-**The height-20 enumeration.** `scripts/dalby_a41_h20.sh`, dalby, rev
+**The height-20 enumeration.** `scripts/dalby_a41_h20.sh`, rev
 `b88b38bc5`, 76 cores, nothing injected from the formula table; 2026-09-05,
 11:41 to 21:19 EDT, exit 0.
 
@@ -353,7 +353,6 @@ determined from the same (n, H) entries. The family tables feed every depth at
 every level and were checked against entries only at k <= 19; a shared error
 surfacing first at k >= 20 would move all depth pairs coherently and pass
 every agreement-only check. Only an enumeration crosses that family.
-`paper/L8-below-onset.tex` quotes this.
 
 ## The family tables' own software leg
 
@@ -378,7 +377,7 @@ T(2k-4, k-4), k = 5..19; it exits 1 without a K >= 19, e = 4 table and does
 not fall back to the Python enumeration. Its comparator is
 `severance_w3_gate.check_depth`, imported. The table
 `results/severance_w3_families_K21_e4.txt` was produced by
-`scripts/severance_e4_k21.sh` (`families 21 4`, 8 threads, dalby,
+`scripts/severance_e4_k21.sh` (`families 21 4`, 8 threads,
 2026-08-23 09:27 to 14:21, rev `95fbb6ceb`, 105 entries, sha256 checked
 against the producing machine's copy). The check passes: depth 1, 19 entries
 and depth 5, 15 entries, all exact; 0.20 s. Its negative control, +3^-17 at
@@ -512,124 +511,26 @@ coloring recount's rows stop at size 41.
 
 ## Measured costs
 
-**A fixed height as the maximum size grows.** `scripts/nmax_scaling.sh`,
-dalby, 8 cores held fixed, one height at a time; raw output
-`results/nmax-scaling.txt`. The box carried other jobs, so wall is
-contaminated and the cpu column is the measurement.
+The depth-5 family enumeration at 8 threads
+(`./build/severance_w3_families families K 4 8`, `results/depth5/ladder.txt`):
 
-| height | | size 40 | size 42 | size 45 | 40 to 45 |
-|---|---|---|---|---|---|
-| 14 | wall | 300.6 s | 336.9 s | 418.4 s | 1.392x |
-| 14 | cpu | 1685.9 s | 1925.5 s | 2432.0 s | 1.442x |
-| 15 | wall | 835.2 s | 1056.5 s | 1400.0 s | 1.676x |
-| 15 | cpu | 4669.9 s | 5524.7 s | 6845.3 s | 1.466x |
-
-Exponent in the maximum size: 3.10 at H = 14, 3.24 at H = 15, about +0.14 per
-height, so H = 21 extrapolates to about 4.1 and 40 to 45 to about 1.6x. Two
-points setting a slope six heights out is a weak extrapolation. The
-enumeration's 4.4x per term is the cost of raising height and size together.
-
-**The family enumeration per unit of excess.**
-`scripts/lastditch/emax_ladder.sh`, ayr, 16 threads, K = 10; raw output
-`results/emax-ladder.txt`.
-
-| emax | wall | rss | per-e wall | per-e rss |
-|---|---|---|---|---|
-| 0 | 0.01 s | 4 MB | | |
-| 1 | 0.09 s | 4 MB | 9.0x | 1.0x |
-| 2 | 0.74 s | 17 MB | 8.2x | 4.1x |
-| 3 | 4.92 s | 83 MB | 6.6x | 4.9x |
-| 4 | 46.71 s | 480 MB | 9.5x | 6.0x |
-| 5 | 326.79 s | 2.39 GB | 7.0x | 5.1x |
-
-**Thread count moves memory.** The enumeration builds per-thread private maps
-and merges them afterward (`cpp/severance_w3_families.cpp`, `step`), so a
-K slope taken across thread counts is not a slope.
-
-| K, e = 4 | 8 threads | 16 threads | 40 threads |
-|---|---|---|---|
-| 8 | 128.9 MB | | 138 MB |
-| 10 | 462.9 MB | 480 MB | 577 MB |
-| 12 | 1150.1 MB | | 1.54 GB |
-| 14 | 2459.5 MB | 2.69 GB | |
-| 16 | 4239.2 MB | 4.79 GB | |
-
-The 40-thread points took 12.2 s, 71.4 s, 265.0 s of wall at K = 8, 10, 12;
-the 16-thread points are `results/emax4-k-ladder.txt`
-(`scripts/lastditch/emax4_kladder.sh`, ayr), the 8-thread points
-`results/depth5/ladder.txt` (ayr). Slopes taken before the fixed-thread
-series, and where each put `families 21 4`:
-
-| reading | threads | slope per K | projected rss at K = 21 |
-|---|---|---|---|
-| e = 4, K = 8 to 12 | 40 | 1.828x | 184 GB |
-| e = 4, K = 10 to 12 | 40 | 1.636x | 84 GB |
-| e = 3, K = 10 to 22 | 10 and 40 | 1.308x | 18 GB |
-| e = 4, K = 10 to 14 | 16 | 1.521x (wall 1.972x) | 51 GB, 23 h |
-| e = 4, K = 8 to 16, five points | 8 | decelerating | 8.5 to 16 GB |
-
-**Depth 5.** `results/depth5/ladder.txt` (ayr, 2026-08-22, rev `a66bc61`,
-8 threads, `./build/severance_w3_families families K 4 8`); analysis
-`experiments/depth5_cost_ladder.py`, which steps a decaying ratio rather than
-a geometric mean.
-
-| K | wall | rss | wall x per +2K | rss x per +2K |
-|---|---|---|---|---|
-| 8 | 6.52 s | 128.9 MB | | |
-| 10 | 48.16 s | 462.9 MB | 7.39 | 3.59 |
-| 12 | 219.20 s | 1150.1 MB | 4.55 | 2.48 |
-| 14 | 731.86 s | 2459.5 MB | 3.34 | 2.14 |
-| 16 | 1988.13 s | 4239.2 MB | 2.72 | 1.72 |
-
-The K = 21 run (dalby, 2026-08-23, 8 threads) took 4 h 54 m (17,660 s) and
-18.3 GB (18,743 MB) against projections of 3.1 h to 6.7 h and 8.5 GB to
-16.1 GB from this ladder, so the method brackets wall and under-predicts
-memory, and every memory figure it produces is a floor.
-
-**Depth 6, not run.** `scripts/lastditch/emax5_kladder.sh` (dalby, 2026-08-23,
-8 threads, about 2.2 h in all); analysis `experiments/depth6_cost_ladder.py`,
-which imports the depth-5 extrapolator.
-
-| K | wall | rss | wall x per +2K | rss x per +2K |
-|---|---|---|---|---|
-| 8 | 40.04 s | 413.8 MB | | |
-| 10 | 369.50 s | 2,230.0 MB | 9.23 | 5.39 |
-| 12 | 1,951.05 s | 7,063.8 MB | 5.28 | 3.17 |
-| 14 | 7,633.96 s | 16,877.0 MB | 3.91 | 2.39 |
-
-The extrapolator under-predicts this series too (K = 14 from the three points
-below it: 6,295 s and 14,627 MB against 7,634 s and 16,877 MB measured), and
-more loosely than depth 5's.
-
-| `families 21 5` at 8 threads | wall | rss |
+| K | wall | rss |
 |---|---|---|
-| decelerating | 36.3 h | 74.2 GB |
-| with the K = 14 bias applied | 44 h | 85 GB |
-| deceleration stops | 251 h | 347 GB |
+| 8 | 6.52 s | 128.9 MB |
+| 10 | 48.16 s | 462.9 MB |
+| 12 | 219.20 s | 1150.1 MB |
+| 14 | 731.86 s | 2459.5 MB |
+| 16 | 1988.13 s | 4239.2 MB |
+| 21 | 17,660 s | 18,743 MB |
 
-The per-excess factor is not a constant: the emax 5 over emax 4 ratio at
-K = 8, 10, 12, 14 is 6.14, 7.67, 8.90, 10.43 in wall and 3.21, 4.82, 6.14,
-6.86 in memory, growing about 20% per two units of K, so applying it once as
-a constant would be badly wrong at depth 7. At 16 threads the projection is
-about 148 GB and does not fit a 128 GB box; at 8 threads it is 1.5 to 2 days
-with the other 72 cores idle. For a run of five further terms from one
-enumeration, the reach rule puts height 20 with J = 6 at n <= 45 against a
-277 GB disk peak, where height 21 with J = 4 reaches the same n against
-580 GB, more than the 563 GB then free.
-
-**The coloring recount in parallel.** `cpp/motley_par.cpp` at H = 18,
-size 40, 32 threads (ayr), reproducing the five recorded residue rows
-(`results/cutcount_b1/residues/`, `results/motley-par/README.md`):
-
-    p=2147483647  wall=3316.25 s  rss 60,159,508 kB  IDENTICAL to the recorded row
-    frontier states=72,487,711 (the count recorded for the serial run)
-
-against about 79,940 s per prime serially, 24x on a box with fewer cores. The
-serial pricing of height 19 was 27 to 40 days; the parallel program's run over
-heights 1 to 19 at size 41 took about 22 hours
-(`results/cutcount_b1/rows41/README.md`). Memory at height 19 was extrapolated
-from the H = 18 point at 3.0x per height to about 180 GB with 32-bit primes, 110
-GB with 16-bit, 68 GB with 8-bit; the run used nine primes near 2^16.
+The K = 21 run is the one a(41) uses. Extrapolating the K ≤ 16 ladder
+(`experiments/depth5_cost_ladder.py`) had predicted 3.1 to 6.7 h and 8.5 to
+16.1 GB for it, so projections from this ladder bracket wall and
+under-predict memory. Memory scales with thread count as well as K, since
+the enumeration builds per-thread maps and merges them afterward, so a
+slope taken across thread counts is not a slope. Depth 6 was priced
+(`scripts/lastditch/emax5_kladder.sh`) at 36 to 44 h and 74 to 85 GB for
+K = 21 and not run.
 
 ## The square lattice
 
@@ -745,9 +646,9 @@ and these five integers are its target.
     python3 experiments/depth6_cost_ladder.py
 
 All of the above run in seconds on the files in the tree. The measurements
-were `scripts/nmax_scaling.sh` (dalby), `scripts/lastditch/emax_ladder.sh`
-and `scripts/lastditch/emax4_kladder.sh` (ayr), the 8-thread series
-`./build/severance_w3_families families K 4 8` for K = 8, 10, 12, 14, 16
-(ayr), `scripts/lastditch/emax5_kladder.sh` (dalby, about 2.2 h),
-`scripts/severance_e4_k21.sh` (dalby, 4 h 54 m) and `scripts/dalby_a41_h20.sh`
-(dalby, 9.63 h on 76 cores).
+were `scripts/nmax_scaling.sh`, `scripts/lastditch/emax_ladder.sh`,
+`scripts/lastditch/emax4_kladder.sh`, the 8-thread series
+`./build/severance_w3_families families K 4 8` for K = 8, 10, 12, 14, 16,
+`scripts/lastditch/emax5_kladder.sh` (about 2.2 h),
+`scripts/severance_e4_k21.sh` (4 h 54 m) and `scripts/dalby_a41_h20.sh`
+(9.63 h on 76 cores).

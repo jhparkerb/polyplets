@@ -40,5 +40,5 @@ how the computation works, and the notes used to maintain the repository.
 
 | file | what |
 |---|---|
-| `docs/publication-split.md` | how the machine-written papers in `paper/` are labelled |
-| `docs/l-papers-record.md` | how those papers were produced and reduced from ten to six |
+| `docs/publication-split.md` | how the papers in `paper/` are labelled: the author's prose, or machine-written and unread |
+| `docs/l-papers-record.md` | the numbering, and the literature searches the machine-written papers' novelty sections rely on |

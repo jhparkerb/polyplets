@@ -43,8 +43,7 @@ rows41/run/), and three more arms run over them:
                n <= 40: 589 cells, H = 1..19.
   ROW-41       rows41 assembled at n = 41 and compared against the kink
                engine's own sweep, results/a41/h<H>.out: 19 cells.  This is
-               the two-engine agreement on the swept half of a(41), which the
-               audit found "recorded nowhere in the tree".
+               the two-engine agreement on the swept half of a(41).
   HELD-OUT-41  at EVERY height H = 1..19: CRT over the eight smaller primes,
                the largest predicted (scripts/motley_crt.py's rule, the one
                that produced the rows), the reconstruction tied back to

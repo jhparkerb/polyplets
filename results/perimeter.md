@@ -16,8 +16,8 @@ denominators, on both lattices through `k = 6`: the defect identity, the
 monotonicity behind the enumerator and the reduction of the king column to the
 square column are proved; period, degree, denominator and onset per class are
 interpolated with spare points; the shared leading coefficient and onset are
-derived. The square column reproduces Asinowski, Barequet and Zheng (2018); the
-king column is not in the literature. At the minimum end, `pmin(n)` is
+derived. The square column reproduces Asinowski, Barequet and Zheng (2018); no
+source for the king column was found. At the minimum end, `pmin(n)` is
 published (A261491 square, A235382 king); indexed by `p`, the classes are
 eventually constant with a linear threshold. The king constants are a
 convolution of the 4-colored partition function with box-skew deficits,

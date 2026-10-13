@@ -64,11 +64,6 @@ The state of rigorous knowledge, with grades:
 | convolution certificate | λ ≤ 9.3154 | exact rational certificate | `docs/proofs/polyplet-upper-bound.md` |
 | elementary counting | λ ≤ 5⁵/4⁴ ≈ 12.207 | proved | `docs/proofs/polyplet-upper-bound.md` |
 
-For scale, the rigorous bracket on the growth rate of 1324-avoiding
-permutations after decades of work is 10.271 ≤ gr ≤ 13.5 around a numerical
-11.60 (Bevan, Brignall, Elvey Price and Pantone, EJC 88 (2020) 103115), a
-ratio of 1.31. This bracket's ratio is 9.3154/6.543 = 1.42.
-
 ## The strip growth constants μ_H
 
 Values from power iteration on M(x), double precision, printed to seven
@@ -162,7 +157,7 @@ An exactly checked M(den/num) v ≥ v therefore certifies λ ≥ μ_H ≥ num/de
 | 17 | **6.543** | 6543 / 10³ | 6536381 | 6.546486999 | 3 / 110 | 134.8 | 6 | 772.7 |
 
 Every row is a line in `results/strip_mu_certificates.log` (git revision
-900b4ff, gympie, 2026-07-31), with vector checksum, precision fields and
+900b4ff, 2026-07-31), with vector checksum, precision fields and
 wall time; "states" is the in-edge-reachable boundary count, "tries" the
 number of candidate numerators before one passed, and the float column the
 value the search phase proposed, used nowhere in the proof. H = 12, 13 and
@@ -699,92 +694,16 @@ and no algorithm, so this corroborates 7.11 independently, though at H ≤ 13
 it is not sharper. On H ≤ 11, full Richardson in 1/H² gives 7.41 and a local
 two-point fit 6.64–6.71, so higher-order corrections matter.
 
-`experiments/strip_fss.py` solves ln μ_H = ln λ − a/H − b/H² exactly on
-consecutive triples of the seven-decimal ladder:
-
-| triple | λ | a | b |
-|---|---|---|---|
-| [11,12,13] | 7.29817 | 1.65351 | 3.19705 |
-| [13,14,15] | 7.25820 | 1.51121 | 4.11872 |
-| [15,16,17] | 7.22999 | 1.39472 | 4.99006 |
-
-(The script prints a = 1.65350, b = 3.19710 for the first triple, agreeing
-with `numpy` and 50-digit `mpmath`; the table's last digits are display
-rounding and lie 10–25× below the noise floor next.) Perturbing each μ_H in
-a triple by one unit in its seventh decimal over all sign combinations gives
-spreads of λ 6.8e−5 to 1.1e−4, a 2.2e−4 to 5.0e−4, b 1.3e−3 to 4.0e−3; λ
-keeps 5–6 significant figures, a 3–4, b 3. Against that floor, b climbs by
-+0.92 and +0.87 across the triples (220–700× the floor) and λ drifts −0.020
-then −0.014 per height step (120–290× the floor), overshooting the
-differential-approximant 7.1102 by +0.120 at the top triple. The surface
-term H(ln λ − ln μ_H) at λ = 7.1102 is still falling at H = 17 by 0.035053
-per step, and its increments shrink 6.52% per step where a clean 1/H²
-correction predicts (16/17)² ≈ 11.42%; at λ = 7.111 the figures are
-0.034940 and 6.54%. A third ansatz ln μ_H = ln λ − a/H − c ln(H)/H² gives
-λ = 7.21575, 7.19121, 7.17462 on the same triples (a = 1.10866, 0.99219,
-0.90289; c = 3.25956, 3.62540, 3.92824), halving the overshoot; three
-parameters on three points is an exact solve and proves nothing about the
-correction's form.
-
-These numbers might be read as requiring a term between 1/H and 1/H², most
-likely logarithmic. The sensitivity analysis next shows that they do not;
-what both readings share is that no 1/H² coefficient, and hence no central
-charge, is readable from this ladder at H ≤ 17.
-
-`experiments/strip_fss_lambda_sensitivity.py` (three negative controls): the
-surface-term diagnostic feeds λ in as a constant, and an error δ in ln λ
-adds H·δ to the surface term, so every increment picks up a constant +δ that
-never decays. The increment ratio at H = 17, solved exactly for the exponent
-q in S(H) = S_∞ + c H^(−q):
-
-| λ fed in | dS(17) | ratio | shrink | q |
-|---|---|---|---|---|
-| 7.1102 | −0.035053 | 0.934769 | 6.52% | +0.078 |
-| 7.111 | −0.034940 | 0.934572 | 6.54% | +0.082 |
-| clean 1/H² | | 0.882353 | 11.76% | 1 |
-
-(The asymptotic shortcut ((H−1)/H)^(q+1) reads q = 1.065 off an exactly-1/H²
-ladder; the first control caught it.) The λ that makes the ladder look
-clean at H = 17 is λ* = 7.2300; the two values tested differ by 8e−4, 150×
-too small a range to see it. Over all 27 last-digit perturbations of
-μ_15..μ_17, λ* stays within [7.229932, 7.230046]. λ*(H), the λ at which
-height H's increment ratio equals the clean prediction, tends to λ for any
-expansion whose leading correction is a/H:
-
-| H | 7 | 9 | 11 | 13 | 15 | 17 |
-|---|---|---|---|---|---|---|
-| λ*(H) | 7.6044 | 7.4502 | 7.3574 | 7.2982 | 7.2582 | 7.2300 |
-
-Monotone, decrements decaying as H^(−2.73); summing the tail gives
-λ*(∞) = 7.1026, offset −0.0076 from 7.1102. The same extrapolator on two
-synthetic ladders built at λ = 7.1102, one analytic (a/H + b/H² + c/H³ at
-the fitted coefficients) and one with a genuine a/H + c ln H/H², returns
-7.1095 and 7.1097, so its control accuracy is 7e−4 and the real ladder's
-residual is ten times that. The raw diagnostic on the same three ladders
-gives λ*(17) = 7.1211, 7.1647 and 7.2300 (offsets +0.011, +0.055, +0.120):
-the real ladder's offset is twice the log-term synthetic's, yet all three
-extrapolate to within 0.008 of the truth, so the offset measures how slowly
-the correction series converges, not its form. The direct test, with λ held
-at 7.1102 and ln μ_H = ln λ − Σ c_j/H^j fitted on a window:
-
-| window | terms | rms residual | worst | λ if fitted instead |
-|---|---|---|---|---|
-| H ≥ 2 | 3 | 6.4e−3 | 1.3e−2 | 7.4178 |
-| H ≥ 8 | 3 | 1.3e−4 | 2.1e−4 | 7.2088 |
-| H ≥ 10 | 4 | 2.9e−6 | 4.1e−6 | 7.1556 |
-| H ≥ 12 | 4 | 4.4e−7 | 6.6e−7 | 7.1487 |
-
-The ladder's truncation floor is about 1.5e−8 in ln μ, so a four-term
-analytic expansion at λ = 7.1102 describes H ≥ 12 to within 30× the floor
-and nothing is left for a log term to explain. With λ free it comes out
-7.15–7.25, drifting down as the window rises and terms are added, never
-reaching 7.1102: the upward bias of a slowly converging asymptotic series on
-a fitted leading constant. Not established: that there is no log term; a
-small-amplitude one fits as well. Established: the ladder at H ≤ 17 cannot
-tell them apart, and the fitted λ is still biased about +0.04 high at the
-best window. The H ≥ 12 fit has six points against four coefficients.
+Fitting ln μ_H = ln λ − a/H − b/H² on consecutive triples of the
+seven-decimal ladder (`experiments/strip_fss.py`, with the controls in
+`experiments/strip_fss_lambda_sensitivity.py`) gives λ = 7.298, 7.258,
+7.230 on the top three triples, drifting down and never reaching 7.1102,
+while a four-term expansion with λ held at 7.1102 fits H ≥ 12 to within 30×
+the ladder's truncation floor. So the ladder at H ≤ 17 cannot tell a
+logarithmic correction from none, no 1/H² coefficient is readable from it,
+and a λ fitted from it is biased about +0.04 high at the best window.
 Everything here takes λ = 7.1102(1) from the differential approximants as
-given. Nothing here bears on the certified lower bound.
+given, and nothing here bears on the certified lower bound.
 
 ## Where a(n)'s weight sits: the height distribution
 
@@ -951,6 +870,7 @@ and king rows returned A001168 and A006770 in the same session).
     python3 experiments/flank_saddle.py                    # the tall flank at n=40
     python3 experiments/lambda_atlas_probe.py --nmax 9     # the short rook, ~12 min
 
-The upper-bound scripts are listed in `docs/proofs/polyplet-upper-bound.md`;
-`paper/L3-lambda-bounds.tex` is the paper on the bracket and
-`paper/verify_l_papers.py` checks its printed numbers.
+The upper-bound scripts are listed in `docs/proofs/polyplet-upper-bound.md`.
+`paper/L3-lambda-bounds.tex`, a paper on the bracket written by a language
+model (`paper/README.md`), has its printed numbers checked by
+`paper/verify_l_papers.py`.

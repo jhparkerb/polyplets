@@ -573,8 +573,7 @@ walk-range distribution, B(H,2,H) = 2^H - 2 (the Burnside check's edge
 control), monotone tail 2, next-to-tail 2(H+1), B(H+1,2,H) = H 2^(H-1), tail
 2(H+2). The k = 0 slice modulo 3 is visibly 3-automatic: row H = 9 reads
 100000122, a zero desert carrying row H = 3's skeleton 102 (a Lucas-type
-digit product, provable with the mod-3 methods of
-`results/arithmetic-structure.md`); the k = 1, 2 slices show parity striping
+digit product, not proved); the k = 1, 2 slices show parity striping
 (020202..., 002222002221), undecoded. The full table at production scale
 would cost an a(36)-sized run.
 
@@ -617,7 +616,7 @@ in D(33):
   have never been counted separately. Log-convexity of each parity class is
   observed, not proved.
 - The k >= 1 stripes of the joint box table modulo 3 are undecoded, and its
-  k = 0 digit law is unproved.
+  k = 0 digit pattern is unproved.
 - D(34) has not been run; it would rest on the fitted P_5 on odd S unless the
   n = 33 direct strips fix it.
 - Per-entry mod 4 at n = 40 needs a bounded-height mode for I_H(<v>) and a

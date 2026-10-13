@@ -4,9 +4,8 @@
 # reference (banked production per-height — no column re-run), plus a total
 # check against the certified a(n). The kink kernel is an INDEPENDENT
 # transition implementation (per-cell union-find + NW carry vs the column
-# kernel's per-column union-find), so a full cell match is the
-# independent-reimplementation closure the a(23) validation plan names
-# ([[a23-readiness-and-validation]]).
+# kernel's per-column union-find), so a full cell match is an
+# independent-reimplementation check.
 #
 # Usage: kink_validate.sh MAXN COUNTER REFDIR [CERTFILE]
 #   REFDIR   : dir of existing column-kernel h<H>.out files (H=1..MAXN)

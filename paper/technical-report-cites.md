@@ -1,6 +1,6 @@
 # Where `paper/technical-report.tex` would take a citation
 
-2026-09-05, `paper/technical-report-gaps.md` B3. The keys are in
+2026-09-05, `paper/technical-report-gaps.md`. The keys are in
 `paper/technical-report.bib`, every entry checked against the copy in `literature/`
 (or, for OEIS, the live entry). The `.tex` is jasonp's and is not edited here:
 this file says which sentence, which key, and why, and he places the `\cite`.

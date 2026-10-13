@@ -898,8 +898,8 @@ by perimeter and not by area. What follows strengthens every part of it.
   switches to edge adjacency (`dl` in `[−wp+1, w−1]` instead of `[−wp, w]`,
   the rule `cpp/convex_perim_tm.cpp` uses for its own control) and
   reproduces A067675, fixed convex polyominoes by area.
-- Not in OEIS; no king convex enumeration in the literature, all classical
-  convex work being edge-connected. Classical anchors: Bender 2.30914 for
+- Not in OEIS; no king convex enumeration was found in the literature, the
+  classical convex work being edge-connected. Classical anchors: Bender 2.30914 for
   convex polyominoes by area, Temperley 3.2056 for column-convex polyominoes.
 
 | n | tool | wall_s | peak_rss_mb |
@@ -1029,12 +1029,13 @@ disagreement at the 19th. A degree-3 relation of height `3.4e4` absorbs about
 
 ### The area generating function as a q-series
 
-The derivations in this subsection come from an unattended run on a copy of
-the repository cut at `74b2c20`; its files are kept only in git history, at
-commit `e5e7870` under `results/ghostship/grading/run-record/sandbox/`. That
-run also re-derived the semiperimeter series to `s = 200` and its degree-2
-algebraicity, matching `results/convex_perim_terms_s200.txt` on all 199
-shared terms; nothing below claims those.
+The derivations in this subsection come from an unattended machine run on a
+copy of the repository; its files are kept only in git history (commit
+`e5e7870`), and nobody has checked the derivations by hand. What is stated
+below as verified is the agreement of its formulas with terms recorded in
+this tree. That run also re-derived the semiperimeter series to `s = 200`
+and its degree-2 algebraicity, matching `results/convex_perim_terms_s200.txt`
+on all 199 shared terms; nothing below claims those.
 
 **The bivariate box generating function, derived.** From an explicit
 four-phase catalytic functional equation, eliminating the catalytic variable
@@ -1069,8 +1070,9 @@ recorded. Fixed-height area generating functions are rational with
 cyclotomic denominators: `A_2 = q²(3−q)/(1−q)³`,
 `A_3 = q³(7+2q+3q²−4q³+2q⁴)/((1−q)⁴(1−q³))`, `A_4` with denominator
 `(1−q)⁴(1−q³)²(1−q⁴)`; slices sum to the area sequence for `n ≤ 12`; the
-mechanism is a q-Temperley argument proved in that run. Row numerators
-satisfy `N_h(1) = A153337`, proved at generating-function level, plus halving
+mechanism is a q-Temperley argument given in that run and not checked here.
+Row numerators satisfy `N_h(1) = A153337` on the recorded heights, with an
+argument at generating-function level in the same run, plus halving
 identities at `x = −1`.
 
 **Certified constants.** The area generating function is a finite combination
@@ -1085,9 +1087,10 @@ smallest positive zero of the Temperley denominator
     mu = 3.128943269730886252277447995387754160532...
     A  = 0.974452213135004649151329420860243327425...
 
-both certified to 44+ digits by exact-rational interval arithmetic with a
-simple-pole certificate; control values reproduce the published Kotesovec and
-Klarner–Rivest digits.
+both reported by that run as certified to 44+ digits by exact-rational
+interval arithmetic with a simple-pole certificate (the certificate is in git
+history, not in this tree); control values reproduce the published Kotesovec
+and Klarner–Rivest digits. The 199-digit µ above, from the series, agrees.
 
 **The exponential spectrum is the reciprocal zero set of K.** The Prony
 spectrum of the unrestricted and staircase series (next section) consists of
@@ -1894,9 +1897,9 @@ the boxes (degree 22 at 185 digits took 41 s, degree 45 took 1669 s, degree 30
 at 251 digits took 303 s; a degree-120 box extrapolates to hours). Neither
 run.
 
-Novelty: HV-convex king animals are not in OEIS or the literature under any
-name; no source states the squeeze for intermediate classes; Propositions 6,
-7, 10 and 11 have no counterpart found. A225114's entry, fetched 2026-08-05
+Novelty: HV-convex king animals are not in OEIS, and no literature source
+for them was found under any name; no source found states the squeeze for
+intermediate classes; Propositions 6, 7, 10 and 11 have no counterpart found. A225114's entry, fetched 2026-08-05
 (`experiments/oeis_lookup.py --full id:A225114`), has 24 terms, one comment
 and the conjectured continued fraction, no asymptotic and no growth constant;
 A001523 confirmed on twelve terms. Read-only lookups: `D_asc = 1, 3, 10, 34,
@@ -2064,12 +2067,13 @@ corners. `experiments/component_stratification.py`.
   1, 1.5, 2, 2.5, 3, 3.501, 4.003, 4.506, 5.009 for `n = 1..9`: a typical
   polyplet is about `n/2` edge-components of about 2 cells each. It is not
   exactly `(n+1)/2`: `Σ_c c·C(6,c) = 13416 ≠ 13412 = (7/2)a(6)`.
-- This fragmentation is the mechanism behind `λ ≈ 7.11 ≫ 4.06`: `a(n)` is
-  dominated by corner-assemblies of small pieces. A species-style composition
+- At these `n`, `a(n)` is dominated by corner-assemblies of small pieces,
+  which is consistent with `λ ≈ 7.11 ≫ 4.06`. A species-style composition
   `a(n) = f(A001168)` does not close: corner-gluing is geometrically
   constrained (no overlap, specific adjacency, global connectivity), not free.
 - Not in OEIS (row- and antidiagonal-flattened; columns `c = 2` and `c = 3`);
-  no literature decomposes king animals by edge-component count.
+  no literature source decomposing king animals by edge-component count was
+  found.
 
 ## Rook and diagonal edges in a typical polyplet
 
@@ -2494,58 +2498,6 @@ not written); irreducibility says nothing about mixing time, so no sampler
 payoff follows. The square-lattice case is very likely a lemma of Janse van
 Rensburg and Madras, J. Phys. A 30 (1997) 8035–8066, wanted in
 `literature/MISSING.md`; novelty is not claimed.
-
-## Machinery retargetable beyond polyplets
-
-An inventory, not results: novelty unchecked on every item, nothing run on a
-non-king problem except where marked, no competitiveness claimed, costs
-unestimated.
-
-- **A1. The universal diagonal law** (`docs/proofs/universal-diagonal-law.md`),
-  stated for the row-local class and already run on square, hex and king
-  (`experiments/universal_law_check.py`, `experiments/hex_gas.py`,
-  `experiments/diagonal_law_proof_check.py`). Not instanced: triangular, the
-  spread-8 neighborhood, `|dx| ≤ 2` lattices, directed and anisotropic
-  variants; the obvious target is the A001168 near-diagonal closed forms by
-  the same peeling recursion and modular spine.
-- **A2. The symmetry-companion machine** (`cpp/sym/symtm.cpp`,
-  `scripts/derive_related.py`, `results/sym_counts.txt`) for any polyform
-  family with a dihedral action; the subgroup-invariant counts are missing on
-  every lattice.
-- **B1. Certified spectral-radius bounds** (`cpp/strip_mu_cert.cpp`, a
-  Collatz–Wielandt certificate in integers, needing neither positivity of `v`
-  nor irreducibility) and the upper half `experiments/certificate_bound.py`
-  (already run on Bui's rook six-type system, `λ_2 ≤ 4.63`): a
-  machine-checkable two-sided bracket for constrained-coding capacity,
-  subshift entropy, language growth rates.
-- **B2. Mechanized non-D-finiteness** from strip generating functions
-  (`experiments/anisotropic_dfinite.py`, `results/anisotropic-not-dfinite.md`):
-  the widest reach, for self-avoiding walks and polygons by width, directed
-  and convex families, percolation and dimer strips, bounded-height heap
-  models.
-- **B3. A Northcott-type bound**, formerly a standalone Lean file (last at
-  commit `697f376`): a house bound forces `M(minpoly) ≤ (max 1 B)^deg`, hence
-  unbounded degree for pairwise distinct algebraic integers with a uniform
-  house bound.
-- **C1. The column-step engine** behind the `libenum` seam:
-  commutative-associative reduce, work-stealing orchestrator, spill/merge, CRT
-  counting, checkpoint and cross-architecture recount; retargets needing only
-  a new transition table: SAW/SAP, percolation clusters, Potts/Ising strips,
-  dimers, spanning forests.
-- **C2. The measured infrastructure findings** (`docs/engine-record.md`):
-  how to saturate a small heterogeneous fleet on a disk-bound enumeration.
-- **C3. Verification methodology**: confidence tiers, gates
-  (`docs/engineering-standards.md`), per-term provenance,
-  `docs/observability.md`, and the computed-table-into-Lean pattern
-  (`#guard_msgs` axiom footprints, in-tree `native_decide` bridges).
-- **D1. Statistical physics**: king is the matching lattice of `Z²` for site
-  percolation (`p_c` values sum to 1), so perimeter-refined counts plus the
-  Sykes–Essam identity give `p_c` against the known 0.40725; finite-size
-  scaling of the certified `µ_H` ladder against Yang–Lee predictions.
-- **D2. The repository as primary source** on AI-assisted research, no
-  compute.
-
-Cheapest first: B2, B1, A1, then C3/D2 as write-ups, then C1 as a real port.
 
 ## Open problems
 

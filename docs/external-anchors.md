@@ -1,10 +1,8 @@
 # External anchors: published values this machinery reproduces
 
-An internal consistency check asks the reader to trust us. An external anchor
-does not: it is a number somebody else published, which our programs land on
-without being told to. Every item below is of that kind, with the file where
-the comparison can be repeated. The order is by how little the reader has to
-take on faith.
+An external anchor is a number somebody else published, which our programs
+land on without being told to. Every item below is of that kind, with the
+file where the comparison can be repeated.
 
 One caution on the first anchor. `fixtures/b006770.txt` carries 20 terms, but
 n = 19 and 20 in it are this project's; OEIS A006770 (revision 44, 2026-05-30)
@@ -39,10 +37,9 @@ produced the uncertified one.
 ## Tier 3 — published theorems our results land on
 
 - Richard, arXiv:0704.0716: the rectangles area limit law `beta_{1,1/2}` for
-  convex polygons. Our area-moment work rederived it without knowing, which is
-  a collision on priority and at the same time a check: the king lattice, where
-  nothing is solved, lands in the same universality class as the solved square
-  case. Enting–Guttmann (1989) cover the square control.
+  convex polygons. Our area-moment computation rederived it before the paper
+  was found; the result is Richard's, and the rederivation is a check on the
+  computation. Enting–Guttmann (1989) cover the square control.
 - Delest–Viennot (1984): algebraicity of convex polyominoes by perimeter, used
   as the positive control for the algebraicity guesser that produced our king
   verdicts. A guesser that cannot find a known algebraic equation is not
