@@ -23,10 +23,9 @@ by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
 
 * `isDiagonalPoly_hexP1` / `hex_T_sub_one` : `P₁(n) = 9n − 15`, i.e.
   `T(n, n−1) = (9n − 15)·2^(n−4)` for `n ≥ 3` (paper instance table, density
-  `9 = 3²`), given the second cell `T(4,3) = 21` as a hypothesis. The
-  first cell `T(3,2) = 6` the kernel decides from the generic enumerator;
-  `T(4,3)` needs more than 8 GB in the kernel (measured 2026-10-12), so it
-  enters as the hypothesis `isDiagonalPoly_hexP1` and `hex_T_sub_one` carry.
+  `9 = 3²`), unconditionally: the kernel decides both onset cells,
+  `T(3,2) = 6` and `T(4,3) = 21`, from the generic enumerator `Tc` (the second
+  at 5.7 GB and 12 s, measured 2026-10-12).
 * `Checks.lean`: the row sum of the computed height triangle at `n = 3`
   reproduces A001207 (fixed polyhexes) `11` — the same cross-family check as
   for the square lattice against A001168.
@@ -66,11 +65,15 @@ theorem adj_hex {p q : ℤ × ℤ} :
     abs_eq (by norm_num : (0 : ℤ) ≤ 1)]
   omega
 
-/-! ## The first cell -/
+/-! ## The two onset cells -/
 
 /-- `T(3,2) = 6`: of the 11 fixed 3-cell polyhexes, one is flat and four are
 strict staircases, leaving six of height exactly 2. -/
 theorem T_hex_3_2 : T hexLattice 3 2 = 6 := by
+  rw [← Tc_eq_T_of_reach_le_one hex_reach_le]; decide +kernel
+
+/-- `T(4,3) = 21`. -/
+theorem T_hex_4_3 : T hexLattice 4 3 = 21 := by
   rw [← Tc_eq_T_of_reach_le_one hex_reach_le]; decide +kernel
 
 /-! ## `P₁` -/
@@ -92,22 +95,21 @@ lemma hexP1_eval_three : hexP1.eval (3 : ℚ) = ((T hexLattice 3 2 * hexLattice.
   rw [hexP1_eval, T_hex_3_2, b_hex]; norm_num
 
 /-- `P₁` at the second onset point: `P₁(4) = T(4,3) · b^0 = 21`, given the cell. -/
-lemma hexP1_eval_four (h43 : T hexLattice 4 3 = 21) :
+lemma hexP1_eval_four :
     hexP1.eval (4 : ℚ) = ((T hexLattice 4 3 * hexLattice.b ^ 0 : ℕ) : ℚ) := by
-  rw [hexP1_eval, h43, b_hex]; norm_num
+  rw [hexP1_eval, T_hex_4_3, b_hex]; norm_num
 
-/-- **The hexagonal `P₁`**, given the second cell `T(4,3) = 21`. -/
-theorem isDiagonalPoly_hexP1 (h43 : T hexLattice 4 3 = 21) :
-    IsDiagonalPoly hexLattice 1 hexP1 :=
+/-- **The hexagonal `P₁`.** -/
+theorem isDiagonalPoly_hexP1 : IsDiagonalPoly hexLattice 1 hexP1 :=
   isDiagonalPoly_one_of_eval hexLattice hexP1 hexP1_natDegree_le hexP1_eval_three
-    (hexP1_eval_four h43)
+    hexP1_eval_four
 
 /-- **The hexagonal `P₁`, human form**: the number of fixed polyhexes with `n`
 cells and bounding-box height exactly `n − 1` is `(9n − 15)·2^(n−4)`, for every
-`n ≥ 3`, given `T(4,3) = 21`. -/
-theorem hex_T_sub_one (h43 : T hexLattice 4 3 = 21) (n : ℕ) (hn : 3 ≤ n) :
+`n ≥ 3`. -/
+theorem hex_T_sub_one (n : ℕ) (hn : 3 ≤ n) :
     (T hexLattice n (n - 1) : ℚ) = (9 * (n : ℚ) - 15) * (2 : ℚ) ^ ((n : ℤ) - 4) := by
-  have h := isDiagonalPoly_hexP1 h43 n (by omega)
+  have h := isDiagonalPoly_hexP1 n (by omega)
   simp only [topRowRecursion_T, topRowRecursion_b, b_hex] at h
   norm_num [hexP1_eval] at h ⊢
   rw [h]

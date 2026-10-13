@@ -225,6 +225,11 @@ TODO.
   is proved once, by the climb (`isDiagonalPoly_P1`, `T_sub_one` in
   `Staircase/Climb`); the Lagrange copy in `DiagonalPolys` is gone, and that
   file is the 19 polynomials as data.
+- Memory cap 18 GB per kernel step, three quarters of the machine (2026-10-12,
+  his ruling: the 8 GB of the first pass was an overreaction to an OOM the
+  PRP job caused): the hex and
+  square `T(4,3)` close at 5.7 and 5.2 GB, so `hex_T_sub_one` and
+  `square_T_sub_one` take no hypothesis and `Audit.lean` guards them.
 - Delete outside the Report cone (2026-10-12, third checkpoint): 60 modules,
   24k lines; `Pin.lean` (now `DiagonalPolys.lean`) cut to the polynomials, the pin lemma and
   `P1_closed`. Reversed the same day for the L-paper modules `RowLocal/`,

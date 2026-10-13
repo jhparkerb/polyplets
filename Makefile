@@ -930,7 +930,9 @@ build/dmirror_spine: cpp/dmirror_spine.cpp cpp/obs.h | build
 # polyplets/Polyplets/Audit.lean pin every Report.lean theorem to the standard
 # three axioms). The greps are belt and braces: a `sorry` or a `native_decide`
 # in a module the root does not import would otherwise pass unnoticed. Serial
-# (LEAN_NUM_THREADS=1): a lean process on this tree peaks at ~3.5 GB.
+# (LEAN_NUM_THREADS=1 gives lake one worker, so one module at a time): the
+# heaviest kernel step (EnumData's boards6_eq) peaks at 10.8 GB; the cap on
+# one step is 18 GB, three quarters of the 24 GB machine.
 lean:
 	@if grep -rwn 'sorry' polyplets/Polyplets polyplets/Polyplets.lean; then \
 	  echo 'lean: RED -- sorry present'; exit 1; fi

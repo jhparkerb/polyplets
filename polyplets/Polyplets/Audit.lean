@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Polyplets.Report
+import Polyplets.RowLocal.Hex
+import Polyplets.RowLocal.Square
 import Polyplets.StairGrowth
 import Polyplets.Upper.BuiRD2
 import Polyplets.Upper.BuiRD3
@@ -52,6 +54,14 @@ namespace Polyplets
 /-- info: 'Polyplets.T_sub_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms T_sub_two
+
+/-- info: 'Polyplets.RowLocal.hex_T_sub_one' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms RowLocal.hex_T_sub_one
+
+/-- info: 'Polyplets.RowLocal.square_T_sub_one' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms RowLocal.square_T_sub_one
 
 /-- info: 'Polyplets.Enum.boards_spec' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

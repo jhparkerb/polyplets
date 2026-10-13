@@ -27,10 +27,10 @@ counts fixed polyominoes of `n` cells and bounding-box height exactly `H`.
 
 * `isDiagonalPoly_squareP1` / `square_T_sub_one` : `P₁(n) = 4n − 8`, i.e.
   `T(n, n−1) = 4n − 8` for `n ≥ 3` (paper instance table, density `4 = 2²`),
-  given the second cell `T(4,3) = 8` as a hypothesis. The first
-  `T(3,2) = 4` the kernel decides from the generic enumerator `Tc`, and
-  `RowLocal/Compute.lean`'s `isDiagonalPoly_of_eval` does the Lagrange step; `T(4,3)` needs more
-  than 8 GB in the kernel (measured 2026-10-12).
+  unconditionally: the kernel decides both onset cells, `T(3,2) = 4` and
+  `T(4,3) = 8`, from the generic enumerator `Tc` (the second at 5.2 GB and
+  10 s, measured 2026-10-12), and `RowLocal/Compute.lean`'s
+  `isDiagonalPoly_one_of_eval` does the Lagrange step.
 * `Checks.lean`: the row sum of the computed height triangle at `n = 3`
   reproduces A001168 (fixed polyominoes) `6`.
 -/
@@ -71,15 +71,18 @@ theorem adj_square {p q : ℤ × ℤ} :
     rcases abs_cases (p.2 - q.2) with ⟨h2, h2'⟩ | ⟨h2, h2'⟩ <;>
       rw [h1, h2] <;> omega
 
-/-! ## The first cell
+/-! ## The two onset cells
 
 The generic enumerator at `W = n` (legitimate because the reach is `≤ 1`),
 decided by the kernel; `Tc_eq_T_of_reach_le_one` transports the value to the
-noncomputable `T`. The second cell `T(4,3) = 8` needs more than 8 GB in the
-kernel (measured 2026-10-12) and enters below as a hypothesis. -/
+noncomputable `T`. -/
 
 /-- `T(3,2) = 4`: the four L-trominoes. -/
 theorem T_square_3_2 : T squareLattice 3 2 = 4 := by
+  rw [← Tc_eq_T_of_reach_le_one square_reach_le]; decide +kernel
+
+/-- `T(4,3) = 8`: the eight fixed tetrominoes of height three. -/
+theorem T_square_4_3 : T squareLattice 4 3 = 8 := by
   rw [← Tc_eq_T_of_reach_le_one square_reach_le]; decide +kernel
 
 /-! ## `P₁` -/
@@ -101,26 +104,23 @@ lemma squareP1_eval_three :
     squareP1.eval (3 : ℚ) = ((T squareLattice 3 2 * squareLattice.b ^ 1 : ℕ) : ℚ) := by
   rw [squareP1_eval, T_square_3_2, b_square]; norm_num
 
-/-- `P₁` at the second onset point: `P₁(4) = T(4,3) · b^0 = 8`, given the cell. -/
-lemma squareP1_eval_four (h43 : T squareLattice 4 3 = 8) :
+/-- `P₁` at the second onset point: `P₁(4) = T(4,3) · b^0 = 8`. -/
+lemma squareP1_eval_four :
     squareP1.eval (4 : ℚ) = ((T squareLattice 4 3 * squareLattice.b ^ 0 : ℕ) : ℚ) := by
-  rw [squareP1_eval, h43, b_square]; norm_num
+  rw [squareP1_eval, T_square_4_3, b_square]; norm_num
 
-/-- **The square `P₁`**, given the second cell
-`T(4,3) = 8`: Lagrange uniqueness identifies `4X − 8` with the witness of
-`RowLocal.exists_isDiagonalPoly`. -/
-theorem isDiagonalPoly_squareP1 (h43 : T squareLattice 4 3 = 8) :
-    IsDiagonalPoly squareLattice 1 squareP1 :=
+/-- **The square `P₁`**: Lagrange uniqueness identifies `4X − 8` with the
+witness of `RowLocal.exists_isDiagonalPoly`. -/
+theorem isDiagonalPoly_squareP1 : IsDiagonalPoly squareLattice 1 squareP1 :=
   isDiagonalPoly_one_of_eval squareLattice squareP1 squareP1_natDegree_le squareP1_eval_three
-    (squareP1_eval_four h43)
+    squareP1_eval_four
 
 /-- **The square `P₁`, human form**: the number of fixed polyominoes with `n`
-cells and bounding-box height exactly `n − 1` is `4n − 8`, for every `n ≥ 3`,
-given `T(4,3) = 8`. (The drift factor is `1^(n-4) = 1`, so the law
-*is* the closed form.) -/
-theorem square_T_sub_one (h43 : T squareLattice 4 3 = 8) (n : ℕ) (hn : 3 ≤ n) :
+cells and bounding-box height exactly `n − 1` is `4n − 8`, for every `n ≥ 3`.
+(The drift factor is `1^(n-4) = 1`, so the law *is* the closed form.) -/
+theorem square_T_sub_one (n : ℕ) (hn : 3 ≤ n) :
     (T squareLattice n (n - 1) : ℚ) = 4 * (n : ℚ) - 8 := by
-  have h := isDiagonalPoly_squareP1 h43 n (by omega)
+  have h := isDiagonalPoly_squareP1 n (by omega)
   simp only [topRowRecursion_T, topRowRecursion_b, b_square] at h
   simpa [squareP1_eval] using h
 

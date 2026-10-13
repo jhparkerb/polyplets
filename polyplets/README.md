@@ -197,7 +197,12 @@ trees made it an 11-second `decide +kernel`.)
 
 The window enumerations of `Weights.lean` reach the kernel only for the
 smallest cells: V(1,1), Vt(1,1), Vt(1,2), d(0,1), d(0,2), d(1,2) at 2.7–3.5 GB
-each; d(0,3) needs 6 GB and anything larger passes 8 GB
+each; d(0,3) needs 6 GB and anything larger passed the 8 GB cap of the
+first pass. The cap on one kernel step is 18 GB since 2026-10-12, three quarters
+of the 24 GB machine (builds run serially); under it the hex and square T(4,3) close
+at 5.7 and 5.2 GB, 12 and 10 s, so every lattice P₁ is unconditional.
+The cap was raised after the first pass, not the measurements, so the
+"passes 8 GB" cells above are unmeasured beyond 8 GB.
 (`scripts/lean-decide-trials.sh`, 2026-10-12; the powerset counters `Tc` and
 `ac` measured there were removed 2026-10-12, the enumerator having replaced
 them). Everything up to six
