@@ -15,10 +15,6 @@ was done about it. It supersedes the per-paper rows of
 `docs/publication-split.md` section 3 and the numbering narrative in
 `paper/README.md`; both were updated to match.
 
-jasonp asked whether the L papers were truly worth the time spent, whether each
-deserved its own write-up, and how to condense. This is the answer, and what
-was done about it.
-
 ### What the assessment found
 
 **Ten papers, 108 pages, 33,067 words of prose, sixteen days of drafting.** The
