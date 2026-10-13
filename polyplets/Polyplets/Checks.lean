@@ -156,6 +156,13 @@ theorem d_rows_le_6 : d 0 3 = 9 ∧ d 0 4 = 27 ∧ d 1 3 = 40 ∧ d 2 3 = 136 �
     boards6_eq]
   decide +kernel
 
+/-- The right-hand side of `d_staircase_2_3` evaluates to the enumerated
+`d 2 4 = 1019`: `3·136 + (25/3)·40 + (833/27)·9`. -/
+theorem d_staircase_value_2_3 :
+    mu 0 * (d 2 3 : ℚ) + mu 1 * (d 1 3 : ℚ) + mu 2 * (d 0 3 : ℚ) = 1019 := by
+  obtain ⟨h03, -, h13, h23, -⟩ := d_rows_le_6
+  rw [mu_zero, mu_one, mu_two, h03, h13, h23]; norm_num
+
 open Enum in
 /-- The cluster weights on at most six cells (cross-checked enumerations,
 2026-07-20). -/

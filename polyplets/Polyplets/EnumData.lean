@@ -941,4 +941,16 @@ theorem T_6_4 : T 6 4 = 1480 := by
   rw [T_eq_length (by norm_num) (by norm_num), boards6_eq]
   decide +kernel
 
+/-! ## The two cluster weights the `μ₂` gate consumes -/
+
+/-- `V 1 2 = 49`: one cluster row, surplus `2`, on five cells. -/
+theorem V_1_2 : V 1 2 = 49 := by
+  rw [V_eq_length (by norm_num : 1 + 2 + 2 ≤ 14), boards5_eq]
+  decide +kernel
+
+/-- `V 2 2 = 339`: two cluster rows, surplus `2`, on six cells. -/
+theorem V_2_2 : V 2 2 = 339 := by
+  rw [V_eq_length (by norm_num : 2 + 2 + 2 ≤ 14), boards6_eq]
+  decide +kernel
+
 end Polyplets.Enum

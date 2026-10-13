@@ -217,9 +217,11 @@ literal. That is how `Checks.lean` has rows 4–6 of the triangle,
 a(3) … a(6), the walk-top counts d(k,H) for H + k ≤ 6, the weights with at
 most six cells (V(1,2), V(2,2), V(1,3), Vt(2,2), Vt(1,3), Vt(2,3)) and the
 symmetry counts R90, R180, Hm, Dm for n ≤ 5, and how `T_sub_two` holds
-outright. Seven cells are the limit: `boards 7` (23,592 boards) passes 12 GB in
-one kernel run, so V(2,3), Vt(3,3), V(3,3) and d(3,4) stay out, as do the
-unconditional 3.95 < λ and μ₂ that rested on them.
+outright. Seven cells are the limit: growing `boards 7` (23,592 boards) in
+one kernel run was at 13.6 GB after 8 minutes when the elaborator's heartbeat
+limit stopped it (2026-10-12, under the 18 GB cap), so V(2,3), Vt(3,3),
+V(3,3) and d(3,4) stay out, as does the unconditional 3.95 < λ that rested on
+them. μ₂ is back, on the kernel-decided V(1,2) and V(2,2) (`EnumData.lean`).
 
 ## What is not reached
 

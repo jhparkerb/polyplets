@@ -3,6 +3,7 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Polyplets.EnumData
 import Polyplets.Staircase.Series
 import Polyplets.Weights
 
@@ -23,9 +24,8 @@ of `Series.lean` and the cluster weights of `Weights.lean`.
 * `mu` — the multiplier `1/z*`, defined **non-recursively** from `ν`; the
   inverse law `mu ∗ ν = eps` (`mu_conv_nu`) follows from `root`.
 
-The numeric gate `mu_one` reuses the kernel-decided `V_1_1` of `Weights.lean`.
-(`mu_two` and the conditional `mu_three_of` rested on `native_decide` weights
-and were removed 2026-10-12.)
+The numeric gates `mu_one` and `mu_two` reuse the kernel-decided weights
+`V_1_1` (`Weights.lean`), `V_1_2` and `V_2_2` (`EnumData.lean`).
 -/
 
 namespace Polyplets
@@ -192,22 +192,44 @@ theorem mu_conv_nu : conv mu nu = eps := by
 theorem mu_conv_nu_pow (ℓ : ℕ) : conv (convPow mu ℓ) (convPow nu ℓ) = eps :=
   conv_convPow_inv mu_conv_nu ℓ
 
-/-! ## Numeric gate
+/-! ## Numeric gates
 
-`μ₁ = 25/3` unconditionally, from the kernel-decided weight `V_1_1`. -/
+`μ₁ = 25/3` and `μ₂ = 833/27` unconditionally, from the kernel-decided weights
+`V_1_1`, `V_1_2`, `V_2_2`. -/
 
-/-- The first convolution power unfolded. -/
+/-- The first two convolution powers unfolded. -/
 lemma convPow_nu_one : convPow nu 1 = nu := by simp only [convPow, conv_eps]
+
+lemma convPow_nu_two : convPow nu 2 = conv nu nu := by simp only [convPow, conv_eps]
 
 /-! Interior-weight values as `vGuard`-coefficients. -/
 
 lemma vGuard_10 : vGuard 1 0 = 0 := by simp [vGuard]
 lemma vGuard_11 : vGuard 1 1 = 25 := by rw [vGuard_eq (by norm_num) (by norm_num), V_1_1]; norm_num
+lemma vGuard_12 : vGuard 1 2 = 49 := by
+  rw [vGuard_eq (by norm_num) (by norm_num), Enum.V_1_2]; norm_num
+lemma vGuard_20 : vGuard 2 0 = 0 := by simp [vGuard]
+lemma vGuard_21 : vGuard 2 1 = 0 := by simp [vGuard]
+lemma vGuard_22 : vGuard 2 2 = 339 := by
+  rw [vGuard_eq (by norm_num) (by norm_num), Enum.V_2_2]; norm_num
+
+/-- `ν₁ = −25/27`. -/
+lemma nu_one : nu 1 = -25/27 := by
+  rw [nu_unfold 1 (le_refl 1), Finset.Icc_self, Finset.sum_singleton, convPow_nu_two]
+  simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
+  norm_num [vGuard_10, vGuard_11, nu_zero]
 
 /-- **Gate μ₁.** `μ₁ = 25/3`, via `V_1_1`. -/
 theorem mu_one : mu 1 = 25 / 3 := by
   rw [mu_succ_eq (le_refl 1), Finset.Icc_self, Finset.sum_singleton, convPow_nu_one]
   simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
   norm_num [vGuard_10, vGuard_11, nu_zero]
+
+/-- **Gate μ₂.** `μ₂ = 833/27`, via `V_1_1`, `V_1_2`, `V_2_2`. -/
+theorem mu_two : mu 2 = 833 / 27 := by
+  rw [mu_succ_eq (by norm_num), show Finset.Icc 1 2 = ({1, 2} : Finset ℕ) by decide,
+    Finset.sum_insert (by decide), Finset.sum_singleton, convPow_nu_one, convPow_nu_two]
+  simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
+  norm_num [vGuard_10, vGuard_11, vGuard_12, vGuard_20, vGuard_21, vGuard_22, nu_zero, nu_one]
 
 end Polyplets

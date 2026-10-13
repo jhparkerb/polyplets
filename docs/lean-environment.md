@@ -129,11 +129,13 @@ All `lake` invocations below run from `polyplets/` and use
   `#guard_msgs` pin the axiom footprints of the `Report.lean` theorems. It
   is not in the default `make` gate list, since only gympie has the
   toolchain.
-- Memory: a `lean` process on this tree peaks around 2–3 GB, except
-  `Polyplets/EnumData.lean`, whose five kernel checks of the six-cell
-  enumeration peak at 4–5 GB (8–14 s each); kernel `decide` over the
-  powerset counters on anything but the smallest cells climbs past 6 GB in
-  seconds. `scripts/lean-guard.sh MAX_RSS_GB SECONDS CMD...` kills a
+- Memory: the cap on one kernel step is three quarters of the machine, 18 GB
+  on gympie (2026-10-12), and the build is serial (`LEAN_NUM_THREADS=1` gives
+  lake one worker). A `lean` process on this tree peaks around 2–3 GB, except
+  `Polyplets/EnumData.lean`, whose one kernel check of the six-cell
+  enumeration peaks at 10.8 GB (53 s), the hex and square `T(4,3)` at 5–6 GB
+  (10–12 s) and `Checks.symmetry_le_5` at 8 GB; `boards 7` is the next step
+  up. `scripts/lean-guard.sh MAX_RSS_GB SECONDS CMD...` kills a
   command's whole process tree at a memory or time limit;
   `scripts/lean-decide-trials.sh` measured the powerset cells with it and
   `scripts/lean-enumdata-measure.sh OUTDIR` the EnumData checks.
