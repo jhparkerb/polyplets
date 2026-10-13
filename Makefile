@@ -147,7 +147,7 @@ gates-force:
 # the gates it protects.
 GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/g2_asan build/perimeter_defect build/perimeter_min build/prec_guess \
-  build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
+  build/severance_w1 build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
   build/strip_mu_kink build/subgraph_count build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
@@ -431,7 +431,7 @@ gate-kink-oracle: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 # critical path.  They are separate targets rather than one gate-severance so
 # that -j schedules them independently and a failed one is named by the recipe
 # at the end of `gates`.
-gate-severance-w1:
+gate-severance-w1: build/severance_w1
 	python3 experiments/severance_w1_gate.py --selftest
 	python3 experiments/severance_w1_gate.py $(GATE_DEEP)
 
