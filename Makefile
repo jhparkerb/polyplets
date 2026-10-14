@@ -265,7 +265,9 @@ DEPS_gate-severance-w2 = experiments/severance_w2_gate.py \
                 experiments/slope2_law_vs_truth.py
 DEPS_gate-g2  = build/g2 build/g2_asan \
                 tests/gate_g2.py tests/common.py scripts/g1_naive.py $(FIXTURES)
-DEPS_gate-kink-oracle = build/ns/orchestrate build/ns/map_worker \
+# orchestrate by its sources, not the binary: the binary is phony and links the
+# commit hash in, so every commit gives it a new mtime and the gate never skipped.
+DEPS_gate-kink-oracle = $(GO_SRC) build/ns/map_worker \
                 build/ns/merge_worker tests/gate_kink_oracle.py tests/common.py \
                 $(FIXTURES)
 
@@ -279,7 +281,10 @@ DEPS_gate-kink-oracle = build/ns/orchestrate build/ns/map_worker \
 # mtimes alone would miss a file being deleted or added: the survivors are all
 # older than the stamp, so the gate would skip a tree that no longer builds the
 # same way. Three ways to run rather than skip -- the list differs, a listed
-# file has gone missing, or one is newer -- and all three are the safe direction.
+# file has gone missing, or one is not strictly older than the stamp -- and all
+# three are the safe direction. The stamp's mtime is the moment the gate STARTED
+# (a marker touched before the run lends its mtime to the stamp on success), so an input edited
+# while the gate ran, or in the same second, makes the next run go ahead.
 timed-%:
 	@deps='$(DEPS_$*)'; stamp=$(STAMPS)/$*; skip=; \
 	 list=$$(printf '%s\n' $$deps | sort); \
@@ -287,7 +292,7 @@ timed-%:
 	    [ "$$list" = "$$(cat "$$stamp")" ]; then \
 	   skip=1; \
 	   for f in $$deps; do \
-	     if [ ! -e "$$f" ] || [ "$$f" -nt "$$stamp" ]; then skip=; break; fi; \
+	     if [ ! -e "$$f" ] || ! [ "$$stamp" -nt "$$f" ]; then skip=; break; fi; \
 	   done; \
 	 fi; \
 	 if [ -n "$$skip" ]; then \
@@ -295,10 +300,12 @@ timed-%:
 	   exit 0; \
 	 fi; \
 	 t0=$$(date +%s); \
+	 if [ -n "$$deps" ]; then mkdir -p $(STAMPS); : > "$$stamp.new"; fi; \
 	 $(MAKE) --no-print-directory $* ; st=$$?; \
 	 if [ $$st -eq 0 ] && [ -n "$$deps" ]; then \
-	   mkdir -p $(STAMPS); printf '%s\n' "$$list" > "$$stamp"; \
+	   printf '%s\n' "$$list" > "$$stamp"; touch -r "$$stamp.new" "$$stamp"; \
 	 fi; \
+	 rm -f "$$stamp.new"; \
 	 echo "gate-time $$(( $$(date +%s) - t0 ))s $*"; \
 	 exit $$st
 
