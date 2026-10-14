@@ -113,8 +113,10 @@ reads Go packages and nothing else in this tree.)
 Declaring one wrong is caught two ways: `gate_makefile_wiring` requires a
 declared gate's own script to be among its deps, so editing a gate always
 re-runs it; and a dep that has gone missing makes the gate run rather than
-skip. `make gates-force` ignores every stamp, `gates-deep` implies it, and the
-hook forces on a new ref.
+skip. `make gates-force` ignores every stamp, and the hook forces on a new ref.
+`gates-deep` keeps separate stamps (`build/stamps/<gate>.deep`), so a deep
+pass skips what an earlier deep pass already ran on the same inputs;
+`make gates-deep FORCE_GATES=1` runs all of it. Bare `make` is `gates`.
 
 The hook's `docs_only` test treats `.txt` under `results/` and `fixtures/` as
 data, not prose: gates read `results/holes_n14.txt`, `results/siteperim_*.txt`

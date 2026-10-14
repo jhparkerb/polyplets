@@ -4,6 +4,11 @@
 # mode, so the problem only shows on a Linux clone).
 SHELL := /bin/bash
 
+# Bare `make` is the push tier. Pinned here because the default is otherwise
+# whichever rule comes first, and that silently became gates-deep (~570 s,
+# every gate at full size) when its block was moved above `gates`.
+.DEFAULT_GOAL := gates
+
 CXX ?= c++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 
@@ -130,8 +135,11 @@ GATELOG = build/gates.log
 # ns-gate-fast is in here because two of its gates take $(GATE_DEEP) as well
 # (the worker-CLI H=8 case): running only `gates` left their deep tier with
 # nothing that ever restores it. Command-line overrides propagate to sub-makes.
+# The deep tier keeps its own stamps (gate-foo.deep), so it too skips a gate
+# whose inputs are unchanged since its last full-size pass; add FORCE_GATES=1
+# for a release run that executes everything.
 gates-deep:
-	$(MAKE) gates ns-gate-fast GATE_DEEP=--deep FORCE_GATES=1
+	$(MAKE) gates ns-gate-fast GATE_DEEP=--deep
 
 # Every gate, ignoring every stamp -- what to run when you want the suite to
 # have actually executed rather than to have decided it did not need to.
@@ -231,6 +239,7 @@ DEPS_ns-gate-kink-worker-cli   = build/ns/gate_kink_worker_cli build/ns/map_work
 DEPS_ns-gate-persistent-worker = build/ns/gate_persistent_worker \
                 build/ns/map_worker build/ns/merge_worker
 DEPS_gate-strip-cert           = build/strip_mu_cert
+DEPS_gate-sig-fold             = build/sig_fold_unit
 
 DEPS_gate-strip-fast = build/strip_mu_fast build/strip_mu_kink \
                 tests/gate_strip_fast.py tests/common.py $(FIXTURES)
@@ -286,7 +295,7 @@ DEPS_gate-kink-oracle = $(GO_SRC) build/ns/map_worker \
 # (a marker touched before the run lends its mtime to the stamp on success), so an input edited
 # while the gate ran, or in the same second, makes the next run go ahead.
 timed-%:
-	@deps='$(DEPS_$*)'; stamp=$(STAMPS)/$*; skip=; \
+	@deps='$(DEPS_$*)'; stamp=$(STAMPS)/$*$(if $(GATE_DEEP),.deep); skip=; \
 	 list=$$(printf '%s\n' $$deps | sort); \
 	 if [ -n "$$deps" ] && [ -z "$(FORCE_GATES)" ] && [ -f "$$stamp" ] && \
 	    [ "$$list" = "$$(cat "$$stamp")" ]; then \
