@@ -151,7 +151,7 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/strip_mu_kink build/subgraph_count build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
-  $(if $(GMP_LDFLAGS),build/convex_perim_tm build/middle_kingdom_tm)
+  $(if $(GMP_LDFLAGS),build/convex_area_tm build/convex_perim_tm build/middle_kingdom_tm)
 
 # --- input gating -----------------------------------------------------------
 # A gate that re-runs when nothing it reads has changed is pure waiting. A gate
@@ -898,10 +898,11 @@ lean:
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
-# constants. Deliberately does not depend on build/convex_area_tm (GMP is
-# optional here): the series files are in the tree, and the gate skips only
-# the transfer-matrix oracle when GMP is absent. ~4 s.
-gate-convex-dfinite: build/prec_guess
+# constants. The series files are in the tree; the transfer-matrix oracle
+# needs build/convex_area_tm, so the gate builds it when GMP is present. Without
+# GMP the oracle is a skipped check, which fails the gate unless waived with
+# POLY_ALLOW_DEGRADED_GATES=1. ~4 s.
+gate-convex-dfinite: build/prec_guess $(if $(GMP_LDFLAGS),build/convex_area_tm)
 	python3 tests/gate_convex_dfinite.py
 
 # Gate MK-DIR4-PERIM: the dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
