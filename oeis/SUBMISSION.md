@@ -55,8 +55,9 @@ contributor's name and the day of submission, so a staged date can no longer go
 stale. A `%H` link to the now-public repository was added.
 
 Checklist rule 1 (linked entries move together) is satisfied by submitting the
-six as one batch — the policy notes six related extensions is normal practice,
-not "bulk."
+six as one batch. The OEIS AI guideline forbids bulk or serial submission of
+machine-generated *sequences* without prior permission and says nothing about
+extensions (§6).
 
 ### Wave 2 — new sequences: the hole family + two singletons (staged, READY*)
 
@@ -164,9 +165,9 @@ it requires trusting prose.
    machine did (algorithm design, implementation, drafting, run orchestration)
    and what the author did (goals, design and verification decisions,
    machine ownership and operation, inspection, responsibility for
-   correctness), plus the checkable verification protocol of §2. Editors ask;
-   the A396719 precedent shows a precise answer suffices and evasion sinks
-   entries.
+   correctness), plus the checkable verification protocol of §2. Editors do
+   ask ("Did you use AI to generate this sequence?", the first A396719, Jun
+   2026); the guideline and what editors did under it are in §6.
 7. **Repo visibility**: %H links require the repo (github.com/jhparkerb/polyplets)
    or a compiled paper at a stable URL to be publicly reachable — jasonp
    decides what to publish and links accordingly. If neither is public at
@@ -209,3 +210,52 @@ it requires trusting prose.
 - **2026-07-17 green board**: full `make ns-gates` suite GREEN (incl. the
   newly-wired gate-g2); the paper's self-contained claim checker passes
   412/412; the paper compiles warning-free.
+
+## 6. AI use: the guideline and what editors did (checked 2026-10-23)
+
+**The guideline** is the OEIS wiki page "Use of AI for OEIS Submissions" (the
+old title "...is Forbidden" redirects to it; latest approved revision 29 Aug
+2026; its earlier history needs a wiki login). A human author is responsible
+for anything an AI produced, and must verify the name, the terms, that
+formulas are provably correct, that programs are correct and produce the
+terms, and that comments are accurate and comprehensible. Forbidden: AI text
+in the pink boxes; an AI as author or co-author; AI-generated full text of
+comments; an AI-generated program whose working and limits the submitter does
+not understand; bulk or serial submission of machine-generated sequences
+without permission. It quotes Tao: authors who cannot give a clear,
+expert-level talk on the result should not publish it.
+
+**Rejections.** A rejected entry's A-number is recycled, so these numbers now
+show unrelated approved sequences; the record is in the history pages
+(`oeis.org/history?seq=A396919&start=20`, and likewise for the others).
+- A396919 (Noor Alenizy, Jul 2026): pink-box replies carried hidden zero-width
+  characters; "Rejected, NFO, violation of AI-policies" (Irvine, Jul 3);
+  Arndt proposed blocking the account.
+- A396748 (Tomáš Kling, Jun 2026): data wrong, and "AI is not allowed in pink
+  boxes" (Branicky); recycled Jun 17.
+- A396719 (Chen Wei-Shi, Jun 2026): asked whether AI generated it, answered
+  no; rejected Jun 9 for another reason (it repackaged columns already in
+  the OEIS).
+
+**Accepted extensions whose code an AI wrote**, each with a GitHub repo linked
+from the entry:
+
+| entry | contributor, repo | added | editors' questions |
+|---|---|---|---|
+| A142886 | Michael Spiegel, `mspiegel/A142886` (62 of 65 commits Claude) | b-file 0..163 to 0..203, Jun 2026 | credit for the existing terms in the b-file link, "(terms 0..163 from Robert A. Russell)", per oeis.org/SubmitB.html |
+| A104430 | Jeremia Passmore, `Horizon-Hawk/oeis-A104430` (all commits Claude) | a(20), proposed Oct 18, approved Oct 19 2026 | none |
+| A109455 | James Guillochon, `guillochon/oeis-results` | corrected a(6), Sep 26 to Oct 10 2026 | whether the published source (Knuth) has the wrong value, so it can be noted |
+| A181671 | Gaurav Vyas, `realgauravvyas/ramanujan-primes-beyond-1e19` | a(18)-a(23), Aug 2026 | |
+| A347537 and about 30 others | Jacob Glickman, `jhg023/first-knowns` (all code Claude) | Aug-Oct 2026 | |
+| A096772 | Adam Reichert (C++ by Claude Code; program uploaded to the OEIS) | b-file to 825, Apr 2026 | |
+
+How much AI use the repo disclosed ranged from nothing (A104430) to a
+statement at the top of the README (first-knowns), and none of these
+histories has an editor comment about AI. The single-sequence repos have 16
+to 42 files. Passmore's whole pink-box note was three sentences: the new
+term, the two independent implementations that agree and both reproduce
+a(0)-a(19), and that code and logs are at the link.
+
+Not yet in the OEIS, with no pending draft: `Jourdelune/langford31` (L(2,31)
+for A014552, entirely Claude), `kanestar2/oeis-a072503`,
+`PowyBot/oeis-a400741`.
