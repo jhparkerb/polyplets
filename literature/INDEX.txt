@@ -1,11 +1,20 @@
 Reference-paper archive for the papers in paper/
 (PDFs are gitignored local copies; this index and MISSING.md are tracked.)
 
+Listed here but not held (see MISSING.md): jensen_counting_polyominoes_
+parallel, gray, counting_polyominoes_revisited, tremblay_vernay,
+guttmann_series_appendix. Copies that differ from the published text:
+  barequet.pdf         ESA 2015 version (Rote's site), not the CACM 2016 text
+  stanley.pdf          Stanley's online EC1 2nd ed., version of 15 July 2011
+  nijenhuis.pdf        the whole book, from Wilf's page
+  strang.pdf           author's preprint (MIT page), 14 pp.
+  redelmeier_1981.txt  pdftotext of the ScienceDirect scan's text layer
+
 == Cited in the report's bibliography ==
 
 bibkey       file                                       citation
 ----------   ----------------------------------------   ---------------------------------------------------------
-redelmeier   redelmeier_1981.pdf (+ .txt)               Redelmeier, Counting polyominoes: yet another attack, Discrete Math. 36(2) (1981) 191-203.
+redelmeier   redelmeier_1981.pdf (+ .txt)               Redelmeier, Counting polyominoes: yet another attack, Discrete Math. 36(3) (1981) 191-203, doi 10.1016/0012-365X(81)90237-5.
 klarner      klarner.pdf                                Klarner, Cell growth problems, Canad. J. Math. 19 (1967) 851-863.
 jensen2001   jensen_lattice_animals.pdf                 Jensen, Enumerations of lattice animals and trees, J. Stat. Phys. 102(3-4) (2001) 865-881.
 jensen2003   jensen_counting_polyominoes_parallel.pdf   Jensen, Counting polyominoes: a parallel implementation for cluster computing, ICCS 2003, LNCS 2659, 203-212.
@@ -30,7 +39,7 @@ Polyomino/animal enumeration:
   counting_polyominoes_revisited.pdf       Barequet & Ben-Shachar, Counting polyominoes, revisited (TOPP problem 37 line of work).
   (no local copy)                          Barequet & Ben-Shachar, Counting polyominoes, revisited: corrigendum and addendum, arXiv:2610.10632 (2026). Corrects A(67); the error was found by the mod-4 congruence in results/symmetry-classes.md.
   shirakawa_n59.pdf                        Enumeration of polyominoes up to size n=59 (per PDF title).
-  barequet_moffie_2007_jensen_complexity.pdf  Barequet & Moffie, On the complexity of Jensen's algorithm for counting fixed polyominoes (2007).
+  barequet_moffie_2007_jensen_complexity.pdf  Barequet & Moffie, On the complexity of Jensen's algorithm for counting fixed polyominoes, J. Discrete Algorithms 5 (2007) 348-355.
   barequet_rote_twisted_cylinders.pdf      Barequet, Moffie, Ribo & Rote, Counting polyominoes on twisted
                                            cylinders, INTEGERS: Electron. J. Combin. Number Theory 6
                                            (2006) #A22. (Venue confirmed from the title page 2026-08-06;
@@ -52,11 +61,23 @@ Polyomino/animal enumeration:
                                            dimensions, European J. Combin. 63 (2017) 146-163. Obtained
                                            2026-08-06. The general-k framework; k=4 and k=5 proved for
                                            the first time. Paper 2's defect-diagonal precedent.
-  voge_guttmann_2003.pdf                   Voge & Guttmann (2003), polygon/animal series analysis.
+  voge_guttmann_2003.pdf                   Voge & Guttmann, On the number of hexagonal polyominoes, Theoret. Comput. Sci. 307 (2003) 433-453.
   guttmann_series_appendix.pdf             Guttmann, series-analysis appendix (differential approximants background).
   jensen_benzenoid_parallel.pdf            Jensen, parallel enumeration of benzenoid hydrocarbons.
-  efficient_enumeration_algorithms_2016.pdf  Efficient enumeration algorithms survey/paper (2016).
+  efficient_enumeration_algorithms_2016.pdf  Conway, The design of efficient algorithms for enumeration, arXiv:1610.09806 (2016; v2 2017).
   tremblay_vernay.pdf                      Tremblay & Vernay, On the generation of discrete figures with connectivity constraints, RAIRO-TIA 58 (2024). (Source of A006770's a(18); cited in the OEIS entry.)
+  jensen_guttmann_2000_statistics_lattice_animals_polygons.pdf
+                                           Jensen & Guttmann, Statistics of lattice animals (polyominoes)
+                                           and polygons, J. Phys. A 33 (2000) L257-L263 (arXiv
+                                           cond-mat/0007238).
+  hsu_nadler_grassberger_2004_lattice_animals_trees.pdf
+                                           Hsu, Nadler & Grassberger, Simulations of lattice animals and
+                                           trees, arXiv cond-mat/0408061 (2004). PERM sampling; square
+                                           site animals to n = 46 with error bars.
+  care_ettelaie_1999_rosenbluth_cluster_counting.pdf
+                                           Care & Ettelaie, An improved Rosenbluth Monte Carlo scheme for
+                                           cluster counting and lattice animal enumeration, arXiv
+                                           physics/9911023 (1999).
 
 Non-D-finiteness of anisotropic generating functions (the lineage our theorem sits in):
   bousquet-melou_rechnitzer_2002_lattice_animals_heaps_of_dimers.pdf
@@ -177,9 +198,10 @@ Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push
                                            222-234. Reference [2] of Gouyou-Beauchamps & Leroux 2004,
                                            and a candidate origin for the growth-phase decomposition.
                                            It is not: it uses "decomposition par strates" (Temperley,
-                                           developed by Bousquet-Melou), column at a time. Recovered
-                                           2026-08-06 from the Wayback Machine as PostScript --
-                                           fpsac.org's own copy is a 404 -- and ps2pdf'd here.
+                                           developed by Bousquet-Melou), column at a time. Title:
+                                           Enumeration et generation aleatoire de polyominos convexes en
+                                           reseau hexagonal. ps2pdf of the FPSAC archive's PostScript,
+                                           12 pp.
   leroux_rassart_robitaille_1998_convex_polyominoes_symmetry_classes.pdf
                                            Leroux, Rassart & Robitaille, Adv. Appl. Math. 21 (1998)
                                            343-380 (arXiv math/9803130). The square-lattice
@@ -207,6 +229,10 @@ lists is what turned up the 1977 primary:
                                            Bollobas & Radcliffe, Isoperimetric Inequalities for Faces of
                                            the Cube and the Grid, European J. Combin. 11 (1990) 323-333.
                                            Altshuler's [4]; the combinatorics-side reference.
+  bollobas_leader_1990_face_isoperimetric.pdf
+                                           Bollobas & Leader, Exact face-isoperimetric inequalities,
+                                           European J. Combin. 11 (1990) 335-340. An edge-isoperimetric
+                                           companion to Wang & Wang 1977.
   chung_2004_discrete_isoperimetric_inequalities.pdf
                                            Chung, Discrete Isoperimetric Inequalities, Surveys in Diff.
                                            Geom. IX (2004) 53-82. Survey; spectral/Cheeger flavour.

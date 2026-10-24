@@ -82,11 +82,10 @@ imply it. Remove an entry, and file the PDF, once obtained.
   bond-perimeter maximum; Fisher, Guttmann & Whittington 1991 shows that
   statement is folklore, so probably nothing to find.
 - D. J. Kleitman, M. M. Krieger & B. L. Rothschild, Studies in Appl. Math. 50
-  (1971); B. Bollobás & I. Leader, Combinatorica 11 (1991) 299–314 and
-  European J. Combin. 11 (1990) 325–340; S. L. Bezrukov, "An isoperimetric
-  problem for Manhattan lattices." The edge-isoperimetric companions to the
-  vertex result cited from Wang & Wang 1977; needed only if the bond-perimeter
-  twin is ever printed.
+  (1971); B. Bollobás & I. Leader, Combinatorica 11 (1991) 299–314;
+  S. L. Bezrukov, "An isoperimetric problem for Manhattan lattices." The
+  edge-isoperimetric companions to the vertex result cited from Wang & Wang
+  1977; needed only if the bond-perimeter twin is ever printed.
 - D. J. Klein, "Rigorous results for branched polymers with excluded volume,"
   J. Chem. Phys. 75 (1981) 5186–5189. The other route to existence of the
   growth constant; Klarner is held.
@@ -98,10 +97,32 @@ imply it. Remove an entry, and file the PDF, once obtained.
 - B. Delyon, thesis, Paris VI 1980. The cluster-size result behind the
   Hammond and Georgakopoulos–Panagiotis chain; probably unobtainable.
 
-Free on arXiv and not yet filed: Hsu & Grassberger, physics/9911023, and
-Hsu, Nadler & Grassberger, cond-mat/0408061, which apply PERM sampling to
-lattice animals and reach square-lattice site animals to n = 46 with error
-bars. The sampling literature is not missing, only unfiled.
+- A. Asinowski, G. Barequet & Y. Zheng, "Enumerating polyominoes with fixed
+  perimeter defect," Electron. Notes Discrete Math. 61 (2017) 61–67.
+  Paywalled. Cited in `paper/shared/refs.bib`; their ANALCO 2018 paper
+  (below) has the same results with proofs.
+
+## Listed in `INDEX.txt` or cited by path
+
+- I. Jensen, "Counting polyominoes: a parallel implementation for cluster
+  computing," ICCS 2003, LNCS 2659 (2003) 203–212. Paywalled; an
+  academia.edu copy needs a login.
+- S. B. Gray, "Local properties of binary images in two dimensions," IEEE
+  Trans. Computers C-20(5) (1971) 551–561. Paywalled.
+- G. Barequet & G. Ben-Shachar, "Counting polyominoes, revisited,"
+  Algorithmica (2026), doi 10.1007/s00453-026-01392-6; conference version
+  ALENEX 2024, 133–143. Both paywalled; preprint at Research Square, doi
+  10.21203/rs.3.rs-4304962/v1.
+- H. Tremblay & J. Vernay, "On the generation of discrete figures with
+  connectivity constraints," RAIRO-TIA 58 (2024) 16, doi
+  10.1051/ita/2024013. Open access; the site needs a browser.
+- A. Asinowski, G. Barequet & Y. Zheng, "Polycubes with small perimeter
+  defect," ANALCO 2018, SIAM, 93–100. `results/perimeter.md:78` cites it as
+  `asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`.
+- The same authors' Séminaire Lotharingien 79 slides,
+  `mat.univie.ac.at/~slc/wpapers/s79vortrag/asinowski.pdf`. Free.
+- A. J. Guttmann, a series-analysis appendix on differential approximants.
+  Unidentified.
 
 ## Searches on record
 
@@ -139,9 +160,9 @@ Guttmann & Whittington 1991 and has no primary.
 
 **The perimeter-defect theorems** (L6): the Asinowski–Barequet–Zheng slides
 (Séminaire Lotharingien 79, `mat.univie.ac.at/~slc/wpapers/s79vortrag/`) and
-their ANALCO 2018 paper (held) carry the k = e + 2f identity and the
-rational-with-cyclotomic-denominator theorem for fixed defect; L6 attributes
-both in place.
+their ANALCO 2018 paper (neither held) carry the k = e + 2f identity and
+the rational-with-cyclotomic-denominator theorem for fixed defect; L6
+attributes both in place.
 
 **Concatenation bounds** (Barequet, Ben-Shachar & Osegueda 2021, held): the
 method bounds growth constants, not log-convexity, and a king comb shatters
