@@ -10,8 +10,8 @@
 // Python parsers (which `int()` each token), so a banner line there would crash
 // them -- provenance rides the stderr event stream instead, never stdout.
 //
-// Header-only, stdlib + POSIX (getrusage / gethostname) only; compiles on gympie
-// (macOS/clang) and ayr (Linux/gcc), the one fork being ru_maxrss's units.
+// Header-only, stdlib + POSIX (getrusage / gethostname) only; compiles with
+// clang on macOS and gcc on Linux, the one difference being ru_maxrss's units.
 
 #pragma once
 

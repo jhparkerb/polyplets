@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-motley-par
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-motley-par
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -164,7 +164,7 @@ gates-force:
 GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/g2_asan build/perimeter_defect build/perimeter_min build/prec_guess \
   build/severance_w1 build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
-  build/strip_mu_kink build/subgraph_count build/symcount_fast build/symtm \
+  build/strip_mu_kink build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker build/ns/combine \
   build/strip_tm build/motley_par build/dmirror_spine \
@@ -801,13 +801,6 @@ gate-sym: build/symcount_fast
 # Gate subgroup: per-SUBGROUP invariant counts + the a(n) mod 4 congruence
 gate-subgroup: build/symcount_fast build/symtm
 	python3 tests/gate_subgroup.py $(GATE_DEEP)
-
-# Gate E0: weighted connected-subgraph counter vs brute force
-gate-e0: build/subgraph_count
-	python3 tests/gate_e0.py
-
-build/subgraph_count: cpp/sym/subgraph_count.cpp | build
-	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 # Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form.
 # Also the 16-cell directedness grid mode ("grid"/"gridbad") and the

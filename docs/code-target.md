@@ -23,9 +23,9 @@ counts, with the checks that guard them and their Makefile rules.
 | Redelmeier enumerator | `cpp/g2_redelmeier.cpp` | whole rows n <= 22 |
 | strip transfer matrix | `cpp/strip_tm.cpp` | the 469 entries with H <= 14 |
 | coloring recount | `cpp/motley_par.cpp` | the entries with H <= 19 |
-| symmetry counts | `cpp/sym/symcount_fast.cpp`, `cpp/sym/symtm.cpp`, `cpp/sym/subgraph_count.cpp`, `cpp/dmirror_spine.cpp` | a(n) mod 4, T(n,H) mod 2, the symmetry-class sequences |
+| symmetry counts | `cpp/sym/symcount_fast.cpp`, `cpp/sym/symtm.cpp`, `cpp/dmirror_spine.cpp` | a(n) mod 4, T(n,H) mod 2, the symmetry-class sequences |
 | shared | `cpp/obs.h`, `cpp/argparse.h` where these use it | |
-| checks | `tests/engine/`, and the `tests/gate_*.py` that run the programs above (`gate_kink_oracle`, `gate_g2`, `gate_motley_par`, `gate_sym`, `gate_symtm`, `gate_subgroup`, `gate_e0`, `gate_verify`), with `tests/common.py` | |
+| checks | `tests/engine/`, and the `tests/gate_*.py` that run the programs above (`gate_kink_oracle`, `gate_g2`, `gate_motley_par`, `gate_sym`, `gate_symtm`, `gate_subgroup`, `gate_verify`), with `tests/common.py` | |
 
 Found while scoping: `strip_tm` has no make target that runs it, and
 `gate-motley-par` is outside the automatic chain because of `-fopenmp`. Both
