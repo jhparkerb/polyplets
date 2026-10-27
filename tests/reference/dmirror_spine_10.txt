@@ -7,4 +7,4 @@ gate: 169 banked dmirror_strip cells at S <= 10, all reproduced
   10   4    3360           704          2656         0        
   10   5    12908          2908         10798        -798        <== SPLIT UNDEFINED
   10   6    53134          13802        48179        -8847       <== SPLIT UNDEFINED
-  max components in one hook: 9 (six bits hold 64; the four-bit field this replaced held 16, and aliased at 17)
+  max components in one hook: 9 (the label field holds 64)

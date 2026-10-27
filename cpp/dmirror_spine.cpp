@@ -37,8 +37,6 @@
 // Output is one line per (S, k): total, main, anti, neither -- "neither" is
 // nonzero only where the split is undefined (S <= 2k+1) and is reported
 // rather than assumed away.
-//
-// Target: ayr or dalby.
 
 #include <algorithm>
 #include <array>
@@ -161,10 +159,9 @@ struct StateHash {
 
 // Six bits per cell, ten cells per word, five words -- 50 slots against the
 // 48 cells a hook can hold at MAXS, and 63 labels against the 48 components
-// those cells can form.  Four bits was not enough: hook 0 of an S x S board
-// has 2S-1 cells and a position p >= 2 contributes its two mirror cells as
-// SEPARATE components, so an alternating occupancy reaches ~S components --
-// nineteen at S = 20, and sixteen from S = 16 up.  See LABEL WIDTH below.
+// those cells can form.  Hook 0 of an S x S board has 2S-1 cells and a
+// position p >= 2 contributes its two mirror cells as SEPARATE components, so
+// an alternating occupancy reaches ~S components.
 inline void setLab(std::array<u64, 5>& a, int i, int v) {
   a[i / 10] |= (u64(v & 63) << (6 * (i % 10)));
 }
@@ -172,10 +169,8 @@ inline int getLab(const std::array<u64, 5>& a, int i) {
   return static_cast<int>((a[i / 10] >> (6 * (i % 10))) & 63);
 }
 
-// The largest number of components any one hook has carried this run.  The
-// four-bit field held 16 labels and aliased the 17th onto the first, so this
-// is the number that says whether a four-bit run was sound: at most 16 and it
-// was, 17 or more and it silently merged two components.
+// The largest number of components any one hook has carried this run,
+// reported so the margin under the 6-bit label field is visible.
 int g_maxComp = 0;
 
 struct DSU {
@@ -232,15 +227,10 @@ int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
   for (int i = 0; i < m; ++i) {
     const int r = d.find(i);
     if (root2lab[r] < 0) root2lab[r] = nl++;
-    // LABEL WIDTH.  Six bits hold labels 0..63, so 64 components fit and the
-    // 65th would alias onto label 0 and silently merge two components.  The
-    // test below is one step tighter than that -- it refuses at 64, before
-    // anything is lost -- and the four-bit version it replaces was tight in
-    // the same way: it refused at 16 components, which four bits still hold,
-    // so its firing at S = 20 was a refusal and not a corruption.  Kept
-    // fail-closed rather than argued away, because the four-bit version came
-    // with the argument ("the cell budget keeps a hook far below that") and
-    // the argument was wrong.
+    // Six bits hold labels 0..63; a 65th component would alias onto label 0
+    // and silently merge two components.  The test refuses at 64, before
+    // anything is lost, rather than relying on an argument that a hook stays
+    // far below that.
     if (nl > 63) {
       std::fprintf(stderr,
                    "FATAL: %d components in one hook exceeds the 6-bit label "
@@ -412,8 +402,9 @@ int main(int argc, char** argv) {
 
   const int S = std::atoi(argv[1]);
   const int kmax = (argc > 2) ? std::atoi(argv[2]) : 6;
-  if (S < 2 || S > MAXS) {
-    std::fprintf(stderr, "S out of range\n");
+  // State::n is a u8, so the cell cap S + KMAX must stay under 256.
+  if (argc > 3 || S < 2 || S > MAXS || kmax < 0 || S + kmax > 255) {
+    std::fprintf(stderr, "need 2 <= S <= %d, KMAX >= 0, S + KMAX <= 255\n", MAXS);
     return 2;
   }
   if (!gate(root, std::min(S, 11))) {
@@ -447,8 +438,7 @@ int main(int argc, char** argv) {
                 (S >= 2 * k + 2) ? "" : "   <== SPLIT UNDEFINED");
     std::fflush(stdout);
   }
-  std::printf("  max components in one hook: %d (six bits hold 64; the "
-              "four-bit field this replaced held 16, and aliased at 17)\n",
+  std::printf("  max components in one hook: %d (the label field holds 64)\n",
               g_maxComp);
   rep.done("S=" + std::to_string(S) + " kmax=" + std::to_string(kmax) +
            " maxcomp=" + std::to_string(g_maxComp));
