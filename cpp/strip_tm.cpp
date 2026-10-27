@@ -8,18 +8,21 @@
 // and recovers the triangle by the exact second difference in H:
 //     T(n,H) = C_H(n) - 2 C_{H-1}(n) + C_{H-2}(n)   (C_0 = C_{-1} = 0).
 //
-// Counts are __int128: C_H(n) <= H * a(n), and a(36) ~ 2.5e28, so H<=15 at
-// n<=40 stays far under the 1.7e38 int128 ceiling. State is packed 4 bits per
-// row (label 0=empty else 1..8) into a uint64, so H<=15.
+// Counts are __int128: C_H(n) <= H * a(n) < 16 * 1e32 at n <= 40, far under
+// the 1.7e38 ceiling. The state is a column's component labels, 4 bits per
+// row (0 = empty, else 1..8; a column of 16 rows has at most 8 components)
+// packed into a uint64, so H <= 16.
 //
-// This shares no enumeration with the kink NW-carry kernel that produced the
-// banked triangle; agreement is a genuine cross-check. The Python twin
-// (experiments/strip_engine.py) is brute-force-anchored at small n and this
-// binary is cross-checked against it on H<=10.
+// It shares no enumeration code with the column-by-column enumerator that
+// produced the stored triangle, though it decides king connectivity by the
+// same union-find rule (results/second-sources.md). tests/gate_reference.py
+// checks its second difference against that triangle for H <= 10, n <= 24.
 //
-// Usage: strip_tm <Hmax> <Nmax> [banked_perheight_dir]
-//   prints per-H timing, C_H head values, and (if a banked dir is given)
-//   a match count of engine T(n,H) vs the banked triangle.
+// Usage: strip_tm <Hmax> <Nmax> [perheight_dir]
+//   prints per-H timing, C_H head values, and (if a directory of h<H>.out
+//   files is given) a match count of T(n,H) against them.
+//        strip_tm single <H> <Nmax> <outfile>
+//   computes one C_H and writes "n C_H(n)" lines, n = 0..Nmax, to outfile.
 
 #include <cstdint>
 #include <cstdio>
@@ -60,12 +63,11 @@ static i128 parse_i128(const std::string& s) {
 
 struct Engine {
   int H, N;
-  // transition cache: state -> successor states + cell-count added, stored as
-  // PARALLEL arrays (u64 + uint8_t = 9 bytes/edge, vs 16 for a padded pair) so
-  // the cache stays in RAM at H=16 (~millions of states x ~thousands of edges).
-  struct TL { std::vector<u64> next; std::vector<uint8_t> add; };
+  // Transition cache: state -> successor states and the cells each adds, as
+  // parallel arrays (9 bytes per edge rather than 16 for a padded pair), and
+  // whether the state is one component, so the animal can end there.
+  struct TL { std::vector<u64> next; std::vector<uint8_t> add; bool closable = false; };
   std::unordered_map<u64, TL> trans;
-  std::unordered_map<u64, char> closable;
 
   static inline int lab(u64 st, int r) { return int((st >> (4 * r)) & 0xF); }
 
@@ -137,10 +139,9 @@ struct Engine {
       u64 ns;
       if (step(st, S, ns)) { lst.next.push_back(ns); lst.add.push_back((uint8_t)add); }
     }
-    // closable = exactly one component in st
     int comps = 0; bool seen[9] = {false};
     for (int r = 0; r < H; ++r) { int g = lab(st, r); if (g && !seen[g]) { seen[g] = true; ++comps; } }
-    closable[st] = (comps == 1) ? 1 : 0;
+    lst.closable = (comps == 1);
     auto res = trans.emplace(st, std::move(lst));
     return res.first->second;
   }
@@ -175,7 +176,7 @@ struct Engine {
         for (int n = N; n >= 0; --n) if (vec[n] != 0) { hi = n; break; }
         if (hi == 0 && vec[0] == 0) continue;
         const auto& tl = transitions(st);
-        if (closable[st]) for (int n = 0; n <= N; ++n) if (vec[n]) C[n] += vec[n];
+        if (tl.closable) for (int n = 0; n <= N; ++n) if (vec[n]) C[n] += vec[n];
         for (size_t e = 0; e < tl.next.size(); ++e) {
           int add = tl.add[e];
           u64 ns = tl.next[e];
@@ -192,13 +193,16 @@ struct Engine {
 };
 
 int main(int argc, char** argv) {
-  // Single-height mode: compute only C_H(0..N) and write "n value" lines.
-  // Lets the three machines split heights and compose by differencing later.
-  if (argc >= 5 && std::string(argv[1]) == "single") {
+  const char* usage = "usage: strip_tm <Hmax> <Nmax> [perheight_dir]\n"
+                      "       strip_tm single <H> <Nmax> <outfile>\n";
+  // Single-height mode, so heights can run as separate jobs and be combined
+  // by differencing afterwards.
+  if (argc >= 2 && std::string(argv[1]) == "single") {
+    if (argc != 5) { std::fputs(usage, stderr); return 1; }
     int H = std::atoi(argv[2]);
     int Nmax = std::atoi(argv[3]);
     std::string out = argv[4];
-    if (H > 16) { std::fprintf(stderr, "H<=16 (state packing)\n"); return 1; }
+    if (H < 1 || H > 16 || Nmax < 1) { std::fprintf(stderr, "need 1 <= H <= 16, Nmax >= 1\n"); return 1; }
     std::printf("strip_tm single: H=%d Nmax=%d -> %s\n", H, Nmax, out.c_str());
     std::fflush(stdout);
     Engine e; e.H = H; e.N = Nmax;
@@ -214,12 +218,11 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  if (argc < 3) { std::fprintf(stderr, "usage: strip_tm <Hmax> <Nmax> [banked_dir]\n"
-                                       "       strip_tm single <H> <Nmax> <outfile>\n"); return 1; }
+  if (argc < 3 || argc > 4) { std::fputs(usage, stderr); return 1; }
   int Hmax = std::atoi(argv[1]);
   int Nmax = std::atoi(argv[2]);
   std::string bankdir = (argc > 3) ? argv[3] : "";
-  if (Hmax > 16) { std::fprintf(stderr, "Hmax<=16 (state packing)\n"); return 1; }
+  if (Hmax < 1 || Hmax > 16 || Nmax < 1) { std::fprintf(stderr, "need 1 <= Hmax <= 16, Nmax >= 1\n"); return 1; }
 
   std::printf("strip_tm (C++): Hmax=%d Nmax=%d\n", Hmax, Nmax);
   std::vector<std::vector<i128>> Ccols(Hmax + 1);
@@ -272,7 +275,8 @@ int main(int argc, char** argv) {
       std::printf("  first mismatch T(%lld,%lld): engine=%s banked=%s\n",
                   fb_n, fb_H, i128str(fb_g).c_str(), i128str(fb_e).c_str());
     else
-      std::printf("  ALL AGREE -> columns H<=%d independently confirmed to n=%d\n", Hmax, bmax);
+      std::printf("  ALL AGREE -> columns H<=%d independently confirmed to n=%d\n", Hmax,
+                  std::min(bmax, Nmax));
   }
 
   std::printf("\nC_H head values (independent), n=H..H+3:\n");
