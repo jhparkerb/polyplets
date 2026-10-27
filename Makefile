@@ -672,8 +672,9 @@ build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
 # determinism.
 #
 # Not in any automatic chain, because of -fopenmp: build/motley_par does not
-# compile under Apple clang without libomp, or on a box with no omp.h, so a
-# chain containing it would fail there. Run by hand where OpenMP is present:
+# compile on a box with no OpenMP compiler (on Darwin, no MacPorts clang and
+# libomp; see OMPCXX), so a chain containing it would fail there. Run by hand
+# where OpenMP is present:
 # `make gate-motley-par` (1200 cell-comparisons over H=1..10, both controls
 # that must fail firing).
 gate-motley-par: build/motley_par

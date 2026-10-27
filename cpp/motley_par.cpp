@@ -140,8 +140,8 @@ static inline int successors(u128 key, int H, int r, int c, Succ out[SUCC_CAP]) 
 // published index has, by the release/acquire pair, also seen the key.
 
 // A bucket's idx field holds row+1, so that the EMPTY sentinel is ZERO.  That
-// is what lets clear() be a MADV_DONTNEED instead of a memset: a refaulted
-// page reads back as zeroes, which reads back as empty.  At H = 20 the bucket
+// is what lets clear() be a MADV_DONTNEED instead of a memset on Linux: a
+// refaulted page reads back as zeroes, which reads back as empty.  At H = 20 the bucket
 // array is ~8 GB and there are 861 cell-steps, so this is 7 TB of memset that
 // does not happen.
 static const u32 IDX_EMPTY = 0u;
