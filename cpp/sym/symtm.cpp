@@ -1,4 +1,4 @@
-// Symmetric-polyplet transfer-matrix counter (Hall of Mirrors thread).
+// Symmetric-polyplet transfer-matrix counter.
 //
 // Counts FIXED polyplets (king-connected animals) invariant under a chosen
 // symmetry, far past the explicit orbit-graph Redelmeier (symcount_fast):
@@ -13,8 +13,9 @@
 // H=1..maxn counts precisely the hmirror-fixed animals; the two axis
 // placements (through a cell row / between rows) arise as odd/even H.
 // Everything else — connectivity union-find, stranding, closable harvest,
-// completion prune — is the production transition, unchanged. The R1 fold
-// is skipped: reflectSig is the identity on every reachable state.
+// completion prune — is the production transition, unchanged. The
+// reflection fold is skipped: reflectSig is the identity on every reachable
+// state.
 //
 // r180 mode: the 180-degree rotation center of a fixed animal is its bbox
 // center, and the rotation maps column j to column W-1-j row-reversed — so
@@ -50,8 +51,15 @@
 // dmirror hook (34 + 33 label bytes + flag), and stepColumnSquare8 /
 // forEachViableMask are instantiated at uint64_t masks.
 //
-// CLI:  symtm {hmirror|r180|dmirror} MAXN [THREADS]   -> "n count" lines.
-// Gate: tests/gate_symtm.py (live cross-algorithm diff vs symcount_fast).
+// CLI:  symtm {hmirror|r180} MAXN [THREADS] [--strips HMIN HMAX] [--byheight]
+//       symtm hmirror ... [--maxwidth W]
+//       symtm dmirror MAXN [THREADS [SMIN SMAX]]
+//   "n count" lines, n with a zero count omitted. --strips and SMIN SMAX run
+//   a range of strips, whose partial totals sum to the full count; --byheight
+//   prints "n H W count" (hmirror) or "n H count" (r180, H the true height);
+//   --maxwidth stops hmirror's column loop at width W.
+// Checks: tests/gate_symtm.py (against symcount_fast, a different
+// algorithm) and tests/gate_reference.py.
 
 #define POLY_SIGMAX 70
 
@@ -209,8 +217,8 @@ static void forEachPalinMask(const Sig& old, int H, int budget, F&& fn) {
   palinRec(cx, 0, budget, 0u, 0ull, 0, -1, fn);
 }
 
-// One exact-height strip: the whole-column serial sweep (the same loop as
-// experiments/kink_tm's columnSweep) over palindromic masks, accumulating
+// One exact-height strip: the whole-column serial sweep over palindromic
+// masks, accumulating
 // closable-state counts into total[n]. Returns per-strip work counters for
 // the heartbeat (stateSum = live states summed over columns; steps/dead =
 // stepColumnSquare8 calls and its stranding rejections).
@@ -344,7 +352,8 @@ static bool glueOdd(const Sig& s, int H, u64 m) {
   return true;
 }
 
-// Row-pair coverage, the r180 tall-strip lever. The finished animal needs
+// Row-pair coverage, the prune that makes r180's tall strips cheap. The
+// finished animal needs
 // EVERY bbox row nonempty (an empty row disconnects a king animal), and the
 // right half covers row r iff the left covers H-1-r — so the left must
 // eventually put a cell in every pair {i, H-1-i}. Which pairs past columns
@@ -613,12 +622,9 @@ static StripStats sweepR180(int H, int maxn, std::vector<u64>& total,
 // Hook sweep inside an outer loop over the exact bbox S: hook k = cells
 // with min(x,y)=k, swept k=0..S-1; the hook frontier is one hook in
 // absolute coordinates and king adjacency only ever reaches the next hook.
-// (A merged single-sweep variant without the S loop — implicit bbox,
-// harvest on connectivity alone — was built and byte-matched too, but
-// MEASURED SLOWER at every point (n=20 serial 12.5s vs 7.1s; n=24 10t
-// >120s vs 92s): the exact-S touch debt prunes more than strip-merging
-// dedups, and strips parallelize for free. Recover it from git history if
-// ever needed.)
+// The loop over S is faster than one sweep with an implicit bbox (measured:
+// n=20 serial 7.1 s against 12.5 s), because the exact-S touch debt prunes
+// more than merging strips saves.
 //
 // Sig layout (POLY_SIGMAX=70): b[0] = corner label (cell (k,k)), b[i] =
 // column-arm position i (cell (k,k+i)) for i=1..33, b[DM_ROW+i] = row-arm
@@ -721,8 +727,8 @@ static Outcome dmStep(const Sig& old, int k, int S, u64 mask, Sig& out) {
   return Outcome::Alive;
 }
 
-// Hook-k masks worth stepping, with the r180 lesson applied: all prunes IN
-// the recursion. Positions are decided DESCENDING (Anew..0) so the touch
+// Hook-k masks worth stepping, with every prune inside the recursion (as in
+// r180), so doomed subtrees are never descended. Positions are decided DESCENDING (Anew..0) so the touch
 // debt is fixed at the first set bit. Debts, each admissible and merged by
 // max (one future corner-chain to (S-1,S-1) both touches and covers every
 // remaining row at 1 cell per hook, so they share their cheapest witness):
@@ -814,8 +820,8 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
 // arm pairs 2) — no transpose doubling: each dmirror-fixed animal is built
 // exactly once.
 //
-// RAM is the binding resource at the fat strips (the n=32 push), so two
-// bookkeeping moves shrink the peak, both byte-neutral:
+// RAM is the binding resource at the fat strips (n >= 30), so two
+// bookkeeping moves shrink the peak, neither changing a count:
 //   - count vectors are OFFSET by the hook floor: a state in db at loop k
 //     has ms >= k (hooks 0..k-1 are each nonempty), so c[i] holds n = k+i
 //     and the k dead zero entries are never allocated;
@@ -825,8 +831,8 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
 //
 // Unlike hmirror/r180, dmirror is threaded INSIDE the strip: the fattest
 // strip is ~16% of the whole sweep's cpu, so with strip-level parallelism
-// alone it floors the wall (measured on the ayr n=28 run: total cpu on
-// target but the tail all single-threaded). The db is sharded by hash;
+// alone it sets the wall time (measured at n=28: the tail ran on one
+// thread). The db is sharded by hash;
 // per hook, threads pull source states off an atomic cursor and insert
 // stepped states into per-shard maps under per-shard mutexes — the totals
 // are u64 sums, so scheduling order cannot change any result byte. The
@@ -834,16 +840,16 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
 // uses the low bits, and reusing them would leave each shard's map with a
 // correlated, mostly-empty bucket array on power-of-two implementations.
 // Tiny hooks skip the thread spawn (work < 256 states).
-// Compact frontier shard (Shrink Ray). The unordered_map<Sig,RVal>
-// frontier OOMed dalby at n=32: hash node + full-width heap count vector
-// cost ~300B+/state (S=31 measured 79.1GB peak; S=30 died >124GB). Flat
-// storage instead:
+// Compact frontier shard. An unordered_map<Sig,RVal> frontier costs
+// ~300 B+/state (hash node plus a full-width heap count vector), which ran
+// out of 128 GB at n=32 (S=30). Flat storage instead:
 //   ent - fixed 88-byte entries: cov(u64) off(u32) lo,len(u8) sig(70B) pad
 //   idx - open-addressing table (pow2, load <= 1/2) of entry indices,
 //         probed with the LOW hash bits (shard selection uses the high 32)
 //   cnt - one arena; an entry's counts live at [off, off+len),
 //         absolute n = floor + lo + j
-// Ranged blocks bank profile_rows' measured 0.56x mean occupied width. lo
+// A state's nonzero counts occupy about 0.56 of the full width on average
+// (measured), so each entry stores only its range. lo
 // is exact -- every contributor is nonzero at its own lo, by induction
 // from the seed: a contribution whose lo element would land past maxn is
 // pruned before insert (ms + w + owed > maxn) -- so ms = floor + lo with
@@ -1070,8 +1076,7 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
 }
 
 int main(int argc, char** argv) {
-  // Optional flags may appear anywhere; strip them, then read positionals so
-  // the existing dmirror "MAXN THREADS SMIN SMAX" interface is untouched.
+  // Optional flags may appear anywhere; strip them, then read positionals.
   std::vector<std::string> pos;
   bool byHeight = false;
   int hmin = -1, hmax = -1, wcap = -1;
@@ -1098,8 +1103,9 @@ int main(int argc, char** argv) {
     std::fprintf(stderr,
                  "usage: %s {hmirror|r180} MAXN [THREADS] "
                  "[--strips HMIN HMAX] [--byheight]\n"
+                 "       %s hmirror ... [--maxwidth W]\n"
                  "       %s dmirror MAXN [THREADS [SMIN SMAX]]\n",
-                 argv[0], argv[0]);
+                 argv[0], argv[0], argv[0]);
     return 2;
   }
   const int maxn = std::atoi(pos[1].c_str());
@@ -1112,8 +1118,17 @@ int main(int argc, char** argv) {
                  isDm ? 34 : 40, type.c_str());
     return 2;
   }
-  if (byHeight && isDm) {
-    std::fprintf(stderr, "--byheight is hmirror/r180 only\n");
+  if (isDm && (byHeight || hmin > 0 || hmax > 0 || wcap > 0)) {
+    std::fprintf(stderr, "--byheight, --strips and --maxwidth are hmirror/r180 only\n");
+    return 2;
+  }
+  if (wcap > 0 && type != "hmirror") {
+    std::fprintf(stderr, "--maxwidth is hmirror only\n");
+    return 2;
+  }
+  if ((hmin > 0 || hmax > 0) && !(1 <= hmin && hmin <= hmax && hmax <= maxn)) {
+    std::fprintf(stderr, "bad strip range %d..%d (need 1<=HMIN<=HMAX<=MAXN)\n",
+                 hmin, hmax);
     return 2;
   }
   int nthreads = pc >= 3 ? std::atoi(pos[2].c_str()) : 1;
