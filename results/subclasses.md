@@ -2079,8 +2079,7 @@ corners. `experiments/component_stratification.py`.
 
 A sampled distribution, collected for "cheap core plus sparse correction"
 decompositions of king adjacency, which were all measured dead
-(`results/closed-doors.md`); the exact `(size, rook-edge-count)` table, a
-small extension of the `--contacts` flag in `cpp/g2_redelmeier.cpp`, was
+(`results/closed-doors.md`); the exact `(size, rook-edge-count)` table was
 therefore not built. The structural fact beneath it, zero rook edges iff
 A001168, is the `bishopConn` check in the same program and the identity
 `C(n,n) = A001168` above.

@@ -6,15 +6,21 @@
 // compare >= origin in that order; the classic untried/tried discipline does
 // the rest. Lattice-generic: the neighbor table is the only per-lattice part.
 //
-// CLI:  g2 LATTICE MAXN [--per-box] [--split S K IDX] [analysis modes]
-//   aggregate mode: lines "n count"
+// CLI:  g2 LATTICE MAXN [mode] [--split S K IDX]
+//   default:        lines "n count"
 //   --per-box:      lines "n w h count"   (w,h = bounding box dims)
-//   analysis modes (see the usage string in main()): --rook-bishop, --perimeter,
-//       --siteperim, --holes/--holes8, --maxhole/--maxhole8/--maxhole-strat, --contacts
+//   --rook-bishop:  lines "n count rook-connected bishop-connected"
+//   --perimeter:    lines "n edge-perimeter count"
+//   --siteperim:    lines "n site-perimeter count"
+//   --holes, --holes8:     lines "n holes count"
+//   --maxhole, --maxhole8: lines "n M(n)", the largest total hole area
 //   --split S K IDX: deterministic subtree partition at animal size S into K
 //       classes; worker IDX counts its classes' subtrees, worker 0 also
 //       counts all nodes of size < S. Summing all workers' outputs
-//       elementwise must equal the unsplit run (gate check C).
+//       elementwise equals the unsplit run (tests/gate_g2.py check C); for
+//       --maxhole the workers combine by elementwise max instead.
+// tests/gate_g2.py checks every mode against published sequences, a brute
+// force oracle, or another mode.
 //
 // Counts are unsigned 64-bit; safe through ~9e18, far beyond any run this
 // binary will be asked to do (polyplet a(22) ~ 4.7e16).
@@ -34,13 +40,10 @@ using u64 = std::uint64_t;
 
 struct Offset { int dx, dy; };
 
-// Offsets ordered by grid-index delta ascending (see kSquare8) so the neighbor
-// probes walk memory low-to-high.
+// Each table is ordered by grid-index delta (dy*gridW+dx) ascending, so the
+// status[] probes in the neighbor loop walk memory low-to-high. The order
+// affects only the enumeration order, not the counts.
 static constexpr Offset kSquare4[] = {{0,-1},{-1,0},{1,0},{0,1}};
-// Ordered by grid-index delta (dy*gridW+dx) ascending: the 8 status[] probes in
-// the neighbor loop then walk memory low-to-high (bottom row, middle row, top
-// row), which streams/prefetches better. Order is enumeration-order only; the
-// counts are offset-order-independent (gate C confirms split-sum invariance).
 static constexpr Offset kSquare8[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
                                       {1,0},{-1,1},{0,1},{1,1}};
 static constexpr Offset kTri6[]    = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
@@ -61,11 +64,9 @@ struct Counter {
   // test a single add + load. A cell's status never changes while it is
   // placed: it was already 1 when it entered an untried list, and the
   // tried-set rule keeps it 1 after unplacement until its adder unwinds.
-  // Fixed compile-time grid stride (L3): the neighbor deltas dj[k] = dy*gridW+dx
-  // then fold into immediate load offsets instead of being reloaded from the
-  // struct and added to j every node (the post-L1 hot spot). A row is 128 bytes
-  // = 2 cache lines; the 3-row neighbor stencil stays trivially L1-resident.
-  // Holds any maxn with 2*maxn+2 < 128, i.e. maxn <= 62 (binary caps at 40).
+  // The grid stride is a compile-time constant so the neighbor deltas
+  // dy*gridW+dx fold into immediate load offsets. A row's x index runs
+  // 0..2*maxn+2, which fits 128 for maxn <= 62; main() caps maxn at 40.
   static constexpr int gridW = 128;
   std::vector<char> status;
   std::vector<int> xOf, yOf;          // coordinates of grid index j
@@ -135,21 +136,6 @@ struct Counter {
   bool maxHole8 = false;                     // background flood 8-connected?
   std::vector<u64> maxAreaBySize;            // [size] -> max enclosed empty area
 
-  // optional STRATIFIED maxhole (--maxhole-strat, implies maxHoleCheck): M_asym(n) = max
-  // hole area among ASYMMETRIC (trivial-D4-stabilizer) animals; M_k(n) = max total hole
-  // area over animals with EXACTLY k holes. Reuses the flood/placed machinery.
-  bool maxHoleStrat = false;
-  std::vector<u64> maxAreaAsym;              // [size] -> max hole area, asymmetric only
-  std::vector<u64> maxAreaByK;               // [size*kStride + k] -> max total area, k holes
-  int kStride = 0;
-  std::vector<int> symX, symY, symTX, symTY; // scratch for the D4 symmetry check
-
-  // optional (size, #diagonal-contacts) distribution (--contacts). A diagonal contact is a
-  // king-but-not-rook adjacency: a pair of cells at offset (+-1,+-1). Density test (c=3/4?).
-  bool contactsCheck = false;
-  std::vector<u64> byContacts;
-  int contactStride = 0;
-  int diagOff[4] = {0};                      // the 4 diagonal neighbor deltas (grid-index)
   bool needsCells = false;                   // any analysis needing inAnimal/placed (set in init)
 
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
@@ -171,74 +157,18 @@ struct Counter {
     return comps;
   }
 
-  // Number of holes: bounded enclosed empty regions. Flood the empty exterior of
-  // the bounding box expanded by one cell (so the outside is one connected
-  // region), then count the connected components among the empty cells inside the
-  // box that the exterior flood never reached. Background connectivity is
-  // 4-connected (--holes, the Jordan dual of the 8-connected king foreground:
-  // the topologically consistent choice and the same hole definition OEIS uses
-  // for polyominoes in A389193) or 8-connected (--holes8, the same adjacency as
-  // the foreground); both are computed and compared.
-  int countHoles() {
-    ++hstamp;
-    const int xlo = minx - 1, xhi = maxx + 1;
-    const int ylo = -1, yhi = maxy + 1;        // miny is always 0
-    const int bgdeg = holes8 ? 8 : 4;
+  // Holes are found by flood fill over the empty cells of the bounding box
+  // expanded by one cell. Background connectivity is 4 (--holes, --maxhole: the
+  // planar dual of the 8-connected king foreground, and the hole definition OEIS
+  // uses for polyominoes in A389193) or 8 (--holes8, --maxhole8).
+  //
+  // flood() stamps every empty cell reachable from the seeds on floodStk;
+  // floodExterior() starts a new stamp and floods from the expanded box's
+  // border, so afterwards an unstamped empty cell in the box is enclosed.
+  void flood(int bgdeg) {
     static const int BX[8] = {1, -1, 0, 0, 1, 1, -1, -1};
     static const int BY[8] = {0, 0, 1, -1, 1, -1, 1, -1};
-    floodStk.clear();
-    auto push = [&](int x, int y) {
-      const int j = cellIndex(x, y);
-      if (hseen[j] != hstamp) { hseen[j] = hstamp; floodStk.push_back(j); }
-    };
-    auto flood = [&]() {
-      while (!floodStk.empty()) {
-        const int j = floodStk.back(); floodStk.pop_back();
-        const int cx = xOf[j], cy = yOf[j];
-        for (int k = 0; k < bgdeg; ++k) {
-          const int x = cx + BX[k], y = cy + BY[k];
-          if (x < xlo || x > xhi || y < ylo || y > yhi) continue;
-          const int nb = cellIndex(x, y);
-          if (inAnimal[nb] || hseen[nb] == hstamp) continue;
-          hseen[nb] = hstamp; floodStk.push_back(nb);
-        }
-      }
-    };
-    // seed the exterior flood from the whole border of the expanded box
-    for (int x = xlo; x <= xhi; ++x) { push(x, ylo); push(x, yhi); }
-    for (int y = ylo; y <= yhi; ++y) { push(xlo, y); push(xhi, y); }
-    flood();
-    int holes = 0;
-    for (int y = 0; y <= maxy; ++y)
-      for (int x = minx; x <= maxx; ++x) {
-        const int j = cellIndex(x, y);
-        if (inAnimal[j] || hseen[j] == hstamp) continue;
-        ++holes;                               // a fresh enclosed region
-        hseen[j] = hstamp; floodStk.push_back(j);
-        flood();
-      }
-    return holes;
-  }
-
-  // Total enclosed empty AREA for the current animal: same exterior flood as
-  // countHoles(), but count every empty cell inside the (expanded) box that the
-  // exterior flood never reaches -- i.e. the sum of all hole areas. Background
-  // connectivity 4-connected (primary, Jordan dual of the king foreground) or
-  // 8-connected (--maxhole8).
-  int holeArea() {
-    ++hstamp;
-    const int xlo = minx - 1, xhi = maxx + 1;
-    const int ylo = -1, yhi = maxy + 1;        // miny is always 0
-    const int bgdeg = maxHole8 ? 8 : 4;
-    static const int BX[8] = {1, -1, 0, 0, 1, 1, -1, -1};
-    static const int BY[8] = {0, 0, 1, -1, 1, -1, 1, -1};
-    floodStk.clear();
-    auto push = [&](int x, int y) {
-      const int j = cellIndex(x, y);
-      if (hseen[j] != hstamp) { hseen[j] = hstamp; floodStk.push_back(j); }
-    };
-    for (int x = xlo; x <= xhi; ++x) { push(x, ylo); push(x, yhi); }
-    for (int y = ylo; y <= yhi; ++y) { push(xlo, y); push(xhi, y); }
+    const int xlo = minx - 1, xhi = maxx + 1, ylo = -1, yhi = maxy + 1;
     while (!floodStk.empty()) {
       const int j = floodStk.back(); floodStk.pop_back();
       const int cx = xOf[j], cy = yOf[j];
@@ -250,11 +180,44 @@ struct Counter {
         hseen[nb] = hstamp; floodStk.push_back(nb);
       }
     }
+  }
+  void floodExterior(int bgdeg) {
+    ++hstamp;
+    floodStk.clear();
+    const int xlo = minx - 1, xhi = maxx + 1, ylo = -1, yhi = maxy + 1;  // miny is always 0
+    auto push = [&](int x, int y) {
+      const int j = cellIndex(x, y);
+      if (hseen[j] != hstamp) { hseen[j] = hstamp; floodStk.push_back(j); }
+    };
+    for (int x = xlo; x <= xhi; ++x) { push(x, ylo); push(x, yhi); }
+    for (int y = ylo; y <= yhi; ++y) { push(xlo, y); push(xhi, y); }
+    flood(bgdeg);
+  }
+
+  // Number of holes: connected components of enclosed empty cells.
+  int countHoles() {
+    const int bgdeg = holes8 ? 8 : 4;
+    floodExterior(bgdeg);
+    int holes = 0;
+    for (int y = 0; y <= maxy; ++y)
+      for (int x = minx; x <= maxx; ++x) {
+        const int j = cellIndex(x, y);
+        if (inAnimal[j] || hseen[j] == hstamp) continue;
+        ++holes;
+        hseen[j] = hstamp; floodStk.push_back(j);
+        flood(bgdeg);
+      }
+    return holes;
+  }
+
+  // Total hole area: the number of enclosed empty cells.
+  int holeArea() {
+    floodExterior(maxHole8 ? 8 : 4);
     int area = 0;
     for (int y = 0; y <= maxy; ++y)
       for (int x = minx; x <= maxx; ++x) {
         const int j = cellIndex(x, y);
-        if (!inAnimal[j] && hseen[j] != hstamp) ++area;   // enclosed empty cell
+        if (!inAnimal[j] && hseen[j] != hstamp) ++area;
       }
     return area;
   }
@@ -276,7 +239,7 @@ struct Counter {
 
   void init() {
     needsCells = connCheck || perimCheck || holesCheck || maxHoleCheck ||
-                 siteperimCheck || contactsCheck;  // (maxHoleStrat rides maxHoleCheck)
+                 siteperimCheck;
     const int gridH = maxn + 3;                  // rows y = -1 .. maxn+1
     const int cells = gridW * gridH;
     status.assign(cells, 0);
@@ -299,8 +262,6 @@ struct Counter {
       placed.clear();
       placed.reserve(maxn + 1);
       rookOff[0] = 1; rookOff[1] = -1; rookOff[2] = gridW; rookOff[3] = -gridW;
-      diagOff[0] = gridW + 1; diagOff[1] = gridW - 1;
-      diagOff[2] = -gridW + 1; diagOff[3] = -gridW - 1;
     }
     if (connCheck) {
       rookConn.assign(maxn + 1, 0);
@@ -329,49 +290,6 @@ struct Counter {
     if (maxHoleCheck) {
       maxAreaBySize.assign(maxn + 1, 0);
     }
-    if (maxHoleStrat) {
-      kStride = maxn + 1;
-      maxAreaByK.assign(static_cast<size_t>(maxn + 1) * kStride, 0);
-      maxAreaAsym.assign(maxn + 1, 0);
-    }
-    if (contactsCheck) {
-      contactStride = 4 * maxn + 1;            // #diagonal contacts <= 2*size <= 2*maxn
-      byContacts.assign(static_cast<size_t>(maxn + 1) * contactStride, 0);
-    }
-  }
-
-  // True iff the animal has trivial D4 stabilizer (no nontrivial rotation/reflection maps
-  // it onto itself up to translation) -- i.e. its free orbit has full size 8.
-  // TODO(simplify): this D4 transform table + canon duplicate the affine-transform
-  // machinery in cpp/sym/symcount_fast.cpp; a shared D4/affine header would unify them.
-  bool isAsymmetric() {
-    static const int T[8][4] = {           // (x,y) -> (a*x+b*y, c*x+d*y)
-        {1, 0, 0, 1}, {0, -1, 1, 0}, {-1, 0, 0, -1}, {0, 1, -1, 0},
-        {-1, 0, 0, 1}, {1, 0, 0, -1}, {0, 1, 1, 0}, {0, -1, -1, 0}};
-    symX.resize(size); symY.resize(size);
-    for (int i = 0; i < size; ++i) { symX[i] = xOf[placed[i]]; symY[i] = yOf[placed[i]]; }
-    auto canon = [&](const std::vector<int>& X, const std::vector<int>& Y) {
-      int mnx = X[0], mny = Y[0];
-      for (int i = 1; i < size; ++i) {
-        if (X[i] < mnx) mnx = X[i];
-        if (Y[i] < mny) mny = Y[i];
-      }
-      std::vector<long long> key(size);
-      for (int i = 0; i < size; ++i)
-        key[i] = static_cast<long long>(X[i] - mnx) * 256 + (Y[i] - mny);
-      std::sort(key.begin(), key.end());
-      return key;
-    };
-    const std::vector<long long> orig = canon(symX, symY);
-    symTX.resize(size); symTY.resize(size);
-    for (int t = 1; t < 8; ++t) {
-      for (int i = 0; i < size; ++i) {
-        symTX[i] = T[t][0] * symX[i] + T[t][1] * symY[i];
-        symTY[i] = T[t][2] * symX[i] + T[t][3] * symY[i];
-      }
-      if (canon(symTX, symTY) == orig) return false;   // a nontrivial symmetry fixes it
-    }
-    return true;
   }
 
   // Cold path: the optional (size,*) distributions, run once per counted node only
@@ -391,13 +309,6 @@ struct Counter {
       const int perim = 4 * size - adjsum;       // exposed unit edges
       byPerim[size * perimStride + perim] += 1;
     }
-    if (contactsCheck) {
-      int diagsum = 0;
-      for (int i = 0; i < size; ++i)
-        for (int k = 0; k < 4; ++k)
-          if (inAnimal[placed[i] + diagOff[k]]) ++diagsum;
-      byContacts[static_cast<size_t>(size) * contactStride + diagsum / 2] += 1;  // pair = 2
-    }
     if (holesCheck) {
       byHoles[size * holeStride + countHoles()] += 1;
     }
@@ -415,20 +326,6 @@ struct Counter {
         }
       bySiteperim[size * spStride + sp] += 1;
     }
-    if (maxHoleStrat) {
-      // TODO(simplify): holeArea() then countHoles() flood the same animal twice; a
-      // combined flood returning (area, #holes) would halve this path's per-record cost.
-      // Deferred -- must keep the holes8 vs maxHole8 background-degree choice consistent.
-      const u64 area = static_cast<u64>(holeArea());
-      if (area > 0) {                          // hole-free animals contribute nothing here
-        const int k = countHoles();            // k >= 1
-        const size_t kid = static_cast<size_t>(size) * kStride + k;
-        if (area > maxAreaByK[kid]) maxAreaByK[kid] = area;
-        // the (expensive) D4 check runs ONLY for an animal that would beat the asym
-        // record -- short-circuit on area first, so it fires a handful of times per size.
-        if (area > maxAreaAsym[size] && isAsymmetric()) maxAreaAsym[size] = area;
-      }
-    }
   }
 
   // The hot recursion. The run-constant modes are template parameters, so each
@@ -440,10 +337,9 @@ struct Counter {
   // TRACKBOX folds in the fact that the analyses also read minx/maxx/maxy: in pure
   // aggregate mode (no box, no analysis) the box save/update/restore is skipped
   // entirely. run() dispatches to the right instantiation once.
-  // Compile-time neighbor deltas in grid-index space, folded from the constexpr
-  // offset table and the fixed stride (L3). Used in the kernel so `j + DJ[k]`
-  // becomes an immediate load offset instead of a per-node reload+add of dj[].
-  // Value-identical to the member dj[] that init() computes for the analysis path.
+  // Compile-time neighbor deltas in grid-index space, so `j + DJ[k]` in the
+  // kernel is an immediate load offset. Equal to the dj[] that init() computes
+  // for the analysis path.
   template <int DEG>
   static constexpr std::array<int, DEG> kDJ() {
     std::array<int, DEG> d{};
@@ -456,8 +352,8 @@ struct Counter {
   void searchT(const std::uint16_t* untriedIn, int numUntried) {
     constexpr bool TRACKBOX = PERBOX || NEEDS;
     static constexpr std::array<int, DEG> DJ = kDJ<DEG>();
-    // u16 untried entries (L4): grid indices are < 128*(maxn+3) <= 5504,
-    // so they fit uint16_t and the per-call memcpy of the untried list halves.
+    // Grid indices are < 128*(maxn+3) <= 5504, so untried entries are uint16_t,
+    // which halves the per-call memcpy of the untried list.
     std::uint16_t untried[kMaxUntried];
     std::memcpy(untried, untriedIn,
                 static_cast<size_t>(numUntried) * sizeof(std::uint16_t));
@@ -534,47 +430,47 @@ struct Counter {
           for (int k = 0; k < DEG; ++k) stale += st[j + DJ[k]];
           bs[maxn] += static_cast<u64>(numUntried + DEG - stale);
         } else {
-        int newCount = numUntried;
-        for (int k = 0; k < DEG; ++k) {
-          const int j2 = j + DJ[k];
-          if (!st[j2]) {
-            st[j2] = 1;
-            untried[newCount++] = j2;
-          }
-        }
-        // Terminal batch: when the children are the last (size==maxn) level, each of
-        // untried[0..newCount) placed as the last cell is a distinct maxn-cell animal.
-        // Count them all at once -- no recursion, no per-cell place/unplace. This is
-        // the most-visited level, so collapsing it removes the bulk of the child
-        // memcpys and terminal bookkeeping. Always sound under !NEEDS (needs the cell
-        // placed) except when a --split boundary sits AT the last level: then a
-        // terminal cell carries per-cell ownership the batch can't express, so under
-        // SPLIT it applies only when the boundary is strictly above maxn.
-        bool batched = false;
-        if constexpr (!NEEDS) {
-          bool canBatch = true;
-          if constexpr (SPLIT) canBatch = (splitS < maxn);
-          if (canBatch && size + 1 == maxn) {
-            bs[maxn] += static_cast<u64>(newCount);
-            if constexpr (PERBOX) {
-              for (int t = 0; t < newCount; ++t) {
-                const int j2 = untried[t];
-                const int xx = xo[j2], yy = yo[j2];
-                const int w = std::max(xx, maxx) - std::min(xx, minx) + 1;
-                const int h = std::max(yy, maxy) + 1;   // miny is always 0
-                bb[boxIndex(maxn, w, h)] += 1;
-              }
+          int newCount = numUntried;
+          for (int k = 0; k < DEG; ++k) {
+            const int j2 = j + DJ[k];
+            if (!st[j2]) {
+              st[j2] = 1;
+              untried[newCount++] = j2;
             }
-            batched = true;
           }
-        }
-        if (!batched) searchT<DEG, PERBOX, NEEDS, SPLIT>(untried, newCount);
-        // The cells we just marked are exactly untried[numUntried..newCount); the
-        // child works on its own memcpy'd copy and never writes through this buffer,
-        // so those slots still hold them. Unmark by walking the slots -- no separate
-        // reachedUndo stack needed (removing it drops a std::vector push/pop per
-        // neighbor from the hot loop).
-        for (int t = numUntried; t < newCount; ++t) st[untried[t]] = 0;
+          // Terminal batch: when the children are the last (size==maxn) level, each of
+          // untried[0..newCount) placed as the last cell is a distinct maxn-cell animal.
+          // Count them all at once -- no recursion, no per-cell place/unplace. This is
+          // the most-visited level, so collapsing it removes the bulk of the child
+          // memcpys and terminal bookkeeping. Always sound under !NEEDS (needs the cell
+          // placed) except when a --split boundary sits AT the last level: then a
+          // terminal cell carries per-cell ownership the batch can't express, so under
+          // SPLIT it applies only when the boundary is strictly above maxn.
+          bool batched = false;
+          if constexpr (!NEEDS) {
+            bool canBatch = true;
+            if constexpr (SPLIT) canBatch = (splitS < maxn);
+            if (canBatch && size + 1 == maxn) {
+              bs[maxn] += static_cast<u64>(newCount);
+              if constexpr (PERBOX) {
+                for (int t = 0; t < newCount; ++t) {
+                  const int j2 = untried[t];
+                  const int xx = xo[j2], yy = yo[j2];
+                  const int w = std::max(xx, maxx) - std::min(xx, minx) + 1;
+                  const int h = std::max(yy, maxy) + 1;   // miny is always 0
+                  bb[boxIndex(maxn, w, h)] += 1;
+                }
+              }
+              batched = true;
+            }
+          }
+          if (!batched) searchT<DEG, PERBOX, NEEDS, SPLIT>(untried, newCount);
+          // The cells we just marked are exactly untried[numUntried..newCount); the
+          // child works on its own memcpy'd copy and never writes through this buffer,
+          // so those slots still hold them. Unmark by walking the slots -- no separate
+          // reachedUndo stack needed (removing it drops a std::vector push/pop per
+          // neighbor from the hot loop).
+          for (int t = numUntried; t < newCount; ++t) st[untried[t]] = 0;
         }
       }
 
@@ -620,8 +516,8 @@ struct Counter {
 int main(int argc, char** argv) {
   if (argc < 3) {
     std::fprintf(stderr,
-        "usage: %s {square4|square8|tri6} MAXN [--per-box] [--rook-bishop] "
-        "[--perimeter] [--siteperim] [--holes|--holes8] [--maxhole|--maxhole8] "
+        "usage: %s {square4|square8|tri6} MAXN [--per-box | --rook-bishop | "
+        "--perimeter | --siteperim | --holes | --holes8 | --maxhole | --maxhole8] "
         "[--split S K IDX]\n",
         argv[0]);
     return 2;
@@ -655,10 +551,6 @@ int main(int argc, char** argv) {
       c.maxHoleCheck = true; c.maxHole8 = true;
     } else if (std::strcmp(argv[i], "--siteperim") == 0) {
       c.siteperimCheck = true;
-    } else if (std::strcmp(argv[i], "--maxhole-strat") == 0) {
-      c.maxHoleCheck = true; c.maxHoleStrat = true;
-    } else if (std::strcmp(argv[i], "--contacts") == 0) {
-      c.contactsCheck = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -674,9 +566,8 @@ int main(int argc, char** argv) {
     }
   }
 
-  // The Redelmeier enumeration is one recursive call with no clean per-unit
-  // boundary to heartbeat on; the maxhole_split.py driver provides per-worker
-  // progress, so here we frame it with start/done (provenance + wall + cost).
+  // One recursive call with no natural unit to heartbeat on, so only the
+  // start and done events (docs/observability.md).
   std::string job = "g2-" + lattice + "-N" + std::to_string(c.maxn);
   std::string extra = "lattice=" + lattice;
   if (c.splitK > 1) {
@@ -722,30 +613,6 @@ int main(int argc, char** argv) {
         if (v) std::printf("%d %d %llu\n", n, p,
                            static_cast<unsigned long long>(v));
       }
-  } else if (c.contactsCheck) {
-    // "n  contacts  count"; sum over contacts of count == bySize[n]. Total diagonal contacts
-    // and the per-cell density c (= mean #contacts / n -> ?) follow from this distribution.
-    for (int n = 1; n <= c.maxn; ++n)
-      for (int d = 0; d < c.contactStride; ++d) {
-        const u64 v = c.byContacts[static_cast<size_t>(n) * c.contactStride + d];
-        if (v) std::printf("%d %d %llu\n", n, d, static_cast<unsigned long long>(v));
-      }
-  } else if (c.maxHoleStrat) {
-    // "n M(n) M_asym(n) M_1(n) M_2(n) ..."  (M_asym = max hole area over asymmetric
-    // animals; M_k = max total hole area over animals with exactly k holes).
-    std::printf("# n M(n) M_asym(n) M_1(n) M_2(n) ...\n");
-    for (int n = 1; n <= c.maxn; ++n) {
-      int kmax = 0;
-      for (int k = 1; k < c.kStride; ++k)
-        if (c.maxAreaByK[static_cast<size_t>(n) * c.kStride + k]) kmax = k;
-      std::printf("%d %llu %llu", n,
-                  static_cast<unsigned long long>(c.maxAreaBySize[n]),
-                  static_cast<unsigned long long>(c.maxAreaAsym[n]));
-      for (int k = 1; k <= kmax; ++k)
-        std::printf(" %llu", static_cast<unsigned long long>(
-                                 c.maxAreaByK[static_cast<size_t>(n) * c.kStride + k]));
-      std::printf("\n");
-    }
   } else if (c.maxHoleCheck) {
     // "n  M(n)"; M(n) = max enclosed empty area over all n-cell polyplets.
     // Across --split workers, combine by taking the elementwise MAX (not sum).
