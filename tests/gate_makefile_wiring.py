@@ -54,14 +54,7 @@ MAKEFILE = os.path.join(ROOT, "Makefile")
 # Deliberate exclusions. Key = target, value = why it is not in GATE_TARGETS.
 # Adding an entry here is a decision to make in the open, not a way to quiet
 # this gate: the reason is printed on every green run.
-EXCUSED = {
-    "gate-motley-par":
-        "needs build/motley_par, which needs -fopenmp: it does not compile on "
-        "gympie (Apple clang, no libomp) or dalby (no omp.h), so no automatic "
-        "chain can carry it without failing on two of the three boxes. Run by "
-        "hand on ayr. The reason used to read 'lives with the ns-gates', which "
-        "ns-gates has never done -- an allowlist reason that was not true",
-}
+EXCUSED = {}
 
 
 # Where gate scripts live, and what a gate script looks like. Kept broad on
@@ -350,7 +343,7 @@ def _prereqs_one(text, prereq_var, target_var):
         return [f"no {prereq_var} assignment found in Makefile"]
     declared = set(m.group(1).replace("\\\n", " ").split())
     # Only the WIRED gates matter: the sweep runs exactly the target list, so an
-    # excused gate's binary (build/motley_par) is never built concurrently and
+    # excused gate's binary is never built concurrently and
     # listing it here would just make every push compile something nothing runs.
     w = re.search(rf"^{target_var}\s*=\s*((?:.*\\\n)*.*)$", text, re.M)
     wired = set(w.group(1).replace("\\\n", " ").split()) if w else set()
@@ -507,7 +500,7 @@ def selftest():
     print("  [RED 3] stale EXCUSED entry caught")
 
     # RED 4: an excuse for a gate that is in fact wired.
-    bad = check(recipes, wired | {"gate-motley-par"}, EXCUSED)
+    bad = check(recipes, wired, dict(EXCUSED, **{"gate-a": "excused"}))
     assert any("obsolete and misleading" in b for b in bad), bad
     print("  [RED 4] excuse for an already-wired gate caught")
 

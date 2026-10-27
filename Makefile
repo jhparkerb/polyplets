@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-motley-par
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -166,7 +166,8 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/severance_w1 build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
   build/strip_mu_kink build/subgraph_count build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
-  build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
+  build/ns/orchestrate build/ns/map_worker build/ns/merge_worker build/ns/combine \
+  build/strip_tm build/motley_par build/dmirror_spine \
   $(if $(GMP_LDFLAGS),build/convex_area_tm build/convex_perim_tm build/middle_kingdom_tm)
 
 # --- input gating -----------------------------------------------------------
@@ -264,6 +265,13 @@ DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
                 tests/common.py scripts/g1_naive.py scripts/symcount.py $(FIXTURES)
 DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
+DEPS_gate-reference = build/g2 build/strip_tm build/motley_par \
+                build/symcount_fast build/symtm build/dmirror_spine \
+                build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
+                build/ns/combine scripts/term.sh tests/gate_reference.py \
+                tests/common.py $(wildcard tests/reference/*)
+DEPS_gate-motley-par = build/motley_par tests/gate_motley_par.py \
+                $(wildcard results/cutcount_b1/rows/*)
 DEPS_gate-motley-crt = scripts/motley_crt.py \
                 $(wildcard results/cutcount_b1/residues/*) \
                 results/cutcount_b1/rows/C18.out \
@@ -671,15 +679,18 @@ build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
 # widths, byte-identically against cutcount_b1, and for thread-count
 # determinism.
 #
-# Not in any automatic chain, because of -fopenmp: build/motley_par does not
-# compile on a box with no OpenMP compiler (on Darwin, no MacPorts clang and
-# libomp; see OMPCXX), so a chain containing it would fail there. Run by hand
-# where OpenMP is present:
-# `make gate-motley-par` (1200 cell-comparisons over H=1..10, both controls
-# that must fail firing).
+# 1200 cell-comparisons over H=1..10, both controls that must fail firing.
+# Needs an OpenMP compiler (OMPCXX).
 gate-motley-par: build/motley_par
 	python3 tests/gate_motley_par.py --selftest
 	python3 tests/gate_motley_par.py 10
+
+# Every program behind the published counts prints exactly what it printed
+# before the rewrite (docs/code-target.md, tests/reference/).
+gate-reference: build/g2 build/strip_tm build/motley_par build/symcount_fast \
+                build/symtm build/dmirror_spine build/ns/orchestrate \
+                build/ns/map_worker build/ns/merge_worker build/ns/combine
+	python3 tests/gate_reference.py --selftest
 
 build/strip_mu_kink: cpp/strip_mu_kink.cpp core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
