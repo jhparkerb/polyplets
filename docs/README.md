@@ -30,6 +30,7 @@ how the computation works, and the notes used to maintain the repository.
 
 | file | what |
 |---|---|
+| `docs/code-target.md` | the code-quality pass over the programs behind the published counts, and how it is checked |
 | `docs/engineering-standards.md` | how the tests are written: a check must be seen to fail before it is trusted |
 | `docs/push-gate-tiers.md` | which checks run on every push, what they cost, and what `make gates-deep` adds |
 | `docs/job-checklist.md` | before launching a long computation |
