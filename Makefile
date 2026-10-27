@@ -106,6 +106,14 @@ else
   JOBS ?= $(shell nproc 2>/dev/null || echo 4)
 endif
 
+# The OpenMP build (build/motley_par). Apple clang rejects -fopenmp, so on
+# Darwin use MacPorts clang (with the libomp port) when it is installed.
+ifeq ($(shell uname -s),Darwin)
+  OMPCXX ?= $(shell command -v clang++-mp-20 2>/dev/null || command -v clang++-mp-19 2>/dev/null || echo $(CXX))
+else
+  OMPCXX ?= $(CXX)
+endif
+
 # The parallel run keeps its output live, and also lands in build/gates.log so
 # that a failed gate can be named at the end.  make 3.81 (what macOS ships) has
 # no --output-sync, so the sub-make's "*** [gate-foo] Error 1" line is printed
@@ -657,7 +665,7 @@ build/strip_mu: cpp/strip_mu.cpp | build
 # is not optional -- the cell-step is an OpenMP loop -- and scripts/
 # gen_compile_commands.sh mirrors that so clangd and gate-compile-db agree.
 build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
-	$(CXX) $(CXXFLAGS) -O2 -fopenmp -o $@ $<
+	$(OMPCXX) $(CXXFLAGS) -O2 -fopenmp -o $@ $<
 
 # Gate the parallel engine against the banked exact C_H rows at three payload
 # widths, byte-identically against cutcount_b1, and for thread-count

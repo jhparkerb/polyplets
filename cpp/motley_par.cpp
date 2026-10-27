@@ -236,12 +236,16 @@ struct Buf {
   void clear() {
     n.store(0, std::memory_order_relaxed);
     overflow.store(0, std::memory_order_relaxed);
-    // EMPTY is zero, so handing the pages back IS the clear.
-    if (madvise(b, nb * sizeof(Bucket), MADV_DONTNEED) != 0) {
+#if defined(__linux__)
+    // EMPTY is zero, and Linux refills a private anonymous page with zeros
+    // after MADV_DONTNEED, so handing the pages back IS the clear.  macOS
+    // keeps the old contents, which leaves the last step's buckets live and
+    // find_or_insert probing forever; there the loop below is the clear.
+    if (madvise(b, nb * sizeof(Bucket), MADV_DONTNEED) == 0) return;
+#endif
 #pragma omp parallel for schedule(static)
-      for (size_t i = 0; i < nb; i++)
-        b[i].idx.store(IDX_EMPTY, std::memory_order_relaxed);
-    }
+    for (size_t i = 0; i < nb; i++)
+      b[i].idx.store(IDX_EMPTY, std::memory_order_relaxed);
   }
 
   // Rows a thread reserved in its last block and never used.  Tiny (threads x
