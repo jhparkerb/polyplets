@@ -8,7 +8,12 @@
 // residual translation a mirror axis leaves free. See scripts/symcount.py.
 //
 // CLI:  symcount_fast {r90|r180|hmirror|dmirror|c4|d2ax|d2diag|d4} MAXN
-//                                                        -> "n count" lines.
+//                      [THREADS] [--byheight]
+//   "n count" lines, n with a zero count omitted; with --byheight, "n H count"
+//   lines, H the bounding-box height of the whole animal. THREADS defaults to
+//   the hardware count. tests/gate_sym.py and tests/gate_subgroup.py check
+//   it against a brute-force oracle and the Python, tests/gate_symtm.py
+//   against the transfer-matrix counter symtm.
 //
 // The first four are per-ELEMENT fixed-point counts Fix(g) (what Burnside
 // needs). The last four are per-SUBGROUP invariant counts I(H) (what the
@@ -238,10 +243,8 @@ struct Counter {
   // Allocation-free Redelmeier over the shared `list` pool. This node owns the
   // untried range list[start..end); it tries each candidate forward, appending
   // a candidate's newly-reached neighbors past the current end so the child's
-  // untried range list[i+1..newEnd) is a single contiguous slice — no per-node
-  // vector copy (the old `next = untried` + `newly` was ~3 heap allocs/node).
-  // On backtrack the appended tail is unmarked and truncated. Forward vs the
-  // old LIFO order changes traversal, not the multiset of animals counted.
+  // untried range list[i+1..newEnd) is a single contiguous slice. On backtrack
+  // the appended tail is unmarked and truncated.
   void search(int root, int start, int w) {
     if (connectedAndAnchored()) {
       counts[w] += 1;
@@ -346,7 +349,8 @@ int main(int argc, char** argv) {
   }
   SymType type = makeType(pos[0]);
   const int maxn = std::atoi(pos[1].c_str());
-  // Grid and counts are sized from maxn; u64 counts hold I(K)(n) ~ lambda^(n/4) far past 64.
+  // The grid is sized from maxn; the counts grow far slower than a(n), so
+  // u64 holds them at any maxn this can reach.
   if (maxn < 1 || maxn > 64) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
 
   int nthreads = pos.size() == 3 ? std::atoi(pos[2].c_str()) : 0;
