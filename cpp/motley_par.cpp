@@ -13,7 +13,7 @@
 // accounting, and the gate is that the rows come out byte-identical.
 //
 // What is different from `cutcount_b1 --modp`:
-//   * open-addressed flat table (24 B/bucket) + a contiguous payload slab,
+//   * open-addressed flat table (8 B/bucket) + a contiguous payload slab,
 //     instead of unordered_map + one heap vector per state per cell-step;
 //   * the cell-step is an OpenMP parallel loop over source buckets, with
 //     lock-free find-or-insert and a per-state spinlock over the n-loop;
@@ -23,13 +23,13 @@
 //     cannot be interrupted is a defect (docs/job-checklist.md §5).
 //
 // Modes:
-//   motley_par --census <H> <Nmax> [--threads T]
-//        reachable frontier states per cell-step; no payload.  This is the
-//        measurement results/second-sources.md §2 projects with a +-20% census
-//        ratio.
-//   motley_par --modp <H> <Nmax> <p> <outfile> [--threads T] [--ckpt DIR]
+//   motley_par --census <H> <Nmax> [--threads T] [--sizes-out FILE]
+//        reachable frontier states per cell-step; no payload.  --sizes-out
+//        writes them for a later --modp --sizes pass.
+//   motley_par --modp <H> <Nmax> <p> <outfile> [--threads T] [--ckpt DIR] [--sizes FILE]
 //        C_H(n) mod p for n = 1..Nmax, "n value" lines, same format as
-//        cutcount_b1 --modp.
+//        cutcount_b1 --modp.  --sizes sizes every table exactly from a census
+//        pass, which lets consumed source rows be handed back to the OS.
 //
 // Events (obs.h) on stderr; stdout is the human-readable report.
 
@@ -674,18 +674,20 @@ int main(int argc, char** argv) {
       g_sizes_out = argv[++i];
     } else pos.push_back(argv[i]);
   }
-  if (pos.size() >= 3 && !std::strcmp(pos[0], "--census")) {
+  if (pos.size() == 3 && !std::strcmp(pos[0], "--census")) {
     int H = atoi(pos[1]), Nmax = atoi(pos[2]);
-    if (H > HMAX_KEY) { fprintf(stderr, "limits: H<=%d\n", HMAX_KEY); return 1; }
+    if (H < 1 || H > HMAX_KEY || Nmax < 1) {
+      fprintf(stderr, "limits: 1<=H<=%d, Nmax>=1\n", HMAX_KEY); return 1;
+    }
     census(H, Nmax);
     rep.done("mode=census H=" + std::to_string(H));
     return 0;
   }
-  if (pos.size() >= 5 && !std::strcmp(pos[0], "--modp")) {
+  if (pos.size() == 5 && !std::strcmp(pos[0], "--modp")) {
     int H = atoi(pos[1]), Nmax = atoi(pos[2]);
     u64 p = strtoull(pos[3], nullptr, 10);
-    if (H > HMAX_KEY || p >= (1ull << 31) || p < 2) {
-      fprintf(stderr, "limits: H<=%d, 2<=p<2^31\n", HMAX_KEY); return 1;
+    if (H < 1 || H > HMAX_KEY || Nmax < 1 || p >= (1ull << 31) || p < 2) {
+      fprintf(stderr, "limits: 1<=H<=%d, Nmax>=1, 2<=p<2^31\n", HMAX_KEY); return 1;
     }
     // Payload width from the prime: the accumulator is u64, so the only
     // requirement is that a residue fits the stored type.
