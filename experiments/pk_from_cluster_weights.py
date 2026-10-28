@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Severance W1 assembly: P_k ab initio from cluster weights alone.
+"""Assembly: P_k ab initio from cluster weights alone.
 
-Reads the exact aggregated cluster weights produced by build/severance_w1
-(results/severance_w1_weights_k9.txt), assembles [y^k]F(z) via the chain
+Reads the exact aggregated cluster weights produced by build/cluster_weights
+(results/cluster_weights_k9.txt), assembles [y^k]F(z) via the chain
 identity of docs/proofs/diagonal-law.md Step 2,
 
     F = E_b * (1 - S)^(-1) * E_t + P,
@@ -24,7 +24,7 @@ of mu (this route is finite polynomial algebra, order-by-order by construction),
 and no mixing of the u-series master equation H with the y-series chain -- only
 the y-series chain appears here.
 
-Run:  python3 experiments/severance_w1_assemble.py [weights.txt] [--red]
+Run:  python3 experiments/pk_from_cluster_weights.py [weights.txt] [--red]
 """
 import os
 import sys
@@ -36,7 +36,7 @@ sys.path.insert(0, os.path.join(ROOT, "experiments"))
 from slope2_law_vs_truth import read_pk, read_tri  # noqa: E402
 from cluster_weight_dp import compositions, KNOWN_WEIGHTS  # noqa: E402
 
-DEFAULT_WEIGHTS = os.path.join(ROOT, "results", "severance_w1_weights_k9.txt")
+DEFAULT_WEIGHTS = os.path.join(ROOT, "results", "cluster_weights_k9.txt")
 
 # deg R_k = 2k+1 with these leading coefficients, banked k <= 5
 # (docs/proofs/diagonal-law.md "what remains open"; experiments/spine_deeper.py)

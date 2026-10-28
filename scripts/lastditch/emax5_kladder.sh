@@ -38,7 +38,7 @@
 # Kill/resume: kill the PID in ~/var/emax5-k/pid.  No resume -- each rung is
 # independent and rerunning one costs only that rung.
 set -euo pipefail
-BIN=$HOME/src/polyominoes/build/severance_w3_families
+BIN=$HOME/src/polyominoes/build/cluster_weight_families
 OUT=$HOME/var/emax5-k
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"; : > "$OUT/kladder.txt"
 echo "start $(date -Is) rev=$(cd $HOME/src/polyominoes && git rev-parse --short HEAD)" \

@@ -11,7 +11,7 @@ carries exactly two new constants,
 
     P_k(n) = [y^k] exp( sum_j (a_j + b_j n) y^j ),
 
-so ANY two independent linear equations in (a_k, b_k) pin it -- and Severance W3
+so ANY two independent linear equations in (a_k, b_k) pin it -- and the depth-defect computation
 (results/below-onset.md) supplies them from cells that are far SHORTER
 than the onset anchors.  For a below-onset cell at depth j,
 
@@ -207,7 +207,7 @@ def pin_level(k, ab_lower, depths, tri, Dj):
 def load_depths(jmax, K):
     """Dj[j][k] for j = 1..jmax, k = 0..K, all ab initio."""
     from depth1_gap_walk import walk_families, series_D1
-    from severance_w3_depths import D_series
+    from depth_defects import D_series
     out = {1: list(series_D1(walk_families(K), K))}
     for j in range(2, jmax + 1):
         out[j] = list(D_series(j, K))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Severance W3: below-onset defects at depth j from bounded-excess cluster weights.
+"""Depth defects: below-onset defects at depth j from bounded-excess cluster weights.
 
 Deliverable of docs/onset-defect-severance-plan.md (deleted) Sec.3 W3.  Exposes
 
@@ -7,7 +7,7 @@ Deliverable of docs/onset-defect-severance-plan.md (deleted) Sec.3 W3.  Exposes
 
 computed from independently enumerated cluster-weight families only.  Nothing
 here reads the banked triangle, the wired P_k, or any defect series; the gate
-experiments/severance_w3_gate.py owns that side of the comparison.
+experiments/depth_defects_gate.py owns that side of the comparison.
 
 ===========================================================================
 1. The depth-j identity, derived from the proved chain identity
@@ -110,7 +110,7 @@ there is exact, not an approximation.
 3. Reach: depths 1-4 closed
 ===========================================================================
 
-j = 1, 2, 3 are green at every banked cell (severance_w3_gate.py 3), costing
+j = 1, 2, 3 are green at every banked cell (depth_defects_gate.py 3), costing
 2 s and 79 s respectively for the e <= 1 and e <= 2 family passes at K = 19.
 
 j = 4 needs excess 3, i.e. 5-cell rows (and 4-then-3, 3-then-3-then-3
@@ -123,11 +123,11 @@ level alone lands 166254 interior states in 3.8 s, and level 2 -- where the
 3 min with the process at 1.5 GB (killed at 7 min rather than run a multi-hour
 job).
 
-Resolved 2026-08-09 by the standing rule for compute: cpp/severance_w3_families
+Resolved 2026-08-09 by the standing rule for compute: cpp/cluster_weight_families
 .cpp is a straight port of families() and weights_for_type() below, enumerating
 each row placement by pruned DFS rather than shape x offset and threading the
 per-level expansion.  K = 19, emax = 3 costs 146 s wall / 494 MB on gympie
-(10 threads) and is cached in results/severance_w3_families_K19_e3.txt, which
+(10 threads) and is cached in results/cluster_weight_families_K19_e3.txt, which
 _load_table() picks up; every other call keeps the Python path.  Cross-checks:
 the C++ agrees with the Python families() cell-for-cell at (K, emax) = (9, 3),
 (19, 1) and (19, 2), and its own emax = 3 table (span cap 42) agrees with the
@@ -295,9 +295,9 @@ TABLE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resu
 def _load_table(K, emax):
     """Cached C++ family table, or None.
 
-    Written by build/severance_w3_families (cpp/severance_w3_families.cpp), a
+    Written by build/cluster_weight_families (cpp/cluster_weight_families.cpp), a
     straight port of families() below: header line
-    '# severance_w3_families K=<K> emax=<E>' then one 'e k sig bb pp' line per
+    '# cluster_weight_families K=<K> emax=<E>' then one 'e k sig bb pp' line per
     (excess, surplus) cell.  Only the e <= 3 / K = 19 pass needs it (section 3);
     everything else stays on the Python path.
 
@@ -307,7 +307,7 @@ def _load_table(K, emax):
     checks that empirically against the banked weights and the gap walk.
     """
     for Kt in range(K, 40):
-        path = os.path.join(TABLE_DIR, f"severance_w3_families_K{Kt}_e{emax}.txt")
+        path = os.path.join(TABLE_DIR, f"cluster_weight_families_K{Kt}_e{emax}.txt")
         if not os.path.exists(path):
             continue
         sig = [[0] * (K + 1) for _ in range(emax + 1)]
@@ -315,7 +315,7 @@ def _load_table(K, emax):
         pp = [[0] * (K + 1) for _ in range(emax + 1)]
         with open(path) as fh:
             head = fh.readline().split()
-            assert head[:4] == ["#", "severance_w3_families", f"K={Kt}", f"emax={emax}"], \
+            assert head[:4] == ["#", "cluster_weight_families", f"K={Kt}", f"emax={emax}"], \
                 f"{path}: unexpected header {head}"
             for line in fh:
                 if line.startswith("#"):
@@ -465,9 +465,9 @@ def validate(K=9, verbose=True):
         assert got == w, (v, got, w)
     print(f"   {len(KNOWN_WEIGHTS)} types, all four weights each  OK")
 
-    print("== aggregated families vs results/severance_w1_weights_k9.txt")
+    print("== aggregated families vs results/cluster_weights_k9.txt")
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "..", "results", "severance_w1_weights_k9.txt")
+                        "..", "results", "cluster_weights_k9.txt")
     ref_sig, ref_bb, ref_bt, ref_pp = {}, {}, {}, {}
     ntypes = 0
     with open(path) as fh:

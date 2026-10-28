@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """B13: the depth-5 gate, written red-first, BEFORE D_5 exists.
 
-severance_w3_gate.py accepts depths j <= 4 by comparing the ab-initio
+depth_defects_gate.py accepts depths j <= 4 by comparing the ab-initio
 D_series(j, 19) against the banked defect T(2k+1-j, k+1-j) - law at every
 banked cell.  Depth 5 has the same banked surface waiting -- the 15 cells
 T(2k-4, k-4), k = 5..19 -- and, until now, no gate.  This file is that gate,
@@ -9,7 +9,7 @@ written while D_5 does not yet exist, so that when the emax = 4 family table
 lands it lands into a gate that predates it rather than one written to fit it.
 
 Status at authoring (2026-08-20): **this gate cannot run green.**  D_series(5,
-19) needs the excess <= 4 family table (results/severance_w3_families_K*_e4
+19) needs the excess <= 4 family table (results/cluster_weight_families_K*_e4
 .txt, K >= 19), which does not exist yet; the emax = 4 K-ladder producing it
 is running on ayr.  That is fine and expected.  Until the table exists the
 production run exits RED with a message saying exactly that -- it does NOT
@@ -21,14 +21,14 @@ D_5 anywhere.  It extracts the empirical depth-5 series from the banked cells
 themselves (T - law -- the values a correct D_5 must reproduce), confirms the
 comparator passes it (a tautology by construction: this validates the
 HARNESS, not depth 5), then perturbs one entry and proves the comparator
-fires.  The comparator is severance_w3_gate.check_depth itself, imported, not
+fires.  The comparator is depth_defects_gate.check_depth itself, imported, not
 reimplemented -- the code proved red here is the code the future table will
 face.
 
 Usage:
-  python3 experiments/severance_w3_depth5_gate.py             # RED until the
+  python3 experiments/depth5_gate.py             # RED until the
                                                               #   e4 table lands
-  python3 experiments/severance_w3_depth5_gate.py --selftest  # runnable now
+  python3 experiments/depth5_gate.py --selftest  # runnable now
 
 Exit 0 = GATE GREEN; anything else = red.
 """
@@ -41,7 +41,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from slope2_law_vs_truth import read_pk, read_tri           # noqa: E402
-from severance_w3_gate import anchors, banked_defects, check_depth  # noqa: E402
+from depth_defects_gate import anchors, banked_defects, check_depth  # noqa: E402
 
 J = 5
 K = 19
@@ -61,10 +61,10 @@ def empirical_series(P, tri):
 def main():
     P, tri = read_pk(), read_tri()
     anchors(P, tri)
-    import severance_w3_depths as W
+    import depth_defects as W
     if W._load_table(K, J - 1) is None:
         raise SystemExit(
-            f"GATE RED: no emax={J-1} family table (results/severance_w3_"
+            f"GATE RED: no emax={J-1} family table (results/cluster_weight_"
             f"families_K*_e{J-1}.txt, K >= {K}) -- D_{J} cannot be computed "
             f"ab initio yet.  Expected from the ayr emax=4 K-ladder; the "
             f"pure-Python fallback is deliberately NOT taken (hours, and a "

@@ -30,6 +30,6 @@ experiments/**/*.out
 docs/drill*.md
 
 # Scratch staging for results files a run is still writing (see
-# scripts/severance_e4_k21.sh): an untracked file under results/ stamps every
+# scripts/cluster_weight_families_e4_k21.sh): an untracked file under results/ stamps every
 # binary built while it is there as -dirty.
 results/*.partial

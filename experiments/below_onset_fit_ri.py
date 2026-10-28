@@ -4,13 +4,13 @@
 The wired `diagCoeffTable` came from the production sweep, so a tower that
 reads it inherits the incumbent's connectivity rule. This one is built from:
 
-  * Severance W1's ab-initio P_1..P_9 (cluster weights; matched the wired
+  * the cluster-weight DP's ab-initio P_1..P_9 (cluster weights; matched the wired
     table coefficient for coefficient, results/below-onset.md) --
     also the only way to start, since level 1's depth-2 cell would be T(1,0);
   * the coloring recount's own banked C_H rows, telescoped T = C_H - 2C_{H-1} + C_{H-2},
     for the higher levels -- a different rule, proved in
     docs/proofs/cutcount-identity.md;
-  * the ab-initio depth defects D_j(k) of Severance W3, which read neither
+  * the ab-initio depth defects D_j(k) of the depth-defect computation, which read neither
     triangle nor wired table;
   * the product form, a Lean-complete theorem.
 
@@ -45,13 +45,13 @@ AB0 = {}
 
 
 def abinitio_levels():
-    """(a_k, b_k) for k = 1..9 straight from Severance W1's cluster weights.
+    """(a_k, b_k) for k = 1..9 straight from the cluster-weight DP's cluster weights.
 
     Not from the wired diagCoeffTable: W1 matched that table coefficient for
     coefficient, but the table is the incumbent's file, and this whole exercise
     is about not reading the incumbent's files."""
-    from severance_w1_assemble import load_weights, assemble_R, pk_from_R
-    W = load_weights(os.path.join(ROOT, "results", "severance_w1_weights_k9.txt"))
+    from pk_from_cluster_weights import load_weights, assemble_R, pk_from_R
+    W = load_weights(os.path.join(ROOT, "results", "cluster_weights_k9.txt"))
     R = assemble_R(W, W1_ABINITIO)
     ab = {}
     for k in range(1, W1_ABINITIO + 1):

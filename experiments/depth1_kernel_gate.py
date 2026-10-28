@@ -1,6 +1,6 @@
-"""Fail-closed gate for Severance W2 (docs/onset-defect-severance-plan.md (deleted) §3).
+"""Fail-closed gate for the depth-1 kernel derivation (docs/onset-defect-severance-plan.md (deleted) §3).
 
-The W2 deliverable is experiments/severance_w2_kernel.py exposing
+The W2 deliverable is experiments/depth1_kernel.py exposing
 
     derived_phi() -> list of 5 sympy expressions in x
                      (coefficients of W^0..W^4, from the kernel-method
@@ -15,8 +15,8 @@ This gate accepts the candidate iff:
   C. --selftest: a perturbed candidate must fail both A and B (RED).
 
 Usage:
-  python3 experiments/severance_w2_gate.py             # judge the candidate
-  python3 experiments/severance_w2_gate.py --selftest  # RED control on Phi itself
+  python3 experiments/depth1_kernel_gate.py             # judge the candidate
+  python3 experiments/depth1_kernel_gate.py --selftest  # RED control on Phi itself
 
 Exit 0 = GATE GREEN; anything else = red.
 """
@@ -107,7 +107,7 @@ def main():
         return
     # Re-deriving the candidate is 94% of this gate: 550 s of 583 s under
     # cProfile on dalby (2026-08-24), all of it sympy cancel/expand inside
-    # severance_w2_kernel.build_F1 -> solve_start. That derivation is settled
+    # depth1_kernel.build_F1 -> solve_start. That derivation is settled
     # and does not move, so the push tier does not re-run it.
     #
     # What the push tier still runs is NOT vacuous: --selftest checks the
@@ -121,7 +121,7 @@ def main():
         print("              --selftest checked PHI against the independent "
               "walk series")
         return
-    from severance_w2_kernel import derived_phi                 # noqa: E402
+    from depth1_kernel import derived_phi                 # noqa: E402
     cand = derived_phi()
     assert len(cand) == 5, "candidate must be 5 coefficients W^0..W^4"
     check_proportional(cand)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Severance W4, Phase 0: are depths 2, 3 degree-4 algebraic on depth 1's curve?
+"""Depth-tower field test: are depths 2, 3 degree-4 algebraic on depth 1's curve?
 
-Hypothesis (generalizing severance_w2_kernel.py's depth-1 result): every
+Hypothesis (generalizing depth1_kernel.py's depth-1 result): every
 below-onset depth-j defect GF  F_j(y) = sum_k D_j(k) y^k  lies in the SINGLE
 biquadratic field  K = Q(s)[A,B]  (y = s^2), with
 
@@ -26,7 +26,7 @@ Calibration (verifier held above the claim): stage C runs depth 1 through the
 same pipeline and asserts it reproduces the known (8,4) box and the published
 Phi_1 leading factor (27x-1)^2 (= (9y-1)^2 after y=3x).
 
-Run from repo root:  python3 -u experiments/severance_w4_field.py [KMAX]
+Run from repo root:  python3 -u experiments/depth_tower_field.py [KMAX]
 """
 import os
 import sys
@@ -34,8 +34,8 @@ import time
 from fractions import Fraction as Fr
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from severance_w3_depths import D_series                              # noqa: E402
-from severance_w3_modp import Dj_mod                                  # noqa: E402
+from depth_defects import D_series                              # noqa: E402
+from depth_defects_modp import Dj_mod                                  # noqa: E402
 from depth1_minpoly import (powers_of_series, relation_rows,          # noqa: E402
                             check_relation)
 from depth1_asymptotics import modp_nullspace                         # noqa: E402

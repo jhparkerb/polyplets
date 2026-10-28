@@ -1,6 +1,6 @@
-"""Fail-closed gate for Severance W1 (docs/onset-defect-severance-plan.md (deleted) §3).
+"""Fail-closed gate for the cluster-weight DP (docs/onset-defect-severance-plan.md (deleted) §3).
 
-Checks the C++ cluster-weight port (build/severance_w1) against:
+Checks the C++ cluster-weight port (build/cluster_weights) against:
   A. the banked per-composition KNOWN_WEIGHTS, k <= 5, exactly;
   B. level-6 holdouts against BANKED Python-DP values (LEVEL6 below), the
      same practice TWO_ROW_INTERIOR already uses and for the same reason --
@@ -13,11 +13,11 @@ Checks the C++ cluster-weight port (build/severance_w1) against:
   D. --selftest: perturbs a value and requires the comparator to fire (RED).
 
 Usage:
-  python3 experiments/severance_w1_gate.py               # A+B+C on binary k<=6
-  python3 experiments/severance_w1_gate.py FILE [FILE..] # + C on deep files
-  python3 experiments/severance_w1_gate.py --selftest
-  python3 experiments/severance_w1_gate.py --deep        # recompute B live
-  python3 experiments/severance_w1_gate.py --emit-level6 # print LEVEL6 to re-bank
+  python3 experiments/cluster_weights_gate.py               # A+B+C on binary k<=6
+  python3 experiments/cluster_weights_gate.py FILE [FILE..] # + C on deep files
+  python3 experiments/cluster_weights_gate.py --selftest
+  python3 experiments/cluster_weights_gate.py --deep        # recompute B live
+  python3 experiments/cluster_weights_gate.py --emit-level6 # print LEVEL6 to re-bank
 
 Exit 0 = gate green; any mismatch raises and exits nonzero.
 """
@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cluster_weight_dp import (compositions, interior, boundary, pure,
                                KNOWN_WEIGHTS, TWO_ROW_INTERIOR)
 
-BINARY = os.path.join("build", "severance_w1")
+BINARY = os.path.join("build", "cluster_weights")
 
 
 def parse(text):
@@ -79,7 +79,7 @@ def check_known(table):
 # that have not moved since they were derived.  Banking them keeps the holdout
 # exactly as strong -- the C++ is still compared against a value the Python DP
 # produced independently -- and moves only the recomputation, which --deep and
-# gate-severance-w1-deep still do.  Same practice as TWO_ROW_INTERIOR.
+# gate-cluster-weights-deep still do.  Same practice as TWO_ROW_INTERIOR.
 #
 # (7,)'s interior is not in TWO_ROW_INTERIOR because it is a ONE-row stack; the
 # other two take their interior from that table and only their boundary/pure

@@ -27,12 +27,12 @@ derived is read from a stored value on the push and re-derived in the deep tier.
 - `gate-tma` check M runs at n=12 on the push, enough for the part a unit test
   cannot reach, that the sweep applies the fold correctly. The full check (M
   and N at 391 s of the gate's 429 s) is deep-tier.
-- `gate-severance-w1` reads stored DP values for the level-6 holdout, and runs
+- `gate-cluster-weights` reads stored DP values for the level-6 holdout, and runs
   the DP live on a level-3 composition every push so a broken DP is still
   caught. Both cross-checks the stored values claim (against `TWO_ROW_INTERIOR`,
   and against the single-row closed form) are asserted every run. The live
   level-6 DP is deep-tier.
-- `gate-severance-w2` keeps `--selftest` on the push (stored Φ checked against
+- `gate-depth1-kernel` keeps `--selftest` on the push (stored Φ checked against
   the gap-walk series rebuilt from an independent enumeration through x^80,
   with a perturbed candidate as the control that must fail) and defers only the
   sympy derivation, which is 550 s of its 583 s under cProfile.
@@ -56,10 +56,10 @@ Deep-tier costs of the gates that take `--deep`:
 
 | gate | deep tier | push tier |
 |---|---|---|
-| `gate-severance-w1` | 536.5 s | 1.5 s |
+| `gate-cluster-weights` | 536.5 s | 1.5 s |
 | `gate-perimeter-min` | 418.4 s | 16.8 s |
 | `gate-tma` | 325.3 s | 21 s |
-| `gate-severance-w2` | 173.4 s | 12 s |
+| `gate-depth1-kernel` | 173.4 s | 12 s |
 | `gate-g2` | 138.1 s | |
 | `gate-s2` | 85.8 s | |
 | `gate-modp` | 73.8 s | |

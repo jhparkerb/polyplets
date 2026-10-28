@@ -20,7 +20,7 @@
 # gets a real dalby run at all.
 # Kill: kill the PID in ~/var/emax-ladder/pid.
 set -euo pipefail
-BIN=$HOME/src/polyominoes/build/severance_w3_families
+BIN=$HOME/src/polyominoes/build/cluster_weight_families
 OUT=$HOME/var/emax-ladder
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"; : > "$OUT/ladder.txt"
 for E in 0 1 2 3 4 5 6 7; do

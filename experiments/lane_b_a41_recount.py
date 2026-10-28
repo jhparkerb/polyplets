@@ -7,7 +7,7 @@ Route, chosen to be different where difference is possible:
     diagCoeffTable, no defect series anywhere below k = 20;
   * own polynomial representation (dict), own product-form recurrence, own
     2x2 solver, own assembly loop;
-  * D_j imported from severance_w3_depths/depth1_gap_walk ONLY for k >= 20
+  * D_j imported from depth_defects/depth1_gap_walk ONLY for k >= 20
     (unavoidable: no onset anchor exists there), and first cross-checked at
     every k <= 19 against this script's own empirical extraction
     D_j(k) = T_banked - main term;
@@ -136,7 +136,7 @@ def main():
 
     # 3. defects: empirical extraction at k <= 19 vs the imported series
     from depth1_gap_walk import walk_families, series_D1
-    from severance_w3_depths import D_series
+    from depth_defects import D_series
     D = {1: list(series_D1(walk_families(21), 21))}
     for j in (2, 3, 4):
         D[j] = list(D_series(j, 21))

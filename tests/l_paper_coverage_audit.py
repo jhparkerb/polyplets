@@ -137,7 +137,7 @@ def manuscripts():
 # always exits 0, so coverage can regress silently while gate-l-paper-verifier
 # stays green -- the kill matrix proves EXISTING checks can fail, it says
 # nothing about NEW literals being read at all. The full sweep is ~80 s, less
-# than the wired gate-severance-w1 was. A per-paper unguarded-count ceiling
+# than the wired gate-cluster-weights was. A per-paper unguarded-count ceiling
 # seeded from the banked table (results/l-paper-verifier-coverage.md) would
 # ratchet it; the readability campaign only lowers counts, so a ceiling never
 # fights it. ~30 lines + a recipe. Not now: that campaign is mid-flight and

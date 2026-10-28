@@ -32,7 +32,7 @@ so lambda = 9Y + Y^2 t Sigma/9 and, at Y = 1/9,
 
     1 - 9 Y_c = t Sigma / 729,      alpha = Sigma / 729.
 
-Both counts come from experiments/severance_w3_depths.transitions, the vetted
+Both counts come from experiments/depth_defects.transitions, the vetted
 row-transfer enumeration (a new row is legal iff every pending block of the old
 row has a cell adjacent to it).  Nothing is counted by hand.
 
@@ -51,7 +51,7 @@ import time
 from fractions import Fraction as F
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import severance_w3_depths as W                                    # noqa: E402
+import depth_defects as W                                    # noqa: E402
 
 ALPHA = F(50, 81)
 

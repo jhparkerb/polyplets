@@ -2,7 +2,7 @@
 """Ridgeline 1: the depth tower in closed form -- G(Y,t) = t*(Phat + Bhat^2/(t-3-Shat)).
 
 Derivation (no fitting, no series input).  The proved chain identity
-(docs/proofs/diagonal-law.md Step 2, quoted in experiments/severance_w3_depths.py)
+(docs/proofs/diagonal-law.md Step 2, quoted in experiments/depth_defects.py)
 is
 
     F(y,z) = E_b (1-S)^-1 E_t + P,     S = 3z + sigma,
@@ -17,7 +17,7 @@ Change variables to
     Y = y z,      t = 1/z        (so y = Y t, z = 1/t).
 
 Every monomial y^k z^l = Y^k z^(l-k) = Y^k t^e depends on the type only through
-(k, e).  Hence, with the excess-graded aggregates of severance_w3_depths.families,
+(k, e).  Hence, with the excess-graded aggregates of depth_defects.families,
 
     Shat(Y,t) = sum_e t^e Sig_e(Y),   Bhat(Y,t) = sum_e t^e Bb_e(Y)  (Bb_0 has +1),
     Phat(Y,t) = sum_e t^e Pp_e(Y),
@@ -38,7 +38,7 @@ y = Yt, w = (t-3)/t,
     F = sum_k Y^k sum_s a_(2k+1-s) t^s (t-3)^(k-s),
 
 so [Y^k t^(j-1)] F = (-3)^(k+1-j) sum_(s<j) C(k-s, j-1-s) a_(2k+1-s), which is
-identity (D) of severance_w3_depths verbatim.  Therefore
+identity (D) of depth_defects verbatim.  Therefore
 
     D_j(k) = [Y^k t^(j-1)] ( Phat + Bhat^2/(t-3-Shat) )   for  j-1 <= k.   (M')
 
@@ -51,7 +51,7 @@ is: a marker for cluster excess, i.e. a perturbation of the row-transfer of the
 all-pairs gap walk.  At t = 0 it is identity (II) of
 results/below-onset.md: Phat_0 - Bb_0^2/(3 + Sig_0).
 
-This script verifies (M') against severance_w3_depths.D_series (which computes the
+This script verifies (M') against depth_defects.D_series (which computes the
 same defects through the independent route (C)/(D)) and, at j = 1, against
 depth1_gap_walk's (II).  RED control included.
 
@@ -64,13 +64,13 @@ import time
 from fractions import Fraction as F
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from severance_w3_depths import families, D_series, TABLE_DIR      # noqa: E402
+from depth_defects import families, D_series, TABLE_DIR      # noqa: E402
 
 
 def load_families(K, emax):
     """families(K, emax), preferring a cached table of any K_table >= K.
 
-    severance_w3_depths._load_table only scans K_table < 40, so the K = 60
+    depth_defects._load_table only scans K_table < 40, so the K = 60
     excess-1 pass it cannot see; this reader accepts any K_table.  The cap in the
     file is the exact bound 2l+e+1 for the l <= K_table rows that contribute, so
     truncating a larger table to K is identity on cells k <= K -- which is what
@@ -78,7 +78,7 @@ def load_families(K, emax):
     """
     best = None
     for name in sorted(os.listdir(TABLE_DIR)):
-        m = re.match(r"severance_w3_families_K(\d+)_e(\d+)\.txt$", name)
+        m = re.match(r"cluster_weight_families_K(\d+)_e(\d+)\.txt$", name)
         if not m or int(m.group(2)) != emax or int(m.group(1)) < K:
             continue
         if best is None or int(m.group(1)) < best[0]:
@@ -90,7 +90,7 @@ def load_families(K, emax):
     pp = [[0] * (K + 1) for _ in range(emax + 1)]
     with open(os.path.join(TABLE_DIR, best[1])) as fh:
         head = fh.readline().split()
-        assert head[:4] == ["#", "severance_w3_families",
+        assert head[:4] == ["#", "cluster_weight_families",
                             "K=%d" % best[0], "emax=%d" % emax], head
         for line in fh:
             if line.startswith("#"):

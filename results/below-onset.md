@@ -155,8 +155,8 @@ an irreducible quartic with coprime integer coefficients:
 `Φ(x, N(x)) = 0` through `x^200`; the fit used orders 0..56, so 144 orders
 were not used in it.
 
-**Derived** (`experiments/severance_w2_kernel.py`; checked by
-`experiments/severance_w2_gate.py`, which also fails on a perturbed input) by
+**Derived** (`experiments/depth1_kernel.py`; checked by
+`experiments/depth1_kernel_gate.py`, which also fails on a perturbed input) by
 the kernel method, the standard technique for a functional equation with a
 catalytic variable. The polynomial `D(u) = u² - y(1+u+u²)²` whose vanishing the
 method exploits factors into two quadratic branches in `s = √y`, small roots in
@@ -268,14 +268,14 @@ Grade every cluster type `(s_1..s_ℓ)` by its excess `e = Σ(s_i - 2)`. The
 coefficient `[z^(k+1-j)]` of the correction polynomial draws only on
 families of total excess at most `j-1`, assembled through the chain identity
 with binomial `(1-3z)` corrections (identity (C)/(D) in
-`experiments/severance_w3_depths.py`; at `j = 1` it is (II)). Excess, not
+`experiments/depth_defects.py`; at `j = 1` it is (II)). Excess, not
 rows of size 3, bounds the class: depth 3 needs the one-4-row family, depth
 4 needs one-5-row, `4+3` and `3+3+3`. No triangle data and no `P_k` enter.
 
 Family tables: Python row-transfer DP for `e ≤ 2`; `e = 3` at `K = 19` by
-`cpp/severance_w3_families.cpp` (`build/severance_w3_families`, exact
-`__int128`, 146 s), `results/severance_w3_families_K19_e3.txt`.
-`experiments/severance_w3_gate.py` compares against the triangle side,
+`cpp/cluster_weight_families.cpp` (`build/cluster_weight_families`, exact
+`__int128`, 146 s), `results/cluster_weight_families_K19_e3.txt`.
+`experiments/depth_defects_gate.py` compares against the triangle side,
 assembled from the enumerated entries and the stored `P_k`, which the
 candidate never touches (a perturbed candidate fails it):
 
@@ -287,7 +287,7 @@ depth 4: 16 entries match exactly (k = 4..19)
 ```
 
 Family validation: 31 types with 4 known weights each, exact; aggregated
-`(k,e)` values against `results/severance_w1_weights_k9.txt` exact, all
+`(k,e)` values against `results/cluster_weights_k9.txt` exact, all
 four families, `e ≤ 3`; the `e = 0` series equals the depth-1 families to
 `ℓ ≤ 9`; C++ against Python at three `(K, emax)` corners; span-cap
 independence; fresh enumerations past every table at `k = 11` (five values,
@@ -300,7 +300,7 @@ D_4(4..7) = 1400566/6561, 75221426/19683, 1199562484/19683, 51621741496/59049
 
 Python family DP, one core: `(K, emax) = (19,1)` 5.6 s, `(27,1)`
 20 s, `(60,1)` 395 s, `(15,2)` 73 s, `(19,2)` 214 s, `(23,2)` 516 s,
-`(11,3)` 290 s. `experiments/severance_w3_modp.py` computes `D_j(k)` mod `p`
+`(11,3)` 290 s. `experiments/depth_defects_modp.py` computes `D_j(k)` mod `p`
 at 7.4× the exact path's speed.
 
 ## 6. The asymptotics at depths 1 to 7, measured
@@ -421,7 +421,7 @@ is at or above the onset.
 For cluster types with surplus `k_c = Σ(s_i-1)`, `ℓ_c` rows and excess
 `e_c = k_c - ℓ_c`, every monomial `y^k z^ℓ` of the chain identity is
 `Y^k t^e` under `Y = yz`, `t = 1/z`. With the excess-graded aggregates `Ŝ`,
-`B̂`, `P̂` of `severance_w3_depths.families`, the chain telescopes:
+`B̂`, `P̂` of `depth_defects.families`, the chain telescopes:
 
 ```
 G(Y,t) = P̂(Y,t) + B̂(Y,t)² / (t - 3 - Ŝ(Y,t)),                        (M)
@@ -478,7 +478,7 @@ leaves: `λ = 9Y + Y² t Σ/9`, so
 ```
 
 `experiments/ridgeline_vertex.py` counts both with
-`severance_w3_depths.transitions`, the vetted row transfer (a row is legal
+`depth_defects.transitions`, the vetted row transfer (a row is legal
 iff every pending block of the previous row has a cell adjacent to it):
 
 ```
@@ -572,7 +572,7 @@ algebraic degree tending to infinity (`results/anisotropic-not-dfinite.md`;
 atom degrees 1, 2, 4, 9, 29, 68, 181, 462, …), while a D-finite bivariate
 function has sections whose singularities have bounded degree.
 
-**Empirical shadow** (`experiments/severance_w4_field.py`, mod-`p` scan at
+**Empirical shadow** (`experiments/depth_tower_field.py`, mod-`p` scan at
 `K = 110`, 16 rows withheld): depth 1 has minimal box
 `(deg_y, deg_W) = (8,4)`; depth 2 has no relation with `deg_W ≤ 4` to
 `deg_y = 18` and none with `deg_W ≤ 6` to `deg_y = 12`, as an inalgebraic
@@ -580,7 +580,7 @@ function has sections whose singularities have bounded degree.
 
 **What survives** is the dominant-singularity data,
 `Σ_j A_j t^j = (√6/27)·t/√(1 - 50t/81)`, branch at `t = 81/50`, which §7
-derives. The excess-4 table `results/severance_w3_families_K21_e4.txt`
+derives. The excess-4 table `results/cluster_weight_families_K21_e4.txt`
 (`families 21 4`, 8 threads, 4 h 54 m, 18,743 MB peak; costs in
 `results/below-onset-fit.md`) gives exact `D_5` to `k ≤ 21`. Sharpening `R_5` from
 data needs `D_5(k)` to `k ≈ 28..30`, which no table reaches.
@@ -645,14 +645,14 @@ script prints none of them.
 
 ## 10. P_1..P_9 from cluster weights, with no enumerated entry
 
-Weights: `cpp/severance_w1.cpp` (`build/severance_w1`, exact `__int128`
+Weights: `cpp/cluster_weights.cpp` (`build/cluster_weights`, exact `__int128`
 with overflow check), all 511 compositions to surplus 9 in
-`results/severance_w1_weights_k9.txt` (`k ≤ 8` in
-`results/severance_w1_weights_k8.txt`). Assembly
-`experiments/severance_w1_assemble.py`, exact fractions through the chain
+`results/cluster_weights_k9.txt` (`k ≤ 8` in
+`results/cluster_weights_k8.txt`). Assembly
+`experiments/pk_from_cluster_weights.py`, exact fractions through the chain
 identity: the derived `P_k` equals the stored table coefficient by
 coefficient for `k = 1..9`, reproduces 3 computed in-onset entries per
-level, `deg R_k = 2k+1` throughout. `experiments/severance_w1_gate.py`
+level, `deg R_k = 2k+1` throughout. `experiments/cluster_weights_gate.py`
 checks (23 assertions, each of which fails on a perturbed input):
 per-composition values exact at `k ≤ 5`; fresh level-6 enumerations (`(7,)`
 full; `(4,4)`, `(3,5)` boundary and pure fresh, interior against the 8.4 h
@@ -756,17 +756,17 @@ python3 experiments/depth1_gap_walk.py                # 42 s
 python3 experiments/depth1_minpoly.py; python3 experiments/depth1_asymptotics.py; python3 experiments/depth1_recurrence.py
 python3 experiments/depth1_sharpness.py               # 45 s
 python3 experiments/depth1_parametric.py
-make gate-severance-w1 gate-severance-w2 gate-severance-w3
-build/severance_w3_families 19 3                      # 146 s, results/severance_w3_families_K19_e3.txt
-python3 experiments/severance_w3_modp.py; python3 experiments/severance_w4_field.py
+make gate-cluster-weights gate-depth1-kernel gate-depth-defects
+build/cluster_weight_families 19 3                      # 146 s, results/cluster_weight_families_K19_e3.txt
+python3 experiments/depth_defects_modp.py; python3 experiments/depth_tower_field.py
 python3 experiments/ridgeline_master.py; python3 experiments/ridgeline_vertex.py
-python3 experiments/ridgeline_dump_families.py 60 1   # 395 s; writes results/severance_w3_families_K60_e1.txt
+python3 experiments/ridgeline_dump_families.py 60 1   # 395 s; writes results/cluster_weight_families_K60_e1.txt
 python3 experiments/ridgeline_scaling.py 60 1         # 4 s with the cache; also 29 2 and 19 3
 python3 experiments/defect_bivariate.py; python3 experiments/boundary_layer.py
 python3 experiments/allpairs_kernel.py                # ρ at any gmax
 ```
 
-`severance_w3_depths._load_table` scans only `K_table < 40`; the `K = 60`
+`depth_defects._load_table` scans only `K_table < 40`; the `K = 60`
 cache is read by `ridgeline_master.load_families` and reproduces the
 uncached run exactly. Data formats:
 `results/ns_a40/perheight/h{H}.out` is `n count`;

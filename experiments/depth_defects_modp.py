@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Severance W3, mod-p: the depth-j defect series D_j(k) mod p.
+"""Depth defects mod p: the depth-j defect series D_j(k) mod p.
 
-The exact path (severance_w3_depths.D_series) is bignum-bound -- the cluster
+The exact path (depth_defects.D_series) is bignum-bound -- the cluster
 weights grow like ~14.4^k, so a K~100 series-fit for the depth-tower field test
-(severance_w4_field.py) costs ~20 min of Fraction arithmetic per depth.  The
+(depth_tower_field.py) costs ~20 min of Fraction arithmetic per depth.  The
 minimal-polynomial DEGREE scan that answers the field-membership question is
 reduced mod p and is scale-invariant, so nothing exact is needed to find the box
 (deg_y, deg_W); only the branch-locus fingerprint wants Q.
@@ -15,13 +15,13 @@ carried as field elements: the D_j(k) denominators are pure powers of 3 (checked
 empirically for j<=3), so every division is pow(inv3, .., p).
 
 Faithfulness is proved, not assumed (verifier held above the claim):
-  * families_mod(K, emax, mod=None) reproduces severance_w3_depths.families()
+  * families_mod(K, emax, mod=None) reproduces depth_defects.families()
     cell-for-cell (a literal copy of that DP; the mod is the only added op);
-  * Dj_mod(j, K, p) reproduces severance_w3_depths.D_series(j, K) reduced mod p
+  * Dj_mod(j, K, p) reproduces depth_defects.D_series(j, K) reduced mod p
     (numerator * inverse(denominator)).
 main() asserts both before the module is usable.
 
-Run:  python3 -u experiments/severance_w3_modp.py [Kcheck]
+Run:  python3 -u experiments/depth_defects_modp.py [Kcheck]
 """
 import math
 import os
@@ -29,14 +29,14 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from severance_w3_depths import (transitions, q_end, bare_end, _shapes,   # noqa: E402
+from depth_defects import (transitions, q_end, bare_end, _shapes,   # noqa: E402
                                  _row_partition)
 
 PRIME = (1 << 61) - 1
 
 
 # --------------------------------------------------------- families() mod p
-# Literal copy of severance_w3_depths.families(); the ONLY change is `% mod`
+# Literal copy of depth_defects.families(); the ONLY change is `% mod`
 # on the two weight accumulations (guarded by `if mod`).  main() checks the
 # mod=None branch equals the trusted families() cell-for-cell.
 
@@ -85,7 +85,7 @@ def families_mod(K, emax, mod=None, verbose=False):
 
 
 # ---------------------------------------------- D_series assembly mod p
-# Mirror of severance_w3_depths.D_series + Nj_integer, in Z/pZ.  Every Fraction
+# Mirror of depth_defects.D_series + Nj_integer, in Z/pZ.  Every Fraction
 # op there maps to a modular op here: F(-3)->(-3 mod p), F(1,3)->inv3, and the
 # final 3^(k+1) that Nj_integer multiplies in is folded so N_j[k] is returned
 # directly.  math.comb stays an exact int, reduced on use.
@@ -170,7 +170,7 @@ def main():
     p = PRIME
 
     print(f"== check families_mod(mod=None) == families() cell-for-cell, K={Kchk}")
-    from severance_w3_depths import families                          # noqa: E402
+    from depth_defects import families                          # noqa: E402
     for emax in (0, 1, 2):
         s0, b0, p0 = families(Kchk, emax)
         s1, b1, p1 = families_mod(Kchk, emax, mod=None)
@@ -178,7 +178,7 @@ def main():
     print(f"   emax=0,1,2 identical  OK")
 
     print(f"== check Dj_mod(j,K,p) == D_series(j,K) mod p, K={Kchk}")
-    from severance_w3_depths import D_series                          # noqa: E402
+    from depth_defects import D_series                          # noqa: E402
     for j in (1, 2, 3):
         t = time.time()
         D = D_series(j, Kchk)

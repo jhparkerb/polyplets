@@ -52,13 +52,13 @@ altogether, and depths 8 and 9.
 - **The defect D_j(k)** is the rational correction in the identity of the next
   section. Depth 1 comes from the gap walk `experiments/depth1_gap_walk.py`;
   depths 2 to 5 from the bounded-excess family enumeration
-  (`cpp/severance_w3_families.cpp`, assembled by
-  `experiments/severance_w3_depths.py`; derivation in `results/below-onset.md`).
+  (`cpp/cluster_weight_families.cpp`, assembled by
+  `experiments/depth_defects.py`; derivation in `results/below-onset.md`).
   Depth j needs the family table at excess e <= j-1. The tables
-  `results/severance_w3_families_K<K>_e<e>.txt` carry three weight columns,
+  `results/cluster_weight_families_K<K>_e<e>.txt` carry three weight columns,
   `sig`, `bb`, `pp`, per (e, k). None of this reads the triangle or any P_k.
-- **The cluster-weight enumeration** (`cpp/severance_w1.cpp`,
-  `results/severance_w1_weights_k9.txt`) gives P_1 to P_9 with no triangle
+- **The cluster-weight enumeration** (`cpp/cluster_weights.cpp`,
+  `results/cluster_weights_k9.txt`) gives P_1 to P_9 with no triangle
   input.
 - **The assembly** is the set of formulas P_k with their constants fixed,
   used to supply the entries of a row that were not enumerated.
@@ -166,7 +166,7 @@ comparison is equality of rationals.
 `experiments/below_onset_fit_ri.py` answers each row with an assembly built from
 nothing the main program produced, excluding the row from its own determining
 set: levels 1..9 from the cluster-weight enumeration through
-`experiments/severance_w1_assemble.py`; levels 10 and up from the coloring
+`experiments/pk_from_cluster_weights.py`; levels 10 and up from the coloring
 recount's entries, every determining entry at H <= hmax; D_j for j <= 4; the
 product form. The main program's triangle and the OEIS b-file appear only as
 comparison targets. Every input was traced to its file; none comes from the
@@ -262,7 +262,7 @@ with the assembler the enumerated files, the product form, D_j at k = 20 and
 and T(39,18), and no check at its own level; level 20 has 6 pairs and 5
 checks. What the depth-4 assembly rests on with a single computation behind
 it is three integers, `sig`, `bb`, `pp` at e = 3, k = 21 of
-`results/severance_w3_families_K22_e3.txt`, plus the two determining entries:
+`results/cluster_weight_families_K22_e3.txt`, plus the two determining entries:
 the k = 22 row is truncated away by `D_series(4, 21)` and the k = 20 row is
 checked by level 20's pair agreement. The congruence gate below guards only
 the fractional part of D_4(21): measured on a shadow copy of the table,
@@ -271,7 +271,7 @@ assembler's a(41) by exactly 9, because a shift of Delta in D_4(21) moves
 T(41,20) by 9 Delta and every single-entry error enters D_4(21) with a
 coefficient in (1/9) Z.
 
-Depth 5 closes it. `results/severance_w3_families_K21_e4.txt` supplies D_5,
+Depth 5 closes it. `results/cluster_weight_families_K21_e4.txt` supplies D_5,
 and level 21 gains T(38,17), an entry the coloring recount covers:
 
     python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
@@ -358,7 +358,7 @@ every agreement-only check. Only an enumeration crosses that family.
 
 The D_j consumed at k = 20 and 21 come from the k = 20..22 rows of the
 K22 tables, produced by the C++ enumerator alone. The pure-Python enumeration
-in `experiments/severance_w3_depths.py` was run to overlap them:
+in `experiments/depth_defects.py` was run to overlap them:
 
 | Python run | wall | compared against | entries | mismatch |
 |---|---|---|---|---|
@@ -371,13 +371,13 @@ identical at every k <= 22; so D_2(20), D_3(20), D_2(21), D_3(21) have two
 computations. A Python e = 3 run to K = 22 was estimated at 3 to 4 hours plus
 the memory growth that stopped a K = 19 attempt at 1.5 GB, and was not run.
 
-**The depth-5 check** (`experiments/severance_w3_depth5_gate.py`,
-`make gate-severance-depth5`) compares against the 15 recorded entries
+**The depth-5 check** (`experiments/depth5_gate.py`,
+`make gate-depth5`) compares against the 15 recorded entries
 T(2k-4, k-4), k = 5..19; it exits 1 without a K >= 19, e = 4 table and does
 not fall back to the Python enumeration. Its comparator is
-`severance_w3_gate.check_depth`, imported. The table
-`results/severance_w3_families_K21_e4.txt` was produced by
-`scripts/severance_e4_k21.sh` (`families 21 4`, 8 threads,
+`depth_defects_gate.check_depth`, imported. The table
+`results/cluster_weight_families_K21_e4.txt` was produced by
+`scripts/cluster_weight_families_e4_k21.sh` (`families 21 4`, 8 threads,
 2026-08-23 09:27 to 14:21, rev `95fbb6ceb`, 105 entries, sha256 checked
 against the producing machine's copy). The check passes: depth 1, 19 entries
 and depth 5, 15 entries, all exact; 0.20 s. Its negative control, +3^-17 at
@@ -423,7 +423,7 @@ which fixes the numerator of D_j(k) modulo 3^(k+j) from P_k alone. The
 modulus grows with k and j, so the strongest congruences fall on the
 frontier's unenumerated entries. Entries used to determine their own level
 are reported and never counted. 71 recorded entries are checked at full
-equality (which subsumes the entries `experiments/severance_w3_gate.py`
+equality (which subsumes the entries `experiments/depth_defects_gate.py`
 checks, and T(40,20)); the two free entries, with no recorded value, get the
 congruence:
 
@@ -446,7 +446,7 @@ for a reason that belongs to the construction rather than to this lattice.
 - The product form makes (a_k, b_k) equivalent to the aggregate cluster weights
   of surplus <= k, and those are connected-animal counts of the same species
   as the object being counted. Every known exact route to them carries a
-  frontier connectivity partition (the state of `cpp/severance_w1.cpp` is the
+  frontier connectivity partition (the state of `cpp/cluster_weights.cpp` is the
   top row's cells plus their partition). Growth per level, measured in two
   implementations: Python, k = 4, 5, 6 at 3.1 s, 65 s, more than 530 s; C++,
   k <= 7 in seconds, k = 8 in minutes, k = 9 in 66 min and 53 GB, k = 10 not
@@ -472,7 +472,7 @@ for a reason that belongs to the construction rather than to this lattice.
   markers by the kernel method of enumerative combinatorics; (b) a
   super-constant state quotient in the cluster enumeration. The cheap probe
   of (a) is that method at e = 1 against the 60-order table
-  `results/severance_w3_families_K60_e1.txt`; desk work, not done.
+  `results/cluster_weight_families_K60_e1.txt`; desk work, not done.
 
 **Depths 8 and 9, closed.** With exact defects through depth 9 every level
 k <= 21 would be determined from strip-engine entries at H <= 14 (level 21
@@ -512,7 +512,7 @@ coloring recount's rows stop at size 41.
 ## Measured costs
 
 The depth-5 family enumeration at 8 threads
-(`./build/severance_w3_families families K 4 8`, `results/depth5/ladder.txt`):
+(`./build/cluster_weight_families families K 4 8`, `results/depth5/ladder.txt`):
 
 | K | wall | rss |
 |---|---|---|
@@ -639,7 +639,7 @@ and these five integers are its target.
     python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/coloring-recount/rows41 --rows 39,40,41
     python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
     python3 experiments/lane_b_a41_recount.py
-    make gate-below-onset-fit-pairs gate-below-onset-fit-congruence gate-severance-depth5
+    make gate-below-onset-fit-pairs gate-below-onset-fit-congruence gate-depth5
     python3 experiments/below_onset_fit_square.py
     python3 experiments/below_onset_fit_square_depth2.py
     python3 experiments/depth5_cost_ladder.py
@@ -648,7 +648,7 @@ and these five integers are its target.
 All of the above run in seconds on the files in the tree. The measurements
 were `scripts/nmax_scaling.sh`, `scripts/lastditch/emax_ladder.sh`,
 `scripts/lastditch/emax4_kladder.sh`, the 8-thread series
-`./build/severance_w3_families families K 4 8` for K = 8, 10, 12, 14, 16,
+`./build/cluster_weight_families families K 4 8` for K = 8, 10, 12, 14, 16,
 `scripts/lastditch/emax5_kladder.sh` (about 2.2 h),
-`scripts/severance_e4_k21.sh` (4 h 54 m) and `scripts/dalby_a41_h20.sh`
+`scripts/cluster_weight_families_e4_k21.sh` (4 h 54 m) and `scripts/dalby_a41_h20.sh`
 (9.63 h on 76 cores).

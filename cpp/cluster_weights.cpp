@@ -1,5 +1,5 @@
 // Cluster-weight row-transfer DP -- C++ port of experiments/cluster_weight_dp.py
-// (Severance W1, docs/onset-defect-severance-plan.md (deleted) section 3).
+// (the cluster-weight DP, docs/onset-defect-severance-plan.md (deleted) section 3).
 //
 // Purpose: the ab-initio cluster weights (interior, boundary_bottom,
 // boundary_top, pure) for every composition at levels k = 1..K, where a
@@ -8,8 +8,8 @@
 // around k = 6 (~20x per level); this is a straight translation with one added
 // search prune and cross-composition memoization.
 //
-//   usage: build/severance_w1 K [threads]
-//   stdout (contract with experiments/severance_w1_gate.py), one line per
+//   usage: build/cluster_weights K [threads]
+//   stdout (contract with experiments/cluster_weights_gate.py), one line per
 //   composition, levels ascending, compositions in compositions(k) order:
 //       v1,v2,...,vm \t interior \t boundary_bottom \t boundary_top \t pure
 //   stderr: obs.h start/heartbeat/done event stream.
@@ -19,7 +19,7 @@
 //                            self-check: output must be identical with and
 //                            without it.
 //
-// Predicted cost (measured, see results/severance_w1_weights_k*.txt headers in
+// Predicted cost (measured, see results/cluster_weights_k*.txt headers in
 // the campaign log): k<=7 seconds, k=8 minutes, k=9 hours (dalby).
 // Kill/resume: no checkpointing -- a level is recomputed from scratch; levels
 // are independent and printed as they finish.
@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
   char extra[128];
   std::snprintf(extra, sizeof extra, "K=%d threads=%d rev_memo=%d", K, threads,
                 rev_memo ? 1 : 0);
-  obs::Reporter rep("severance_w1", 0, extra);
+  obs::Reporter rep("cluster_weights", 0, extra);
 
   for (int k = 1; k <= K; ++k) {
     const auto comps = compositions(k);

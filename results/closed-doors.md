@@ -53,7 +53,7 @@ is *injected* when its entries come from that table instead of a run.
 
 `λ` is the growth constant `lim a(n)^(1/n)`; `μ_H` is the growth constant of
 the strip of height `H`. The **defect dynamic program**
-(`cpp/severance_w3_families.cpp`) computes the defects `D_j`, `j ≥ 2`, from
+(`cpp/cluster_weight_families.cpp`) computes the defects `D_j`, `j ≥ 2`, from
 clusters of bounded excess `e`, one level `K` at a time.
 
 ## 1. The frontier does not compress

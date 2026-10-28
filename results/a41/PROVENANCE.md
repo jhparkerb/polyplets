@@ -104,7 +104,7 @@ depth pair with no independent check at its own level:
 The congruence check (`gate-below-onset-fit-congruence`) constrains only the
 fractional part of D_4(21). A shift Δ in D_4(21) moves T(41,20) by 9Δ, and
 every single-entry error in the e = 3 row of
-`results/severance_w3_families_K22_e3.txt` enters D_4(21) with a
+`results/cluster_weight_families_K22_e3.txt` enters D_4(21) with a
 coefficient in (1/9)Z, so every error that table can carry is an integer
 shift of a(41), invisible to an integrality test. Measured on a shadow copy
 of the table: `sig[3][21] + 9` leaves the congruence check green and moves
@@ -113,7 +113,7 @@ integers, `sig`, `bb`, `pp` at e = 3, k = 21: the k = 22 row is truncated
 away by `D_series(4, 21)` and the k = 20 row is pinned by level 20's pair
 agreement.
 
-At depth 5, `results/severance_w3_families_K21_e4.txt` supplies D_5 and
+At depth 5, `results/cluster_weight_families_K21_e4.txt` supplies D_5 and
 level 21 gains T(38,17), a cell the coloring recount also covers:
 
     python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41

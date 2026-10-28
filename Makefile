@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
+GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -163,7 +163,7 @@ gates-force:
 # the gates it protects.
 GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/g2_asan build/perimeter_defect build/perimeter_min build/prec_guess \
-  build/severance_w1 build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
+  build/cluster_weights build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
   build/strip_mu_kink build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker build/ns/combine \
@@ -201,7 +201,7 @@ DEPS_ns-gate-go             = $(GO_SRC)
 DEPS_gate-p-paper-verifier  = $(PAPER_SRC) tests/gate_p_paper_verifier.py \
                               scripts/provenance_table.py results/triangle.txt \
                               experiments/cluster_weight_dp.py experiments/depth1_gap_walk.py \
-                              experiments/severance_w1_assemble.py experiments/severance_w3_depths.py \
+                              experiments/pk_from_cluster_weights.py experiments/depth_defects.py \
                               experiments/slope2_law_vs_truth.py experiments/below_onset_fit.py \
                               experiments/below_onset_fit_ri.py scripts/cutcount_assembly_gate.py \
                               orchestrator/sweep.go results/ns_a40/triangle.txt \
@@ -282,10 +282,10 @@ DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
                 results/siteperim_square8_n14.txt results/siteperim_square4_n20.txt \
                 results/siteperim_tri6_n12.txt
-DEPS_gate-severance-w1 = build/severance_w1 experiments/severance_w1_gate.py \
+DEPS_gate-cluster-weights = build/cluster_weights experiments/cluster_weights_gate.py \
                 experiments/cluster_weight_dp.py
-DEPS_gate-severance-w2 = experiments/severance_w2_gate.py \
-                experiments/severance_w2_kernel.py experiments/depth1_recurrence.py \
+DEPS_gate-depth1-kernel = experiments/depth1_kernel_gate.py \
+                experiments/depth1_kernel.py experiments/depth1_recurrence.py \
                 experiments/depth1_gap_walk.py experiments/cluster_weight_dp.py \
                 experiments/slope2_law_vs_truth.py
 DEPS_gate-g2  = build/g2 build/g2_asan \
@@ -427,9 +427,9 @@ gate-below-onset-fit-congruence:
 
 # Gate BELOW-ONSET-FIT-PAIRS.  Level 21 of the a(41) tower has one below-onset pin
 # pair at depths j <= 4 and so no check at its own level: +9 on sig[3][21] of
-# results/severance_w3_families_K22_e3.txt leaves the congruence gate green and
+# results/cluster_weight_families_K22_e3.txt leaves the congruence gate green and
 # moves the depth-4 a(41) by exactly 9 (measured).  At depth 5
-# (results/severance_w3_families_K21_e4.txt) level 21 has three pin pairs
+# (results/cluster_weight_families_K21_e4.txt) level 21 has three pin pairs
 # through T(38,17), T(39,18), T(40,19), and any single-entry error in that row
 # makes them disagree.  The gate builds the depth-5 tower with the pin cells
 # and pair counts pinned, requires a(41) from results/a41/h*.out plus the tower
@@ -460,24 +460,24 @@ gate-kink-oracle: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 # has quietly stopped being able to fail is caught before its pass is believed.
 # Production run on a 10-core laptop: W1 219 s, W2 69 s, W3 0.1 s, depth 5
 # 0.1 s.  W1 is the only slow one and it is well inside the suite's parallel
-# critical path.  They are separate targets rather than one gate-severance so
+# critical path.  They are separate targets rather than one combined gate so
 # that -j schedules them independently and a failed one is named by the recipe
 # at the end of `gates`.
-gate-severance-w1: build/severance_w1
-	python3 experiments/severance_w1_gate.py --selftest
-	python3 experiments/severance_w1_gate.py $(GATE_DEEP)
+gate-cluster-weights: build/cluster_weights
+	python3 experiments/cluster_weights_gate.py --selftest
+	python3 experiments/cluster_weights_gate.py $(GATE_DEEP)
 
-gate-severance-w2:
-	python3 experiments/severance_w2_gate.py --selftest
-	python3 experiments/severance_w2_gate.py $(GATE_DEEP)
+gate-depth1-kernel:
+	python3 experiments/depth1_kernel_gate.py --selftest
+	python3 experiments/depth1_kernel_gate.py $(GATE_DEEP)
 
-gate-severance-w3:
-	python3 experiments/severance_w3_gate.py --selftest
-	python3 experiments/severance_w3_gate.py
+gate-depth-defects:
+	python3 experiments/depth_defects_gate.py --selftest
+	python3 experiments/depth_defects_gate.py
 
-gate-severance-depth5:
-	python3 experiments/severance_w3_depth5_gate.py --selftest
-	python3 experiments/severance_w3_depth5_gate.py
+gate-depth5:
+	python3 experiments/depth5_gate.py --selftest
+	python3 experiments/depth5_gate.py
 
 # Gate MODP: the R3 u32 mod-p sweep.  CRT of sum_H B_H(n) mod p_i over three
 # primes must equal the exact a(n) from build/tma, both unfolded and under
@@ -886,14 +886,14 @@ build/prec_guess: cpp/prec_guess.cpp cpp/argparse.h cpp/obs.h | build
 # Cluster-weight row-transfer DP, C++ port of experiments/cluster_weight_dp.py
 # (the depth tables' W1 stage): the ab-initio interior/boundary/pure weights
 # per composition, levels k = 1..K.
-build/severance_w1: cpp/severance_w1.cpp cpp/obs.h | build
+build/cluster_weights: cpp/cluster_weights.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
 
 # Bounded-excess cluster-weight families, C++ port of the row-transfer DP in
-# experiments/severance_w3_depths.py (the depth tables' W3 stage): the aggregated interior /
+# experiments/depth_defects.py (the depth tables' W3 stage): the aggregated interior /
 # bottom-edge / pure series by (excess e, surplus k). Feeds the cached table
-# results/severance_w3_families_K19_e3.txt that unblocks depth j = 4.
-build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
+# results/cluster_weight_families_K19_e3.txt that unblocks depth j = 4.
+build/cluster_weight_families: cpp/cluster_weight_families.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
 
 # The reach-merged frontier census (A1.1): how many N-key classes at height H,

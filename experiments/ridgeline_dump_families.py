@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Dump an excess-graded family table in the format severance_w3_depths._load_table reads.
+"""Dump an excess-graded family table in the format depth_defects._load_table reads.
 
 The Python family DP is the cost of every Ridgeline run at large K
 (families(60, emax=1) is ~6.5 min); caching it makes reruns instant.  Format is
-exactly the one cpp/severance_w3_families writes:
+exactly the one cpp/cluster_weight_families writes:
 
-    # severance_w3_families K=<K> emax=<E>
+    # cluster_weight_families K=<K> emax=<E>
     e k sig bb pp
 
-Written to results/severance_w3_families_K<K>_e<E>.txt.  ridgeline_master.
+Written to results/cluster_weight_families_K<K>_e<E>.txt.  ridgeline_master.
 load_families picks it up for any K' <= K at the same emax;
-severance_w3_depths._load_table also does, but only for K < 40, which is why the
+depth_defects._load_table also does, but only for K < 40, which is why the
 Ridgeline reader exists (the useful excess-1 table is K = 60).
 
 Run from repo root:  python3 experiments/ridgeline_dump_families.py K EMAX [outdir]
@@ -20,14 +20,14 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import severance_w3_depths as W                                    # noqa: E402
+import depth_defects as W                                    # noqa: E402
 
 
 def main():
     K = int(sys.argv[1])
     emax = int(sys.argv[2])
     outdir = sys.argv[3] if len(sys.argv) > 3 else W.TABLE_DIR
-    path = os.path.join(outdir, "severance_w3_families_K%d_e%d.txt" % (K, emax))
+    path = os.path.join(outdir, "cluster_weight_families_K%d_e%d.txt" % (K, emax))
     if os.path.exists(path):
         print("refusing to overwrite existing %s" % path)
         return 1
@@ -36,14 +36,14 @@ def main():
     print("families(%d, %d) in %.1fs" % (K, emax, time.time() - t0))
     tmp = path + ".partial"
     with open(tmp, "w") as fh:
-        fh.write("# severance_w3_families K=%d emax=%d\n" % (K, emax))
+        fh.write("# cluster_weight_families K=%d emax=%d\n" % (K, emax))
         for e in range(emax + 1):
             for k in range(K + 1):
                 fh.write("%d %d %d %d %d\n" % (e, k, sig[e][k], bb[e][k], pp[e][k]))
     os.rename(tmp, path)
     print("wrote %s" % path)
     # read it straight back and insist it reproduces the arrays.  Note
-    # severance_w3_depths._load_table only scans K < 40, so the reader used here
+    # depth_defects._load_table only scans K < 40, so the reader used here
     # is ridgeline_master.load_families, which accepts any K.
     W._FAM.clear()
     from ridgeline_master import load_families                     # noqa: E402

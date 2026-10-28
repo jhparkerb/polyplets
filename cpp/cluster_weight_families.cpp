@@ -1,5 +1,5 @@
 // Bounded-excess cluster-weight FAMILIES -- C++ port of the row-transfer DP in
-// experiments/severance_w3_depths.py (Severance W3, docs/onset-defect-severance-
+// experiments/depth_defects.py (the depth-defect computation, docs/onset-defect-severance-
 // plan.md section 3).
 //
 // The Python file's section 3 records why depth j = 4 stalled: the depth-j
@@ -11,17 +11,17 @@
 // the per-level state expansion spread over threads.
 //
 //   usage:
-//     build/severance_w3_families families K EMAX [threads]
-//     build/severance_w3_families types  2,3 4,2 5 ...      [validation mode]
+//     build/cluster_weight_families families K EMAX [threads]
+//     build/cluster_weight_families types  2,3 4,2 5 ...      [validation mode]
 //
-//   stdout, families mode (the contract with severance_w3_depths.py::_load_table):
-//       # severance_w3_families K=<K> emax=<EMAX>
+//   stdout, families mode (the contract with depth_defects.py::_load_table):
+//       # cluster_weight_families K=<K> emax=<EMAX>
 //       <e> <k> <sig> <bb> <pp>            one line per (excess e, surplus k)
 //     with sig = sum of interior weights over all cluster types of surplus k and
 //     excess e, bb = bottom-edge (cluster + q above, no p below), pp = pure
 //     (cluster alone).  Lines are ascending in (e, k); cells with k < 1 are
 //     omitted.  '#' lines are comments.
-//   stdout, types mode (contract with the validation in severance_w3_depths.py):
+//   stdout, types mode (contract with the validation in depth_defects.py):
 //       <v1,v2,...> \t interior \t bottom \t top \t pure
 //   stderr: obs.h start/heartbeat/done event stream.
 //
@@ -371,7 +371,7 @@ void families(int K, int emax, int threads, obs::Reporter& rep) {
     rep.beat(static_cast<double>(ell), ex, true);
   }
 
-  std::printf("# severance_w3_families K=%d emax=%d\n", K, emax);
+  std::printf("# cluster_weight_families K=%d emax=%d\n", K, emax);
   for (int e = 0; e <= emax; ++e)
     for (int k = 1; k <= K; ++k)
       std::printf("%d %d %s %s %s\n", e, k, to_dec(sig[e][k]).c_str(),
@@ -432,12 +432,12 @@ void types_mode(const std::vector<std::string>& specs) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  if (argc < 2) die("usage: severance_w3_families families K EMAX [threads] "
+  if (argc < 2) die("usage: cluster_weight_families families K EMAX [threads] "
                     "| types v1 v2 ...");
   const std::string mode = argv[1];
   if (mode == "types") {
     std::vector<std::string> specs(argv + 2, argv + argc);
-    obs::Reporter rep("severance_w3_families", 0, "mode=types");
+    obs::Reporter rep("cluster_weight_families", 0, "mode=types");
     types_mode(specs);
     rep.done("");
     return 0;
@@ -453,7 +453,7 @@ int main(int argc, char** argv) {
   char extra[128];
   std::snprintf(extra, sizeof extra, "mode=families K=%d emax=%d threads=%d span=%d",
                 K, emax, threads, 2 * K + emax + 1);
-  obs::Reporter rep("severance_w3_families", K, extra);
+  obs::Reporter rep("cluster_weight_families", K, extra);
   families(K, emax, threads, rep);
   rep.done("");
   return 0;

@@ -7,13 +7,13 @@ meta-version of the failure two of this week's commits fixed." It then asks for
 a lint with an allowlist for the deliberate exclusions. This is that lint.
 
 It was written after successor row S-A5 (results/undertow-review-queue.md (deleted))
-found FOUR unwired gates at once -- the whole Severance family -- three of
+found FOUR unwired gates at once -- the whole below-onset defect family -- three of
 which had no reason to be out beyond nobody having wired them. A green suite
 that silently skips four real checks is worse than a red one.
 
 There are TWO surfaces, and the second is the one that actually bit us. The
 first is recipe-vs-GATE_TARGETS. The second is SCRIPT-vs-Makefile: the four
-Severance gates were not recipes missing from GATE_TARGETS -- they had no
+The below-onset defect gates were not recipes missing from GATE_TARGETS -- they had no
 recipe at all, so a recipe-level check sees nothing wrong and passes. A gate
 script that the Makefile has never heard of is the quieter failure and the more
 common one. Checking only the first surface would have passed the tree on the
@@ -97,8 +97,8 @@ RED_LINE_CASES = [
     ("make: *** [gate-tma] Error 1", "gate-tma"),
     ("make[1]: *** [Makefile:2: gate-tma] Error 1", "gate-tma"),
     ("make: *** [timed-gate-tma] Error 1", "gate-tma"),
-    ("make[1]: *** [Makefile:126: timed-gate-severance-w1] Error 1",
-     "gate-severance-w1"),
+    ("make[1]: *** [Makefile:126: timed-gate-cluster-weights] Error 1",
+     "gate-cluster-weights"),
     # a red PREREQUISITE names no gate, and must not invent one
     ("make: *** [build/g2] Error 1", None),
     ("ok   H holes-sum square8 n<=9", None),
@@ -272,7 +272,7 @@ def check_deep_wiring(text):
 # anchors on ^gate-, and a binary-backed ns gate has no script for the script
 # surface to see. So an ns-gate-foo recipe dropped from ns-gates and
 # ns-gate-fast would go unrun AND unlinted -- the same shape as the four
-# Severance gates, in the one family the lint could not see.
+# The below-onset defect gates, in the one family the lint could not see.
 NS_AGGREGATES = ("ns-gates", "ns-gate-fast")
 
 # Deliberate exclusions in the ns family. Separate from EXCUSED because that
@@ -386,7 +386,7 @@ def recipe_text(text):
 
     Searching the whole file would count a script named in a COMMENT as run,
     and that is not hypothetical: the pre-fix Makefile named
-    severance_w3_depth5_gate.py in a comment explaining why it was NOT wired.
+    depth5_gate.py in a comment explaining why it was NOT wired.
     A substring check over the raw text reads that as coverage and passes the
     exact gate the comment says is unrun.
     """
@@ -516,7 +516,7 @@ def selftest():
 
     # RED 5: the failure that actually happened -- a gate script with no recipe
     # anywhere. A recipe-level check alone cannot see this.
-    bad = check_scripts(scr | {"experiments/severance_w3_gate.py"}, text,
+    bad = check_scripts(scr | {"experiments/depth_defects_gate.py"}, text,
                         EXCUSED_SCRIPTS)
     assert any("never names" in b for b in bad), bad
     print("  [RED 5] gate script with no Makefile recipe caught "

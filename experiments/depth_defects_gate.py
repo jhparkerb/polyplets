@@ -1,6 +1,6 @@
-"""Fail-closed gate for Severance W3 (docs/onset-defect-severance-plan.md (deleted) §3).
+"""Fail-closed gate for the depth-defect computation (docs/onset-defect-severance-plan.md (deleted) §3).
 
-The W3 deliverable is experiments/severance_w3_depths.py exposing
+The W3 deliverable is experiments/depth_defects.py exposing
 
     D_series(j, K) -> list of exact Fractions [D_j(0..K)] with D_j(k) the
                       depth-j defect, computed from the extended gap-walk /
@@ -13,8 +13,8 @@ wired P_k — data the candidate must not consume. Depth 1 is included as a
 known-good anchor (must match the closed depth-1 series).
 
 Usage:
-  python3 experiments/severance_w3_gate.py [J_MAX]     # default 4
-  python3 experiments/severance_w3_gate.py --selftest  # RED control
+  python3 experiments/depth_defects_gate.py [J_MAX]     # default 4
+  python3 experiments/depth_defects_gate.py --selftest  # RED control
 
 Exit 0 = GATE GREEN; anything else = red.
 """
@@ -79,7 +79,7 @@ def main():
     jmax = int(sys.argv[1]) if len(sys.argv) > 1 else 4
     P, tri = read_pk(), read_tri()
     anchors(P, tri)
-    from severance_w3_depths import D_series                    # noqa: E402
+    from depth_defects import D_series                    # noqa: E402
     for j in range(2, jmax + 1):
         check_depth(j, D_series(j, 19), P, tri)
     print("GATE GREEN")

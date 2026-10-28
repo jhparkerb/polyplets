@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Severance W2: DERIVE the depth-1 minimal polynomial Phi(x, W) by the kernel method.
+"""Depth 1: DERIVE the depth-1 minimal polynomial Phi(x, W) by the kernel method.
 
 Nothing here is fitted.  The only inputs are (a) the two-class gap walk defined by
 `experiments/depth1_gap_walk.py` (its `transitions` table and its start/end
@@ -100,7 +100,7 @@ separately, and it is killed inside F1 by the rank-one residue cancellation --
 here that is automatic, because the elimination never produces the boundary
 system whose spectrum rho belongs to.
 
-Run from repo root:  python3 experiments/severance_w2_kernel.py
+Run from repo root:  python3 experiments/depth1_kernel.py
 """
 import os
 import sys

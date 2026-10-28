@@ -14,7 +14,7 @@
 # C_19" choice for closing T(40,19) has two options or one.
 # Kill: kill the PID in ~/var/emax4-k/pid.
 set -euo pipefail
-BIN=$HOME/src/polyominoes/build/severance_w3_families
+BIN=$HOME/src/polyominoes/build/cluster_weight_families
 OUT=$HOME/var/emax4-k
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"; : > "$OUT/kladder.txt"
 for K in 14 16; do

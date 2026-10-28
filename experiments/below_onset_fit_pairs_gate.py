@@ -14,7 +14,7 @@ exactly that, on a shadow copy of the table: +9 on `sig[3][21]` leaves
 `gate-below-onset-fit-congruence` green and moves the depth-4 assembler's a(41) by 9.
 
 The check that closes it has been in the tree since 2026-08-24 and was never
-wired: `results/severance_w3_families_K21_e4.txt` gives depth 5, and at depth 5
+wired: `results/cluster_weight_families_K21_e4.txt` gives depth 5, and at depth 5
 level 21 has THREE pin pairs through `T(38,17)`, `T(39,18)`, `T(40,19)`.
 `pp[3][21]` enters `D_4(21)` but not `D_5(21)`, and `sig`, `bb` enter the two
 with different coefficients, so any single-entry error makes the pairs
@@ -66,7 +66,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
-import severance_w3_depths as swd                                 # noqa: E402
+import depth_defects as swd                                 # noqa: E402
 import slope2_law_vs_truth as sl                                  # noqa: E402
 from below_onset_fit_a41 import build, sweep_rows, tower                 # noqa: E402
 import below_onset_fit_congruence_gate as ucg                            # noqa: E402
@@ -154,7 +154,7 @@ def shadow_tables(mutate):
     ways or the second run reads the first run's tables."""
     with tempfile.TemporaryDirectory() as d:
         for fn in os.listdir(TABLES):
-            if fn.startswith("severance_w3_families_K") and fn.endswith(".txt"):
+            if fn.startswith("cluster_weight_families_K") and fn.endswith(".txt"):
                 shutil.copy(os.path.join(TABLES, fn), d)
         mutate(d)
         swd.TABLE_DIR, saved = d, swd.TABLE_DIR
@@ -201,7 +201,7 @@ def selftest():
         problems.append("GREEN: the tree as it stands fails the gate")
 
     # RED 1: the audit's mutation, measured end to end.
-    with shadow_tables(bump("severance_w3_families_K22_e3.txt", (3, 21), 2, 9)):
+    with shadow_tables(bump("cluster_weight_families_K22_e3.txt", (3, 21), 2, 9)):
         ab, Dj, tri, total = quiet(assemble, 4)
         try:
             quiet(ucg.run_gate, ab, Dj, tri, quiet=True)
@@ -224,14 +224,14 @@ def selftest():
 
     # RED 2, 3: the other two exposed integers of the e = 3, k = 21 row.
     for col, name in ((3, "bb"), (4, "pp")):
-        with shadow_tables(bump("severance_w3_families_K22_e3.txt", (3, 21), col, 1)):
+        with shadow_tables(bump("cluster_weight_families_K22_e3.txt", (3, 21), col, 1)):
             if refuses(5):
                 print(f"RED {col - 1} GREEN: {name}[3][21]+1 refused at depth 5")
             else:
                 problems.append(f"RED {col - 1}: {name}[3][21]+1 passed")
 
     # RED 4: D_5's own table.
-    with shadow_tables(bump("severance_w3_families_K21_e4.txt", (4, 21), 2, 1)):
+    with shadow_tables(bump("cluster_weight_families_K21_e4.txt", (4, 21), 2, 1)):
         if refuses(5):
             print("RED 4 GREEN: the K21_e4 table's e=4 k=21 sig+1 refused")
         else:

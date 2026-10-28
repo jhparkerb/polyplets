@@ -3,10 +3,10 @@
 # waiting for.
 #
 # WHY.  results/undertow-review-queue.md (deleted) B13 refuses the depth-5 route until
-# experiments/severance_w3_depth5_gate.py passes against the 15 banked cells
+# experiments/depth5_gate.py passes against the 15 banked cells
 # T(2k-4, k-4), k = 5..19.  That gate is correctly RED in production today for
 # one reason only: _load_table(19, 4) finds no
-# results/severance_w3_families_K*_e4.txt with K >= 19, so D_series(5,19) has
+# results/cluster_weight_families_K*_e4.txt with K >= 19, so D_series(5,19) has
 # no table and the gate refuses to fall back to the hours-long pure-Python DP.
 # B13 is the stated blocker on the five-terms decision
 # (docs/state-2026-08-23.md (deleted) section 5).  This run produces the table; it does
@@ -27,20 +27,20 @@
 # a kill costs the whole run, which is why it is priced before it is started.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BIN="$ROOT/build/severance_w3_families"
+BIN="$ROOT/build/cluster_weight_families"
 OUT=${SEV_OUT:-$HOME/var/severance-e4}
 K=${1:-21}
 THREADS=${2:-8}
-[ -x "$BIN" ] || { echo "no binary at $BIN -- make build/severance_w3_families" >&2; exit 1; }
+[ -x "$BIN" ] || { echo "no binary at $BIN -- make build/cluster_weight_families" >&2; exit 1; }
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"
-TABLE="$ROOT/results/severance_w3_families_K${K}_e4.txt"
+TABLE="$ROOT/results/cluster_weight_families_K${K}_e4.txt"
 [ -e "$TABLE" ] && { echo "$TABLE already exists -- refusing to overwrite" >&2; exit 1; }
 # Stage outside the tree: a scratch file under results/ makes `git status`
 # dirty, and every binary built while it sits there is stamped -dirty, which
 # is a provenance gate failure for any run started in that window.
-STAGE="$OUT/severance_w3_families_K${K}_e4.txt.partial"
+STAGE="$OUT/cluster_weight_families_K${K}_e4.txt.partial"
 {
-  echo "=== severance_w3_families families $K 4 $THREADS: $(date -Is)"
+  echo "=== cluster_weight_families families $K 4 $THREADS: $(date -Is)"
   echo "=== rev $(cd "$ROOT" && git rev-parse --short HEAD)"
 } >> "$OUT/run.txt"
 /usr/bin/time -f "K=$K emax=4 threads=$THREADS wall=%e rss_kb=%M" \
