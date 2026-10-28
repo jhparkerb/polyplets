@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Assemble a(41) from a short sweep plus the Undertow-pinned tower.
+"""Assemble a(41) from a short sweep plus the below-onset-fitted tower.
 
 The sweep supplies T(41,H) for H <= 19 (runs/a41_low/perheight/h<H>.out).
 Everything above comes from the diagonal tower, whose levels k = 41-H run
 0..21: k <= 19 from the wired table, k = 20 and k = 21 pinned by
-experiments/undertow_pin.py from BELOW-onset cells that are already banked.
+experiments/below_onset_fit.py from BELOW-onset cells that are already banked.
 
 Onset matters at the seam and is handled, not assumed:
 
@@ -25,8 +25,8 @@ value unless:
     (6.9212, 6.9261, 6.9308, 6.9352 at a(37)..a(40)).
 
 Usage:
-  python3 experiments/undertow_a41.py --perheight DIR [--jmax 4] [--nmax 41]
-  python3 experiments/undertow_a41.py --selftest
+  python3 experiments/below_onset_fit_a41.py --perheight DIR [--jmax 4] [--nmax 41]
+  python3 experiments/below_onset_fit_a41.py --selftest
 """
 
 import os
@@ -39,7 +39,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 from slope2_law_vs_truth import read_pk, read_tri                      # noqa: E402
-from undertow_pin import (all_pairs, extract_ab, product_form, load_depths,  # noqa: E402
+from below_onset_fit import (all_pairs, extract_ab, product_form, load_depths,  # noqa: E402
                           peval, pin_level, pow3)
 
 A40 = 56749893611764175164545926946127

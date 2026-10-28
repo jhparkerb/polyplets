@@ -7,10 +7,10 @@
 # n = 40, which is why a(41) has no second rule under it: heights 1..19 come
 # from the kink engine alone and the tower supplies the rest.
 #
-# At HMAX = 19 and depths j <= 4 the Undertow reach rule n <= 2*hmax + J - 1
+# At HMAX = 19 and depths j <= 4 reach rule of the below-onset fit n <= 2*hmax + J - 1
 # gives n <= 41 exactly, so this ladder at Nmax 41 is what makes BOTH
 #   * a(40) complete -- T(40,19) is the single cell the tower cannot reach
-#     from banked H <= 18 data (results/undertow.md), and
+#     from banked H <= 18 data (results/below-onset-fit.md), and
 #   * a(41) rule-independent in every cell,
 # out of one pass.  Run at Nmax 40 it buys only the first.
 #

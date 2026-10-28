@@ -73,7 +73,7 @@ For level k and depth j >= 1,
     T(2k+1-j, k+1-j) = P_k(2k+1-j) 3^(-(k+j)) + D_j(k).
 
 D_j(k) has denominator dividing 3^(k+j); checked, not assumed, for j <= 4 and
-k <= 21 (`experiments/undertow_congruence_gate.py`). P_k(n) is linear in
+k <= 21 (`experiments/below_onset_fit_congruence_gate.py`). P_k(n) is linear in
 (a_k, b_k) with coefficient 1, so each below-onset entry with an exact D_j is
 one linear equation in the two constants of its level, and two entries at
 distinct depths determine the level; the 2x2 system at distinct n is never
@@ -107,7 +107,7 @@ What the two removed heights cost in the a(40) run
 
 ## Checks on the recorded triangle
 
-All by `experiments/undertow_pin.py`, in exact rational arithmetic; every
+All by `experiments/below_onset_fit.py`, in exact rational arithmetic; every
 comparison is equality of rationals.
 
 - **Consistency of the formula table.** At every level k <= 19, P_k minus its
@@ -163,7 +163,7 @@ comparison is equality of rationals.
 
 ## a(n) rule-independent for n <= 40
 
-`experiments/undertow_ri.py` answers each row with an assembly built from
+`experiments/below_onset_fit_ri.py` answers each row with an assembly built from
 nothing the main program produced, excluding the row from its own determining
 set: levels 1..9 from the cluster-weight enumeration through
 `experiments/severance_w1_assemble.py`; levels 10 and up from the coloring
@@ -201,7 +201,7 @@ direct enumeration by a second program is recorded in
 
     a(41) = 393811462683918679824582849262105
 
-Record: `results/a41/PROVENANCE.md`. Assembler: `experiments/undertow_a41.py`.
+Record: `results/a41/PROVENANCE.md`. Assembler: `experiments/below_onset_fit_a41.py`.
 
 | heights | source | run |
 |---|---|---|
@@ -274,14 +274,14 @@ coefficient in (1/9) Z.
 Depth 5 closes it. `results/severance_w3_families_K21_e4.txt` supplies D_5,
 and level 21 gains T(38,17), an entry the coloring recount covers:
 
-    python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
+    python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
     level k=20 determined from (36,16) (37,17) (38,18) (39,19): 6 pairs, 5 independent checks
     level k=21 determined from (38,17) (39,18) (40,19):         3 pairs, 2 independent checks
 
 `pp[3][21]` enters D_4(21) but not D_5(21), and `sig`, `bb` enter the two
 with different coefficients, so any single-entry error in that row makes the
-pairs disagree and the build refuses. `make gate-undertow-pairs`
-(`experiments/undertow_pairs_gate.py`) rebuilds the depth-5 assembly with the
+pairs disagree and the build refuses. `make gate-below-onset-fit-pairs`
+(`experiments/below_onset_fit_pairs_gate.py`) rebuilds the depth-5 assembly with the
 determining entries and pair counts fixed in the check, requires a(41) from
 `results/a41/h*.out` plus the assembly to equal the value above, and carries
 six negative controls: the +9 mutation end to end, `bb` and `pp` at (3, 21),
@@ -396,7 +396,7 @@ perturbed in a shadow tree):
 `pp[e][8] + 1` moves D_{e+1}(8) by exactly 1 and no other depth. The sample
 fed depths 1 to 3, which this check does not look at; the e = 4 row's `pp`
 column is exercised by depth 5, and `pp[3][21] + 1` is refused by the depth-5
-build (`undertow_pairs_gate.py`, control 3).
+build (`below_onset_fit_pairs_gate.py`, control 3).
 
 Overlap of the K21_e4 table with every earlier table, all three columns:
 
@@ -413,7 +413,7 @@ The 21 e = 4 rows are new to that table.
 
 ## The integrality congruence gate
 
-`experiments/undertow_congruence_gate.py` (`make gate-undertow-congruence`).
+`experiments/below_onset_fit_congruence_gate.py` (`make gate-below-onset-fit-congruence`).
 The left side of the identity is an integer and den(D_j(k)) divides 3^(k+j),
 so
 
@@ -543,7 +543,7 @@ A001168 in `results/b001168_external.txt` (the b-file, with a(57) to a(70)
 due to Barequet and Ben-Shachar, 2024) before any fitting. P_k fitted from
 in-onset entries alone needs n up to 3k+1, so k <= 6.
 
-**Depth 1** (`experiments/undertow_square.py`). D_1(k) = (-1)^(k+1), measured
+**Depth 1** (`experiments/below_onset_fit_square.py`). D_1(k) = (-1)^(k+1), measured
 at k <= 5 in `results/below-onset.md` and derived for every k: the square gap
 walk closes on two states with F_1 = -1/(1+y)
 (`experiments/depth1_parametric.py`, checked to k = 40;
@@ -565,7 +565,7 @@ Three negative controls: one input entry perturbed by 1 breaks the agreement;
 the wrong defect sign breaks the fit; the row-sum check fails against a
 perturbed A001168.
 
-**Depth 2** (`experiments/undertow_square_depth2.py`).
+**Depth 2** (`experiments/below_onset_fit_square_depth2.py`).
 D_2(k) = T_sq(2k-1, k-1) - P_k(2k-1), measured against the P_k fitted by the
 onset rule:
 
@@ -624,24 +624,24 @@ and these five integers are its target.
 - Depth 6 (`families 21 5`), priced at 36 to 44 h and 74 to 85 GB, not run.
 - The exponent of a fixed-height enumeration in the maximum size is measured
   at two heights only; the height-20 run's disk peak was not recorded.
-- `undertow_ri.py` on rows <= 18, where it fails; those rows rest on the
+- `below_onset_fit_ri.py` on rows <= 18, where it fails; those rows rest on the
   720-entry agreement.
 - n = 42 needs heights <= 19 enumerated at size 42 with J = 5, or height 20
   with J = 4; heights are the cheaper step.
 
 ## Reproduce
 
-    python3 experiments/undertow_pin.py --verify [--jmax 5]
-    python3 experiments/undertow_pin.py --audit  [--jmax 4]
-    python3 experiments/undertow_pin.py --predict
-    python3 experiments/undertow_pin.py --selftest
-    python3 experiments/undertow_ri.py --hmax 18 --jmax 4
-    python3 experiments/undertow_ri.py --hmax 19 --jmax 4 --rowdir results/cutcount_b1/rows41 --rows 39,40,41
-    python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
+    python3 experiments/below_onset_fit.py --verify [--jmax 5]
+    python3 experiments/below_onset_fit.py --audit  [--jmax 4]
+    python3 experiments/below_onset_fit.py --predict
+    python3 experiments/below_onset_fit.py --selftest
+    python3 experiments/below_onset_fit_ri.py --hmax 18 --jmax 4
+    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/cutcount_b1/rows41 --rows 39,40,41
+    python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
     python3 experiments/lane_b_a41_recount.py
-    make gate-undertow-pairs gate-undertow-congruence gate-severance-depth5
-    python3 experiments/undertow_square.py
-    python3 experiments/undertow_square_depth2.py
+    make gate-below-onset-fit-pairs gate-below-onset-fit-congruence gate-severance-depth5
+    python3 experiments/below_onset_fit_square.py
+    python3 experiments/below_onset_fit_square_depth2.py
     python3 experiments/depth5_cost_ladder.py
     python3 experiments/depth6_cost_ladder.py
 

@@ -27,7 +27,7 @@ What this file establishes, and how:
            the king lattice.
 
   CHECKED  square, `D_1(k) = (-1)^(k+1)` -- to k = 40, against
-           `results/undertow.md`, which measured it at k <= 6.
+           `results/below-onset-fit.md`, which measured it at k <= 6.
   CHECKED  hex, against `T_hex(2k,k) - P_k(2k)/2^(k+1)` from
            `results/hex_diagonal_cells.txt` -- to k = 6.
   CHECKED  king, against `experiments/depth1_gap_walk.py`'s banked series.
@@ -474,7 +474,7 @@ def main():
         if d1_sq[k] != Fr((-1) ** (k + 1)):
             raise SystemExit(f"FAIL: square D_1({k}) = {d1_sq[k]}")
     print(f"  the enumerated walk agrees k <= {a.kmax}; "
-          f"results/undertow.md measured k <= 6  OK")
+          f"results/below-onset-fit.md measured k <= 6  OK")
 
     print("== hex: the b = 2 kernel closure  [DERIVED]")
     A, yh, Sh, Bh, Phh, F1h, mp = hex_kernel()

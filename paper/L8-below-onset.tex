@@ -7,7 +7,7 @@
 %
 %  MERGED 2026-08-23.  L10-undertow.tex was folded in here and withdrawn as a
 %  manuscript.  The 08-22 decision recorded in docs/state-2026-08-23.md §3 read
-%  "L8 absorbs the Undertow material" and was implemented as a tenth paper;
+%  "L8 absorbs the below-onset fit material" and was implemented as a tenth paper;
 %  jasonp's clarification on 08-23 is that absorb meant what it says.  L10 had
 %  spent about two of its seven pages restating this paper's law, frame and
 %  square-lattice check, and this paper carried no citations at all; merged,
@@ -31,9 +31,9 @@
 %    results/below-onset.md        the near-onset layer, downgraded
 %    results/below-onset.md               the gap walk
 %    docs/undertow-chapter.md                 the tower, as a chapter
-%    results/undertow.md                      the tower's campaign record
-%    results/undertow.md    the external check, J = 1
-%    results/undertow.md        depth 2 on the square lattice
+%    results/below-onset-fit.md                      the tower's campaign record
+%    results/below-onset-fit.md    the external check, J = 1
+%    results/below-onset-fit.md        depth 2 on the square lattice
 %    results/a41/PROVENANCE.md                a(41), how it was computed
 %    results/cutcount_b1/rows41/              the second source at Nmax 41
 %    results/undertow-review-{A,B,C}.md       the adversarial review
@@ -573,7 +573,7 @@ $\Dj$ breaks the solution; the same equation offered twice is refused as
 singular; a corrupted lower level breaks the solution.
 
 \paragraph{From the adversarial review.} The review of this construction
-(\repo{results/undertow.md} and its siblings) traced every input to
+(\repo{results/below-onset-fit.md} and its siblings) traced every input to
 its source, and its most useful finding is this:
 
 \begin{quote}
@@ -695,7 +695,7 @@ lattice-parametric machinery this project has elsewhere covers the
 independent checks. At depths $j \le 4$ level $21$ was determined from
 $T(40,19)$ and $T(39,18)$ alone, with nothing checking it; depth $5$ (the
 $e = 4$ family table, computed 2026-08-23) adds $T(38,17)$, and the three pairs
-agree (\repo{experiments/undertow\_pairs\_gate.py}). That agreement is between
+agree (\repo{experiments/below\_onset\_fit\_pairs\_gate.py}). That agreement is between
 fits sharing $D_j(20..21)$. The entry they predict, $T(41,20)$, was then
 enumerated directly on 2026-09-05 ($9.6$ hours on $76$ cores,
 \repo{results/a41/h20.out}) and equals the prediction, so level $21$ has met an
@@ -710,7 +710,7 @@ redundancy}: the Remark in \S\ref{sec:frame}.
 $103$\,GB before anything was measured, re-priced at $3.1$ hours and
 $8.5$\,GB from a small calibration, and the run itself took $4$ hours
 $54$ minutes and $18.7$\,GB on dalby (2026-08-23; the record is
-\repo{results/undertow.md}); its table is what determines $P_{21}$ three
+\repo{results/below-onset-fit.md}); its table is what determines $P_{21}$ three
 ways above.
 \end{itemize}
 
@@ -865,18 +865,18 @@ The construction's own inputs and outputs:
 
 \begin{itemize}
 \item The solution for the constants, with its three negative controls:
-\repo{experiments/undertow\_pin.py}.
+\repo{experiments/below\_onset\_fit.py}.
 \item The defect values and the family DP: the table above, and
 \repo{cpp/severance\_w3\_families.cpp}.
 \item $a(41)$'s provenance, both halves: \repo{results/a41/PROVENANCE.md}.
 \item The second program covering heights $1$--$19$ of row $41$ under a
 different counting rule: \repo{results/cutcount\_b1/rows41/}.
 \item The external validation at depth $1$:
-\repo{results/undertow.md}.
+\repo{results/below-onset-fit.md}.
 \item The external validation at depth $2$:
-\repo{results/undertow.md}.
+\repo{results/below-onset-fit.md}.
 \item The adversarial review that produced \S\ref{sec:tower}'s quoted
-finding: \repo{results/undertow.md} and its siblings.
+finding: \repo{results/below-onset-fit.md} and its siblings.
 \item What may be trusted and how far, in plain terms:
 \repo{results/confidence.md}.
 \end{itemize}

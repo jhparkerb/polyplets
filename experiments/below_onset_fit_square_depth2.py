@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Square-lattice Undertow at depth 2 -- docs/time-at-the-bar.md (deleted) A1.4.
+"""Square-lattice below-onset fit at depth 2 -- docs/time-at-the-bar.md (deleted) A1.4.
 
-results/undertow.md put an EXTERNAL oracle under Undertow for
+results/below-onset-fit.md put an EXTERNAL oracle under the below-onset fit for
 the first time, at depth 1 only: the square lattice's counts are published by
 other people, so a shared conceptual error in this project's king machinery
 cannot hide there.  One depth is one height of saving.  This measures the
@@ -29,7 +29,7 @@ k <= 6, and the depth-2 cell at n = 2k-1 exists for every one of them.  That is
 five levels for D_2 at k = 2..6, the same number D_1 was measured from -- not a
 coincidence, the same wall.
 
-THE PAYOFF, if D_2 has a law.  Undertow's saving is that the TALLEST in-onset
+THE PAYOFF, if D_2 has a law.  The below-onset fit's saving is that the TALLEST in-onset
 cell can be dropped and replaced by a cell below the onset.  Depth 1 drops one
 height; depth 2 drops two, using both n = 2k and n = 2k-1 and keeping only
 n = 2k+1 .. 3k-1.  The test is whether that fit reproduces the classical
@@ -43,7 +43,7 @@ CONTROLS.
   (c) The depth-2 fit must reproduce the tallest TWO in-onset cells it never
       saw -- a genuine holdout, not a re-derivation of its own inputs.
 
-Usage: python3 experiments/undertow_square_depth2.py
+Usage: python3 experiments/below_onset_fit_square_depth2.py
 
 Target machine: ayr or dalby.  Cost: instant, exact rational arithmetic.
 """
@@ -55,8 +55,8 @@ from fractions import Fraction as F
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from undertow_square import (  # noqa: E402
-    load_triangle, lagrange, peval, D1, fit_classical, fit_undertow, same)
+from below_onset_fit_square import (  # noqa: E402
+    load_triangle, lagrange, peval, D1, fit_classical, fit_below_onset, same)
 
 KMAX = 6
 
@@ -99,18 +99,18 @@ def fit_depth2(tri, k, d1=None, d2=None):
 
 def main():
     tri = load_triangle()
-    print("Square-lattice Undertow, depth 2.  Exact rational arithmetic.\n")
+    print("Square-lattice below-onset fit, depth 2.  Exact rational arithmetic.\n")
 
     # ---- control (a): depth 1 still reproduces the file it extends
     ok = True
     for k in range(1, KMAX + 1):
-        P, U = fit_classical(tri, k), fit_undertow(tri, k)
+        P, U = fit_classical(tri, k), fit_below_onset(tri, k)
         if P is None or U is None:
             continue
         if not same(P, U):
             print("  control (a) FAILED at k=%d: depth-1 fit disagrees" % k)
             ok = False
-    print("RED  (a) depth-1 Undertow still reproduces the classical fit, "
+    print("RED  (a) depth-1 below-onset fit still reproduces the classical fit, "
           "k=1..%d   %s" % (KMAX, "OK" if ok else "FAILED"))
 
     # ---- the measurement
@@ -176,7 +176,7 @@ def main():
           % ("FAILED" if vacuous else "OK"))
     print("RED  (c) the depth-2 fit reproduces the two cells it never saw   %s"
           % ("OK" if good_all else "FAILED"))
-    print("\nVERDICT: depth-2 Undertow on the square lattice %s"
+    print("\nVERDICT: depth-2 below-onset fit on the square lattice %s"
           % ("HOLDS at k = 2..%d" % max(d2) if good_all and not vacuous
              else "DOES NOT hold"))
     return 0

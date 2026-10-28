@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-motley-par
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-motley-par
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -202,8 +202,8 @@ DEPS_gate-p-paper-verifier  = $(PAPER_SRC) tests/gate_p_paper_verifier.py \
                               scripts/provenance_table.py results/triangle.txt \
                               experiments/cluster_weight_dp.py experiments/depth1_gap_walk.py \
                               experiments/severance_w1_assemble.py experiments/severance_w3_depths.py \
-                              experiments/slope2_law_vs_truth.py experiments/undertow_pin.py \
-                              experiments/undertow_ri.py scripts/cutcount_assembly_gate.py \
+                              experiments/slope2_law_vs_truth.py experiments/below_onset_fit.py \
+                              experiments/below_onset_fit_ri.py scripts/cutcount_assembly_gate.py \
                               orchestrator/sweep.go results/ns_a40/triangle.txt \
                               $(wildcard results/ns_a40/perheight/*) \
                               $(wildcard results/cutcount_b1/rows41/*) \
@@ -374,7 +374,7 @@ gate-bfiles:
 # the number to be updated deliberately rather than silently. The recount's
 # reach is derived from the banked C rows and checked against the triangle (a
 # row that does not assemble caps it), and the tower refitted from the
-# recount's cells (tag U, experiments/undertow_ri.py run per row) is a fourth
+# recount's cells (tag U, experiments/below_onset_fit_ri.py run per row) is a fourth
 # tier, pinned at 192 cells. Three controls that must fail (--selftest).
 # ~0.5 s, no build needed.
 gate-provenance:
@@ -419,13 +419,13 @@ gate-cutcount-assembly:
 # fail, including one that catches the single-source D_4(21) transitively
 # through the pin it feeds, for a fractional error only.  An integer shift of
 # a defect passes (control 3, by design), and every error a real family-table
-# entry can carry is an integer shift: gate-undertow-pairs below is what
+# entry can carry is an integer shift: gate-below-onset-fit-pairs below is what
 # catches those.
-gate-undertow-congruence:
-	python3 experiments/undertow_congruence_gate.py --selftest
-	python3 experiments/undertow_congruence_gate.py
+gate-below-onset-fit-congruence:
+	python3 experiments/below_onset_fit_congruence_gate.py --selftest
+	python3 experiments/below_onset_fit_congruence_gate.py
 
-# Gate UNDERTOW-PAIRS.  Level 21 of the a(41) tower has one below-onset pin
+# Gate BELOW-ONSET-FIT-PAIRS.  Level 21 of the a(41) tower has one below-onset pin
 # pair at depths j <= 4 and so no check at its own level: +9 on sig[3][21] of
 # results/severance_w3_families_K22_e3.txt leaves the congruence gate green and
 # moves the depth-4 a(41) by exactly 9 (measured).  At depth 5
@@ -435,9 +435,9 @@ gate-undertow-congruence:
 # and pair counts pinned, requires a(41) from results/a41/h*.out plus the tower
 # to equal the banked value, and runs five controls that must fail, the first
 # being that mutation end to end.  Pure Python over tracked files, ~1 s.
-gate-undertow-pairs:
-	python3 experiments/undertow_pairs_gate.py --selftest
-	python3 experiments/undertow_pairs_gate.py
+gate-below-onset-fit-pairs:
+	python3 experiments/below_onset_fit_pairs_gate.py --selftest
+	python3 experiments/below_onset_fit_pairs_gate.py
 
 # Gate KINK-ORACLE.  The kink-carry kernel produced a(30)..a(41)'s swept half,
 # and the maxn-14 sweeps elsewhere in this file let the wired diagonals inject

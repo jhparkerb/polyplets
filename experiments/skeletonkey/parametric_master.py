@@ -8,7 +8,7 @@ ends with what is still missing:
     weights, i.e. defect_gas.py's ledger and the master equation.
 
 `docs/lastditch-ideas.md (deleted)` §1b names that same gap as the blocker on running
-the Undertow pin against an external oracle (square-lattice polyominoes,
+the below-onset fit against an external oracle (square-lattice polyominoes,
 published to n = 56).
 
 It is one substitution. defect_gas.py's chain is `1 = 3z + sum_c W_c y^k

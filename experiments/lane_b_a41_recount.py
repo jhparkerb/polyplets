@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lane B's independent recount of a(41). NOT derived from undertow_a41.py.
+"""Lane B's independent recount of a(41). NOT derived from below_onset_fit_a41.py.
 
 Route, chosen to be different where difference is possible:
   * levels k = 1..19 pinned from their two ONSET anchors T(2k+1,k+1),

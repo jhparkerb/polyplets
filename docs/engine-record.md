@@ -1336,7 +1336,7 @@ entries.
 So a(41) was two jobs (`results/a41/PROVENANCE.md`): heights 1–19 enumerated at
 `Nmax 41` (`--kernel kink --counter u128 --cores 40 --overlap-heights 19
 --heights 1-19`, 4.72 h), and heights 20–41 composed by
-`experiments/undertow_a41.py`, levels `k ≤ 19` from the formula table and
+`experiments/below_onset_fit_a41.py`, levels `k ≤ 19` from the formula table and
 `k = 20, 21` determined from below-onset entries. A run at `Nmax 41` also
 reproduces every recorded row `n ≤ 40` at the heights it enumerates: 760
 entries agree, 0 disagree, and the assembler refuses the `n = 41` row unless
@@ -1406,7 +1406,7 @@ a(1..20) with `fixtures/b006770.txt` and the chain of recorded terms):
     FRONTIER_LEVERS=1 scripts/term.sh 40 # a(40) as run
     scripts/dalby_a41_low.sh                   # a(41) heights 1..19 at Nmax 41
     scripts/dalby_a41_h20.sh                   # a(41) height 20 at Nmax 41, 9.63 h on 76 cores
-    python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
+    python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
     scripts/kink_validate.sh                   # kink against column-kernel rows at maxn 29
     make gate-kink-oracle                      # kink at maxn 18, no injection, against a(1..18)
     make ns-gates                              # the engine gate suite, both ASan kernels

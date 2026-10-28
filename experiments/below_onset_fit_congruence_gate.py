@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B17: the integrality-congruence gate on the Undertow tower's depth defects.
+"""B17: the integrality-congruence gate on the tower fitted below onset's depth defects.
 
 A below-onset tower cell at level k, depth j = 2k+1-n sits at
 
@@ -13,7 +13,7 @@ assumed), integrality of the left side forces
 i.e. D_j(k)'s NUMERATOR mod 3^(k+j) is pinned by P_k alone.  The modulus grows
 with k and j, so the strongest congruences sit exactly where nothing else
 reaches: the frontier levels' unbanked cells.  Discovered as a one-off for
-D_2(21) by Lane B of the Undertow review (results/a41/PROVENANCE.md "One real,
+D_2(21) by Lane B of the review of the below-onset fit (results/a41/PROVENANCE.md "One real,
 weak check"); this gate is the systematic version across the whole tower.
 
 Cell classes, kept honest:
@@ -36,8 +36,8 @@ a(41)'s tower -- shifts the fitted (a_21, b_21) and breaks integrality at the
 free cells (RED 4 measures this rather than asserting it from theory).
 
 Usage:
-  python3 experiments/undertow_congruence_gate.py             # the gate
-  python3 experiments/undertow_congruence_gate.py --selftest  # RED controls
+  python3 experiments/below_onset_fit_congruence_gate.py             # the gate
+  python3 experiments/below_onset_fit_congruence_gate.py --selftest  # RED controls
 
 Exit 0 = GATE GREEN; anything else = red.
 """
@@ -49,11 +49,11 @@ from fractions import Fraction as F
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from undertow_pin import all_pairs, product_form, peval, pow3      # noqa: E402
-from undertow_a41 import build                                   # noqa: E402
+from below_onset_fit import all_pairs, product_form, peval, pow3      # noqa: E402
+from below_onset_fit_a41 import build                                   # noqa: E402
 
 JMAX = 4
-KMAX = 21          # wired 1..19 + Undertow-pinned 20, 21, as in the a(41) run
+KMAX = 21          # wired 1..19 + below-onset-fitted 20, 21, as in the a(41) run
 HMAX_PIN = 19      # the a(41) pin cap: no pinning cell taller than the sweep
 
 
@@ -105,12 +105,12 @@ def run_gate(ab, Dj, tri, quiet=False):
 
 # TODO(2026-08-24, /simplify): two couplings worth loosening, neither unsafe
 # today (both fail loud rather than silently green). RED 4 monkeypatches
-# load_depths in TWO modules because undertow_a41 from-imports the name, so an
+# load_depths in TWO modules because below_onset_fit_a41 from-imports the name, so an
 # innocent import refactor turns the suite red; build() taking an optional Dj
 # override would end that. And this file restates a(41)'s recipe as its own
 # JMAX/KMAX/HMAX_PIN constants plus a reimplemented pin_cells(), so if the
 # recipe moves, the gate keeps green-lighting the old one -- import the
-# constants from undertow_a41 and have build() return the cells it consumed.
+# constants from below_onset_fit_a41 and have build() return the cells it consumed.
 def build_tower():
     return build(JMAX, KMAX, forbid_row=None, hmax=HMAX_PIN)
 
@@ -155,17 +155,17 @@ def selftest():
 
     # RED 4: the transitive probe.  Perturb D_4(21) BEFORE pinning; the fitted
     # (a_21, b_21) absorb the shift and the free cells' integrality breaks.
-    import undertow_pin
-    real = undertow_pin.load_depths
+    import below_onset_fit
+    real = below_onset_fit.load_depths
 
     def tampered(jmax, K):
         out = real(jmax, K)
         out[4][21] += F(1, 3 ** 25)
         return out
-    undertow_pin.load_depths = tampered
+    below_onset_fit.load_depths = tampered
     try:
-        import undertow_a41
-        undertow_a41.load_depths = tampered
+        import below_onset_fit_a41
+        below_onset_fit_a41.load_depths = tampered
         ab2, Dj2, tri2, _ = build_tower()
         try:
             run_gate(ab2, Dj2, tri2, quiet=True)
@@ -177,8 +177,8 @@ def selftest():
                   "reach the pin inputs; do not claim transitive coverage")
             raise SystemExit(1)
     finally:
-        undertow_pin.load_depths = real
-        undertow_a41.load_depths = real
+        below_onset_fit.load_depths = real
+        below_onset_fit_a41.load_depths = real
 
 
 if __name__ == "__main__":

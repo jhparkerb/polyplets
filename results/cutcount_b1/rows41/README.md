@@ -41,7 +41,7 @@ directly by the second program.
 
 ## What these rows settle for rows 39..41
 
-    python3 experiments/undertow_ri.py --hmax 19 --jmax 4 \
+    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 \
             --rowdir results/cutcount_b1/rows41 --rows 39,40,41
 
     row 39: COMPLETE, sum MATCHES a(39)   (20 cells agree with the main computation)
@@ -52,7 +52,7 @@ directly by the second program.
 `results/ns_a40/perheight/h19.out`. All nineteen heights agree with the
 main computation at n = 40.
 
-Row 41 shows "0 agree" because `undertow_ri.py` compares formula cells
+Row 41 shows "0 agree" because `below_onset_fit_ri.py` compares formula cells
 (H ≥ 20) against `results/triangle.txt`, which stops at n = 40. The main
 computation's n = 41 data, `results/a41/` h1..h19.out, are enumerated
 heights, and those nineteen cells are compared against these rows by

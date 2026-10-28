@@ -61,7 +61,7 @@ T(33,18), T(35,19), T(37,20) and T(39,21) exactly.
 from it is itself computable (`results/below-onset.md`). That turns short, cheap
 entries into equations for the same constants. Every level k = 2..19 re-derived
 this way agrees with the level used, and 189 enumerated entries are predicted
-from shorter ones with no error (`results/undertow.md`). These fits share their
+from shorter ones with no error (`results/below-onset-fit.md`). These fits share their
 correction tables with the main route, so they are a consistency check, not an
 independent one.
 
@@ -102,6 +102,6 @@ The closed forms for the tallest levels rest on correction tables computed to
 a certain size and used slightly beyond it. Two of the three tables involved
 have been derived twice by different code. The third is checked by a fourth
 table at the next depth, which gives the top level a third data point; the
-three agree, and `make gate-undertow-pairs` fails if they stop. An integer
+three agree, and `make gate-below-onset-fit-pairs` fails if they stop. An integer
 error in that table would otherwise pass: an error of 9 in one entry moves
 a(41) by 9 and survives the integrality check.

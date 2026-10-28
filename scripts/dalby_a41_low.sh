@@ -1,7 +1,7 @@
 #!/bin/bash
 # a(41), the cheap half: real sweep of heights 1..19 at maxn=41.
 #
-# Why only 19: Undertow (experiments/undertow_pin.py, VERIFY GREEN on 18
+# Why only 19: the below-onset fit (experiments/below_onset_fit.py, VERIFY GREEN on 18
 # levels) pins P_20 and P_21 from BELOW-onset cells that are already banked,
 # so the tower covers k <= 21, i.e. every T(41,H) with H >= 20.  The old rule
 # needed onset anchors and so needed the H = 20 and H = 21 poles -- 9.6 h/48c

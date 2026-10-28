@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Undertow's core claim, tested on a lattice whose answers other people publish.
+"""The below-onset fit's core claim, tested on a lattice whose answers other people publish.
 
 `docs/lastditch-ideas.md (deleted)` sec. 1b: the pin can be run on the square lattice,
 where the counts are published, and that is "the one validation channel this
 project structurally lacks above n = 20".  `docs/last-orders.md (deleted)` C1.3/A1.4.
 
-Undertow's claim, stripped of king-specific machinery:
+The below-onset fit's claim, stripped of king-specific machinery:
 
     a cell BELOW the diagonal law's onset, corrected by a known defect, is as
     good an equation for P_k as a cell above it -- so the tallest, most
@@ -26,8 +26,8 @@ i.e. D_1(k) = (-1)^(k+1), one cell below onset.
 The test, per level k:
 
   CLASSICAL  fit P_k from the k+1 cells at n = 2k+1 .. 3k+1  (in-onset)
-  UNDERTOW   drop the TALLEST of those and use the depth-1 cell instead
-  CHECK      the two fits must agree as polynomials, and Undertow's must
+  BELOW-ONSET drop the TALLEST of those and use the depth-1 cell instead
+  CHECK      the two fits must agree as polynomials, and the below-onset fit's must
              predict the dropped cell exactly
 
 Then both are used to rebuild whole rows and the sums are checked against
@@ -36,11 +36,11 @@ A001168, which is published and which this project did not produce.
 RED controls:
   - perturbing one input cell by 1 must break the agreement (else the test
     cannot detect an error);
-  - a wrong defect sign must break the Undertow fit;
+  - a wrong defect sign must break the below-onset fit;
   - the reconstructed row sums must match A001168 exactly, and must FAIL if
     A001168 is replaced by a perturbed copy.
 
-Usage: python3 experiments/undertow_square.py
+Usage: python3 experiments/below_onset_fit_square.py
 """
 import os
 import sys
@@ -116,7 +116,7 @@ def fit_classical(tri, k):
     return lagrange(pts)
 
 
-def fit_undertow(tri, k, d1=None):
+def fit_below_onset(tri, k, d1=None):
     """P_k with the TALLEST in-onset cell replaced by the depth-1 cell.
 
     The depth-1 cell is T(2k, k) = P_k(2k) + D_1(k), so P_k(2k) = T - D_1(k):
@@ -149,7 +149,7 @@ def main():
     nmax = max(n for (n, h) in tri)
 
     print("=" * 72)
-    print("Undertow on the square lattice, against published counts")
+    print("The below-onset fit on the square lattice, against published counts")
     print("=" * 72)
     print(f"triangle: {BBOX}, n <= {nmax}")
     print(f"counts:   A001168 to n = {max(a)} (OEIS, external)")
@@ -167,13 +167,13 @@ def main():
         return 1
     print()
 
-    print("--- 1. Classical vs Undertow fit, per level ---")
-    print(f"  {'k':>2} {'classical':>12} {'undertow':>12} {'agree':>6} "
+    print("--- 1. Classical vs below-onset fit, per level ---")
+    print(f"  {'k':>2} {'classical':>12} {'below-onset':>12} {'agree':>6} "
           f"{'tallest cell predicted':>24} {'holds':>6}")
     levels = 0
     for k in range(1, 7):
         pc = fit_classical(tri, k)
-        pu = fit_undertow(tri, k)
+        pu = fit_below_onset(tri, k)
         if pc is None or pu is None:
             continue
         ag = same(pc, pu)
@@ -185,18 +185,18 @@ def main():
         print(f"  {k:>2} {'deg ' + str(len(pc)-1):>12} "
               f"{'deg ' + str(len(pu)-1):>12} {str(ag):>6} "
               f"{str(pred):>24} {str(holds):>6}")
-    print(f"\n  {levels} levels; Undertow drops the tallest cell of each and")
+    print(f"\n  {levels} levels; the below-onset fit drops the tallest cell of each and")
     print(f"  reproduces it exactly from a cell one row BELOW the onset.")
     print()
 
     print("--- 2. What that saves, in height ---")
-    print(f"  {'k':>2} {'classical needs H':>18} {'undertow needs H':>18} "
+    print(f"  {'k':>2} {'classical needs H':>18} {'below-onset needs H':>18} "
           f"{'saved':>6}")
     for k in range(1, 7):
         if fit_classical(tri, k) is None:
             continue
         hc = (3 * k + 1) - k       # tallest in-onset cell's height
-        hu = max((3 * k) - k, k)   # tallest cell Undertow still needs
+        hu = max((3 * k) - k, k)   # tallest cell the below-onset fit still needs
         print(f"  {k:>2} {hc:>18} {hu:>18} {hc-hu:>6}")
     print()
 
@@ -207,14 +207,14 @@ def main():
     k = 4
     tri_bad = dict(tri)
     tri_bad[(2 * k + 1, k + 1)] += 1
-    pc, pu = fit_classical(tri_bad, k), fit_undertow(tri_bad, k)
+    pc, pu = fit_classical(tri_bad, k), fit_below_onset(tri_bad, k)
     good = not same(pc, pu)
-    print(f"RED  a 1-cell perturbation breaks classical/Undertow agreement  "
+    print(f"RED  a 1-cell perturbation breaks agreement of the classical and below-onset fits  "
           f"{'OK' if good else 'FAILED'}")
     ok &= good
 
     # 2. the wrong defect sign must break the fit
-    pc, pu = fit_classical(tri, k), fit_undertow(tri, k, d1=-D1(k))
+    pc, pu = fit_classical(tri, k), fit_below_onset(tri, k, d1=-D1(k))
     good = not same(pc, pu)
     print(f"RED  the wrong depth-1 defect sign breaks the fit  "
           f"{'OK' if good else 'FAILED'}")

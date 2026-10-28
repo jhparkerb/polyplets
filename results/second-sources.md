@@ -216,7 +216,7 @@ until both fit points `T(2k+1,k+1)` and `T(2k+2,k+2)` are inside its reach.
 
 Both counts reach zero only at `H = 21`, which does not fit in memory (below).
 Fitting each level from entries below the range where its formula holds, with
-the exactly known defect (`results/below-onset.md`, `results/undertow.md`),
+the exactly known defect (`results/below-onset.md`, `results/below-onset-fit.md`),
 gives a(n) rule-independent for every `n ≤ 39` with the coloring recount at
 `H ≤ 18`; that route is one formula strategy fitted from the recount's data,
 not a second enumeration, and the provenance table carries it as tag U.
@@ -245,7 +245,7 @@ For a target `n` the enumeration must reach `H ≤ ⌊(n+2)/2⌋` at Nmax `n`:
 
 a(40) is the odd one out because `21 = (40+2)/2` exactly. The topmost level a
 run consumes has nothing to check it: for a(39), level 18 predicts T(39,21)
-with no comparison entry. The below-onset fitting of `results/undertow.md`
+with no comparison entry. The below-onset fitting of `results/below-onset-fit.md`
 lowers the required height from `(n+2)/2` to `(n−3)/2`.
 
 The coloring engine's memory is about 8,100 bytes per frontier state with
@@ -293,6 +293,6 @@ on small boards against the C++ at `H ≤ 6`, as
     python3 experiments/paper1_reproducibility_check.py   # coverage (D), Redelmeier (C), coloring recount (F)
     make gate-cutcount-assembly gate-motley-crt gate-provenance gate-residual-cells
     python3 scripts/motley_crt.py --dir results/cutcount_b1/residues41 --height 19
-    python3 experiments/undertow_ri.py --hmax 19 --jmax 4 --rowdir results/cutcount_b1/rows41 --rows 39,40,41
+    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/cutcount_b1/rows41 --rows 39,40,41
     make build/motley_par && make gate-motley-par    # needs -fopenmp
     scripts/g2_wholerow.sh 20 10 800 80              # Redelmeier row 20 on 80 workers

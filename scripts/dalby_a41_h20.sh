@@ -1,7 +1,7 @@
 #!/bin/bash
 # a(41), the H = 20 pole: the real sweep of height 20 at maxn = 41.
 #
-# Why run it at all when Undertow covers H >= 20 from the tower: because a
+# Why run it at all when the below-onset fit covers H >= 20 from the tower: because a
 # swept T(41,20) is a genuine HOLDOUT for P_21.  P_21 is pinned from
 # T(40,19) and T(39,18) and predicts T(41,20) through the depth-2 identity;
 # nothing else on its diagonal can check it, since every in-onset cell of

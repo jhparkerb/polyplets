@@ -9,7 +9,7 @@ obtained by applying the per-excess ladder's ~6x RSS and ~7-9x wall once to
 `J = 5`'s projection.
 
 Depth 5 was asserted the same way at 16 h / 103 GB until five rungs measured it
-at 3.1 h / 8.5 GB, an order of magnitude out (`results/undertow.md`).
+at 3.1 h / 8.5 GB, an order of magnitude out (`results/below-onset-fit.md`).
 These are those rungs for depth 6.
 
 METHOD: the extrapolator is imported from `depth5_cost_ladder.py` rather than

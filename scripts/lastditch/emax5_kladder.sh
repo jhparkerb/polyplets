@@ -13,8 +13,8 @@
 #
 # FIXED THREADS IS NOT A DETAIL.  The family DP builds per-thread private maps
 # and merges after, so RSS scales with thread count and a K-slope that mixes
-# thread counts is not a slope (results/undertow.md, methodology
-# note).  8 threads throughout, matching results/undertow.md so the
+# thread counts is not a slope (results/below-onset-fit.md, methodology
+# note).  8 threads throughout, matching results/below-onset-fit.md so the
 # two ladders are comparable rung for rung.
 #
 # Target: dalby, 8 threads.  Predicted from the emax=4 ladder at 8 threads

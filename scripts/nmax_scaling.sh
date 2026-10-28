@@ -3,7 +3,7 @@
 #
 # Purpose: the whole reach claim turns on this and nobody has measured it.
 # The ladder's 4.4x per term is the cost of raising Nmax AND H_sweep together.
-# Undertow lowers H_sweep by two, so what matters now is the cost of raising
+# The below-onset fit lowers H_sweep by two, so what matters now is the cost of raising
 # Nmax alone -- if that is polynomial and mild, one sweep at a fixed height
 # covers several new rows, and if it is not, it covers one.
 # Heights 14 and 15 are chosen because they are minutes, not hours, and the

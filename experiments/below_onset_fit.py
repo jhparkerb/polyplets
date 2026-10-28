@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Undertow: pin P_k from BELOW-onset cells, so the tower stops needing the tall sweep.
+"""The below-onset fit: pin P_k from BELOW-onset cells, so the tower stops needing the tall sweep.
 
 The standing rule (results/second-sources.md §1) is that level k costs two
 above-onset anchors, T(2k+1, k+1) and T(2k+2, k+2) -- the two TALLEST cells on
@@ -32,7 +32,7 @@ What this file does:
   --selftest RED controls: a perturbed D_j must break the pin, and one equation
              must fail to determine the level.
 
-Run: python3 experiments/undertow_pin.py --verify
+Run: python3 experiments/below_onset_fit.py --verify
 """
 
 import os
@@ -173,7 +173,7 @@ def pow3(e):
 
 # TODO(2026-08-24, /simplify): the pin-and-check loop -- all_pairs, pin_level
 # per pair, refuse unless every depth pair agrees -- exists in four variants
-# (here in predict and emit, undertow_a41.build, undertow_ri.build_tower) with
+# (here in predict and emit, below_onset_fit_a41.build, below_onset_fit_ri.build_tower) with
 # divergent refusal text and slightly different pair filters. That all-pairs
 # agreement IS the campaign's safety invariant, so it is restated four times.
 # One pin_levels(tri, Dj, jmax, hmax, forbid_row, krange) consumed by all four
@@ -394,7 +394,7 @@ def emit(jmax=4, kmax_new=21):
             desc.insert(0, "0")
         cells = ", ".join(f"T({2*k+1-j},{k+1-j})" for j in
                           sorted({x for d in pairs for x in d}))
-        print(f"\t// k={k}: Undertow-pinned from below-onset cells {cells};")
+        print(f"\t// k={k}: below-onset-fitted from below-onset cells {cells};")
         print(f"\t// {len(pairs)} depth pairs agree ({len(pairs)-1} independent checks).")
         print("\t%d: {[]string{%s}, %d}," %
               (k, ", ".join('"%s"' % c for c in desc), kfact))

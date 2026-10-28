@@ -582,7 +582,7 @@ function has sections whose singularities have bounded degree.
 `Σ_j A_j t^j = (√6/27)·t/√(1 - 50t/81)`, branch at `t = 81/50`, which §7
 derives. The excess-4 table `results/severance_w3_families_K21_e4.txt`
 (`families 21 4`, 8 threads, 4 h 54 m, 18,743 MB peak; costs in
-`results/undertow.md`) gives exact `D_5` to `k ≤ 21`. Sharpening `R_5` from
+`results/below-onset-fit.md`) gives exact `D_5` to `k ≤ 21`. Sharpening `R_5` from
 data needs `D_5(k)` to `k ≈ 28..30`, which no table reaches.
 
 ## 9. The near-onset layer
@@ -666,7 +666,7 @@ state-space reduction, not cores.
 `H ≤ 14` and depths `j ≤ 4`: rows `n ≤ 24` are covered end to end by two
 independent programs; rows 25..33 are formula-covered except for the two
 entries per level at `n = 2k+1, 2k+2` that determine `P_10..P_18`; rows
-34..40 need `P_19` and beyond. `results/undertow.md` determines levels 19 to
+34..40 need `P_19` and beyond. `results/below-onset-fit.md` determines levels 19 to
 21 from entries below the onset using these `D_j`, which is what `a(41)`
 rests on; `results/confidence.md` states what each term rests on.
 

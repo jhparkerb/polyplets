@@ -8,7 +8,7 @@ onset (the onset of level k = n − H is n = 2k+1; see `docs/glossary.md` for
 level, depth, defect and fit), so that height 21 was never enumerated. The
 enumeration runs need that server; the assembly, which recomputes a(41) from
 the stored per-height output, runs in under a second on a laptop (the
-`undertow_a41.py` command under Checks).
+`below_onset_fit_a41.py` command under Checks).
 
 ## How
 
@@ -25,9 +25,9 @@ the stored per-height output, runs in under a second on a laptop (the
   each). The run directory was cleaned by the orchestrator, so the disk
   peak was not recorded.
 - Heights 21..41 from the closed forms of `docs/proofs/diagonal-law.md`,
-  assembled by `experiments/undertow_a41.py`: levels k = 41 − H = 0..20,
+  assembled by `experiments/below_onset_fit_a41.py`: levels k = 41 − H = 0..20,
   with k ≤ 19 from the wired coefficient table and k = 20 pinned from cells
-  below its onset by the depth-j corrections D_j (`results/undertow.md`).
+  below its onset by the depth-j corrections D_j (`results/below-onset-fit.md`).
   T(41,21) is exactly at onset on level 20. Before the H = 20 run the
   assembly also supplied T(41,20), from level 21 at depth 2.
 
@@ -45,7 +45,7 @@ only at k ≤ 19; the checks below are about that.
 
 - The Nmax-41 enumeration also produces every row n ≤ 40 at every height
   it covers. All 800 positions with n ≤ 40 and H ≤ 20 (610 of them nonzero)
-  agree with `results/triangle.txt`. `undertow_a41.py` refuses the n = 41
+  agree with `results/triangle.txt`. `below_onset_fit_a41.py` refuses the n = 41
   row unless they match and at least 200 cells were compared.
 - A separate assembly with row 40 excluded from its own pinning set
   reproduces 21 cells of row 40, 0 wrong, and the row re-sums to a(40).
@@ -55,9 +55,9 @@ only at k ≤ 19; the checks below are about that.
 - The method: 18 levels re-derived exactly from below-onset cells, and 189
   enumerated cells (342 predictions in all, 153 of them formula values)
   reproduced from shorter cells with 0 wrong; a(n) comes
-  out independent of the rule for every n ≤ 39 (`results/undertow.md`).
+  out independent of the rule for every n ≤ 39 (`results/below-onset-fit.md`).
 - Re-assembly with the enumerated height 20
-  (`python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41`):
+  (`python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41`):
 
       heights swept: 1..20;  heights from the tower: 21..41
       sweep vs banked triangle: 800 cells agree, 0 disagree
@@ -69,7 +69,7 @@ only at k ≤ 19; the checks below are about that.
 differs wherever it can: levels k = 1..19 fitted from their two onset
 entries in `results/triangle.txt` rather than read from `diagCoeffTable`;
 level 20 fitted from depths (1, 2) with (3, 4) held out; its own polynomial,
-product-form, solver and assembly code. It never reads `undertow_a41.py`.
+product-form, solver and assembly code. It never reads `below_onset_fit_a41.py`.
 
     anchor-pinned k<=19 predict banked in-onset cells: 342 ok, 0 wrong
     imported D_j vs own empirical extraction at k<=19: 70 ok, 0 wrong
@@ -101,7 +101,7 @@ depth pair with no independent check at its own level:
     level k=20 pinned from [(36,16), (37,17), (38,18), (39,19)], 6 pairs, 5 independent checks
     level k=21 pinned from [(39,18), (40,19)],                   1 pair,  0 independent checks
 
-The congruence check (`gate-undertow-congruence`) constrains only the
+The congruence check (`gate-below-onset-fit-congruence`) constrains only the
 fractional part of D_4(21). A shift Δ in D_4(21) moves T(41,20) by 9Δ, and
 every single-entry error in the e = 3 row of
 `results/severance_w3_families_K22_e3.txt` enters D_4(21) with a
@@ -116,7 +116,7 @@ agreement.
 At depth 5, `results/severance_w3_families_K21_e4.txt` supplies D_5 and
 level 21 gains T(38,17), a cell the coloring recount also covers:
 
-    python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
+    python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
     level k=20 pinned from [(36,16), (37,17), (38,18), (39,19)] (tallest H=19), 6 pair(s), 5 independent check(s)
     level k=21 pinned from [(38,17), (39,18), (40,19)] (tallest H=19), 3 pair(s), 2 independent check(s)
     sweep vs banked triangle: 760 cells agree, 0 disagree
@@ -127,11 +127,11 @@ level 21 gains T(38,17), a cell the coloring recount also covers:
 `pp[3][21]` enters D_4(21) but not D_5(21), and `sig`, `bb` enter the two
 with different coefficients, so any single-entry error in that row makes
 the three pairs disagree and `build()` refuses. Also at depth 5:
-`undertow_pin.py --verify --jmax=5` re-derives 18 levels exactly over 160
+`below_onset_fit.py --verify --jmax=5` re-derives 18 levels exactly over 160
 depth pairs, 0 wrong; `--audit --jmax=5` predicts 342 cells from shorter
 cells, 189 of them enumerated, 0 wrong.
 
-`make gate-undertow-pairs` (`experiments/undertow_pairs_gate.py`) rebuilds
+`make gate-below-onset-fit-pairs` (`experiments/below_onset_fit_pairs_gate.py`) rebuilds
 the depth-5 assembly with the pin cells and pair counts fixed, requires
 a(41) from `h*.out` plus the formulas to equal the value above, and carries
 six controls that must each be refused: the +9 mutation above, `bb` and
@@ -149,7 +149,7 @@ enumeration:
 
 The run's rows at n ≤ 40 agree with `results/triangle.txt` on all 40 cells
 of column H = 20, including T(40,20) (same program at a different Nmax, so
-a regression rather than a second source). `gate-undertow-pairs` also
+a regression rather than a second source). `gate-below-onset-fit-pairs` also
 compares the enumerated T(41,20) with the formula's prediction, built
 without that cell among its pins.
 

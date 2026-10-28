@@ -26,7 +26,7 @@ Start with `confidence.md` for how far each term can be trusted.
 | `second-sources.md` | the independent recounts in detail: what each computes, how far it reaches, what it shares with the main program |
 | `diagonal-formula.md` | the closed forms for the tall part of the triangle, and how their constants are determined |
 | `below-onset.md` | the exact deviation from the closed forms just below where they start to hold |
-| `undertow.md` | determining the closed forms from entries below their onset, which is how a(41) was computed |
+| `below-onset-fit.md` | determining the closed forms from entries below their onset, which is how a(41) was computed |
 | `symmetry-classes.md` | free, one-sided, bilateral and asymmetric polyplets, and the congruences between them |
 | `growth-constant.md` | the growth constant λ: proved bounds and estimates |
 | `arithmetic-structure.md` | the triangle modulo 3 and 5, denominators and integrality |

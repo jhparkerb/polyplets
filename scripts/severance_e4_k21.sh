@@ -13,7 +13,7 @@
 # not license using D_5 at k = 21 -- that is what the gate is for, and the
 # gate runs after this lands.
 #
-# WHAT IT COSTS.  results/undertow.md, from a five-rung ladder at
+# WHAT IT COSTS.  results/below-onset-fit.md, from a five-rung ladder at
 # 8 threads throughout with K = 16 held out and predicted to 6.9% / 8.0%:
 # ~3.1 h and ~8.5 GB decelerating, ~6.7 h and ~16.1 GB if the deceleration is
 # assumed to stop dead.  8 threads is not a detail -- the family DP's RSS

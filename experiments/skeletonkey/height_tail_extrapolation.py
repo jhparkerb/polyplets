@@ -3,7 +3,7 @@
 
 Motivation (Skeleton Key, 2026-08-20).  An exact a(n) needs every cell of the
 T(n,H) triangle.  An a(n) good to a few significant digits does not: the sweep
-covers H <= Hsweep exactly, the Undertow tower covers H >= (n-3)/2 exactly, and
+covers H <= Hsweep exactly, the tower fitted below onset covers H >= (n-3)/2 exactly, and
 only the band between them has to be estimated.  This script prices that band.
 
 The extrapolation is validated before it is used: the height-distribution

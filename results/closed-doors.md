@@ -811,7 +811,7 @@ final cluster's cell count, not its own.
 
 The exact variation: run the DP once per target cluster size `ℓ`, capping
 span at `2ℓ + e + 1` in that pass, exact by the engine's own header argument.
-The measured cost (`emax = 4`, `results/undertow.md`) is 12.2 s at `K = 8`,
+The measured cost (`emax = 4`, `results/below-onset-fit.md`) is 12.2 s at `K = 8`,
 71.4 s at `K = 10`, 265.0 s at `K = 12`, a per-unit-`K` ratio `r = 2.159`, so
 the top level alone is `1 − 1/r = 0.537` of a run. Pass `ℓ = K` computes
 level `K` at full span, as the single run does now, so the best possible
@@ -831,7 +831,7 @@ is 1. Dead for the same structural reason as the original, by a cost argument
 independent of the correctness one; only a cap that tightens the top level
 would change it, which needs a different invariant. Memory is not the
 pressure either: depth 5 measured about 8.5 GB, 16.1 GB pessimistic
-(`results/undertow.md`).
+(`results/below-onset-fit.md`).
 
 ## 4. The percolation matching pair
 
@@ -1070,7 +1070,7 @@ where the king derivation has 3.
 Square, derived: with `b = 1` the walk closes on two states,
 `S = 4y/(1−3y)`, `B = (1−y)/(1−3y)`, `P̂ = y/(1−3y)`, so `F_1 = −1/(1+y)` and
 `D_1(k) = (−1)^(k+1)` for all `k ≥ 1`, previously measured at `k ≤ 6`
-(`results/undertow.md`). Hex, derived: the block `u − y(1+u)²` has one small
+(`results/below-onset-fit.md`). Hex, derived: the block `u − y(1+u)²` has one small
 root `u₁ = (1−A)/(1+A)`, `A = √(1−4y)`, and `F_1` is quadratic over `Q(y)`
 where king's is quartic. In the king normalization `y = bx`,
 `N = b·F_1(bx) + 1`:
@@ -1098,7 +1098,7 @@ refused.
 coefficient table, king only, with no cross-route agreement. Depth `j ≥ 2` on
 any lattice but king: the defect dynamic program is a different machine from
 the gap walk and is king-only; the square targets `−4, 8, −3, 10, −1`
-(`results/undertow.md`) are unclaimed. Hex `A_5, A_6` await a `K = 5` weights
+(`results/below-onset-fit.md`) are unclaimed. Hex `A_5, A_6` await a `K = 5` weights
 run. Validating the below-onset machinery against published square counts is
 not free: the formula covers `H ≥ (n+1)/2`, the rest of each row must be
 enumerated, so `n = 56` needs square entries at `H ≤ 28`.

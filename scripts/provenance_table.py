@@ -33,8 +33,8 @@ Source rules, each traceable to the note that establishes it:
                                                         ns_a40/PROVENANCE.md
   U  below-onset tower pinned from the recount's own cells, agreeing with the
      main transfer matrix               H > MOTLEY_H, measured per cell
-                                                        undertow.md,
-                                                        experiments/undertow_ri.py
+                                                        below-onset-fit.md,
+                                                        experiments/below_onset_fit_ri.py
   C  subgroup mod-2/mod-4 congruence   every cell       symmetry-classes.md
                                                         (congruence level only:
                                                         an error survives iff
@@ -130,18 +130,18 @@ MOTLEY_DIR = motley_rowdir()
 @functools.lru_cache(maxsize=None)
 def tower_cells(motley_h=None, rowdir=None, jmax=4):
     """The cells above the recount's reach that the below-onset tower pinned
-    from the recount's cells reproduces exactly: experiments/undertow_ri.py,
+    from the recount's cells reproduces exactly: experiments/below_onset_fit_ri.py,
     one tower per row with the row excluded from its own pinning set, levels
     1..9 ab initio and the rest pinned from recount cells at H <= motley_h.
     Only cells that agree with the main transfer matrix come back; a cell that
-    disagrees makes undertow_ri fail on its own, and this refuses too rather
+    disagrees makes below_onset_fit_ri fail on its own, and this refuses too rather
     than tag around it."""
     motley_h = MOTLEY_H if motley_h is None else motley_h
     rowdir = MOTLEY_DIR if rowdir is None else rowdir
     if not motley_h or rowdir is None:
         return set()
     sys.path.insert(0, str(ROOT / "experiments"))
-    from undertow_ri import cover
+    from below_onset_fit_ri import cover
     cells = set()
     for r in cover(hmax=motley_h, jmax=jmax, rows=range(motley_h + 1, NMAX + 1),
                    rowdir=str(rowdir)):
@@ -186,8 +186,8 @@ EXPECTED = {
     # above -- is reproduced by the recount-pinned tower (tag U).  Pinned so that
     # a tower that stops reaching one of them, or a cell that stops agreeing,
     # fails here rather than dropping out of the table quietly.
-    "tower_reproduced_unsourced": (192, "results/undertow.md; "
-                                       "experiments/undertow_ri.py at H<=%d"
+    "tower_reproduced_unsourced": (192, "results/below-onset-fit.md; "
+                                       "experiments/below_onset_fit_ri.py at H<=%d"
                                        % MOTLEY_H),
 }
 
@@ -405,9 +405,9 @@ def selftest(T):
             return 1
     # RED 3: a tower cell that stops agreeing must refuse, not drop out of U.
     # A canned record stands in for the 21 towers; the refusal path is the same.
-    import undertow_ri
-    real = undertow_ri.cover
-    undertow_ri.cover = lambda **kw: [{"agree": [(40, 20)], "wrong": [(40, 21)]}]
+    import below_onset_fit_ri
+    real = below_onset_fit_ri.cover
+    below_onset_fit_ri.cover = lambda **kw: [{"agree": [(40, 20)], "wrong": [(40, 21)]}]
     tower_cells.cache_clear()
     try:
         try:
@@ -418,7 +418,7 @@ def selftest(T):
             print("SELFTEST FAILED: a disagreeing tower cell did not refuse")
             return 1
     finally:
-        undertow_ri.cover = real
+        below_onset_fit_ri.cover = real
         tower_cells.cache_clear()
     # RED 4: a tracked table that differs from the regeneration by one line
     # must fail (a title-only corruption once passed).

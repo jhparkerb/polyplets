@@ -19,7 +19,7 @@ set, so no cell is ever predicted from itself. Motley covers H <= hmax, the
 tower covers H > hmax, and the report says which heights neither reaches.
 
 Usage:
-  python3 experiments/undertow_ri.py [--hmax 18] [--jmax 4] [--rows 36,37,...]
+  python3 experiments/below_onset_fit_ri.py [--hmax 18] [--jmax 4] [--rows 36,37,...]
                                     [--rowdir DIR]
 
 Exit 0 unless a tower cell disagrees with the incumbent (MISMATCH) or a
@@ -36,7 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
-from undertow_pin import (all_pairs, product_form, load_depths, padd, ptrim,  # noqa: E402
+from below_onset_fit import (all_pairs, product_form, load_depths, padd, ptrim,  # noqa: E402
                           peval, pin_level, pow3, read_tri_motley)
 from slope2_law_vs_truth import read_tri                                   # noqa: E402
 
@@ -198,7 +198,7 @@ def main():
         if r["wrong"] or r["status"] == "WRONG":
             red = True
     if red:
-        raise SystemExit("undertow_ri RED: a tower cell or a row sum disagrees "
+        raise SystemExit("below_onset_fit_ri RED: a tower cell or a row sum disagrees "
                          "with the incumbent")
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate UNDERTOW-PAIRS: every pinned level of the a(41) tower is overdetermined,
+"""Gate BELOW-ONSET-FIT-PAIRS: every pinned level of the a(41) tower is overdetermined,
 and the depth pairs agree.
 
 AUDIT-2026-09-02 M1.  `T(41,20)` sits on level 21 of the tower.  At depths
@@ -11,14 +11,14 @@ and every single-entry error in the e = 3 row of the family table enters
 `D_4(21)` with a coefficient in (1/9) Z, so every realistic table error shifts
 a(41) by an INTEGER and the congruence gate stays green.  RED 1 below measures
 exactly that, on a shadow copy of the table: +9 on `sig[3][21]` leaves
-`gate-undertow-congruence` green and moves the depth-4 assembler's a(41) by 9.
+`gate-below-onset-fit-congruence` green and moves the depth-4 assembler's a(41) by 9.
 
 The check that closes it has been in the tree since 2026-08-24 and was never
 wired: `results/severance_w3_families_K21_e4.txt` gives depth 5, and at depth 5
 level 21 has THREE pin pairs through `T(38,17)`, `T(39,18)`, `T(40,19)`.
 `pp[3][21]` enters `D_4(21)` but not `D_5(21)`, and `sig`, `bb` enter the two
 with different coefficients, so any single-entry error makes the pairs
-disagree and `undertow_a41.build` refuses.  This gate runs that build and pins
+disagree and `below_onset_fit_a41.build` refuses.  This gate runs that build and pins
 its shape:
 
   * levels 20 and 21 pinned at depths j <= 5 from cells no taller than the
@@ -39,7 +39,7 @@ RED controls (--selftest), each in a shadow copy of the family tables:
                        (the blind spot, measured), depth-5 build REFUSES;
   2  bb[3][21]  += 1   depth-5 build refuses;
   3  pp[3][21]  += 1   depth-5 build refuses (the column
-                       results/undertow.md called inert; it is not,
+                       results/below-onset-fit.md called inert; it is not,
                        above depth 1);
   4  the e = 4, k = 21 row of the K21_e4 table, sig += 1: D_5's own input,
                        depth-5 build refuses;
@@ -48,8 +48,8 @@ RED controls (--selftest), each in a shadow copy of the family tables:
                        comparison reports the disagreement.
 
 Usage:
-  python3 experiments/undertow_pairs_gate.py             # the gate
-  python3 experiments/undertow_pairs_gate.py --selftest  # RED controls
+  python3 experiments/below_onset_fit_pairs_gate.py             # the gate
+  python3 experiments/below_onset_fit_pairs_gate.py --selftest  # RED controls
 
 Exit 0 = GATE GREEN; anything else = red.  ~1 s.
 """
@@ -68,8 +68,8 @@ sys.path.insert(0, HERE)
 
 import severance_w3_depths as swd                                 # noqa: E402
 import slope2_law_vs_truth as sl                                  # noqa: E402
-from undertow_a41 import build, sweep_rows, tower                 # noqa: E402
-import undertow_congruence_gate as ucg                            # noqa: E402
+from below_onset_fit_a41 import build, sweep_rows, tower                 # noqa: E402
+import below_onset_fit_congruence_gate as ucg                            # noqa: E402
 from lane_b_a41_recount import CLAIM as A41                       # noqa: E402
 
 JMAX = 5                                       # one depth past the congruence gate's
@@ -77,7 +77,7 @@ KMAX, HMAX_PIN = ucg.KMAX, ucg.HMAX_PIN
 SWEEP = os.path.join(ROOT, "results", "a41")
 TABLES = os.path.join(ROOT, "results")
 
-# Pinned shape of the two Undertow levels at depths <= 5, cells no taller than
+# Pinned shape of the two levels fitted below onset at depths <= 5, cells no taller than
 # H = 19.  Level k, depth j is the cell (2k+1-j, k+1-j); every pair of its
 # cells is a depth pair, so the pair count follows from the cell count.
 EXPECT_CELLS = {
@@ -244,15 +244,15 @@ def selftest():
         t = real()
         t[(38, 17)] += 1
         return t
-    import undertow_a41
-    sl.read_tri, undertow_a41.read_tri = tampered, tampered
+    import below_onset_fit_a41
+    sl.read_tri, below_onset_fit_a41.read_tri = tampered, tampered
     try:
         if refuses(5):
             print("RED 5 GREEN: T(38,17)+1 in the triangle refused at depth 5")
         else:
             problems.append("RED 5: a corrupted pin cell passed")
     finally:
-        sl.read_tri, undertow_a41.read_tri = real, real
+        sl.read_tri, below_onset_fit_a41.read_tri = real, real
 
     # RED 6: the swept holdout cell, corrupted in a shadow copy of the sweep.
     with tempfile.TemporaryDirectory() as d:
@@ -265,26 +265,26 @@ def selftest():
             problems.append("RED 6: a corrupted swept T(41,20) passed the holdout")
 
     if problems:
-        print("undertow-pairs selftest FAILED:")
+        print("below-onset-fit-pairs selftest FAILED:")
         for p in problems:
             print("  " + p)
         return 1
-    print("undertow-pairs selftest ok: 1 green control, 6 RED controls, all fired")
+    print("below-onset-fit-pairs selftest ok: 1 green control, 6 RED controls, all fired")
     return 0
 
 
 def main():
     if "--selftest" in sys.argv:
         return selftest()
-    print("undertow pairs, levels 20 and 21 at depths <= 5, pins at H <= 19, "
+    print("below-onset fit pairs, levels 20 and 21 at depths <= 5, pins at H <= 19, "
           "holdout T(41,20) swept:")
     bad = run_gate()
     if bad:
-        print("\nundertow-pairs gate RED:")
+        print("\nbelow-onset-fit-pairs gate RED:")
         for b in bad:
             print("  " + b)
         return 1
-    print("undertow-pairs gate GREEN")
+    print("below-onset-fit-pairs gate GREEN")
     return 0
 
 
