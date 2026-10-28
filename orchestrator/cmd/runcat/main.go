@@ -48,11 +48,8 @@ func catFile(path string) error {
 	if err != nil {
 		return err
 	}
-	// FAIL-CLOSED: runcat decodes raw record bytes; a compressed body would be
-	// misread as garbage records rather than erroring. No Go zstd path here —
-	// say so, and point at something that actually exists: verify.go is Go too
-	// and there is no C++ dump tool, so the honest answers are the readers'
-	// own fail-closed frame-checksum enforcement and a manual zstd -d.
+	// runcat decodes plain bodies only; a compressed body is refused rather
+	// than misread as records.
 	if hdr.Compression != 0 {
 		return fmt.Errorf("%s: compressed body (compression %d): runcat decodes plain bodies only. Integrity of a compressed body is the in-band zstd frame checksum, enforced fail-closed by the C++ readers (core/runfile.h) — a decode or checksum failure aborts the reading worker. To dump it by hand: tail -c +%d %s | zstd -d", path, hdr.Compression, bodyOff+1, path)
 	}
@@ -81,17 +78,15 @@ func catFile(path string) error {
 	sig := make([]byte, keyLen)
 	meta := make([]byte, 2)
 
+	// Exactly hdr.Records records, then exactly the 8-byte trailer: a body
+	// that ends early, or has bytes left over, is an error.
 	var count uint64
-	for {
+	for ; count < hdr.Records; count++ {
 		if _, err := io.ReadFull(r, sig); err != nil {
-			if err == io.EOF {
-				break
-			}
-			// At end we'll hit the 8-byte CRC trailer; short read is normal stop.
-			break
+			return fmt.Errorf("record %d: key: %w", count, err)
 		}
 		if _, err := io.ReadFull(r, meta); err != nil {
-			break
+			return fmt.Errorf("record %d: lo/len: %w", count, err)
 		}
 		lo := meta[0]
 		length := int(meta[1])
@@ -100,19 +95,18 @@ func catFile(path string) error {
 		for i := range counts {
 			v, err := readVarintBig(r)
 			if err != nil {
-				break
+				return fmt.Errorf("record %d: count %d: %w", count, i, err)
 			}
 			counts[i] = v.String()
 		}
 
 		fmt.Printf("sig=%s lo=%d len=%d counts=[%s]\n",
 			hex.EncodeToString(sig), lo, length, strings.Join(counts, ","))
-		count++
-
-		// Stop after hdr.Records to avoid reading into the CRC.
-		if count >= hdr.Records {
-			break
-		}
+	}
+	if rest, err := io.ReadAll(r); err != nil {
+		return err
+	} else if len(rest) != 8 {
+		return fmt.Errorf("%d bytes after the last record, want the 8-byte checksum trailer", len(rest))
 	}
 
 	fmt.Printf("# total: %d records\n", count)

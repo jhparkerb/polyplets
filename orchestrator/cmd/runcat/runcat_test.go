@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"os"
 	"path/filepath"
 	"testing"
@@ -36,5 +37,34 @@ func TestCatFileFailsOnCrcMismatch(t *testing.T) {
 
 	if err := catFile(path); err == nil {
 		t.Fatalf("catFile returned nil on a CRC mismatch (runcat would exit 0)")
+	}
+}
+
+// TestCatFileFailsOnShortBody proves a body that ends inside a record is an
+// error even when its checksum is consistent: the seed's last count byte is
+// cut and the trailer recomputed over the shortened body.
+func TestCatFileFailsOnShortBody(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "seed_h3.bin")
+	if err := orchestrator.WriteSeedPolyrun(path, "test", 3, 8); err != nil {
+		t.Fatal(err)
+	}
+	_, bodyOff, err := orchestrator.ParseHeader(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := data[bodyOff : len(data)-9]
+	short := append(append([]byte{}, data[:bodyOff]...), body...)
+	short = binary.LittleEndian.AppendUint64(short, orchestrator.Fnv1a64(body))
+	if err := os.WriteFile(path, short, 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := catFile(path); err == nil {
+		t.Fatalf("catFile returned nil on a body that ends inside a record")
 	}
 }
