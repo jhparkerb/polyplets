@@ -1068,8 +1068,8 @@ class RunFileReader {
     return saw_polyrun && byteorder_ok && counter_ok;
   }
 
-  // A missing trailer or a checksum mismatch on a full read is corruption, so
-  // it stops the program like failShort does.
+  // A missing trailer, a checksum mismatch or bytes after the trailer on a
+  // full read is corruption, so it stops the program like failShort does.
   void verifyCRC() {
     if (!fp_) return;
     uint8_t stored[8];
@@ -1085,6 +1085,11 @@ class RunFileReader {
       std::fprintf(stderr,
                    "RunFileReader: CRC mismatch in %s (computed %016llx, stored %016llx)\n",
                    path_.c_str(), (unsigned long long)crc_, (unsigned long long)stored_crc);
+      std::exit(1);
+    }
+    uint8_t extra;
+    if (rawRead(&extra, 1)) {
+      std::fprintf(stderr, "RunFileReader: bytes after the CRC trailer in %s\n", path_.c_str());
       std::exit(1);
     }
   }

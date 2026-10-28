@@ -689,6 +689,22 @@ static void testBodyChecksumMismatchAborts() {
   std::remove((std::string(kCrcPath) + ".idx").c_str());
 }
 
+// Bytes after the checksum trailer mean the file is not what the writer
+// finished, so a full read must stop the program.
+static void testBytesAfterTrailerAbort() {
+  writeRun(kCrcPath, 3, 100);
+  assert(runInChild(readAllCrc) == 0 && "control: an intact file must read to the end");
+  {
+    FILE* f = std::fopen(kCrcPath, "ab");
+    assert(f);
+    std::fputc(0, f);
+    std::fclose(f);
+  }
+  assert(runInChild(readAllCrc) != 0 && "a byte after the trailer must stop the program");
+  std::remove(kCrcPath);
+  std::remove((std::string(kCrcPath) + ".idx").c_str());
+}
+
 // A count that wraps the counter word, or a combined window past the byte
 // range of lo/len, must stop the program: either would otherwise be a wrong
 // number with no other sign. The checks are explicit (core/run.h addCount),
@@ -793,6 +809,7 @@ int main() {
   testOversizeKeyLenRefused();
   testCombineOverflowAborts();  // the children print their abort messages
   testBodyChecksumMismatchAborts();
+  testBytesAfterTrailerAbort();
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }
