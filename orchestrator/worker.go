@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -176,7 +177,9 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 	// Stream stdout live: event=progress lines feed onProgress and are NOT
 	// retained; everything else (tri rows, event=done) is collected for parsing.
 	var lines []string
+	sawDone := false
 	sc := bufio.NewScanner(stdout)
+	sc.Buffer(make([]byte, 0, 64*1024), 16*1024*1024) // as the persistent pool
 	for sc.Scan() {
 		line := sc.Text()
 		if onProgress != nil && strings.HasPrefix(line, "event=progress") {
@@ -185,7 +188,14 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 			}
 			continue
 		}
+		if strings.HasPrefix(line, "event=done") {
+			sawDone = true
+		}
 		lines = append(lines, line)
+	}
+	scanErr := sc.Err()
+	if scanErr != nil {
+		_, _ = io.Copy(io.Discard, stdout) // let the worker finish writing, so Wait returns
 	}
 
 	err = cmd.Wait()
@@ -195,6 +205,15 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 			return WorkerResult{}, fmt.Errorf("%s: %w: %s", filepath.Base(binary), err, diag)
 		}
 		return WorkerResult{}, fmt.Errorf("%s: %w", filepath.Base(binary), err)
+	}
+	// An unread tail or a missing done line means the output is incomplete:
+	// parsed anyway, its OutRecords would read 0 and the unit's output would
+	// be deleted as empty. Same contract as workerProc.runRequest.
+	if scanErr != nil {
+		return WorkerResult{}, fmt.Errorf("%s: reading stdout: %w", filepath.Base(binary), scanErr)
+	}
+	if !sawDone {
+		return WorkerResult{}, fmt.Errorf("%s: exited without event=done", filepath.Base(binary))
 	}
 
 	result, perr := ParseWorkerOutput(lines)

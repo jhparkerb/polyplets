@@ -1,10 +1,11 @@
 package orchestrator
 
-// guard_test.go — refuse-at-start guards (BUGS-OF-SHAME cat 2): an invalid
-// config must fail loudly at the start of Run, not silently miscount.
+// guard_test.go — guards that must fail loudly rather than miscount: an
+// invalid config at the start of Run, and a worker whose output is incomplete.
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -181,5 +182,29 @@ func TestRejectZeroCores(t *testing.T) {
 	_, err := Run(context.Background(), cfg, nil)
 	if err == nil {
 		t.Fatalf("Run(Cores=0) returned nil error (silent undercount); want a refuse-at-start error")
+	}
+}
+
+// TestRunWorkerRequiresDoneLine: a one-shot worker that exits 0 without its
+// event=done line has an incomplete stdout. Read as a result, its OutRecords
+// would be 0 and mapPhase would delete its output as empty: an undercount
+// with no error. runWorker must refuse it, as the persistent pool does.
+func TestRunWorkerRequiresDoneLine(t *testing.T) {
+	dir := t.TempDir()
+	fake := filepath.Join(dir, "fake_worker")
+	script := "#!/bin/sh\necho 'tri 3 4 7'\nexit 0\n"
+	if err := os.WriteFile(fake, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := runWorker(context.Background(), fake, nil, nil, nil); err == nil {
+		t.Fatalf("runWorker accepted output with no event=done line")
+	}
+	good := filepath.Join(dir, "good_worker")
+	script = "#!/bin/sh\necho 'tri 3 4 7'\necho 'event=done cpu_s=0 wall_s=0 peak_rss_mb=0 records=1 spill_bytes=0 stop_key='\n"
+	if err := os.WriteFile(good, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := runWorker(context.Background(), good, nil, nil, nil); err != nil {
+		t.Fatalf("control: complete worker output rejected: %v", err)
 	}
 }
