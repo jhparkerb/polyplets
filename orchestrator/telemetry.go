@@ -145,11 +145,10 @@ func (t *telemetry) observe(c ColumnCost) {
 
 // observeRound emits one per-round cost line for the kink kernel, where a
 // column is H+2 map+merge rounds (seed, H stage rounds, finalize) rather than
-// the column kernel's single round. The aggregate ColumnCost row folds all of
-// them together, hiding WHICH round carries the merge-barrier wall the
-// persistent-worker rearchitecture targets; this breaks it out per round.
-// Stdout-only (event=kink_round) — it does NOT touch cost_profile.tsv, whose
-// schema the a-priori predictor reads, so it is pure observability. Nil-safe.
+// the column kernel's single round. The aggregate ColumnCost row folds them
+// together and hides which round carries the wall time; this breaks it out.
+// Stdout only (event=kink_round): cost_profile.tsv, whose schema the a-priori
+// predictor reads, is untouched. Nil-safe.
 func (t *telemetry) observeRound(H, col int, round string, frontierIn uint64,
 	mapWall, mapCPU, mergeWall, mergeCPU float64, mapUnits, mergeRanges int) {
 	if t == nil {
@@ -164,8 +163,8 @@ func (t *telemetry) observeRound(H, col int, round string, frontierIn uint64,
 
 // effCores is cpu_s/wall_s (NOT divided by cores): "how many cores were busy
 // on average", so a value near cfg.Cores means full utilization and a value
-// well below it is the partitioning-artifact signature Even Keel targets.
-// Guards divide-by-zero (a zero-wall round, e.g. an empty column) to 0.
+// well below it means the work was split unevenly across workers. A zero-wall
+// round (an empty column, say) gives 0 rather than dividing by zero.
 func effCores(cpuS, wallS float64) float64 {
 	if wallS <= 0 {
 		return 0
@@ -298,11 +297,10 @@ func (t *telemetry) emitETA() {
 		doneFrac, etaRemain, etaAt.Format(time.RFC3339), correction)
 }
 
-// appendProfileRow appends one column's cost row — O(1) per column, vs the old
-// full rewrite which was O(cols²) over the run and held the lock longer (Profile
-// Rewrite). The header is written only when the file is empty, so a resumed run
-// extends the existing profile instead of truncating it to the post-resume cols.
-// Observability-only: a partial last line on a crash is harmless.
+// appendProfileRow appends one column's cost row. The header is written only
+// when the file is empty, so a resumed run extends the existing profile rather
+// than starting it over. Observability only: a partial last line after a crash
+// is harmless.
 func (t *telemetry) appendProfileRow(c ColumnCost) error {
 	f, err := os.OpenFile(t.outPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {

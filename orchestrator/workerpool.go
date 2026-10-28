@@ -62,17 +62,15 @@ func startPersistentWorker(ctx context.Context, binary string) (*workerProc, err
 // event=done line, mirroring runWorker's per-invocation scanning contract
 // exactly (event=progress lines feed onProgress and are dropped, everything
 // else -- tri rows, event=done -- is collected for ParseWorkerOutput).
-// stop, if non-nil, SIGTERMs the underlying process for cooperative early
-// stop (work-stealing) -- same mechanism as the one-shot path, just aimed
-// at a long-lived process instead of a fresh one; the watcher is scoped to
-// this one request so it can't fire against a LATER request reusing the
-// same slot.
+// stop, if non-nil, SIGTERMs the process for a cooperative early stop
+// (work-stealing), as on the one-shot path. The watcher ends with this
+// request; should its signal still land during a later request on the same
+// slot, that request stops early and reports a stop key, and both call
+// sites in sweep.go requeue the remainder of any result carrying one, so the
+// cost is repeated work, never a lost range.
 func (w *workerProc) runRequest(requestLine string, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
-	// Two writes, not one requestLine+"\n" concatenation: the "\n" is a
-	// static string literal (zero allocation), while "+" would allocate a
-	// fresh copy of the whole line just to append one byte -- real cost at
-	// this call frequency (once per work unit), found via a real heap-alloc
-	// profile with --persistent-workers enabled.
+	// Two writes rather than requestLine+"\n", which would copy the whole
+	// line once per work unit to append one byte (seen in a heap profile).
 	if _, err := io.WriteString(w.stdin, requestLine); err != nil {
 		return WorkerResult{}, fmt.Errorf("write request: %w", err)
 	}
@@ -173,8 +171,8 @@ type slot struct {
 }
 
 // WorkerPool manages `size` persistent-worker slots shared across the
-// entire Run() call (all heights, all columns, all rounds) -- the same
-// scope the old Cores-wide `sem` channel had.
+// entire Run() call (all heights, all columns, all rounds), the same scope
+// as the Cores-wide `sem` channel the one-shot path uses.
 type WorkerPool struct {
 	ctx   context.Context
 	slots chan *slot
@@ -193,8 +191,8 @@ func NewWorkerPool(ctx context.Context, bin WorkerBin, size int) *WorkerPool {
 	return p
 }
 
-// checkout blocks until a slot is available (the pool's own concurrency
-// gate -- replaces the old Cores-wide `sem <- struct{}{}`).
+// checkout blocks until a slot is available; with a pool, this takes the
+// place of `sem` as the concurrency limit.
 func (p *WorkerPool) checkout() *slot {
 	return <-p.slots
 }
@@ -204,7 +202,7 @@ func (p *WorkerPool) checkin(s *slot) {
 
 // RunMap sends one map_worker request to a pooled persistent process
 // (lazily starting it on this slot if not already running), blocking until
-// a slot is free. Same signature/semantics as the old RunMapWorker.
+// a slot is free. Same contract as RunMapWorker.
 func (p *WorkerPool) RunMap(a MapArgs, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	s := p.checkout()
 	defer p.checkin(s)
@@ -219,8 +217,7 @@ func (p *WorkerPool) RunMap(a MapArgs, onProgress func(uint64), stop <-chan stru
 }
 
 // RunMerge sends one merge_worker request to a pooled persistent process.
-// Same signature/semantics as the old RunMergeWorker, now with the same
-// work-stealing onProgress/stop contract as RunMap.
+// Same contract as RunMergeWorker.
 func (p *WorkerPool) RunMerge(a MergeArgs, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	s := p.checkout()
 	defer p.checkin(s)
