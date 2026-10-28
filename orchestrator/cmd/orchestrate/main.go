@@ -1,20 +1,12 @@
 // main.go — orchestrate CLI entry point.
 //
-// Usage:
+// orchestrate -h lists every flag; scripts/term.sh shows the production
+// invocation. Two quick checks:
 //
-//	orchestrate [--maxn N] [--fold] [--cores N] [--ram BYTES]
-//	            [--run-dir DIR] [--spill-dir DIR] [--checkpoint PATH]
-//	            [--checkpoint-every SECS] [--resume] [--compare]
-//	            [--workers-dir DIR]
+//	orchestrate --kernel kink --maxn 16 --compare    # a(1..16) against fixtures/b006770.txt
+//	orchestrate --maxn 16 --compare                  # the same with the column kernel
 //
-// Parallel == serial check:
-//
-//	orchestrate --maxn 16 --compare
-//
-// Kill+resume check:
-//
-//	orchestrate --maxn 16 --compare   # kill with SIGTERM mid-run
-//	orchestrate --maxn 16 --resume --compare  # resumes from checkpoint
+// SIGTERM or SIGINT writes a checkpoint and stops; --resume continues from it.
 package main
 
 import (
@@ -52,7 +44,7 @@ func main() {
 	}
 
 	maxn := flag.Int("maxn", 16, "max cell count")
-	fold := flag.Bool("fold", true, "R1 vertical-mirror fold")
+	fold := flag.Bool("fold", true, "fold each state with its vertical mirror (halves the frontier)")
 	cores := flag.Int("cores", runtime.NumCPU(), "max parallel workers")
 	// Scheduling knob DEFAULTS are the validated production values (the
 	// utilization work: docs/engine-record.md). A bare
@@ -83,6 +75,10 @@ func main() {
 	maxDiagK := flag.Int("max-diag-k", -1, "cap on wired diagonal closed-forms: -1 (default) = no cap, all wired diagonals dispatch; 0 = NO diagonal injection at all (every strip is really swept); k = cap at that k. Set to k-1 to force the H=maxn-k strip back to a REAL column sweep, e.g. 16 at maxn=37 sweeps H20 for real (the strict route; the swept T(37,20) is P_17's first independent holdout). Stamped into the checkpoint: a resumed run must pass the same value")
 	flag.Parse()
 
+	if *maxn < 1 {
+		fmt.Fprintf(os.Stderr, "orchestrate: --maxn must be >= 1, got %d\n", *maxn)
+		os.Exit(2)
+	}
 	if *kernel != "column" && *kernel != "kink" {
 		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column or kink, got %q\n", *kernel)
 		os.Exit(2)
@@ -104,8 +100,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
 		os.Exit(2)
 	}
-	// A2: belt-and-suspenders — the Go result pipeline is big.Int (unbounded)
-	// post-widening, so this only catches maxn past u128's exact range even
+	// Belt and braces: the Go result pipeline is big.Int (unbounded), so this
+	// only catches maxn past u128's exact range even
 	// when --counter itself isn't checked for some reason; CheckCounterWidth
 	// above is the primary, --counter-aware guard.
 	if err := orchestrator.CheckResultWidth(*maxn); err != nil {
