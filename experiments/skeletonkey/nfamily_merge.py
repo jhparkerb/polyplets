@@ -48,7 +48,7 @@ BANKED_N = {4: 8, 5: 19, 6: 43, 7: 101, 8: 239, 9: 575, 10: 1399, 11: 3441}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-ROWDIR = os.path.join(ROOT, "results", "cutcount_b1", "rows")
+ROWDIR = os.path.join(ROOT, "results", "coloring-recount", "rows")
 
 
 # ---------------------------------------------------------------- lattice bits

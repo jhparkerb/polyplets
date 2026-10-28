@@ -55,7 +55,7 @@ against the data in `results/`:
 
 | verifier | manuscript | reads |
 |---|---|---|
-| `verify_technical_report.py` | `technical-report.tex`: its tables and the numbers in its prose | `results/ns_a40/`, b-files, `results/holes_n18.txt`, `results/a41/`, `results/cutcount_b1/rows41/` |
+| `verify_technical_report.py` | `technical-report.tex`: its tables and the numbers in its prose | `results/ns_a40/`, b-files, `results/holes_n18.txt`, `results/a41/`, `results/coloring-recount/rows41/` |
 | `verify_l_papers.py` | L1, L3, L4, L6; not L5 or L8 | `results/strip_mu_certificates.log`, `results/triangle.txt`, `results/perimmin_square8_p48_r6.txt`, `results/perimdefect_square{4,8}_n78_k6.txt` |
 
 Each fails on a manuscript whose tables have drifted and carries a control

@@ -19,7 +19,7 @@ engine never decides connectivity.
 This is the mathematical content of the coloring recount, the second enumeration
 program (Tier 1 of `results/second-sources.md` §7), in closed form and proved as
 combinatorics. Ground truth for the rule is the source
-`results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256
+`results/coloring-recount/cutcount_b1.cpp.59e90660` (sha256
 `59e90660b42a0d94ceae5459287db35b4d93f87a5e62753ccd549235edaa8d3d`), lines
 93–173 — `slot`, `canon`, `gather`, `shifted`, `successors`; the core of
 `experiments/cutcount/cutcount_b1_probe.cpp` is byte-identical over those lines,
@@ -428,4 +428,4 @@ size suffice, and what is the minimal window?
 
 What this second method has confirmed, and why the engine's own self-checks
 were not enough (§3's corollary), is in `results/second-sources.md`; the
-source the model is a reading of is `results/cutcount_b1/`.
+source the model is a reading of is `results/coloring-recount/`.

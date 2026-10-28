@@ -1,4 +1,4 @@
-// motley_par.cpp — parallel color-symmetrized spin transfer matrix, the
+// coloring_recount.cpp — parallel color-symmetrized spin transfer matrix, the
 // coloring recount's engine.
 //
 // Same rule, same answer, more cores: the single-threaded engine spent
@@ -6,7 +6,7 @@
 //
 // The rule is frozen.  `slot`, `canon`, `gather`, `shifted` and `successors`
 // below are transcribed character for character from
-// `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256 59e90660...,
+// `results/coloring-recount/cutcount_b1.cpp.59e90660` (sha256 59e90660...,
 // lines 93-173), which is what `docs/proofs/cutcount-identity.md` proves and
 // what every banked C_H row was produced by.  Everything else in this file --
 // the table, the parallelism, the payload width, the checkpoint -- is
@@ -23,10 +23,10 @@
 //     cannot be interrupted is a defect (docs/job-checklist.md §5).
 //
 // Modes:
-//   motley_par --census <H> <Nmax> [--threads T] [--sizes-out FILE]
+//   coloring_recount --census <H> <Nmax> [--threads T] [--sizes-out FILE]
 //        reachable frontier states per cell-step; no payload.  --sizes-out
 //        writes them for a later --modp --sizes pass.
-//   motley_par --modp <H> <Nmax> <p> <outfile> [--threads T] [--ckpt DIR] [--sizes FILE]
+//   coloring_recount --modp <H> <Nmax> <p> <outfile> [--threads T] [--ckpt DIR] [--sizes FILE]
 //        C_H(n) mod p for n = 1..Nmax, "n value" lines, same format as
 //        cutcount_b1 --modp.  --sizes sizes every table exactly from a census
 //        pass, which lets consumed source rows be handed back to the OS.
@@ -412,7 +412,7 @@ static void census(int H, int Nmax) {
   if (!g_sizes_out.empty()) {
     FILE* f = fopen(g_sizes_out.c_str(), "w");
     if (!f) { perror(g_sizes_out.c_str()); std::exit(1); }
-    fprintf(f, "# motley_par sizes H=%d Nmax=%d steps=%zu\n", H, Nmax, g_sizes.size());
+    fprintf(f, "# coloring_recount sizes H=%d Nmax=%d steps=%zu\n", H, Nmax, g_sizes.size());
     for (size_t v : g_sizes) fprintf(f, "%zu\n", v);
     fclose(f);
     printf("sizes -> %s (%zu cell-steps)\n", g_sizes_out.c_str(), g_sizes.size());
@@ -429,7 +429,7 @@ static std::vector<size_t> load_sizes(const std::string& path, int H, int Nmax) 
   int hh = -1, nn = -1;
   size_t want = 0;
   if (!fgets(line, sizeof line, f) ||
-      sscanf(line, "# motley_par sizes H=%d Nmax=%d steps=%zu", &hh, &nn, &want) != 3 ||
+      sscanf(line, "# coloring_recount sizes H=%d Nmax=%d steps=%zu", &hh, &nn, &want) != 3 ||
       hh != H || nn != Nmax) {
     fprintf(stderr, "FATAL sizes_header %s (H=%d Nmax=%d)\n", path.c_str(), hh, nn);
     std::exit(4);
@@ -660,7 +660,7 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
 // ================================== main ====================================
 
 int main(int argc, char** argv) {
-  obs::Reporter rep("motley_par");
+  obs::Reporter rep("coloring_recount");
   g_rep = &rep;
   const char* ckptdir = nullptr;
   const char* sizesfile = nullptr;
@@ -697,8 +697,8 @@ int main(int argc, char** argv) {
     return 0;
   }
   fprintf(stderr,
-          "usage: motley_par --census <H> <Nmax> [--threads T] [--sizes-out FILE]\n"
-          "       motley_par --modp <H> <Nmax> <p> <out> [--threads T] [--ckpt DIR]\n"
+          "usage: coloring_recount --census <H> <Nmax> [--threads T] [--sizes-out FILE]\n"
+          "       coloring_recount --modp <H> <Nmax> <p> <out> [--threads T] [--ckpt DIR]\n"
           "                  [--sizes FILE]   exact table sizes from a census pass;\n"
           "                                   enables handing consumed rows back\n");
   return 1;

@@ -70,7 +70,7 @@ which programs have recomputed it. In summary: heights 1..10 (355 cells)
 match the fixed-height generating functions expanded to n = 40; heights
 1..14 match the strip transfer matrix (469 cells, `results/second-sources.md`;
 it shares the union-find rule in `core/transition.h`); heights 1..19 match
-the coloring recount (`results/cutcount_b1/`), which shares no code and
+the coloring recount (`results/coloring-recount/`), which shares no code and
 never decides connectivity; H = 20 is the standalone re-run above, the same
 program twice; H = 21 has one enumeration; heights 22..40 are closed forms
 P_0..P_18, each checked on an enumerated cell outside its fit. The mod-2

@@ -27,12 +27,12 @@ Source rules, each traceable to the note that establishes it:
                                        k = n-H <= 18, n >= 2k+1, H <= 21
                                                         second-sources.md
   M  the coloring recount, rule-independent
-                                       H <= MOTLEY_H    second-sources.md
+                                       H <= COLORING_H    second-sources.md
   F  P_k formula-derived cell, the formula itself holdout-validated elsewhere
                                        k <= 18, n >= 2k+1, H > 21
                                                         ns_a40/PROVENANCE.md
   U  below-onset tower pinned from the recount's own cells, agreeing with the
-     main transfer matrix               H > MOTLEY_H, measured per cell
+     main transfer matrix               H > COLORING_H, measured per cell
                                                         below-onset-fit.md,
                                                         experiments/below_onset_fit_ri.py
   C  subgroup mod-2/mod-4 congruence   every cell       symmetry-classes.md
@@ -89,7 +89,7 @@ def _reach_by_rowdir(nmax, root):
     """
     T = read_triangle(root / "results" / "triangle.txt")
     out = {}
-    for d in sorted((root / "results" / "cutcount_b1").glob("rows*")):
+    for d in sorted((root / "results" / "coloring-recount").glob("rows*")):
         if not d.is_dir():
             continue
         C, M = assemble_rows(d)
@@ -106,7 +106,7 @@ def _reach_by_rowdir(nmax, root):
     return out
 
 
-def motley_reach(nmax=None, root=None):
+def coloring_reach(nmax=None, root=None):
     """The greatest height the coloring recount covers, derived from the banked
     row sets and checked against the triangle (see _reach_by_rowdir), rather
     than a hand-edited constant that goes stale when a new row set lands."""
@@ -115,38 +115,38 @@ def motley_reach(nmax=None, root=None):
     return max(_reach_by_rowdir(nmax, root).values(), default=0)
 
 
-def motley_rowdir(nmax=None, root=None):
-    """The banked row set that achieves motley_reach()."""
+def coloring_rowdir(nmax=None, root=None):
+    """The banked row set that achieves coloring_reach()."""
     root = Path(root) if root else ROOT
     nmax = NMAX if nmax is None else nmax
     by = _reach_by_rowdir(nmax, root)
     return max(by, key=by.get) if by else None
 
 
-MOTLEY_H = motley_reach()
-MOTLEY_DIR = motley_rowdir()
+COLORING_H = coloring_reach()
+COLORING_DIR = coloring_rowdir()
 
 
 @functools.lru_cache(maxsize=None)
-def tower_cells(motley_h=None, rowdir=None, jmax=4):
+def tower_cells(coloring_h=None, rowdir=None, jmax=4):
     """The cells above the recount's reach that the below-onset tower pinned
     from the recount's cells reproduces exactly: experiments/below_onset_fit_ri.py,
     one tower per row with the row excluded from its own pinning set, levels
-    1..9 ab initio and the rest pinned from recount cells at H <= motley_h.
+    1..9 ab initio and the rest pinned from recount cells at H <= coloring_h.
     Only cells that agree with the main transfer matrix come back; a cell that
     disagrees makes below_onset_fit_ri fail on its own, and this refuses too rather
     than tag around it."""
-    motley_h = MOTLEY_H if motley_h is None else motley_h
-    rowdir = MOTLEY_DIR if rowdir is None else rowdir
-    if not motley_h or rowdir is None:
+    coloring_h = COLORING_H if coloring_h is None else coloring_h
+    rowdir = COLORING_DIR if rowdir is None else rowdir
+    if not coloring_h or rowdir is None:
         return set()
     sys.path.insert(0, str(ROOT / "experiments"))
     from below_onset_fit_ri import cover
     cells = set()
-    for r in cover(hmax=motley_h, jmax=jmax, rows=range(motley_h + 1, NMAX + 1),
+    for r in cover(hmax=coloring_h, jmax=jmax, rows=range(coloring_h + 1, NMAX + 1),
                    rowdir=str(rowdir)):
         if r["wrong"]:
-            raise SystemExit("provenance: the Motley-pinned tower disagrees with "
+            raise SystemExit("provenance: the tower pinned by the coloring recount disagrees with "
                              "the incumbent at %s" % r["wrong"])
         cells.update(r["agree"])
     return cells
@@ -179,20 +179,20 @@ EXPECTED = {
     # deliberately.  The H=18 rows took it from 11 to 6, retiring (36,18),
     # (37,18), (38,18), (39,18) and (40,18); the H=19 rows retired (38,19),
     # (39,19) and (40,19).  What is left is (39,20), (40,20), (40,21).
-    "congruence_only_cells": (3, "results/cutcount_b1/rows41/README.md; "
-                                 "Motley at H<=%d, derived from the banked "
-                                 "row sets" % MOTLEY_H),
+    "congruence_only_cells": (3, "results/coloring-recount/rows41/README.md; "
+                                 "the coloring recount at H<=%d, derived from the banked "
+                                 "row sets" % COLORING_H),
     # Every cell with no exact recount -- the formula-only ones and the three
     # above -- is reproduced by the recount-pinned tower (tag U).  Pinned so that
     # a tower that stops reaching one of them, or a cell that stops agreeing,
     # fails here rather than dropping out of the table quietly.
     "tower_reproduced_unsourced": (192, "results/below-onset-fit.md; "
                                        "experiments/below_onset_fit_ri.py at H<=%d"
-                                       % MOTLEY_H),
+                                       % COLORING_H),
 }
 
 
-def sources(n, h, motley_h=MOTLEY_H):
+def sources(n, h, coloring_h=COLORING_H):
     """The corroborating sources for one cell, by the rules in the docstring."""
     out = set()
     if n <= 22:
@@ -206,20 +206,20 @@ def sources(n, h, motley_h=MOTLEY_H):
     k = n - h
     if k <= PK_KMAX and n >= 2 * k + 1:
         out.add("P" if h <= SWEEP_H else "F")
-    if h <= motley_h:
+    if h <= coloring_h:
         out.add("M")
-    if motley_h == MOTLEY_H and (n, h) in tower_cells():
+    if coloring_h == COLORING_H and (n, h) in tower_cells():
         out.add("U")                 # measured at this reach only, not a rule
     out.add("C")
     return out
 
 
-def analyze(T, motley_h=MOTLEY_H):
+def analyze(T, coloring_h=COLORING_H):
     cells = sorted(T)
     a = {}
     for (n, h), v in T.items():
         a[n] = a.get(n, 0) + v
-    src = {c: sources(*c, motley_h=motley_h) for c in cells}
+    src = {c: sources(*c, coloring_h=coloring_h) for c in cells}
     # C is congruence-level, F and U are formula-level; none is an exact recount.
     exact = {c: (s - {"C", "F", "U"}) for c, s in src.items()}
     stats = {
@@ -305,13 +305,13 @@ def render_table(T, a, src, exact, stats):
              "k <= 18, n >= 2k+1, H > %d | formula-level |" % SWEEP_H)
     L.append("| M | the coloring recount, a second enumerator that counts by "
              "coloring cells and never decides connectivity | H <= %d | "
-             "full |" % MOTLEY_H)
+             "full |" % COLORING_H)
     L.append("| U | the closed forms of `docs/proofs/diagonal-law.md` with "
              "their constants fixed from the coloring recount's own entries "
              "| H > %d, rows %d-%d, measured per entry | formula-level: "
              "shares the depth tables with P and F; agrees with the main "
              "computation at every tagged entry |"
-             % (MOTLEY_H, MOTLEY_H + 1, NMAX))
+             % (COLORING_H, COLORING_H + 1, NMAX))
     L.append("| C | subgroup mod-2/mod-4 | every cell | congruence only |")
     L.append("\n## Coverage\n")
     L.append("- cells: **%d**; strip covers **%d**; fixed-height GFs **%d**"
@@ -368,17 +368,17 @@ def stale_file(text, path=None):
 
 def selftest(T):
     """RED control: a corrupted rule must be caught."""
-    a, src, exact, stats = analyze(T, motley_h=MOTLEY_H)
+    a, src, exact, stats = analyze(T, coloring_h=COLORING_H)
     bad = check(stats, verbose=False)
     if bad:
         print("SELFTEST FAILED: clean run should pass:", bad)
         return 1
     # RED: widening the recount's reach by one height must change the pinned
     # count of congruence-only cells (a cell count is what the table asserts).
-    _, _, _, stats2 = analyze(T, motley_h=MOTLEY_H + 1)
+    _, _, _, stats2 = analyze(T, coloring_h=COLORING_H + 1)
     if not check(stats2, verbose=False):
-        print("SELFTEST FAILED: Motley at H=%d left the pinned cell count "
-              "unchanged" % (MOTLEY_H + 1))
+        print("SELFTEST FAILED: the coloring recount at H=%d left the pinned cell count "
+              "unchanged" % (COLORING_H + 1))
         return 1
     # RED 2: a corrupt banked row must SHRINK the derived reach, not be
     # credited for existing.  Stage a copy of results/ with one digit of
@@ -389,19 +389,19 @@ def selftest(T):
         root = Path(d)
         (root / "results").mkdir()
         shutil.copy(TRIANGLE, root / "results" / "triangle.txt")
-        shutil.copytree(ROOT / "results" / "cutcount_b1" / "rows",
-                        root / "results" / "cutcount_b1" / "rows")
-        shutil.copytree(ROOT / "results" / "cutcount_b1" / "rows41",
-                        root / "results" / "cutcount_b1" / "rows41")
-        p = root / "results" / "cutcount_b1" / "rows41" / "C19.out"
+        shutil.copytree(ROOT / "results" / "coloring-recount" / "rows",
+                        root / "results" / "coloring-recount" / "rows")
+        shutil.copytree(ROOT / "results" / "coloring-recount" / "rows41",
+                        root / "results" / "coloring-recount" / "rows41")
+        p = root / "results" / "coloring-recount" / "rows41" / "C19.out"
         lines = p.read_text().splitlines()
         n, v = lines[-2].split()                 # n = 40: a cell the triangle has
         lines[-2] = "%s %d" % (n, int(v) + 1)
         p.write_text("\n".join(lines) + "\n")
-        got = motley_reach(root=root)
-        if got >= MOTLEY_H:
+        got = coloring_reach(root=root)
+        if got >= COLORING_H:
             print("SELFTEST FAILED: a corrupted rows41/C19.out still credits "
-                  "Motley with H=%d" % got)
+                  "the coloring recount with H=%d" % got)
             return 1
     # RED 3: a tower cell that stops agreeing must refuse, not drop out of U.
     # A canned record stands in for the 21 towers; the refusal path is the same.
@@ -433,9 +433,9 @@ def selftest(T):
         if stale_file(text, p) is not None:
             print("SELFTEST FAILED: an exact regeneration was called stale")
             return 1
-    print("selftest ok: a one-height change in Motley's reach moves the "
+    print("selftest ok: a one-height change in the coloring recount's reach moves the "
           "pinned count; a corrupt banked row shrinks the derived reach "
-          "(%d -> %d); a disagreeing tower cell refuses" % (MOTLEY_H, got))
+          "(%d -> %d); a disagreeing tower cell refuses" % (COLORING_H, got))
     return 0
 
 

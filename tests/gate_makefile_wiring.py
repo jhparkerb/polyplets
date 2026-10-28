@@ -70,7 +70,7 @@ EXCUSED_SCRIPTS = {
         "campaign, run by hand on a specific box against a specific build. Kept "
         "as the campaign's run record",
     "scripts/lastditch/gate_sizes_wrap.sh":
-        "not a gate -- the argv wrapper that hands gate-motley-par a census "
+        "not a gate -- the argv wrapper that hands gate-coloring-recount a census "
         "sizes file so it exercises the release path. It is invoked BY that "
         "gate's command line, not by the Makefile",
     "scripts/profile_gates.sh":

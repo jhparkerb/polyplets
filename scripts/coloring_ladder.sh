@@ -1,9 +1,9 @@
 #!/bin/bash
-# Motley heights HMIN..HMAX at one Nmax, with the parallel engine.
+# the coloring recount heights HMIN..HMAX at one Nmax, with the parallel engine.
 #
 # PURPOSE.  T(n,H) = C_H - 2 C_{H-1} + C_{H-2} needs EVERY C_H up to the top
 # height, so a row is only rule-independent once the whole ladder has been run
-# at that Nmax.  Motley's banked rows (results/cutcount_b1/rows/) all stop at
+# at that Nmax.  the coloring recount's banked rows (results/coloring-recount/rows/) all stop at
 # n = 40, which is why a(41) has no second rule under it: heights 1..19 come
 # from the kink engine alone and the tower supplies the rest.
 #
@@ -42,17 +42,17 @@
 # and each pass checkpoints at every column boundary.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BIN=${MOTLEY_BIN:-$ROOT/build/motley_par}
-OUT=${MOTLEY_OUT:-$HOME/var/motley-ladder}
-NMAX=${MOTLEY_NMAX:-41}
-HMIN=${MOTLEY_HMIN:-1}
-HMAX=${MOTLEY_HMAX:-19}
-THREADS=${MOTLEY_THREADS:-$(nproc)}
-read -r -a PRIMES <<< "${MOTLEY_PRIMES:-65521 65519 65497 65479 65449 65447 65437 65423 65413}"
+BIN=${COLORING_BIN:-$ROOT/build/coloring_recount}
+OUT=${COLORING_OUT:-$HOME/var/motley-ladder}
+NMAX=${COLORING_NMAX:-41}
+HMIN=${COLORING_HMIN:-1}
+HMAX=${COLORING_HMAX:-19}
+THREADS=${COLORING_THREADS:-$(nproc)}
+read -r -a PRIMES <<< "${COLORING_PRIMES:-65521 65519 65497 65479 65449 65447 65437 65423 65413}"
 
-[ -x "$BIN" ] || { echo "no engine at $BIN -- make build/motley_par" >&2; exit 1; }
+[ -x "$BIN" ] || { echo "no engine at $BIN -- make build/coloring_recount" >&2; exit 1; }
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"
-echo "=== motley ladder H=$HMIN..$HMAX Nmax=$NMAX threads=$THREADS: $(date -Iseconds) ==="
+echo "=== coloring ladder H=$HMIN..$HMAX Nmax=$NMAX threads=$THREADS: $(date -Iseconds) ==="
 echo "=== engine $($BIN 2>&1 | head -1) ==="
 
 # Tallest first: it is the one that can fail on RAM, and finding that out after

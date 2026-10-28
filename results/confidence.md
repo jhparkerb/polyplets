@@ -51,7 +51,7 @@ king connectivity (`results/second-sources.md`).
 weighted by their number of connected components and reads the connected
 count off a coefficient. It never decides connectivity. Every entry with
 H ≤ 19 and n ≤ 40 agrees with the main program, as do the 19 entries of row 41
-at those heights (`results/cutcount_b1/PROVENANCE.md`).
+at those heights (`results/coloring-recount/PROVENANCE.md`).
 
 **Withheld entries.** Each closed form was fitted on earlier terms and then
 compared with an entry enumerated later: P_15, P_16, P_17 and P_18 predicted

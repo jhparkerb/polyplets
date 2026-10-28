@@ -7,7 +7,7 @@ reads it inherits the incumbent's connectivity rule. This one is built from:
   * Severance W1's ab-initio P_1..P_9 (cluster weights; matched the wired
     table coefficient for coefficient, results/below-onset.md) --
     also the only way to start, since level 1's depth-2 cell would be T(1,0);
-  * MOTLEY's own banked C_H rows, telescoped T = C_H - 2C_{H-1} + C_{H-2},
+  * the coloring recount's own banked C_H rows, telescoped T = C_H - 2C_{H-1} + C_{H-2},
     for the higher levels -- a different rule, proved in
     docs/proofs/cutcount-identity.md;
   * the ab-initio depth defects D_j(k) of Severance W3, which read neither
@@ -15,7 +15,7 @@ reads it inherits the incumbent's connectivity rule. This one is built from:
   * the product form, a Lean-complete theorem.
 
 Each row is answered with a tower that EXCLUDES that row from its own pinning
-set, so no cell is ever predicted from itself. Motley covers H <= hmax, the
+set, so no cell is ever predicted from itself. the coloring recount covers H <= hmax, the
 tower covers H > hmax, and the report says which heights neither reaches.
 
 Usage:
@@ -37,7 +37,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 from below_onset_fit import (all_pairs, product_form, load_depths, padd, ptrim,  # noqa: E402
-                          peval, pin_level, pow3, read_tri_motley)
+                          peval, pin_level, pow3, read_tri_coloring)
 from slope2_law_vs_truth import read_tri                                   # noqa: E402
 
 W1_ABINITIO = 9
@@ -81,7 +81,7 @@ def known_a():
 
 
 def build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row):
-    """Levels 1..kcap; W1 below, Motley-pinned above, `forbid_row` untouchable."""
+    """Levels 1..kcap; W1 below, pinned by the coloring recount above, `forbid_row` untouchable."""
     ab = dict(AB0)
     reached = W1_ABINITIO
     for k in range(W1_ABINITIO + 1, kcap + 1):
@@ -91,17 +91,17 @@ def build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row):
             break
         sols = {d: pin_level(k, dict(ab), d, mtri, Dj) for d in pairs}
         if len(set(sols.values())) != 1:
-            raise SystemExit(f"level k={k}: Motley depth pairs DISAGREE")
+            raise SystemExit(f"level k={k}: the coloring recount depth pairs DISAGREE")
         ab[k] = next(iter(sols.values()))
         reached = k
     return ab, reached
 
 
 def cover(hmax=18, jmax=4, rows=(40,), rowdir=None):
-    """Per row: how Motley (H <= hmax) and the Motley-pinned tower (H > hmax)
+    """Per row: how the coloring recount (H <= hmax) and the tower pinned by the coloring recount (H > hmax)
     cover it, and whether the tower agrees with the incumbent where it can.
 
-    Returns one dict per row: row, mot (Motley heights), tower (tower heights),
+    Returns one dict per row: row, mot (the coloring recount heights), tower (tower heights),
     agree (tower cells equal to the incumbent, as (row, H)), wrong (tower cells
     that differ), gap (heights neither reaches), reached (top pinned level),
     total (the row sum, or None), status in
@@ -109,11 +109,11 @@ def cover(hmax=18, jmax=4, rows=(40,), rowdir=None):
       NEW     complete, no banked a(row) to compare against
       WRONG   complete, sum differs from the banked a(row)
       GAP     some height covered by neither
-      SKIP    Motley has no cells for this row at all
-    scripts/provenance_table.py reads `agree` to tag the tower-from-Motley
+      SKIP    the coloring recount has no cells for this row at all
+    scripts/provenance_table.py reads `agree` to tag the tower-from-coloring-recount
     cells; main() prints the report and exits non-zero on wrong or WRONG."""
     global AB0
-    mtri, inc, A = read_tri_motley(rowdir), read_tri(), known_a()
+    mtri, inc, A = read_tri_coloring(rowdir), read_tri(), known_a()
     AB0 = abinitio_levels()
     kcap = hmax + jmax - 2
     Dj = load_depths(jmax, kcap + 1)
@@ -163,12 +163,12 @@ def main():
     hmax = int(opt("--hmax", 18))
     jmax = int(opt("--jmax", 4))
     rows = [int(x) for x in opt("--rows", "40").split(",") if x]
-    # --rowdir: which Motley C_H rows to telescope.  The banked
-    # results/cutcount_b1/rows/ stop at n = 40; a ladder run at a higher Nmax
+    # --rowdir: which the coloring recount C_H rows to telescope.  The banked
+    # results/coloring-recount/rows/ stop at n = 40; a ladder run at a higher Nmax
     # writes its own set, and row 41 can only be answered from those.
     rowdir = opt("--rowdir", None)
     recs = cover(hmax, jmax, rows, rowdir)
-    print(f"Motley triangle H <= {recs[0]['mtri_top']}; depths j <= {jmax}; "
+    print(f"the coloring recount triangle H <= {recs[0]['mtri_top']}; depths j <= {jmax}; "
           f"levels 1..{W1_ABINITIO} ab initio")
     red = False
     for r in recs:
@@ -176,22 +176,22 @@ def main():
         for n, H in r["wrong"]:
             print(f"    MISMATCH T({n},{H}) k={n-H}")
         if r["status"] == "SKIP":
-            print(f"row {row:2d}: Motley has no cells for this row "
+            print(f"row {row:2d}: the coloring recount has no cells for this row "
                   f"(its C rows stop at Nmax) -- skipped")
             continue
-        # Rows at or below hmax are covered by Motley outright: the tower band
+        # Rows at or below hmax are covered by the coloring recount outright: the tower band
         # is empty and there is nothing for it to do.  Reporting them as a
-        # crash (min() of an empty band) meant the pure-Motley rows were
+        # crash (min() of an empty band) meant the coloring-recount-only rows were
         # claimed and never attested -- Lane A, S-A3.
         tag = {"MATCH": "COMPLETE, sum MATCHES a(%d)" % row,
                "NEW": "COMPLETE, a(%d) = %s" % (row, r["total"]),
                "WRONG": "COMPLETE but sum WRONG",
                "GAP": "GAP %s" % r["gap"]}[r["status"]]
         if not tower_h and len(mot) == row:
-            print(f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells), "
+            print(f"row {row:2d}: the coloring recount H<={max(mot):2d} ({len(mot)} cells), "
                   f"tower not needed -- {tag}")
         else:
-            print(f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells) + "
+            print(f"row {row:2d}: the coloring recount H<={max(mot):2d} ({len(mot)} cells) + "
                   f"tower H>={min(tower_h)} ({len(tower_h)} cells), "
                   f"levels to k={r['reached']}, {len(r['agree'])} agree with "
                   f"the incumbent, {len(r['wrong'])} wrong -- {tag}")

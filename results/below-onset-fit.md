@@ -29,12 +29,12 @@ altogether, and depths 8 and 9.
   `orchestrator/sweep.go` holds P_k for k <= 19, each fitted from two entries;
   the a(40) run wrote formula values for heights H >= 22 instead of
   enumerating them (`results/ns_a40/PROVENANCE.md`).
-- **The coloring recount** (`cpp/motley_par.cpp`, records in
-  `results/cutcount_b1/`) counts C_H(n) by coloring and never decides
+- **The coloring recount** (`cpp/coloring_recount.cpp`, records in
+  `results/coloring-recount/`) counts C_H(n) by coloring and never decides
   connectivity. T(n,H) = C_H(n) - 2 C_{H-1}(n) + C_{H-2}(n)
   (`docs/proofs/cutcount-identity.md`). It covers H <= 18 at n <= 40
-  (`results/cutcount_b1/rows/`) and H <= 19 at n <= 41
-  (`results/cutcount_b1/rows41/`). A value derived with no input from the main
+  (`results/coloring-recount/rows/`) and H <= 19 at n <= 41
+  (`results/coloring-recount/rows41/`). A value derived with no input from the main
   program is called rule-independent, because the coloring recount never
   decides connectivity at all.
 - **The strip engine** is a third program covering H <= 14 at n <= 40
@@ -174,9 +174,9 @@ main program.
 
 | rows from | hmax | rows | result |
 |---|---|---|---|
-| `results/cutcount_b1/rows/` | 18 | 19..39 | complete; every entry agrees; every sum matches a(n) |
+| `results/coloring-recount/rows/` | 18 | 19..39 | complete; every entry agrees; every sum matches a(n) |
 | same | 18 | 40 | complete except T(40,19) |
-| `results/cutcount_b1/rows41/` | 19 | 39, 40 | complete; sums match |
+| `results/coloring-recount/rows41/` | 19 | 39, 40 | complete; sums match |
 | same | 19 | 41 | complete; a(41) as below |
 
 At hmax 18, level 20 is determined from the single pair (37,17), (38,18),
@@ -189,7 +189,7 @@ empty formula band); those rows reduce to the 720-entry agreement.
 T(40,19), the one entry of row 40 the assembly could not reach from H <= 18,
 was enumerated by the coloring recount in its run at maximum size 41 (nine
 primes per height, one held back to predict every entry, about 22 hours;
-`results/cutcount_b1/rows41/README.md`):
+`results/coloring-recount/rows41/README.md`):
 
     T(40,19) = 3247572468599336484342102174163
 
@@ -636,7 +636,7 @@ and these five integers are its target.
     python3 experiments/below_onset_fit.py --predict
     python3 experiments/below_onset_fit.py --selftest
     python3 experiments/below_onset_fit_ri.py --hmax 18 --jmax 4
-    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/cutcount_b1/rows41 --rows 39,40,41
+    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/coloring-recount/rows41 --rows 39,40,41
     python3 experiments/below_onset_fit_a41.py --jmax 5 --perheight results/a41
     python3 experiments/lane_b_a41_recount.py
     make gate-below-onset-fit-pairs gate-below-onset-fit-congruence gate-severance-depth5

@@ -13,7 +13,7 @@ WHAT THIS DOES.  Every numeric literal of two or more digits in
 verifier is re-run.  A literal whose perturbation still passes is UNGUARDED --
 the paper prints it and no check reads it.  Measured 2026-08-23 at four or
 more digits: 199 of 200 guarded.  Widened 2026-09-05 to two or more, because
-the paper's scope claims are two-digit (Redelmeier to 22, Motley to H = 19,
+the paper's scope claims are two-digit (Redelmeier to 22, the coloring recount to H = 19,
 P_k to 19, holes to 18 and 14, 25^k/k!) and the verifier now reads each of
 them out of its sentence; and a letter before the digits no longer exempts
 them (\\g1480, A030233 and $k\\le19$ were all skipped by the old lookbehind).  The

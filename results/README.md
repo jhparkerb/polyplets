@@ -9,7 +9,7 @@
 | `ns_a20/` … `ns_a40/` | one directory per term: the run's per-height output and a `PROVENANCE.md` saying how it was produced and checked |
 | `a41/` | the a(41) computation and its `PROVENANCE.md` |
 | `redelmeier_row20/`, `redelmeier_row22/` | whole-term recounts by Redelmeier enumeration |
-| `cutcount_b1/`, `motley-par/` | the coloring recount (`cutcount_b1/PROVENANCE.md`) |
+| `coloring-recount/`, `coloring-recount/parallel/` | the coloring recount (`coloring-recount/PROVENANCE.md`) |
 | `subgroup_raw/`, `subgroup_counts.txt`, `percell_raw/` | symmetry-subgroup counts behind the mod-4 congruence |
 | `holes_*.txt`, `holes_perheight/` | polyplets counted by number of holes |
 | other `.txt` and `.log` files | data behind particular statements in the notes below, which cite them |

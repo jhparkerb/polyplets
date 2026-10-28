@@ -22,13 +22,13 @@ counts, with the checks that guard them and their Makefile rules.
 | run verifier | `verify/` | checks of the enumerator's run files |
 | Redelmeier enumerator | `cpp/g2_redelmeier.cpp` | whole rows n <= 22 |
 | strip transfer matrix | `cpp/strip_tm.cpp` | the 469 entries with H <= 14 |
-| coloring recount | `cpp/motley_par.cpp` | the entries with H <= 19 |
+| coloring recount | `cpp/coloring_recount.cpp` | the entries with H <= 19 |
 | symmetry counts | `cpp/sym/symcount_fast.cpp`, `cpp/sym/symtm.cpp`, `cpp/dmirror_spine.cpp` | a(n) mod 4, T(n,H) mod 2, the symmetry-class sequences |
 | shared | `cpp/obs.h`, `cpp/argparse.h` where these use it | |
-| checks | `tests/engine/`, and the `tests/gate_*.py` that run the programs above (`gate_kink_oracle`, `gate_g2`, `gate_motley_par`, `gate_sym`, `gate_symtm`, `gate_subgroup`, `gate_verify`), with `tests/common.py` | |
+| checks | `tests/engine/`, and the `tests/gate_*.py` that run the programs above (`gate_kink_oracle`, `gate_g2`, `gate_coloring_recount`, `gate_sym`, `gate_symtm`, `gate_subgroup`, `gate_verify`), with `tests/common.py` | |
 
 Found while scoping: `strip_tm` has no make target that runs it, and
-`gate-motley-par` is outside the automatic chain because of `-fopenmp`. Both
+`gate-coloring-recount` is outside the automatic chain because of `-fopenmp`. Both
 get a check that `make` runs.
 
 ## Out of scope
@@ -45,7 +45,7 @@ rewrite renames or removes.
 1. Before the first edit, record reference outputs from the unmodified code
    in `tests/reference/`: `scripts/term.sh 26` output, `g2 square8` through
    n = 14, the kink-oracle sums, the enumerator's T(n,H) for n <= 24,
-   `strip_tm` and `motley_par` entries at small heights, and the symmetry
+   `strip_tm` and `coloring_recount` entries at small heights, and the symmetry
    programs' counts at their gates' sizes. Each with the command that made it.
 2. One check, run by `make`, reproduces all of them and requires an exact
    match. It is seen failing on a planted change before it is trusted.

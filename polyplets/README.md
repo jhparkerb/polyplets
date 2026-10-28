@@ -66,7 +66,7 @@ a P_k. Their independent checks:
   transfer matrix on several machines and revisions:
   T(28,15) T(29,15) T(30,16) T(31,16) T(32,17) T(33,17) T(34,18) T(35,18)
   T(36,19) T(37,19) T(38,20). All but T(38,20) are also recounted by the
-  coloring recount, which reaches H ≤ 19 (`results/cutcount_b1/PROVENANCE.md`).
+  coloring recount, which reaches H ≤ 19 (`results/coloring-recount/PROVENANCE.md`).
 
 Level 19 is deliberately not determined: its two cells would be the top cells of
 the enumeration, no holdout exists, and no banked term uses it.

@@ -10,7 +10,7 @@
 # Target: ayr, 16 threads.  Predicted from the measured ladder (138 MB / 577 MB
 # / 1.54 GB at K=8/10/12): K=14 ~4 GB and ~15 min, K=16 ~11 GB and ~50 min,
 # both EXTRAPOLATED one and two steps.  Decision it changes: whether depth 5
-# is a launchable job at all, and therefore whether the "depth 5 or Motley
+# is a launchable job at all, and therefore whether the "depth 5 or the coloring recount
 # C_19" choice for closing T(40,19) has two options or one.
 # Kill: kill the PID in ~/var/emax4-k/pid.
 set -euo pipefail

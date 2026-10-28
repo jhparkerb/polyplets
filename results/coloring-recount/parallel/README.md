@@ -1,16 +1,16 @@
-# motley_par: the parallel coloring recount
+# coloring_recount: the parallel coloring recount
 
-Source `cpp/motley_par.cpp`, gate `tests/gate_motley_par.py`, 2026-08-20.
+Source `cpp/coloring_recount.cpp`, gate `tests/gate_coloring_recount.py`, 2026-08-20.
 Every number below is in a file in this directory.
 
-The original coloring program (`results/cutcount_b1/`) is single-threaded;
+The original coloring program (`results/coloring-recount/`) is single-threaded;
 its H = 18 run took 399,700 s of wall on one core of an 80-core machine.
-`motley_par` is the same counting rule on many cores.
+`coloring_recount` is the same counting rule on many cores.
 
 ## The rule is unchanged
 
 `slot`, `canon`, `gather`, `shifted` and `successors` are transcribed
-character for character from `results/cutcount_b1/cutcount_b1.cpp.59e90660`
+character for character from `results/coloring-recount/cutcount_b1.cpp.59e90660`
 lines 93-173, the rule that `docs/proofs/cutcount-identity.md` proves and
 that every stored `C_H` row was produced by. Everything else in the file is
 bookkeeping, and the gate is that the rows come out byte-identical.
@@ -38,7 +38,7 @@ bookkeeping, and the gate is that the rows come out byte-identical.
 | file | what |
 |---|---|
 | `serial-baseline.txt` | `cutcount_b1 --modp` single-thread, H = 10..14 |
-| `thread-scaling.txt` | `motley_par` at 1 / 8 / 32 / 80 threads, H = 13, 14 |
+| `thread-scaling.txt` | `coloring_recount` at 1 / 8 / 32 / 80 threads, H = 13, 14 |
 | `h18-reproduction.log` | ayr: all five stored H = 18 residue rows |
 | `h18-release-gate.log` | dalby: the release path against a stored row |
 | `sizes.H19.N40.txt` | the H = 19 census, 779 cell-steps |
@@ -88,10 +88,10 @@ had come in 34% under the measurement.
 
 ## Gate
 
-`tests/gate_motley_par.py` checks three things:
+`tests/gate_coloring_recount.py` checks three things:
 
 1. rule: every `C_H(n) mod p` against the stored exact rows
-   `results/cutcount_b1/rows/`, at three payload widths;
+   `results/coloring-recount/rows/`, at three payload widths;
 2. implementation: byte-identical to `cutcount_b1 --modp`;
 3. determinism: thread count changes no digit.
 

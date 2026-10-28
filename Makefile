@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-motley-par
+GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -106,7 +106,7 @@ else
   JOBS ?= $(shell nproc 2>/dev/null || echo 4)
 endif
 
-# The OpenMP build (build/motley_par). Apple clang rejects -fopenmp, so on
+# The OpenMP build (build/coloring_recount). Apple clang rejects -fopenmp, so on
 # Darwin use MacPorts clang (with the libomp port) when it is installed.
 ifeq ($(shell uname -s),Darwin)
   OMPCXX ?= $(shell command -v clang++-mp-20 2>/dev/null || command -v clang++-mp-19 2>/dev/null || echo $(CXX))
@@ -167,7 +167,7 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/strip_mu_kink build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker build/ns/combine \
-  build/strip_tm build/motley_par build/dmirror_spine \
+  build/strip_tm build/coloring_recount build/dmirror_spine \
   $(if $(GMP_LDFLAGS),build/convex_area_tm build/convex_perim_tm build/middle_kingdom_tm)
 
 # --- input gating -----------------------------------------------------------
@@ -206,7 +206,7 @@ DEPS_gate-p-paper-verifier  = $(PAPER_SRC) tests/gate_p_paper_verifier.py \
                               experiments/below_onset_fit_ri.py scripts/cutcount_assembly_gate.py \
                               orchestrator/sweep.go results/ns_a40/triangle.txt \
                               $(wildcard results/ns_a40/perheight/*) \
-                              $(wildcard results/cutcount_b1/rows41/*) \
+                              $(wildcard results/coloring-recount/rows41/*) \
                               results/redelmeier_row22/combined.txt \
                               results/subgroup_counts.txt results/maxhole.txt \
                               results/holes_n14.txt results/holes_n18.txt \
@@ -265,18 +265,18 @@ DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
                 tests/common.py scripts/g1_naive.py scripts/symcount.py $(FIXTURES)
 DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
-DEPS_gate-reference = build/g2 build/strip_tm build/motley_par \
+DEPS_gate-reference = build/g2 build/strip_tm build/coloring_recount \
                 build/symcount_fast build/symtm build/dmirror_spine \
                 build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
                 build/ns/combine scripts/term.sh tests/gate_reference.py \
                 tests/common.py $(wildcard tests/reference/*)
-DEPS_gate-motley-par = build/motley_par tests/gate_motley_par.py \
-                $(wildcard results/cutcount_b1/rows/*)
-DEPS_gate-motley-crt = scripts/motley_crt.py \
-                $(wildcard results/cutcount_b1/residues/*) \
-                results/cutcount_b1/rows/C18.out \
-                $(wildcard results/cutcount_b1/residues41/*) \
-                results/cutcount_b1/rows41/C19.out
+DEPS_gate-coloring-recount = build/coloring_recount tests/gate_coloring_recount.py \
+                $(wildcard results/coloring-recount/rows/*)
+DEPS_gate-coloring-crt = scripts/coloring_crt.py \
+                $(wildcard results/coloring-recount/residues/*) \
+                results/coloring-recount/rows/C18.out \
+                $(wildcard results/coloring-recount/residues41/*) \
+                results/coloring-recount/rows41/C19.out
 DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py tests/common.py
 DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
@@ -396,7 +396,7 @@ gate-residual-cells:
 
 # Gate CUTCOUNT-ASSEMBLY: the coloring recount's banked rows still make the
 # triangle, and the held-out prime still predicts.  T(n,H) = C_H - 2 C_{H-1} +
-# C_{H-2} over results/cutcount_b1/rows/, 567 cells H=1..18 against
+# C_{H-2} over results/coloring-recount/rows/, 567 cells H=1..18 against
 # results/triangle.txt; then C_18 reconstructed by CRT from four of the H=18
 # run's five primes, the fifth predicted (40/40) and the reconstruction tied
 # back to the banked exact row.  Coverage is pinned as well as agreement: a
@@ -491,11 +491,11 @@ gate-modp: build/tma build/tma_modp_test
 build/tma_modp_test: cpp/tma_modp_test.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread $< -o $@
 
-# Gate MOTLEY-CRT: scripts/motley_crt.py reconstructs C_18 from the banked
+# Gate COLORING-CRT: scripts/coloring_crt.py reconstructs C_18 from the banked
 # residues, requires it to equal the banked row exactly, and holds out a prime
 # as a control that must fail. Every input is tracked and it is 0.03 s.
-gate-motley-crt:
-	python3 scripts/motley_crt.py --selftest
+gate-coloring-crt:
+	python3 scripts/coloring_crt.py --selftest
 
 # Gate MAKEFILE-WIRING: the lint the GATE_TARGETS comment above asks for.
 # It checks two surfaces.  Recipe-vs-GATE_TARGETS is the obvious one.  The
@@ -667,12 +667,12 @@ build/strip_tm: cpp/strip_tm.cpp cpp/argparse.h | build
 build/strip_mu: cpp/strip_mu.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
-# motley_par: the parallel coloring-recount engine (results/motley-par/README.md).
-# Same frozen rule core as results/cutcount_b1/cutcount_b1.cpp.59e90660; the
+# coloring_recount: the parallel coloring-recount engine (results/coloring-recount/parallel/README.md).
+# Same frozen rule core as results/coloring-recount/cutcount_b1.cpp.59e90660; the
 # parallelism, the flat arena and the chunked release are accounting.  -fopenmp
 # is not optional -- the cell-step is an OpenMP loop -- and scripts/
 # gen_compile_commands.sh mirrors that so clangd and gate-compile-db agree.
-build/motley_par: cpp/motley_par.cpp cpp/argparse.h cpp/obs.h | build
+build/coloring_recount: cpp/coloring_recount.cpp cpp/argparse.h cpp/obs.h | build
 	$(OMPCXX) $(CXXFLAGS) -O2 -fopenmp -o $@ $<
 
 # Gate the parallel engine against the banked exact C_H rows at three payload
@@ -681,13 +681,13 @@ build/motley_par: cpp/motley_par.cpp cpp/argparse.h cpp/obs.h | build
 #
 # 1200 cell-comparisons over H=1..10, both controls that must fail firing.
 # Needs an OpenMP compiler (OMPCXX).
-gate-motley-par: build/motley_par
-	python3 tests/gate_motley_par.py --selftest
-	python3 tests/gate_motley_par.py 10
+gate-coloring-recount: build/coloring_recount
+	python3 tests/gate_coloring_recount.py --selftest
+	python3 tests/gate_coloring_recount.py 10
 
 # Every program behind the published counts prints exactly what it printed
 # before the rewrite (docs/code-target.md, tests/reference/).
-gate-reference: build/g2 build/strip_tm build/motley_par build/symcount_fast \
+gate-reference: build/g2 build/strip_tm build/coloring_recount build/symcount_fast \
                 build/symtm build/dmirror_spine build/ns/orchestrate \
                 build/ns/map_worker build/ns/merge_worker build/ns/combine
 	python3 tests/gate_reference.py --selftest

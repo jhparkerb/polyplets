@@ -1,20 +1,20 @@
 #!/bin/bash
 # Gate the CHUNKED-RELEASE path at production scale, before a 15-hour run uses it.
 #
-# tests/gate_motley_par.py covers H <= 13 with release on (1560 cell
+# tests/gate_coloring_recount.py covers H <= 13 with release on (1560 cell
 # comparisons).  ayr's five-prime H=18 reproduction used the OLD binary, with
 # release OFF.  So the release path has never run near its own size, and
-# Motley C_19 would be the first time -- which is the wrong place to find out.
+# the coloring recount C_19 would be the first time -- which is the wrong place to find out.
 # H = 18 has a banked Confetti residue row to compare against byte for byte.
 #
 # Target: dalby, 80 cores, idle.  Predicted: census ~8 min (H=18 has
 # 72,487,711 states MEASURED), pass ~26 min EXTRAPOLATED from H=14/80t = 11.8 s
 # at ~3.4x per height, RSS ~25 GB (u32, release, 8-byte buckets: 72.5M x 352 B
-# x 1.15 + buckets).  Decision it changes: if RED, Motley C_19 runs with
+# x 1.15 + buckets).  Decision it changes: if RED, the coloring recount C_19 runs with
 # release OFF and needs ~2x the RAM, which changes the payload width.
 # Kill: kill the PID in ~/var/motley-h18-rel/pid.
 set -euo pipefail
-B=$HOME/src/pm-lastditch/build/motley_par4
+B=$HOME/src/pm-lastditch/build/coloring_recount4
 O=$HOME/var/motley-h18-rel
 P=2147483647
 mkdir -p "$O"; echo $$ > "$O/pid"

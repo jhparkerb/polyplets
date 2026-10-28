@@ -25,14 +25,14 @@ the campaign:
      k <= (21-1)/2), and how many are wired closed forms above that.  Cells,
      not shares: a wrong cell ruins a(n) whatever its size, so a percentage
      of a(n) carries no decision (standing ruling, 2026-08-18).
-  F. the Motley (coloring) second source: results/cutcount_b1/rows41/
+  F. the the coloring recount (coloring) second source: results/coloring-recount/rows41/
      assembles to the banked triangle at every cell with H <= 19 and n <= 40
      (589 cells) and to the kink sweep's own n = 41 row at H <= 19 (19
      cells) -- the two arms of `make gate-cutcount-assembly`, called here.
 
 RED controls, all required to fail: each diagonal formula perturbed in its
 leading coefficient must break check B, a single altered digit in the
-Redelmeier column must break check C, and one altered Motley cell must break
+Redelmeier column must break check C, and one altered the coloring recount cell must break
 check F.
 
 Usage: python3 experiments/paper1_reproducibility_check.py
@@ -53,7 +53,7 @@ import provenance_table as PT               # noqa: E402
 
 PERHEIGHT = os.path.join(ROOT, "results", "ns_a40", "perheight")
 TRIANGLE = Path(ROOT, "results", "triangle.txt")
-ROWS41 = Path(ROOT, "results", "cutcount_b1", "rows41")
+ROWS41 = Path(ROOT, "results", "coloring-recount", "rows41")
 A41 = Path(ROOT, "results", "a41")
 SWEEP_H = PT.SWEEP_H                        # the a(40) run's tallest real sweep
 PINNED_K = (SWEEP_H - 1) // 2               # levels with k+1 real in-onset points
@@ -183,10 +183,10 @@ def main():
     tri = CAG.read_triangle(TRIANGLE)
     assert all(tri[c] == T.get(c) for c in tri), "results/triangle.txt != the per-height sweep"
     bad, cells = CAG.check_assembly(ROWS41, TRIANGLE, CAG.EXPECT41_TOP_H, CAG.EXPECT41_CELLS)
-    assert not bad, f"Motley rows41 vs the triangle: {bad[:3]}"
+    assert not bad, f"the coloring recount rows41 vs the triangle: {bad[:3]}"
     bad, top = CAG.check_row41(ROWS41, A41)
-    assert not bad, f"Motley rows41 vs the kink sweep at n = 41: {bad[:3]}"
-    print(f"F. Motley rows41: {cells} cells H<=19, n<=40 equal the triangle; "
+    assert not bad, f"the coloring recount rows41 vs the kink sweep at n = 41: {bad[:3]}"
+    print(f"F. the coloring recount rows41: {cells} cells H<=19, n<=40 equal the triangle; "
           f"{top} cells at n = 41 equal the kink sweep  OK")
     with tempfile.TemporaryDirectory() as d:
         shutil.copytree(ROWS41, os.path.join(d, "rows41"))
@@ -198,7 +198,7 @@ def main():
         bad, _ = CAG.check_assembly(Path(d, "rows41"), TRIANGLE,
                                     CAG.EXPECT41_TOP_H, CAG.EXPECT41_CELLS)
     assert bad, "RED control alive"
-    print("   RED one altered Motley cell breaks the agreement  OK")
+    print("   RED one altered the coloring recount cell breaks the agreement  OK")
     return 0
 
 

@@ -4,7 +4,7 @@
 Read-only with respect to the .tex: parses its tables and checks them
 against results/ns_a40/ (triangle + per-height columns), the staged
 companion b-files, and results/holes_n18.txt; then reads the scope numbers
-out of the paper's prose sentences (Redelmeier to 22, Motley to H = 19,
+out of the paper's prose sentences (Redelmeier to 22, the coloring recount to H = 19,
 P_k to 19, holes to 18 and 14, the 3k-th row, 25^k/k!, a(n)/4, a(n)/8,
 the enclosure sizes) and checks each against the record it rests on, and
 re-derives the T(n,n-1) derivation's intermediate counts by enumeration.
@@ -319,23 +319,23 @@ check("methods: Redelmeier reach",
       said("methods Redelmeier", r"only terms through \$n=(\d+)\$ could be confirmed"),
       max(red))
 
-# Abstract: the coloring transfer matrix (Motley) "recounted every
-# T(n,H<=19)", i.e. every H <= 19 at every n <= 40.  Record: results/cutcount_b1/rows41/C<H>.out holds
+# Abstract: the coloring transfer matrix (the coloring recount) "recounted every
+# T(n,H<=19)", i.e. every H <= 19 at every n <= 40.  Record: results/coloring-recount/rows41/C<H>.out holds
 # C_H(n) = sum_{h<=H} (H-h+1) T(n,h); the triangle is its second difference.
-rowdir = ROOT / "results/cutcount_b1/rows41"
-motley_top = max(int(f.stem[1:]) for f in rowdir.glob("C*.out"))
-C = {H: load_pairs(rowdir / f"C{H}.out") for H in range(1, motley_top + 1)}
+rowdir = ROOT / "results/coloring-recount/rows41"
+coloring_top = max(int(f.stem[1:]) for f in rowdir.glob("C*.out"))
+C = {H: load_pairs(rowdir / f"C{H}.out") for H in range(1, coloring_top + 1)}
 C[0] = C[-1] = {}
-motley_cells = 0
-for H in range(1, motley_top + 1):
+coloring_cells = 0
+for H in range(1, coloring_top + 1):
     for n in range(H, 41):
         t = C[H][n] - 2 * C[H - 1].get(n, 0) + C[H - 2].get(n, 0)
-        check(f"Motley T({n},{H}) == banked", t, col[H][n])
-        motley_cells += 1
-check("abstract: Motley reach in H",
-      said("abstract Motley H", r"recounted every \$T\(n,H\\le(\d+)\)\$"), motley_top)
-if motley_cells != 589:
-    failures.append(f"FAIL Motley coverage: {motley_cells} cells, expected 589")
+        check(f"the coloring recount T({n},{H}) == banked", t, col[H][n])
+        coloring_cells += 1
+check("abstract: the coloring recount reach in H",
+      said("abstract the coloring recount H", r"recounted every \$T\(n,H\\le(\d+)\)\$"), coloring_top)
+if coloring_cells != 589:
+    failures.append(f"FAIL the coloring recount coverage: {coloring_cells} cells, expected 589")
 
 # Abstract 53-54: every a(n) passes the Burnside congruence.  Record: the
 # subgroup-invariant counts I(H), n <= 40 (results/symmetry-classes.md):

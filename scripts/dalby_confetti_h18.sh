@@ -1,5 +1,5 @@
 #!/bin/bash
-# Motley rung 2 (Confetti) production run: C_18(n) mod 5 primes, n <= 40.
+# the coloring recount rung 2 (Confetti) production run: C_18(n) mod 5 primes, n <= 40.
 #
 # Purpose: T(n,18) = C_18 - 2*C_17 + C_16, closing a(n) rule-independently
 # for n <= 35.  Payload: the committed --modp mode (2 streams, u32), five
@@ -121,7 +121,7 @@ for n in sorted(C18):
             match += 1
         else:
             mismatch += 1
-            print(f"MISMATCH T({n},18): motley {t}  incumbent {want[n]}")
+            print(f"MISMATCH T({n},18): coloring {t}  incumbent {want[n]}")
     elif t:
         print(f"NOTE T({n},18) = {t} with no banked value")
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Motley step 0 — the provenance re-run (docs/motley-plan.md (deleted) §"Step 0").
+# Coloring recount step 0 — the provenance re-run (docs/motley-plan.md (deleted) §"Step 0").
 #
 # Purpose: reproduce the banked C_H(n) rows, H = 1..16, Nmax = 40, using the
 # COMMITTED fail-closed engine (second-source 48ac108) instead of the dirty
@@ -9,17 +9,17 @@
 # Target machine: dalby.  Binary: ~/src/pm-b1-step0/build/cutcount_b1, a clean
 # worktree at 48ac108 so the obs stamp reads git=48ac1089 with no -dirty.
 #
-# Predicted cost (measured, results/cutcount_b1/calib_run.log):
+# Predicted cost (measured, results/coloring-recount/calib_run.log):
 #   H=16  4.58 h  60.8 GB      H=15  1.43 h  20.4 GB      H<=14  0.68 h  6.9 GB
 # Run as three concurrent streams (16 | 15 | 14..1): 4.6 h wall, 88 GB peak
 # against dalby's 122 GB available.  Single-stream it is 6.7 core-hours.
 #
 # Exact command (one tmux window per stream):
-#   ./dalby_motley_step0.sh 16
-#   ./dalby_motley_step0.sh 15
-#   ./dalby_motley_step0.sh 14 13 12 11 10 9 8 7 6 5 4 3 2 1
+#   ./dalby_coloring_step0.sh 16
+#   ./dalby_coloring_step0.sh 15
+#   ./dalby_coloring_step0.sh 14 13 12 11 10 9 8 7 6 5 4 3 2 1
 # Then the compare, which is the actual product:
-#   ./dalby_motley_step0.sh --assemble
+#   ./dalby_coloring_step0.sh --assemble
 #
 # Kill/resume: each height is an independent process writing one row file; kill
 # any stream by PID and re-run it with the heights that have no C<H>.out.

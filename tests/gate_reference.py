@@ -5,7 +5,7 @@ the rewrite (docs/code-target.md).
 Each case below is one run of one program at a fixed size.  Its output, less
 the event= observability lines (which carry times and revisions), was
 recorded from the code at master b093919 into tests/reference/<name>.txt,
-and must match byte for byte.  The motley_par case was recorded after the
+and must match byte for byte.  The coloring_recount case was recorded after the
 macOS clear() fix (085aa5f), which does not change what it computes.
 
 Usage:
@@ -56,8 +56,8 @@ def strip_tm():
                       lambda H, path: ("single", H, 24, path), 10)
 
 
-def motley_par():
-    return per_height(f"{BUILD}/motley_par",
+def coloring_recount():
+    return per_height(f"{BUILD}/coloring_recount",
                       lambda H, path: ("--modp", H, 24, P, path, "--threads", 4),
                       10)
 
@@ -106,7 +106,7 @@ def term26():
 CASES = [
     ("g2_square8_12", "build/g2 square8 12 --per-box", g2),
     ("strip_tm_h10_n24", "build/strip_tm single H 24, H = 1..10", strip_tm),
-    ("motley_par_h10_n24", f"build/motley_par --modp H 24 {P}, H = 1..10", motley_par),
+    ("coloring_recount_h10_n24", f"build/coloring_recount --modp H 24 {P}, H = 1..10", coloring_recount),
     ("symcount_fast_16", "build/symcount_fast TYPE 16, all eight types", symcount_fast),
     ("symtm_20", "build/symtm TYPE 20, hmirror r180 dmirror", symtm),
     ("dmirror_spine_10", "build/dmirror_spine 10", dmirror_spine),
@@ -132,11 +132,11 @@ def compare(got, want):
 def cross_checks(gate, outputs):
     """Three programs, one triangle.  strip_tm's C_H(n) counts placements of
     polyplets of height <= H in a height-H strip, so its second difference in
-    H is T(n,H); motley_par computes the same C_H(n) by coloring, mod P."""
+    H is T(n,H); coloring_recount computes the same C_H(n) by coloring, mod P."""
     C = parse_counts(outputs["strip_tm_h10_n24"])
     T = parse_counts("\n".join(ln for ln in outputs["term_26"].splitlines()
                                if not ln.startswith("a ")))
-    M = parse_counts(outputs["motley_par_h10_n24"])
+    M = parse_counts(outputs["coloring_recount_h10_n24"])
     c = lambda H, n: C.get((H, n), 0)
     cells = [(H, n) for H in range(1, 11) for n in range(1, 25)]
     bad = [k for k in cells
@@ -144,7 +144,7 @@ def cross_checks(gate, outputs):
     gate.check(not bad, f"strip_tm second difference == term.sh triangle, "
                         f"{len(cells)} cells H<=10 n<=24" + (f"  MISMATCH {bad[:5]}" if bad else ""))
     bad = [k for k in cells if c(*k) % P != M.get(k, 0)]
-    gate.check(not bad, f"motley_par == strip_tm mod {P}, {len(cells)} cells"
+    gate.check(not bad, f"coloring_recount == strip_tm mod {P}, {len(cells)} cells"
                         + (f"  MISMATCH {bad[:5]}" if bad else ""))
 
 

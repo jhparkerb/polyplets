@@ -12,7 +12,7 @@ and what no recount reaches.
 | program | code | reach | shared with the production engine |
 |---|---|---|---|
 | strip transfer matrix | `cpp/strip_tm.cpp`; reference `experiments/strip_engine.py` | `H ≤ 14`, `n ≤ 40` | the connectivity rule (union-find over a column, stranded-component death); no code, frontier or state encoding |
-| the coloring recount | rule `results/cutcount_b1/cutcount_b1.cpp.59e90660` lines 93–173; parallel engine `cpp/motley_par.cpp` | `H ≤ 19`, `n ≤ 41` | nothing: it never decides connectivity |
+| the coloring recount | rule `results/coloring-recount/cutcount_b1.cpp.59e90660` lines 93–173; parallel engine `cpp/coloring_recount.cpp` | `H ≤ 19`, `n ≤ 41` | nothing: it never decides connectivity |
 | Redelmeier enumeration | `cpp/g2_redelmeier.cpp` (`build/g2`) | whole rows `n ≤ 22` | nothing; its cost grows with the count |
 
 Which program reached which entry is generated in `results/provenance-table.md`
@@ -114,10 +114,10 @@ this tree holds only its rule source.
 | run | payload | date | script, outputs | agreement | cost |
 |---|---|---|---|---|---|
 | calibration, `H ≤ 16` | exact 256-bit; source sha `59e90660` | dalby 2026-08-11 | — | 640 of 640 entries match `results/triangle.txt` | `H = 16`: 16,475 s, 60.8 GB |
-| step 0, `H ≤ 16` | exact; clean build `git=48ac1089`, binary sha256 `e66f4466…` | dalby 2026-08-14 | `scripts/dalby_motley_step0.sh` | 16 rows identical to calibration; 640 of 640 | three streams: `H = 16` 17,047 s, 62.3 GB; `H = 15` 4,806 s, 20.4 GB; `H ≤ 14` ~2,400 s, 6.9 GB; 88 GB together |
-| `H = 17` | exact 128-bit; build `4df3fec9`, sha256 `dd173239…` | dalby 2026-08-14 | `scripts/dalby_motley_h17.sh`; `results/cutcount_b1/rows/C17.out` | T(n,17), `n = 17..40`: 24 of 24 | 39,117 s (10.9 h), 95.0 GB, 23,681,423 states |
-| `H = 18` | five 31-bit primes, one pass each; CRT from four, the fifth predicted | dalby 2026-08-14 to 08-19 | `scripts/dalby_confetti_h18.sh`; `results/cutcount_b1/rows/C18.out`, `results/cutcount_b1/residues/` | T(n,18), `n = 18..40`: 23 of 23; prime 2147483563 predicted at 40 of 40 | 399,700 s on one core (4.63 days), 65.9 GB, 72,487,711 states |
-| Nmax 41, `H ≤ 19` | nine 16-bit primes per height; eight reconstruct, the ninth must predict every entry | dalby 2026-08-20 to 08-21, rev `18b90ab6` | `scripts/motley_ladder.sh`; `results/cutcount_b1/rows41/`, `results/cutcount_b1/residues41/` | 589 entries `H ≤ 19`, `n ≤ 40` match the triangle; 19 entries at `n = 41` match `results/a41/h<H>.out`; ninth prime predicted at all 19 heights | `H = 19`: nine passes of ~5,630 s, peak 61.6 GB, 80 threads |
+| step 0, `H ≤ 16` | exact; clean build `git=48ac1089`, binary sha256 `e66f4466…` | dalby 2026-08-14 | `scripts/dalby_coloring_step0.sh` | 16 rows identical to calibration; 640 of 640 | three streams: `H = 16` 17,047 s, 62.3 GB; `H = 15` 4,806 s, 20.4 GB; `H ≤ 14` ~2,400 s, 6.9 GB; 88 GB together |
+| `H = 17` | exact 128-bit; build `4df3fec9`, sha256 `dd173239…` | dalby 2026-08-14 | `scripts/dalby_coloring_h17.sh`; `results/coloring-recount/rows/C17.out` | T(n,17), `n = 17..40`: 24 of 24 | 39,117 s (10.9 h), 95.0 GB, 23,681,423 states |
+| `H = 18` | five 31-bit primes, one pass each; CRT from four, the fifth predicted | dalby 2026-08-14 to 08-19 | `scripts/dalby_confetti_h18.sh`; `results/coloring-recount/rows/C18.out`, `results/coloring-recount/residues/` | T(n,18), `n = 18..40`: 23 of 23; prime 2147483563 predicted at 40 of 40 | 399,700 s on one core (4.63 days), 65.9 GB, 72,487,711 states |
+| Nmax 41, `H ≤ 19` | nine 16-bit primes per height; eight reconstruct, the ninth must predict every entry | dalby 2026-08-20 to 08-21, rev `18b90ab6` | `scripts/coloring_ladder.sh`; `results/coloring-recount/rows41/`, `results/coloring-recount/residues41/` | 589 entries `H ≤ 19`, `n ≤ 40` match the triangle; 19 entries at `n = 41` match `results/a41/h<H>.out`; ninth prime predicted at all 19 heights | `H = 19`: nine passes of ~5,630 s, peak 61.6 GB, 80 threads |
 
 The `H = 18` passes:
 
@@ -141,7 +141,7 @@ this line.
 `59e90660b42a0d94ceae5459287db35b4d93f87a5e62753ccd549235edaa8d3d`) matching
 neither committed revision on `second-source`; the diff against `7b13137` is
 71 lines, almost all the removal of its `--modp` mode
-(`results/cutcount_b1/PROVENANCE.md`). Step 0 reproduced its 16 rows from a
+(`results/coloring-recount/PROVENANCE.md`). Step 0 reproduced its 16 rows from a
 clean build. `C18.out` has sha256
 `26b4fa322303c8b26798c41dd0daafb698bd6909ab440a834a0eb95bbd0aeb81`.
 
@@ -150,13 +150,13 @@ assembles the rows against `results/triangle.txt` (567 entries from `rows/`,
 589 from `rows41/`), compares `rows41` at `n = 41` against `results/a41/` (19
 entries), reconstructs `C_18` from four primes and predicts the fifth, and
 re-derives the ninth-prime verdict at all 19 heights of the Nmax-41 run (779
-entries), with 16 controls that must fail. `make gate-motley-crt`
-(`scripts/motley_crt.py --selftest`) reconstructs `C_18` and `C_19` and
-confirms a corrupted residue is caught. `tests/gate_motley_par.py` checks the
+entries), with 16 controls that must fail. `make gate-coloring-crt`
+(`scripts/coloring_crt.py --selftest`) reconstructs `C_18` and `C_19` and
+confirms a corrupted residue is caught. `tests/gate_coloring_recount.py` checks the
 parallel engine against the exact rows at three payload widths and for
 thread-count determinism (needs `-fopenmp`).
 
-**The parallel engine** (`results/motley-par/README.md`) keeps the five rule
+**The parallel engine** (`results/coloring-recount/parallel/README.md`) keeps the five rule
 functions and replaces the accounting: flat open-addressed table, OpenMP over
 source rows, payload width from the prime, release of each consumed chunk. At
 `H = 14` it is 50× the single-thread engine on 80 threads; it reproduced all
@@ -249,7 +249,7 @@ with no comparison entry. The below-onset fitting of `results/below-onset-fit.md
 lowers the required height from `(n+2)/2` to `(n−3)/2`.
 
 The coloring engine's memory is about 8,100 bytes per frontier state with
-the exact 256-bit payload and 130 after the changes `results/motley-par/README.md`
+the exact 256-bit payload and 130 after the changes `results/coloring-recount/parallel/README.md`
 describes (residue passes, a flat arena, releasing consumed chunks); states
 grow about 3.1× per height (72,487,711 at H = 18, 224,529,648 at H = 19), so
 H = 19 ran in 61.6 GB and H = 21 would need the better part of a terabyte.
@@ -291,8 +291,8 @@ on small boards against the C++ at `H ≤ 6`, as
     ./build/strip_tm 14 40 results/ns_a40/perheight  # ~38 GB, ~8.6 h
     python3 experiments/strip_engine.py 10 36        # Python reference with the brute-force anchor
     python3 experiments/paper1_reproducibility_check.py   # coverage (D), Redelmeier (C), coloring recount (F)
-    make gate-cutcount-assembly gate-motley-crt gate-provenance gate-residual-cells
-    python3 scripts/motley_crt.py --dir results/cutcount_b1/residues41 --height 19
-    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/cutcount_b1/rows41 --rows 39,40,41
-    make build/motley_par && make gate-motley-par    # needs -fopenmp
+    make gate-cutcount-assembly gate-coloring-crt gate-provenance gate-residual-cells
+    python3 scripts/coloring_crt.py --dir results/coloring-recount/residues41 --height 19
+    python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/coloring-recount/rows41 --rows 39,40,41
+    make build/coloring_recount && make gate-coloring-recount    # needs -fopenmp
     scripts/g2_wholerow.sh 20 10 800 80              # Redelmeier row 20 on 80 workers

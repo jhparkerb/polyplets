@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Fail-closed gate for cpp/motley_par.cpp, the parallel coloring recount.
+"""Fail-closed gate for cpp/coloring_recount.cpp, the parallel coloring recount.
 
 The engine is only worth having if it is the SAME engine.  Three things are
 checked, and the first is the one that matters:
 
   1. RULE.  C_H(n) mod p must equal the banked exact rows
-     results/cutcount_b1/rows/C<H>.out reduced mod p, at every n and every
+     results/coloring-recount/rows/C<H>.out reduced mod p, at every n and every
      height run.  The banked rows are the frozen spec's own output; agreeing
      with them is agreeing with the rule, not with my transcription of it.
   2. IMPLEMENTATION.  The output must be byte-identical to
@@ -18,8 +18,8 @@ checked, and the first is the one that matters:
      does not, there is a race.
 
 Usage:
-  python3 tests/gate_motley_par.py [HMAX] [--bin PATH] [--ref PATH] [--rows DIR]
-  python3 tests/gate_motley_par.py --selftest      # RED controls
+  python3 tests/gate_coloring_recount.py [HMAX] [--bin PATH] [--ref PATH] [--rows DIR]
+  python3 tests/gate_coloring_recount.py --selftest      # RED controls
 
 Exit 0 = GATE GREEN.  Anything else is red, including a missing banked row:
 a gate that silently checks nothing is worse than no gate.
@@ -100,9 +100,9 @@ def main():
     for a in sys.argv[1:]:
         if a.isdigit():
             hmax = int(a)
-    binary = opt("--bin", os.path.join(ROOT, "build", "motley_par"))
+    binary = opt("--bin", os.path.join(ROOT, "build", "coloring_recount"))
     ref = opt("--ref", "")
-    rowdir = opt("--rows", os.path.join(ROOT, "results", "cutcount_b1", "rows"))
+    rowdir = opt("--rows", os.path.join(ROOT, "results", "coloring-recount", "rows"))
     selftest = "--selftest" in sys.argv
 
     if not os.path.exists(binary):

@@ -10,11 +10,11 @@ supply n = 41. Do not overwrite it, and do not mix the two sets in one
 difference.
 
     run       dalby, 2026-08-20 10:38 to 2026-08-21 08:43 (about 22 h)
-    script    scripts/motley_ladder.sh
+    script    scripts/coloring_ladder.sh
     rev       18b90ab6
     method    9 primes near 2^16 per height, Chinese remainder theorem to exact
     check     8 primes reconstruct; the 9th is held out and must predict
-              every cell; scripts/motley_crt.py exits non-zero if it does
+              every cell; scripts/coloring_crt.py exits non-zero if it does
               not. All 19 heights passed. Its --selftest reproduces the
               stored C_18 from 4 primes and includes a control that corrupts
               a residue and confirms the held-out prime catches it.
@@ -24,7 +24,7 @@ difference.
               verified on both sides (249 files, 0 mismatches).
               `make gate-cutcount-assembly` re-derives the held-out verdict
               at every height from those files, and
-              `scripts/motley_crt.py --selftest` covers C_19.
+              `scripts/coloring_crt.py --selftest` covers C_19.
 
 ## What these rows settle for the provenance table
 
@@ -42,7 +42,7 @@ directly by the second program.
 ## What these rows settle for rows 39..41
 
     python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 \
-            --rowdir results/cutcount_b1/rows41 --rows 39,40,41
+            --rowdir results/coloring-recount/rows41 --rows 39,40,41
 
     row 39: COMPLETE, sum MATCHES a(39)   (20 cells agree with the main computation)
     row 40: COMPLETE, sum MATCHES a(40)   (21 cells agree, 0 wrong)

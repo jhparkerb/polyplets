@@ -847,7 +847,7 @@
 <rect x="880" y="139" width="16" height="16" rx="2" fill="#2D5DB8" stroke="#D1D5DB" stroke-width="0.5"/>
 <text x="904" y="152" font-size="12" fill="#1F2937"><tspan font-weight="bold">253</tspan>  Redelmeier recount, n ≤ 22</text>
 <rect x="880" y="165" width="16" height="16" rx="2" fill="#93B4EC" stroke="#D1D5DB" stroke-width="0.5"/>
-<text x="904" y="178" font-size="12" fill="#1F2937"><tspan font-weight="bold">342</tspan>  colouring transfer matrix (Motley), H ≤ 19</text>
+<text x="904" y="178" font-size="12" fill="#1F2937"><tspan font-weight="bold">342</tspan>  colouring transfer matrix (the coloring recount), H ≤ 19</text>
 <rect x="880" y="191" width="16" height="16" rx="2" fill="#DCE6F8" stroke="#D1D5DB" stroke-width="0.5"/>
 <text x="904" y="204" font-size="12" fill="#1F2937"><tspan font-weight="bold">33</tspan>  wired closed form on a really-swept cell, H = 20, 21</text>
 <rect x="880" y="217" width="16" height="16" rx="2" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="0.5"/>
@@ -855,7 +855,7 @@
 <text x="880" y="264" font-size="11.5" fill="#6B7280">dashed staircase: H > n/2, the cells with a closed form</text>
 <text x="880" y="281" font-size="11.5" fill="#6B7280">orange cells: T(39,20), T(40,20), T(40,21)</text>
 <text x="880" y="298" font-size="11.5" fill="#6B7280">they and every injected cell are also reproduced by the</text>
-<text x="880" y="315" font-size="11.5" fill="#6B7280">tower fitted to Motley's cells (tag U, a formula-level check)</text>
+<text x="880" y="315" font-size="11.5" fill="#6B7280">tower fitted to the coloring recount's cells (tag U, a formula-level check)</text>
 <text x="880" y="332" font-size="11.5" fill="#6B7280"></text>
 <text x="880" y="349" font-size="11.5" fill="#6B7280">total 820 cells; source: scripts/provenance_table.py</text>
 </svg>

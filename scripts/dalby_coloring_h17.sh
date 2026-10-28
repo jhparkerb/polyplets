@@ -1,5 +1,5 @@
 #!/bin/bash
-# Motley rung 1 (Half Measure) production run: C_17(n), n <= 40.
+# the coloring recount rung 1 (Half Measure) production run: C_17(n), n <= 40.
 #
 # Purpose: the first height above the banked ladder.  Product is
 # T(n,17) = C_17(n) - 2*C_16(n) + C_15(n), which closes a(n) for n <= 33
@@ -11,7 +11,7 @@
 # stamped b9d725be, clean worktree, gate-cutcount-b1 GREEN on that build.
 #
 # Predicted cost, from the measured H<=16 ladder (RSS x2.984/height, wall
-# x3.209/height, results/cutcount_b1/calib_run.log) times Half Measure's
+# x3.209/height, results/coloring-recount/calib_run.log) times Half Measure's
 # measured payload factor 0.514 and its measured wall factor ~1/1.5:
 #     peak RSS  ~91 GB   (I256 would have been 177 GB)
 #     wall      ~7-10 h  on one core
@@ -22,7 +22,7 @@
 # NOT RESUMABLE: the engine checkpoints nothing, so a kill costs the whole
 # attempt.  The unit is one height; nothing else is lost.
 #
-# Exact command:  ./dalby_motley_h17.sh
+# Exact command:  ./dalby_coloring_h17.sh
 # Kill:           kill <pid of cutcount_b1>
 #
 # Fail-closed.  Three independent checks, all of which must pass:
@@ -83,7 +83,7 @@ for n in sorted(C17):
             match += 1
         else:
             mismatch += 1
-            print(f"MISMATCH T({n},17): motley {t}  incumbent {want[n]}")
+            print(f"MISMATCH T({n},17): coloring {t}  incumbent {want[n]}")
     elif t:
         print(f"NOTE T({n},17) = {t} with no banked value")
 

@@ -37,7 +37,7 @@ boundary state, a count by size; a boundary state records which boundary
 cells are occupied and how they connect through the region already
 processed. The set of boundary states at a column boundary, with their
 counts, is the **frontier**; at height `H` the reachable column states number
-`Motzkin(H+1) − 1`. The **coloring recount** (`results/cutcount_b1/`) is an
+`Motzkin(H+1) − 1`. The **coloring recount** (`results/coloring-recount/`) is an
 independent program that produces `C_H(n)` by a coloring rule instead of
 tracking connectivity.
 

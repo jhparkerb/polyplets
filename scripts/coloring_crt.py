@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reconstruct an exact Motley C_H row from its mod-p residue rows.
+"""Reconstruct an exact the coloring recount C_H row from its mod-p residue rows.
 
 WHY THIS FILE EXISTS.  The CRT reconstruction that turned Confetti's five
 residue rows into the banked exact C_18 lived inside a heredoc in
@@ -23,14 +23,14 @@ FAIL-CLOSED, all of these exit non-zero:
   * zero cells compared.
 
 Usage:
-  motley_crt.py --dir DIR --height H [--nmax N] [--out FILE]
-        DIR holds C<H>.p<prime>.out, one per prime, as motley_par --modp writes
+  coloring_crt.py --dir DIR --height H [--nmax N] [--out FILE]
+        DIR holds C<H>.p<prime>.out, one per prime, as coloring_recount --modp writes
         them.  Primes are read from the filenames.  Writes the exact row as
         "n value" lines.
 
-  motley_crt.py --selftest
-        Reconstructs C_18 from results/cutcount_b1/residues/ (Confetti, five
-        primes) and C_19 from results/cutcount_b1/residues41/ (the Nmax-41
+  coloring_crt.py --selftest
+        Reconstructs C_18 from results/coloring-recount/residues/ (Confetti, five
+        primes) and C_19 from results/coloring-recount/residues41/ (the Nmax-41
         ladder, nine primes), requires each to equal its banked exact row
         exactly, then checks at both heights that a corrupted residue is caught.
 """
@@ -148,7 +148,7 @@ def selftest():
     """Both banked ladders: Confetti (H = 18, five ~31-bit primes, Nmax 40)
     and the Nmax-41 ladder (H = 19, nine ~16-bit primes; AUDIT-2026-09-02 M3).
     The cell count each compares is pinned, so a truncated row cannot pass."""
-    cb = os.path.join(ROOT, "results", "cutcount_b1")
+    cb = os.path.join(ROOT, "results", "coloring-recount")
     selftest_height(18, os.path.join(cb, "residues"),
                     os.path.join(cb, "rows", "C18.out"), 40, "Confetti")
     selftest_height(19, os.path.join(cb, "residues41"),

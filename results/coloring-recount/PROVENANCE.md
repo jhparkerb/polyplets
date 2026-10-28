@@ -1,6 +1,6 @@
 # The coloring recount
 
-This directory holds the output of the second enumerator, `cpp/motley_par.cpp`
+This directory holds the output of the second enumerator, `cpp/coloring_recount.cpp`
 (the exact source of the n ≤ 40 rows is `cutcount_b1.cpp.59e90660`). It shares
 no code with the transfer-matrix engine that produced `results/triangle.txt`,
 and it never decides whether a set of cells is connected.

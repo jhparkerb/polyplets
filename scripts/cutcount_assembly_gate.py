@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Gate CUTCOUNT-ASSEMBLY: Motley's banked rows still make the triangle.
+"""Gate CUTCOUNT-ASSEMBLY: the coloring recount's banked rows still make the triangle.
 
-Written 2026-08-19.  Everything Motley produced was in the tree -- the C_H rows,
+Written 2026-08-19.  Everything the coloring recount produced was in the tree -- the C_H rows,
 the run log, the provenance note -- and NOTHING re-derived the one thing they
 are for.  The assembly
 
@@ -16,7 +16,7 @@ closes the third one.
 
 Two checks, both from files in the tree:
 
-  ASSEMBLY   every banked row results/cutcount_b1/rows/C<H>.out, H = 1..18,
+  ASSEMBLY   every banked row results/coloring-recount/rows/C<H>.out, H = 1..18,
              assembled and compared against results/triangle.txt.  567 cells.
 
   HELD-OUT   Confetti ran five primes: C_18 is reconstructed by CRT from four
@@ -25,18 +25,18 @@ Two checks, both from files in the tree:
              the residue rows were banked (same day) it could not be re-run off
              the repo at all -- results/second-sources.md quoted the runner for it.
              The reconstruction is also compared against the banked exact row,
-             which ties the residues to results/cutcount_b1/rows/C18.out.
+             which ties the residues to results/coloring-recount/rows/C18.out.
 
 Fail-closed on coverage, not just on disagreement: the cell and residue counts
 are pinned, so a row that stops being read, a glob that matches nothing, or a
 prime that quietly drops out fails the gate instead of shrinking it silently.
 
 The Nmax-41 ladder (AUDIT-2026-09-02 M3), added 2026-09-05.  Commit 3a8d566
-banked results/cutcount_b1/rows41/C1..C19.out, the coloring program's rows
+banked results/coloring-recount/rows41/C1..C19.out, the coloring program's rows
 at Nmax 41, with a README saying "8 primes reconstruct, the 9th is held out
 and must predict every cell; all 19 heights passed" -- and nothing in `make`
 read those rows or could re-derive that sentence.  The 171 residue rows and the
-run logs were banked 2026-09-05 (results/cutcount_b1/residues41/,
+run logs were banked 2026-09-05 (results/coloring-recount/residues41/,
 rows41/run/), and three more arms run over them:
 
   ASSEMBLY-41  rows41 assembled and compared against results/triangle.txt at
@@ -45,7 +45,7 @@ rows41/run/), and three more arms run over them:
                engine's own sweep, results/a41/h<H>.out: 19 cells.  This is
                the two-engine agreement on the swept half of a(41).
   HELD-OUT-41  at EVERY height H = 1..19: CRT over the eight smaller primes,
-               the largest predicted (scripts/motley_crt.py's rule, the one
+               the largest predicted (scripts/coloring_crt.py's rule, the one
                that produced the rows), the reconstruction tied back to
                rows41/C<H>.out, and each value under the runner's 2^112
                guard.  19 x 41 = 779 cells.
@@ -62,8 +62,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ROWS = ROOT / "results" / "cutcount_b1" / "rows"
-RESIDUES = ROOT / "results" / "cutcount_b1" / "residues"
+ROWS = ROOT / "results" / "coloring-recount" / "rows"
+RESIDUES = ROOT / "results" / "coloring-recount" / "residues"
 TRIANGLE = ROOT / "results" / "triangle.txt"
 
 def triangle_nmax():
@@ -71,7 +71,7 @@ def triangle_nmax():
 
     Was `NMAX = 40`, hand-edited, and it made this gate's COVERAGE stale
     without making it red -- the failure class `scripts/provenance_table.py`
-    already fixed for MOTLEY_H.  Planted 2026-08-22 during the gate-class
+    already fixed for COLORING_H.  Planted 2026-08-22 during the gate-class
     sweep (`docs/engine-record.md`): with 41 fabricated rows appended to
     results/triangle.txt this gate stayed GREEN, because the assembly loop is
     `range(1, NMAX + 1)` and simply never looked at them, while
@@ -102,9 +102,9 @@ CRT_BOUND = 1 << 112                   # the runner's overflow guard
 PRIME_CHECK = ROOT / "scripts" / "confetti_prime_check.py"
 EXPECT_PER_PRIME_CELLS = 23            # n = 18..40, the cells the triangle has
 
-# The Nmax-41 ladder (results/cutcount_b1/rows41/README.md).
-ROWS41 = ROOT / "results" / "cutcount_b1" / "rows41"
-RESIDUES41 = ROOT / "results" / "cutcount_b1" / "residues41"
+# The Nmax-41 ladder (results/coloring-recount/rows41/README.md).
+ROWS41 = ROOT / "results" / "coloring-recount" / "rows41"
+RESIDUES41 = ROOT / "results" / "coloring-recount" / "residues41"
 A41_SWEEP = ROOT / "results" / "a41"   # the kink engine's h<H>.out at Nmax 41
 NMAX41 = 41
 EXPECT41_TOP_H = 19
@@ -229,7 +229,7 @@ def read_sweep_row(sweep_dir: Path, n: int) -> dict[int, int]:
 
 
 def check_row41(rows_dir: Path, sweep_dir: Path) -> tuple[list[str], int]:
-    """T(41,H) assembled from the Nmax-41 Motley rows vs the kink engine's own
+    """T(41,H) assembled from the Nmax-41 the coloring recount rows vs the kink engine's own
     Nmax-41 sweep -- two engines, no shared code, on every swept cell of a(41).
     """
     bad = []
@@ -250,7 +250,7 @@ def check_row41(rows_dir: Path, sweep_dir: Path) -> tuple[list[str], int]:
             continue
         cells += 1
         if M[(NMAX41, h)] != sweep[h]:
-            bad.append("T(%d,%d): Motley %d, kink sweep %d"
+            bad.append("T(%d,%d): the coloring recount %d, kink sweep %d"
                        % (NMAX41, h, M[(NMAX41, h)], sweep[h]))
     if cells != EXPECT41_ROW41_CELLS:
         bad.append("row 41: compared %d cells, pinned at %d"
@@ -264,7 +264,7 @@ def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
     """CRT all primes but one, predict that one, tie the result to the banked
     exact row, at every n = 1..nmax.  `heldout` picks the prime the RUN held
     out: Confetti's runner held out the last of its list, the smallest (min);
-    the Nmax-41 ladder used scripts/motley_crt.py, which holds out the largest
+    the Nmax-41 ladder used scripts/coloring_crt.py, which holds out the largest
     (max)."""
     bad = []
     primes, paths = residue_rows(res_dir, H)
@@ -288,13 +288,13 @@ def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
 
     # TODO(2026-08-19, updated 2026-09-05): the FIFTH Python copy of this
     # CRT loop (scripts/crt_combine.py, tests/gate_modp.py, the runner's own,
-    # and scripts/motley_crt.py).  motley_crt.py is importable (no argv at
+    # and scripts/coloring_crt.py).  coloring_crt.py is importable (no argv at
     # import) and is the candidate to share; consolidating THIS copy would
     # erode the gate's second-source role against the dalby runner, so the
     # other three are the ones to collapse.  The Nmax-41 arm re-encodes
-    # motley_crt's hold-out rule as `heldout=max`, and both gates carry the
+    # coloring_crt's hold-out rule as `heldout=max`, and both gates carry the
     # ladder's paths, Nmax and prime count separately: one ladder record in
-    # motley_crt.py, read by both, is the consolidation, deferred with the rest.
+    # coloring_crt.py, read by both, is the consolidation, deferred with the rest.
     M = 1
     for p in crt_primes:
         M *= p
@@ -533,7 +533,7 @@ def selftest() -> int:
     # RED 10: one wrong digit in rows41's C19 at n = 41 is visible ONLY to the
     # row-41 arm (the triangle has no row 41); it must fire there.
     out = staged(bump("rows41/C19.out"))
-    if not any("T(41,19): Motley" in b for b in out):
+    if not any("T(41,19): the coloring recount" in b for b in out):
         problems.append("RED 10: a corrupted rows41/C19.out at n = 41 passed "
                         "the row-41 arm (%s)" % out[:2])
     # RED 11: the same row corrupted at n = 40 must fire the triangle arm, and
@@ -545,7 +545,7 @@ def selftest() -> int:
     # RED 12: the kink sweep itself corrupted: the row-41 arm compares two
     # engines, so a wrong h<H>.out must fire too.
     out = staged(bump("a41/h7.out"))
-    if not any("T(41,7): Motley" in b for b in out):
+    if not any("T(41,7): the coloring recount" in b for b in out):
         problems.append("RED 12: a corrupted results/a41/h7.out passed (%s)"
                         % out[:2])
     # RED 13: a corrupted residue at a LOW height of the ladder must be named

@@ -49,13 +49,13 @@ sys.path.insert(0, HERE)
 from slope2_law_vs_truth import read_pk, read_tri  # noqa: E402
 
 
-def read_tri_motley(rowdir=None):
-    """T(n,H) assembled from MOTLEY's banked C_H rows alone.
+def read_tri_coloring(rowdir=None):
+    """T(n,H) assembled from the coloring recount's banked C_H rows alone.
 
     T(n,H) = C_H - 2 C_{H-1} + C_{H-2}, the same telescope cutcount_b1
     --assemble uses.  Nothing here reads the production sweep, so a pin built
     on this triangle owes the incumbent connectivity rule nothing."""
-    rowdir = rowdir or os.path.join(ROOT, "results", "cutcount_b1", "rows")
+    rowdir = rowdir or os.path.join(ROOT, "results", "coloring-recount", "rows")
     C = {}
     for fn in os.listdir(rowdir):
         m = re.match(r"C(\d+)\.out$", fn)
@@ -68,7 +68,7 @@ def read_tri_motley(rowdir=None):
             if len(p) == 2:
                 C[H][int(p[0])] = int(p[1])
     if not C:
-        raise SystemExit(f"no Motley C rows in {rowdir}")
+        raise SystemExit(f"no the coloring recount C rows in {rowdir}")
     tri = {}
     for H in sorted(C):
         for n in C[H]:

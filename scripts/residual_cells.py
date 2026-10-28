@@ -83,7 +83,7 @@ CANONICAL = "results/residual-cells.md"
 
 NMAX = PT.NMAX
 # The ladder the notes actually discuss: banked step 0 through the height that
-# would close row 40 outright.  MOTLEY_H is where it stands today.  The top is
+# would close row 40 outright.  COLORING_H is where it stands today.  The top is
 # PT.SWEEP_H because that IS the closing height -- typing 21 here a second time
 # would leave the fact table one rung short if the sweep ceiling ever moved.
 LADDER = range(16, PT.SWEEP_H + 1)
@@ -122,22 +122,22 @@ def formula_lo(n: int) -> int:
     return min(band)
 
 
-def row40_residual(motley_h: int) -> list[tuple[int, int]]:
+def row40_residual(coloring_h: int) -> list[tuple[int, int]]:
     """Q2: row 40's cells that still rest on the main transfer matrix's connectivity rule."""
     out = []
     for h in range(1, NMAX + 1):
         if h <= PT.SWEEP_H:
-            if h > motley_h:                 # swept, not yet reached by the recount
+            if h > coloring_h:                 # swept, not yet reached by the recount
                 out.append((NMAX, h))
         else:
             # wired at level k = 40 - h; anchors sit at heights 41-h and 42-h,
             # and the higher of the two is what has to be inside the recount's reach
-            if (42 - h) > motley_h:
+            if (42 - h) > coloring_h:
                 out.append((NMAX, h))
     return out
 
 
-def closure_n(motley_h: int) -> int:
+def closure_n(coloring_h: int) -> int:
     """Largest n whose every cell is rule-independent, by the overlap criterion.
 
     The recount covers h <= H from below and the closed-form band covers
@@ -152,7 +152,7 @@ def closure_n(motley_h: int) -> int:
     """
     best = 0
     for n in range(1, NMAX + 1):
-        if all(formula_lo(m) <= motley_h for m in range(1, n + 1)):
+        if all(formula_lo(m) <= coloring_h for m in range(1, n + 1)):
             best = n
     return best
 
@@ -163,7 +163,7 @@ def facts() -> dict:
     F = {}
     prev_q1 = prev_q2 = None
     for h in LADDER:
-        _, _, _, stats = PT.analyze(T, motley_h=h)
+        _, _, _, stats = PT.analyze(T, coloring_h=h)
         q1 = sorted(stats["congruence_only"])
         q2 = sorted(row40_residual(h))
         F["congruence_only.cells@%d" % h] = q1
@@ -206,7 +206,7 @@ _NUMWORD = (r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven"
 TRIGGER_RE = re.compile(
     r"congruence[- ]only"
     r"|only the mod-4|only the congruence|nothing but the congruence"
-    r"|residual (?:cells|band)\b(?=.*(?:row 40|T\(40|Motley|Ticker|congruence))"
+    r"|residual (?:cells|band)\b(?=.*(?:row 40|T\(40|the coloring recount|Ticker|congruence))"
     r"|row 40'?s residual"
     r"|\b" + _NUMWORD + r" of (?:its )?(?:40|forty) cells\b",
     re.I)
@@ -269,7 +269,7 @@ def check_peer(F: dict, root: Path = ROOT) -> list[str]:
                 "gate-provenance` writes it" % GENERATED_PEER]
     text = path.read_text(errors="replace")
     bad = []
-    h = PT.MOTLEY_H
+    h = PT.COLORING_H
     m = re.search(r"only\*{0,2} the mod-4 congruence[^\n]*?\*\*(\d+)\*\*", text)
     if not m:
         bad.append("%s: cannot find the congruence-only count -- the other "
@@ -720,7 +720,7 @@ def selftest() -> int:
         problems.append("GREEN 17b: 'N of 820 cells' is not a row-40 claim "
                         "and must not trigger")
 
-    h = PT.MOTLEY_H
+    h = PT.COLORING_H
     want = F["congruence_only.cells@%d" % h]
 
     # RED 8: the peer generator disagreeing on the count.

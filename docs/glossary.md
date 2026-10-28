@@ -16,7 +16,7 @@ counts of shapes invariant under each mirror and rotation.
 **coloring recount** — The second enumeration program. Instead of tracking
 which boundary cells are connected, it colors components and reads the
 connected count off the coefficient of `q¹` (the Fortuin–Kasteleyn / Potts
-device, `docs/proofs/cutcount-identity.md`). Code under `results/cutcount_b1/`.
+device, `docs/proofs/cutcount-identity.md`). Code under `results/coloring-recount/`.
 
 **column kernel, kink kernel** — The two transitions of the production
 transfer matrix: a whole column per step (`core/transition.h`) or one cell per
@@ -145,7 +145,7 @@ literature's or OEIS's where one exists.
 | formulas, closed forms | P_k; the formula table `diagCoeffTable`; a height is injected when composed from P_k instead of swept | — |
 | fixed from earlier rows; fitted; verified against values from later rows | determined from two entries per level; holdout; determined from below-onset entries | — |
 | transfer matrix | the column kernel (`core/transition.h`) and the kink kernel (`core/kink.h`); the sweep; `orchestrate` | the finite-lattice or transfer-matrix method, Jensen 2001 |
-| a transfer-matrix method that uses coloring instead of tracking connectivity | the coloring recount; `cpp/motley_par.cpp`, `results/cutcount_b1/` | the Fortuin–Kasteleyn / Potts spin representation of q^{components} |
+| a transfer-matrix method that uses coloring instead of tracking connectivity | the coloring recount; `cpp/coloring_recount.cpp`, `results/coloring-recount/` | the Fortuin–Kasteleyn / Potts spin representation of q^{components} |
 | Redelmeier enumeration | `g2` (`cpp/g2_redelmeier.cpp`); brute force; the fleet run | Redelmeier 1981 |
 | Burnside congruences | the subgroup census, a(n) mod 4, `results/symmetry-classes.md` | Burnside's lemma; D4 orbit sizes |
 | double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); see `results/confidence.md` | — |
