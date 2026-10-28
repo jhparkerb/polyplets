@@ -652,7 +652,7 @@ def selftest() -> int:
     # is where the word "residual" is; the body is where the numbers are.
     bad, _, trig = run("| after | row 40's residual band | <!--q:prose-->\n"
                        "|---|---|\n"
-                       "| Ticker Tape | 3 cells |\n", "r11.md")
+                       "| the next run | 3 cells |\n", "r11.md")
     if trig != 2 or not any("r11.md:3" in b for b in bad):
         problems.append("RED 11: a table body row under a triggered header was "
                         "not checked (triggers=%d, %s)" % (trig, bad))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ternary Spine: the mod-3 structure of the height triangle's diagonal family.
+"""The mod-3 spine: the mod-3 structure of the height triangle's diagonal family.
 
 Verifies every link in the chain of results/arithmetic-structure.md:
 
@@ -21,7 +21,7 @@ Verifies every link in the chain of results/arithmetic-structure.md:
   Bonus depth (measured):
     H^3 - H^2 == 25t (mod 27);  (H^3-H^2-25t)/27 == t*(W(t^3)-1) (mod 3).
 
-Run: python3 -m experiments.ternary_spine   (needs results/ns_a36/perheight/)
+Run: python3 -m experiments.mod3_spine   (needs results/ns_a36/perheight/)
 """
 import os, io, types, contextlib
 from fractions import Fraction as F

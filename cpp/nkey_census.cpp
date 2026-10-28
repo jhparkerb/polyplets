@@ -10,7 +10,7 @@
 // compounds with no closed form, no OEIS match on 8, 19, 43, 101, 239, 575,
 // 1399, 3441, 8539, and no recurrence with surplus.  This measures it instead.
 //
-// WHAT IT REPLACES.  experiments/skeletonkey/nfamily_merge.py generates
+// WHAT IT REPLACES.  experiments/nfamily_merge.py generates
 // successors by iterating all 2^H column masks per state: H = 13 cost 962 s
 // and 18 GB on ayr and H = 14 alone would be over an hour.  Here the column is
 // swept ONE CELL AT A TIME -- a row-by-row breadth-first refinement of partial
@@ -496,7 +496,7 @@ u64 censusShared(int H, bool dilate_on, obs::Reporter* rep, size_t batch) {
 }
 
 // The reachable key set from the empty frontier, minus the empty start itself
-// -- the convention of experiments/skeletonkey/nfamily_merge.py, whose counts
+// -- the convention of experiments/nfamily_merge.py, whose counts
 // this must reproduce.
 u64 census(int H, bool dilate_on, obs::Reporter* rep) {
   std::unordered_set<Key, KeyHash> seen;

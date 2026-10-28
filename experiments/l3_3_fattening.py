@@ -38,7 +38,7 @@ pinch detector is broken and the other verdicts mean nothing.
 Gate: the animal counts must reproduce A006770 (1, 4, 20, 110, 638, 3832,
 23592, ...) before any verdict is reported.
 
-Usage: python3 experiments/skeletonkey/l3_3_fattening.py [NMAX]     (ayr)
+Usage: python3 experiments/l3_3_fattening.py [NMAX]     (ayr)
 Cost:  n <= 7 is seconds and megabytes; n = 8 is ~150k animals, still small.
 """
 

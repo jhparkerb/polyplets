@@ -13,7 +13,7 @@ Checks (exact integer arithmetic throughout):
       from runs/sym34 (different code path), n <= 13.
   M7. a(n) parity vs hmirror/r180 parity, n <= 34 (banked both sides).
 
-Run from experiments/tristruct/:  python3 p2_measure.py
+Run from experiments/triangle_structure/:  python3 p2_measure.py
 """
 import os, sys
 from triangle import Triangle

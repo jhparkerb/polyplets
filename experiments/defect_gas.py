@@ -461,7 +461,7 @@ def boundary_weight(sizes, W=9):
 
 def check_ladder(KX=300):
     """Iterate the mod-27 master equation as a pure-algebra fixed point and
-    verify the Ternary Spine ladder on it: (*b) H==W mod 3, the mod-9 lift,
+    verify the mod-3 spine ladder on it: (*b) H==W mod 3, the mod-9 lift,
     and (*c) S == u^2 + uW mod 3 -- to u^KX, no enumeration involved."""
     MOD = 27
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact Change probe 5: the top-row doubling behind the A034299 recurrence.
+"""A034299 basis probe 5: the top-row doubling behind the A034299 recurrence.
 
 r(H) = 2 r(H-1) + (-1)^(H-1) ceil(H/2) (A034299's own recurrence) predicts a
 decomposition of the observability space V_H by top-row usage of the SUFFIX:
@@ -24,7 +24,7 @@ Fail-closed: full-alphabet rank must equal A034299 at every H.
 import sys
 import time
 
-from exactchange_minauto import build_min_automaton, obs_rank, a034299
+from a034299_minauto import build_min_automaton, obs_rank, a034299
 
 
 def main():

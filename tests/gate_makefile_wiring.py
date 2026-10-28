@@ -60,7 +60,7 @@ EXCUSED = {}
 # Where gate scripts live, and what a gate script looks like. Kept broad on
 # purpose: a gate that hides from the glob is a gate that hides from the lint.
 SCRIPT_GLOBS = ("tests/gate_*.py", "experiments/*_gate.py",
-                "experiments/*/*_gate.py",          # tristruct/, skeletonkey/, ...
+                "experiments/*/*_gate.py",          # triangle_structure/, ...
                 "scripts/*gate*.sh", "scripts/*/*gate*.sh")
 
 # Scripts that are deliberately not run by the Makefile, with the reason.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Skeleton Key probe 2 -- is the N-family congruence a plain state merge for
+"""Probe: is the N-family congruence a plain state merge for
 the production column automaton, in characteristic 0?
 
 Two files in the tree disagree without noticing each other:
@@ -19,7 +19,7 @@ The argument given there reads nothing about a block except N(b), so it is a
 statement about the LANGUAGE, hence a congruence over any semiring -- and then
 it is not a characteristic-2 fact but a state-space cut for exact counting.
 This probe tests exactly that, re-deriving the automaton from scratch (no
-exactchange code, no production code is imported) and gating on the banked
+A034299-probe code, no production code is imported) and gating on the banked
 C_H rows, which are exact integers.
 
 Gates, all fail-closed:
@@ -47,7 +47,7 @@ from collections import defaultdict
 BANKED_N = {4: 8, 5: 19, 6: 43, 7: 101, 8: 239, 9: 575, 10: 1399, 11: 3441}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(os.path.dirname(HERE))
+ROOT = os.path.dirname(HERE)
 ROWDIR = os.path.join(ROOT, "results", "coloring-recount", "rows")
 
 
@@ -284,7 +284,7 @@ def main():
     maxh_key = int(sys.argv[2]) if len(sys.argv) > 2 else 11
     nmax = int(sys.argv[3]) if len(sys.argv) > 3 else 12
 
-    print("# skeletonkey nfamily_merge  maxh_full=%d maxh_key=%d nmax=%d"
+    print("# nfamily_merge  maxh_full=%d maxh_key=%d nmax=%d"
           % (maxh_full, maxh_key, nmax), flush=True)
 
     rows = []
@@ -339,7 +339,7 @@ def main():
                      % (H, cls, nkey))
 
         if H in BANKED_N and nkey != BANKED_N[H]:
-            sys.exit("GATE E FAILED H=%d: %d classes vs exactchange's %d"
+            sys.exit("GATE E FAILED H=%d: %d classes vs the A034299 probe's %d"
                      % (H, nkey, BANKED_N[H]))
 
         # gate F -- the flagged machine emits T(n,H) directly, and it must
@@ -433,7 +433,7 @@ def main():
         nkey = len(keys) - 1
         want = motzkin(H + 1) - 1
         if H in BANKED_N and nkey != BANKED_N[H]:
-            sys.exit("GATE E FAILED H=%d: %d classes vs exactchange's %d"
+            sys.exit("GATE E FAILED H=%d: %d classes vs the A034299 probe's %d"
                      % (H, nkey, BANKED_N[H]))
         print("H=%-3d raw=%-12d key=%-9d ratio=%.3f   %.1fs"
               % (H, want, nkey, want / nkey, time.time() - t0), flush=True)

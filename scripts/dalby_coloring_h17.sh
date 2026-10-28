@@ -1,5 +1,5 @@
 #!/bin/bash
-# the coloring recount rung 1 (Half Measure) production run: C_17(n), n <= 40.
+# The coloring recount at H = 17, production run: C_17(n), n <= 40.
 #
 # Purpose: the first height above the banked ladder.  Product is
 # T(n,17) = C_17(n) - 2*C_16(n) + C_15(n), which closes a(n) for n <= 33
@@ -11,7 +11,7 @@
 # stamped b9d725be, clean worktree, gate-cutcount-b1 GREEN on that build.
 #
 # Predicted cost, from the measured H<=16 ladder (RSS x2.984/height, wall
-# x3.209/height, results/coloring-recount/calib_run.log) times Half Measure's
+# x3.209/height, results/coloring-recount/calib_run.log) times the H = 17 run's
 # measured payload factor 0.514 and its measured wall factor ~1/1.5:
 #     peak RSS  ~91 GB   (I256 would have been 177 GB)
 #     wall      ~7-10 h  on one core
@@ -90,5 +90,5 @@ for n in sorted(C17):
 print(f"T(n,17) vs results/triangle.txt: {match} match, {mismatch} mismatch")
 if mismatch or match == 0:
     sys.exit(2)
-print("HALF MEASURE H=17: GREEN")
+print("COLORING H=17: GREEN")
 PY

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """How much of a(n) sits above a given height, and how far that can be extrapolated.
 
-Motivation (Skeleton Key, 2026-08-20).  An exact a(n) needs every cell of the
+Motivation (2026-08-20).  An exact a(n) needs every cell of the
 T(n,H) triangle.  An a(n) good to a few significant digits does not: the sweep
 covers H <= Hsweep exactly, the tower fitted below onset covers H >= (n-3)/2 exactly, and
 only the band between them has to be estimated.  This script prices that band.
@@ -16,7 +16,7 @@ Input: results/ns_a40/perheight/hH.out, one "n count" pair per line.
 import sys, os
 
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PERHEIGHT = os.path.join(ROOT, "results", "ns_a40", "perheight")
 NMAX, HMAX = 40, 40
 

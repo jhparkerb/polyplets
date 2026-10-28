@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact Change probe 4: the minimized automaton, built a priori.
+"""A034299 basis probe 4: the minimized automaton, built a priori.
 
 Probe 3 (exactchange_kernel_probe.py) established that the GF(2) Nerode class
 of a strip-automaton state is EXACTLY the multiset of its block neighborhoods
@@ -22,7 +22,7 @@ Purposes:
   (3) bank the minimized state-count sequence N(H) itself for OEIS lookup
       (8, 19, 43, 101, 239, 575, ... growth ~2.41 -- silver-ratio scent).
 
-Usage: exactchange_minauto.py MAXH [--count-only]
+Usage: a034299_minauto.py MAXH [--count-only]
 """
 import sys
 import time

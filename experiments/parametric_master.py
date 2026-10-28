@@ -32,7 +32,7 @@ This probe runs that on three lattices and checks A_k against the values
 DP over the triangle, not the weights). Agreement is the claim; the two routes
 share no code.
 
-Usage: python3 experiments/skeletonkey/parametric_master.py [KMAX]
+Usage: python3 experiments/parametric_master.py [KMAX]
 """
 
 import os
@@ -41,7 +41,7 @@ import time
 from fractions import Fraction as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(os.path.dirname(HERE))
+ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 
 from experiments.gas_cumulants import cluster_weight  # noqa: E402

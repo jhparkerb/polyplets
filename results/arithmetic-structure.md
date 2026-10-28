@@ -159,7 +159,7 @@ k ≡ 2, and v₃(P_k(3k−2)) ≥ 4 for k ≡ 1. Since r_k is a unit for k ≢ 
 
 for all k ≥ 3, not only the k ≤ 11 the data reached. The finer valuations
 at k ≡ 1 (7, 4, 4, 5 at k = 4, 7, 10, 13) are invisible mod 81 and open.
-Proved in `experiments/tristruct/r2_prove_d3.py` (exact arithmetic, about
+Proved in `experiments/triangle_structure/r2_prove_d3.py` (exact arithmetic, about
 1 s).
 
 *Frame.* (A1) The diagonal formula and P_k(n) = [u^k] G(u) Λ(u)^n for
@@ -167,7 +167,7 @@ n ≥ 2k+1, proved and Lean-checked. (A2) Λ ≡ the fixed point of the mod-81
 master equation at all orders, derived from the cluster expansion with
 completeness from the proved row bound ℓ ≤ k (interior clusters need k ≤ 4,
 boundary clusters k ≤ 3, no new weights), checked against the coefficients
-of Λ for k ≤ 17 (`experiments/tristruct/r2_tower_mod81.py`). (A3)
+of Λ for k ≤ 17 (`experiments/triangle_structure/r2_tower_mod81.py`). (A3)
 G ≡ ε_b ε_t (1 − uΛ'/Λ)/den (mod 81), the boundary residue formula reduced
 mod 81, checked against the coefficients of G for k ≤ 17. (A4) Eleven
 cluster weights (5 interior, 4 boundary, 5 denominator entries, overlapping)
@@ -266,7 +266,7 @@ and n is even; for n odd the fixed set is empty. ∎
 
 The 180° rotation gives the same parity independently (its fixed cell would
 sit at the box center, between rows for H even). Checked on all 190 entries
-of the region in n ≤ 39 (`experiments/tristruct/p2_measure.py`), 135 of them
+of the region in n ≤ 39 (`experiments/triangle_structure/p2_measure.py`), 135 of them
 not used in any fit and 81 of those enumerated. Row 40 is even, so the
 theorem says nothing about a(40).
 
@@ -274,7 +274,7 @@ theorem says nothing about a(40).
 invariant under the full height-preserving Klein group
 (`results/subgroup_d2ax_byheight.txt`, n ≤ 40). I(n,H) = 0 on all 190
 entries with n odd and H even (the theorem) and I(n,H) > 0 on all 630 other
-entries at n ≤ 40 (`experiments/tristruct/p2_symtri_probe.py`; verified, not
+entries at n ≤ 40 (`experiments/triangle_structure/p2_symtri_probe.py`; verified, not
 proved: a 2×(n/2) rectangle is the unique Klein-invariant animal with H = 2,
 so I(n,2) = [n even], but no uniform construction for all four parity
 classes is written down). T(n,H) ≡ I(n,H) (mod 2) is Burnside's lemma,
@@ -477,7 +477,7 @@ height-independent; T4 and the search are per height).
 
 The GF(2) rank r(H) of the strip functional, from the partition automaton
 (to H = 12), the minimized automaton
-(`experiments/tristruct/exactchange_minauto.py`, to H = 13) and the closure
+(`experiments/triangle_structure/a034299_minauto.py`, to H = 13) and the closure
 probes (to H = 10):
 
 | H | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
@@ -560,7 +560,7 @@ engine is a rank factorization. A hand re-derivation found no gap; the
 numeric check that must first fail on a corrupted input has not been run. A
 claimed self-duality (suffix classes are also N-families) is asserted only.
 
-The filtration (`experiments/tristruct/exactchange_doubling_probe.py`,
+The filtration (`experiments/triangle_structure/a034299_doubling_probe.py`,
 H = 4..10). With V_low the span of Hankel rows of words avoiding the top row
 and V_int of words avoiding both boundary rows:
 
@@ -621,17 +621,17 @@ engines.
 
 ## Reproduce
 
-    python3 -m experiments.ternary_spine            # Theorems 1-6, 15 checks; needs results/ns_a36/perheight/
+    python3 -m experiments.mod3_spine            # Theorems 1-6, 15 checks; needs results/ns_a36/perheight/
     python3 experiments/deficit2_proof.py           # Theorem 7
-    python3 experiments/tristruct/r2_tower_mod81.py # the mod-81 master equation and G mod 81
-    python3 experiments/tristruct/r2_prove_d3.py    # Theorem 8
+    python3 experiments/triangle_structure/r2_tower_mod81.py # the mod-81 master equation and G mod 81
+    python3 experiments/triangle_structure/r2_prove_d3.py    # Theorem 8
     python3 experiments/sleeve_zero_census.py       # the sleeve-zero table
     python3 experiments/spine_deeper.py             # the mod-27 lifts
-    cd experiments/tristruct && python3 p2_measure.py && python3 p2_symtri_probe.py   # Theorem 9, the zero set
+    cd experiments/triangle_structure && python3 p2_measure.py && python3 p2_symtri_probe.py   # Theorem 9, the zero set
     python3 experiments/v5_denominator.py           # Theorem 10 and the profiles
     git show 697f376:polyplets/Polyplets/V5Denominator.lean   # the Lean, no longer in the build
-    python3 experiments/tristruct/exactchange_doubling_probe.py
-    python3 experiments/tristruct/exactchange_minauto.py 13   # H = 12 about 17 min and 3.9 GB, H = 13 4 h 42 min and 19.8 GB
+    python3 experiments/triangle_structure/a034299_doubling_probe.py
+    python3 experiments/triangle_structure/a034299_minauto.py 13   # H = 12 about 17 min and 3.9 GB, H = 13 4 h 42 min and 19.8 GB
 
 The triangle is `results/triangle.txt`; the symmetric counts are
 `results/subgroup_d2ax_byheight.txt`.

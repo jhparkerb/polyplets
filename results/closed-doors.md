@@ -187,7 +187,7 @@ orderings in under a second and exits nonzero on failure.
 ### 1.4 The cell-level compressed transfer in characteristic 0
 
 `experiments/skeletonkey/cell_sparsity_modp.py`, 2026-08-22, data in
-`results/skeletonkey/cellsparse.txt`, primes 131071 and 65521. The question
+`results/cell_sparsity_modp.txt`, primes 131071 and 65521. The question
 was whether a compressed cell-level transfer is dense, which would rule it
 out by itself.
 
@@ -284,7 +284,7 @@ cell at row `r` attaches to `b` iff `r ∈ N(b)`, and `b` strands iff the new
 column's mask misses `N(b)`. So this is a congruence of the language over any
 semiring, not a mod-2 fact, and the merged set is exactly the end-of-column
 frontier the engine writes out (`docs/engine-record.md`). Probe
-`experiments/skeletonkey/nfamily_merge.py`, exact integers, sharing no code
+`experiments/nfamily_merge.py`, exact integers, sharing no code
 with the engine.
 
 | H | raw states | merged | ratio | raw growth | merged growth |
@@ -627,7 +627,7 @@ already comes from (`results/growth-constant.md`).
 The route: fatten each king cell `(x, y)` to the block
 `{2x, 2x+1} × {2y, 2y+1}`, fill a marked corner cell at each pinch, and apply
 polyomino contour technology to the image class verbatim.
-`experiments/skeletonkey/l3_3_fattening.py`, over every polyplet to `n = 8`
+`experiments/l3_3_fattening.py`, over every polyplet to `n = 8`
 (176,138, checked against A006770). A grid corner pinches when exactly one
 diagonal pair of the four cells meeting there is in the animal; the two
 absent cells are the candidate blocks for a filler.
@@ -725,7 +725,7 @@ of magnitude.
 
 ### 3.6 Exact bulk plus estimated tail
 
-`experiments/skeletonkey/height_tail_extrapolation.py` on the per-height rows
+`experiments/height_tail_extrapolation.py` on the per-height rows
 of `results/ns_a40/perheight/`; its control is that perturbing a row must
 move the quantile. Fitting the rows, `<H> = 1.228 n^0.682` (against the
 extent exponent `ν → 0.6407`, `results/growth-constant.md`). Exact quantiles
@@ -974,7 +974,7 @@ is the count of thin animals times a power of `k`.
 Not a closed door. The one piece of the diagonal-formula machinery that
 `docs/proofs/universal-diagonal-law.md` left king-only, assembling `c_k` for
 `k ≥ 2` from the cluster weights, is one substitution
-(`experiments/skeletonkey/parametric_master.py`).
+(`experiments/parametric_master.py`).
 
 The renewal chain is `1 = 3z + Σ_c W_c y^k z^(l+1)` at `z = 1/μ`. The 3 is
 the drift-step weight, the number of continuations of a one-cell row, which
@@ -1296,8 +1296,8 @@ arithmetic.
     python3 scripts/probe_hankel_rank2.py --anchor          # reproduces H = 4..10
     python3 scripts/probe_hankel_rank2.py 11                # ~16.5 h single-core, 7.6 GB
     python3 experiments/height_dimension_ladders.py         # the five-sizes inequalities, < 1 s
-    experiments/skeletonkey/cell_sparsity_modp.py 8 results/skeletonkey/cellsparse.txt   # H = 8: 2 h 47 min, ~7 GB
-    python3 experiments/skeletonkey/nfamily_merge.py 8 12 12
+    experiments/skeletonkey/cell_sparsity_modp.py 8 results/cell_sparsity_modp.txt   # H = 8: 2 h 47 min, ~7 GB
+    python3 experiments/nfamily_merge.py 8 12 12
     make build/nkey_census
     build/nkey_census --gate                                # both engines' checks and the cross-check
     build/nkey_census --shared 17                           # ~4 min
@@ -1312,9 +1312,9 @@ arithmetic.
     build/prec_guess alg  results/b006770_upload.txt 4 5
 
     # connectivity handles
-    python3 experiments/skeletonkey/l3_3_fattening.py 8
+    python3 experiments/l3_3_fattening.py 8
     python3 experiments/dual_connectivity_blockcount.py --height 21
-    python3 experiments/skeletonkey/height_tail_extrapolation.py
+    python3 experiments/height_tail_extrapolation.py
 
     # matching pair
     python3 experiments/matching_pair_euler.py 4            # ~3 min
@@ -1324,8 +1324,8 @@ arithmetic.
     python3 experiments/spectral_edge.py
 
     # parametric master equation
-    python3 experiments/skeletonkey/parametric_master.py --wired-only
-    python3 experiments/skeletonkey/parametric_master.py 4  # the K = 4 weights run; (2,2,2,2) takes ~1.8 h
+    python3 experiments/parametric_master.py --wired-only
+    python3 experiments/parametric_master.py 4  # the K = 4 weights run; (2,2,2,2) takes ~1.8 h
     python3 experiments/hex_diag_deep.py --generate --kmax 6 --hmax 20
     python3 experiments/depth1_parametric.py --kernel --kmax 25
 

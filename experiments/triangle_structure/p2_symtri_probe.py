@@ -19,7 +19,7 @@ Probes (all exact):
       H=3..6 for eyeballing + quick linear-recurrence probe mod nothing,
       exact, order<=6 fit on n<=22 predict n>=23.)
 
-Run from experiments/tristruct/:  python3 p2_symtri_probe.py
+Run from experiments/triangle_structure/:  python3 p2_symtri_probe.py
 """
 import os
 from fractions import Fraction
