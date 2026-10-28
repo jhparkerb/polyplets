@@ -291,10 +291,7 @@ func SumCountsInFile(path string) (map[int]*big.Int, uint64, error) {
 			if err != nil {
 				return nil, recCount, fmt.Errorf("reading counts in %s: %w", path, err)
 			}
-			if sums[lo+i] == nil {
-				sums[lo+i] = new(big.Int)
-			}
-			sums[lo+i].Add(sums[lo+i], val)
+			addTo(sums, lo+i, val)
 		}
 		recCount++
 	}
@@ -315,9 +312,23 @@ func SumCountsInFile(path string) (map[int]*big.Int, uint64, error) {
 // readBigUvarint decodes one LEB128 unsigned varint of any width. More than
 // 19 bytes (past u128) is corruption, not a count.
 func readBigUvarint(br io.ByteReader) (*big.Int, error) {
-	v := new(big.Int)
+	// The first 9 bytes carry 63 bits, so they accumulate in a uint64; only a
+	// longer varint (a count past 2^63) goes through big.Int.
+	var u uint64
 	var shift uint
-	for i := 0; i < 19; i++ {
+	for i := 0; i < 9; i++ {
+		b, err := br.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+		u |= uint64(b&0x7f) << shift
+		if b < 0x80 {
+			return new(big.Int).SetUint64(u), nil
+		}
+		shift += 7
+	}
+	v := new(big.Int).SetUint64(u)
+	for i := 9; i < 19; i++ {
 		b, err := br.ReadByte()
 		if err != nil {
 			return nil, err
@@ -363,10 +374,7 @@ func ReadTriangleFile(path string) (map[int]*big.Int, error) {
 		if err1 != nil || !ok {
 			return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
 		}
-		if sums[n] == nil {
-			sums[n] = new(big.Int)
-		}
-		sums[n].Add(sums[n], v)
+		addTo(sums, n, v)
 	}
 	return sums, sc.Err()
 }
@@ -517,10 +525,7 @@ func Run(cfg Config) []CheckResult {
 
 		// Accumulate sums for row-sum check.
 		for n, v := range sums {
-			if allSums[n] == nil {
-				allSums[n] = new(big.Int)
-			}
-			allSums[n].Add(allSums[n], v)
+			addTo(allSums, n, v)
 		}
 	}
 
@@ -615,6 +620,14 @@ func checkGrowthRatio(sums map[int]*big.Int) []CheckResult {
 }
 
 // bigOrZero returns v, or zero when v is nil (an n no file contributed to).
+// addTo adds v into m[n], starting from zero when m has no entry for n.
+func addTo(m map[int]*big.Int, n int, v *big.Int) {
+	if m[n] == nil {
+		m[n] = new(big.Int)
+	}
+	m[n].Add(m[n], v)
+}
+
 func bigOrZero(v *big.Int) *big.Int {
 	if v == nil {
 		return new(big.Int)

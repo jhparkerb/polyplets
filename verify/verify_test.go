@@ -1,8 +1,10 @@
 package verify
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
@@ -215,5 +217,34 @@ func TestBytesAfterLastRecordFail(t *testing.T) {
 	}
 	if _, _, err := SumCountsInFile(path); err == nil {
 		t.Fatalf("SumCountsInFile accepted 3 stray bytes before the trailer")
+	}
+}
+
+// TestReadBigUvarintBoundaries: values either side of the uint64 fast path's
+// 63-bit limit, and past 2^64, decode exactly.
+func TestReadBigUvarintBoundaries(t *testing.T) {
+	two := big.NewInt(2)
+	for _, want := range []*big.Int{
+		big.NewInt(0), big.NewInt(127), big.NewInt(128),
+		new(big.Int).Sub(new(big.Int).Exp(two, big.NewInt(63), nil), big.NewInt(1)),
+		new(big.Int).Exp(two, big.NewInt(63), nil),
+		new(big.Int).Exp(two, big.NewInt(64), nil),
+		new(big.Int).Exp(big.NewInt(3), big.NewInt(45), nil),
+		new(big.Int).Sub(new(big.Int).Exp(two, big.NewInt(128), nil), big.NewInt(1)),
+	} {
+		var enc []byte
+		for x := new(big.Int).Set(want); ; {
+			b := byte(new(big.Int).And(x, big.NewInt(0x7f)).Int64())
+			x.Rsh(x, 7)
+			if x.Sign() == 0 {
+				enc = append(enc, b)
+				break
+			}
+			enc = append(enc, b|0x80)
+		}
+		got, err := readBigUvarint(bytes.NewReader(enc))
+		if err != nil || got.Cmp(want) != 0 {
+			t.Errorf("readBigUvarint(%x) = %v, %v; want %v", enc, got, err, want)
+		}
 	}
 }
