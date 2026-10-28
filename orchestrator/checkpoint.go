@@ -221,34 +221,14 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		case "acct":
 			parseAcct(v, &ck.Acct)
 		case "tri":
-			parts := strings.Fields(v)
-			if len(parts) != 2 {
+			if !setSparse(&ck.Triangle, v) {
 				return bad()
 			}
-			n, err1 := strconv.Atoi(parts[0])
-			val, ok := new(big.Int).SetString(parts[1], 10)
-			if err1 != nil || !ok || n < 0 {
-				return bad()
-			}
-			for n >= len(ck.Triangle) {
-				ck.Triangle = append(ck.Triangle, new(big.Int))
-			}
-			ck.Triangle[n] = val
 			nTri++
 		case "htri":
-			parts := strings.Fields(v)
-			if len(parts) != 2 {
+			if !setSparse(&ck.HTri, v) {
 				return bad()
 			}
-			n, err1 := strconv.Atoi(parts[0])
-			val, ok := new(big.Int).SetString(parts[1], 10)
-			if err1 != nil || !ok || n < 0 {
-				return bad()
-			}
-			for n >= len(ck.HTri) {
-				ck.HTri = append(ck.HTri, new(big.Int))
-			}
-			ck.HTri[n] = val
 			nHTri++
 		case "end":
 			parts := strings.Fields(v)
@@ -280,6 +260,25 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		return nil, fmt.Errorf("%s: POLYCKPT v%d has no `end` terminator — the file is truncated or was never finished", path, ck.Version)
 	}
 	return ck, nil
+}
+
+// setSparse parses a sparse-row line's "<n> <value>" and stores the value at
+// row[n], growing the row as needed. It reports false on a malformed line.
+func setSparse(row *[]*big.Int, v string) bool {
+	parts := strings.Fields(v)
+	if len(parts) != 2 {
+		return false
+	}
+	n, err := strconv.Atoi(parts[0])
+	val, ok := new(big.Int).SetString(parts[1], 10)
+	if err != nil || !ok || n < 0 {
+		return false
+	}
+	for n >= len(*row) {
+		*row = append(*row, new(big.Int))
+	}
+	(*row)[n] = val
+	return true
 }
 
 // parseConfig reads the config line's key=value fields; a value that does
