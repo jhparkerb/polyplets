@@ -1,11 +1,10 @@
 // predict — a-priori wall/RAM estimate for a target n from a measured cost
 // profile, and (optionally) a synthesized reference profile for the live ETA.
 //
-// The model is deliberately simple so the probe can validate it: total run cost
-// scales by a per-term work ratio R, i.e. wall(n) = wall(n0) * R^(n-n0). R is
-// either supplied (--ratio) or measured from two profiles (--profile2): a
-// stable, measured R is the whole point — we validate by predicting a(20) from
-// a(19) and checking the error before trusting the a(21) number.
+// The model is deliberately simple: total run cost scales by a per-term work
+// ratio R, wall(n) = wall(n0) * R^(n-n0). R is either supplied (--ratio) or
+// measured from two profiles (--profile2); check it by predicting a term
+// already run before trusting a prediction for one that has not been.
 //
 // Usage:
 //
@@ -18,6 +17,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"math"
@@ -113,14 +113,19 @@ func writeScaled(path string, rows []orchestrator.ColumnCost, maxn, cores int, s
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	fmt.Fprintf(f, "# cost_profile maxn=%d cores=%d (synthesized, scale=%.4f)\n", maxn, cores, scale)
-	fmt.Fprintf(f, "# H\tcol\tfrontier_in\tfrontier_out\twall_s\tcpu_s\trss_max_mb\n")
+	w := bufio.NewWriter(f)
+	fmt.Fprintf(w, "# cost_profile maxn=%d cores=%d (synthesized, scale=%.4f)\n", maxn, cores, scale)
+	fmt.Fprintf(w, "# H\tcol\tfrontier_in\tfrontier_out\twall_s\tcpu_s\trss_max_mb\n")
 	for _, c := range rows {
-		fmt.Fprintf(f, "%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.1f\n",
+		fmt.Fprintf(w, "%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.1f\n",
 			c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS*scale, c.CPUS*scale, c.RSSMax*scale)
 	}
-	return nil
+	// bufio keeps the first write error and Flush returns it.
+	if err := w.Flush(); err != nil {
+		f.Close()
+		return err
+	}
+	return f.Close()
 }
 
 func humanDur(s float64) string {
