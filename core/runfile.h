@@ -740,14 +740,14 @@ class RunFileReader {
       out.counts[i] = v;
     }
     ++records_read_;
-    // CRC contract (B3): a seeked reader covers only a key-slice, so its running
+    // CRC contract: a seeked reader covers only a key-slice, so its running
     // CRC is partial and CANNOT match the whole-body trailer — the body CRC is
     // therefore verified ONLY on a full (non-seeked) read to completion. Bounded
     // units and merges seek, so production reads intentionally skip it here. The
     // corruption backstop for those is an out-of-band FULL read: verify.go
     // (independent, recomputes the whole-body FNV and FAILS on mismatch) and
-    // runcat (per-file, exits nonzero on mismatch). B4's atomic publish removes
-    // the torn-file hazard that made a skipped seek-read dangerous.
+    // runcat (per-file, exits nonzero on mismatch). Atomic publish removes the
+    // torn-file hazard that made a skipped seek-read dangerous.
     if (records_read_ == records_ && !seeked_) {
 #ifdef POLY_ZSTD
       // Compressed files: no FNV trailer. Drain the frame epilogue so zstd
@@ -784,8 +784,7 @@ class RunFileReader {
     }
     const long hdr = kRunIndexHeaderLen;
     const long entryLen = static_cast<long>(keyLen_) + 16; // key + u64 offset + u64 recidx
-    uint8_t key[SIGMAX];   // V5: sized by the key width, not a hardcoded 64
-                           // (requireKeyLenFits in the ctor guarantees the fit)
+    uint8_t key[SIGMAX];   // requireKeyLenFits in the ctor guarantees the fit
     auto keyAt = [&](long i) -> bool {
       return std::fseek(f, hdr + i * entryLen, SEEK_SET) == 0 &&
              std::fread(key, 1, static_cast<size_t>(keyLen_), f) == static_cast<size_t>(keyLen_);
@@ -1068,21 +1067,24 @@ class RunFileReader {
     return saw_polyrun && byteorder_ok && counter_ok;
   }
 
+  // A missing trailer or a checksum mismatch on a full read is corruption, so
+  // it stops the program like failShort does.
   void verifyCRC() {
     if (!fp_) return;
     uint8_t stored[8];
     // rawRead, not fread: the trailer bytes are usually already in rbuf_.
     if (!rawRead(stored, 8)) {
-      std::fprintf(stderr, "RunFileReader: CRC missing or truncated\n");
-      return;
+      std::fprintf(stderr, "RunFileReader: CRC missing or truncated in %s\n", path_.c_str());
+      std::exit(1);
     }
     uint64_t stored_crc = 0;
     for (int i = 0; i < 8; ++i)
       stored_crc |= static_cast<uint64_t>(stored[i]) << (8 * i);
     if (stored_crc != crc_) {
       std::fprintf(stderr,
-                   "RunFileReader: CRC mismatch (expected %016llx got %016llx)\n",
-                   (unsigned long long)crc_, (unsigned long long)stored_crc);
+                   "RunFileReader: CRC mismatch in %s (computed %016llx, stored %016llx)\n",
+                   path_.c_str(), (unsigned long long)crc_, (unsigned long long)stored_crc);
+      std::exit(1);
     }
   }
 };

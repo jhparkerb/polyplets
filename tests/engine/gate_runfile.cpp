@@ -650,6 +650,44 @@ static void testOversizeKeyLenRefused() {
   std::remove("/tmp/gate_runfile_keylen_out.bin.idx");
 }
 
+// A full (unseeked) read verifies the body checksum, and a mismatch must stop
+// the program like every other corrupt-body path; it used to be printed only.
+// The flip lands in a key byte, so every record still decodes and only the
+// checksum can notice. Control: the unflipped file reads to the end.
+static const char* kCrcPath = "/tmp/gate_runfile_crc.bin";
+static void readAllCrc() {
+  RunFileReader<u64> r(kCrcPath, 3);
+  RunRecord<u64> rec;
+  size_t n = 0;
+  while (r.next(rec)) ++n;
+  if (n != 100) _exit(4);
+}
+static void testBodyChecksumMismatchAborts() {
+  writeRun(kCrcPath, 3, 100);
+  assert(runInChild(readAllCrc) == 0 && "control: an intact file must read to the end");
+  std::vector<char> bytes;
+  {
+    FILE* f = std::fopen(kCrcPath, "rb");
+    assert(f);
+    int c;
+    while ((c = std::fgetc(f)) != EOF) bytes.push_back(static_cast<char>(c));
+    std::fclose(f);
+  }
+  const std::string text(bytes.begin(), bytes.end());
+  const size_t body = text.find("\n\n") + 2;
+  assert(body > 2 && body + 2 < bytes.size());
+  bytes[body + 1] ^= 0x40;  // record 0's second key byte
+  {
+    FILE* f = std::fopen(kCrcPath, "wb");
+    assert(f);
+    std::fwrite(bytes.data(), 1, bytes.size(), f);
+    std::fclose(f);
+  }
+  assert(runInChild(readAllCrc) != 0 && "a body checksum mismatch must stop the program");
+  std::remove(kCrcPath);
+  std::remove((std::string(kCrcPath) + ".idx").c_str());
+}
+
 // A count that wraps the counter word, or a combined window past the byte
 // range of lo/len, must stop the program: either would otherwise be a wrong
 // number with no other sign. The checks are explicit (core/run.h addCount),
@@ -753,6 +791,7 @@ int main() {
   testMergeUnparseableBoundAborts();
   testOversizeKeyLenRefused();
   testCombineOverflowAborts();  // the children print their abort messages
+  testBodyChecksumMismatchAborts();
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }

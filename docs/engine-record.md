@@ -1147,8 +1147,10 @@ a(1..18); the production validation is the a(29) comparison against the column
 kernel (`scripts/kink_validate.sh`) and the agreement with the coloring
 recount, neither automated.
 
-**What the disk layer does not check.** The plain-format body checksum only
-prints on mismatch and is never invoked on the seeking reads production uses;
+**What the disk layer does not check.** The plain-format body checksum stops
+the reader on a mismatch (it only printed until the code-quality pass of
+`docs/code-target.md`, so every run through a(41) had a print-only
+checksum), but it is never invoked on the seeking reads production uses;
 under zstd the last frame of a range-bounded read is never checksummed
 (`core/runfile.h`). The a(40) run predates the short-read fix `b5b4948`, under
 which a truncated frontier body read as end-of-run with exit 0; a dropped
@@ -1392,8 +1394,8 @@ at about 126,000 cpu-s (`results/a41/h20_cost_profile.tsv`). a(41) is heights
   needs a cross-language format-version dispatch.
 - IPC, cache-miss and branch-mispredict rates of the transfer-matrix workload
   were never captured (section 3.8).
-- The disk-layer residuals of section 8: a body checksum that only prints, an
-  unchecked last zstd frame, and no manifest or `verify` pass on a(40) and a(41).
+- The disk-layer residuals of section 8: an unchecked last zstd frame, and no
+  manifest or `verify` pass on a(40) and a(41).
 
 ## Reproduce
 
