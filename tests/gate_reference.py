@@ -23,7 +23,7 @@ import subprocess
 import sys
 import tempfile
 
-from common import ROOT, Gate, run
+from common import ROOT, Gate, parse_counts, run
 
 REFDIR = os.path.join(ROOT, "tests", "reference")
 BUILD = os.path.join(ROOT, "build")
@@ -62,15 +62,19 @@ def motley_par():
                       10)
 
 
-def symcount_fast():
-    types = ["r90", "r180", "hmirror", "dmirror", "c4", "d2ax", "d2diag", "d4"]
+def by_type(binary, types, maxn):
+    """Each type's output lines, prefixed with the type."""
     return "".join(f"{t} {ln}\n" for t in types for ln in
-                   strip_events(run(f"{BUILD}/symcount_fast", t, 16)).splitlines())
+                   strip_events(run(f"{BUILD}/{binary}", t, maxn)).splitlines())
+
+
+def symcount_fast():
+    return by_type("symcount_fast",
+                   ["r90", "r180", "hmirror", "dmirror", "c4", "d2ax", "d2diag", "d4"], 16)
 
 
 def symtm():
-    return "".join(f"{t} {ln}\n" for t in ["hmirror", "r180", "dmirror"] for ln in
-                   strip_events(run(f"{BUILD}/symtm", t, 20)).splitlines())
+    return by_type("symtm", ["hmirror", "r180", "dmirror"], 20)
 
 
 def dmirror_spine():
@@ -125,24 +129,14 @@ def compare(got, want):
     return f"{len(g)} lines, want {len(w)}"
 
 
-def rows(text, skip_a=False):
-    """{(H, n): value} from 'H n value' lines."""
-    out = {}
-    for ln in text.splitlines():
-        f = ln.split()
-        if skip_a and f[0] == "a":
-            continue
-        out[int(f[0]), int(f[1])] = int(f[2])
-    return out
-
-
 def cross_checks(gate, outputs):
     """Three programs, one triangle.  strip_tm's C_H(n) counts placements of
     polyplets of height <= H in a height-H strip, so its second difference in
     H is T(n,H); motley_par computes the same C_H(n) by coloring, mod P."""
-    C = rows(outputs["strip_tm_h10_n24"])
-    T = rows(outputs["term_26"], skip_a=True)
-    M = rows(outputs["motley_par_h10_n24"])
+    C = parse_counts(outputs["strip_tm_h10_n24"])
+    T = parse_counts("\n".join(ln for ln in outputs["term_26"].splitlines()
+                               if not ln.startswith("a ")))
+    M = parse_counts(outputs["motley_par_h10_n24"])
     c = lambda H, n: C.get((H, n), 0)
     cells = [(H, n) for H in range(1, 11) for n in range(1, 25)]
     bad = [k for k in cells
