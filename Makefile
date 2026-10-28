@@ -1177,7 +1177,8 @@ build/ns/gate_spill_zstd_noz: tests/engine/gate_spill_zstd_noz.cpp $(NS_HEADERS)
 ns-gate-arch:
 	go test ./verify/arch/... -count=1
 
-# Regression gate: driver0 reproduces T(n,H) byte-identical to oracle, n≤14
+# Regression check: driver0 sums its in-RAM T(n,H) to a(n) and matches the
+# b-file fixture, n≤14
 ns-gate-regression: build/ns/driver0
 	./build/ns/driver0 --maxn 14
 
@@ -1185,7 +1186,7 @@ ns-gate-regression: build/ns/driver0
 ns-gate-fold: build/ns/driver0
 	./build/ns/driver0 --maxn 12 --fold-check
 
-build/ns/driver0: tests/engine/driver0.cpp $(NS_HEADERS) | build/ns
+build/ns/driver0: tests/engine/driver0.cpp cpp/argparse.h $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns

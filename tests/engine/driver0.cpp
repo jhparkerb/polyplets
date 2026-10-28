@@ -4,12 +4,11 @@
 // accumulates the triangle T(n,H); compares Σ_H T(n,H) to known a(n) values.
 //
 // Usage:
-//   driver0 [--maxn N] [--fold] [--fold-check] [--oracle-tma PATH --out FILE]
+//   driver0 [--maxn N] [--fold] [--fold-check]
 //
 // Modes:
-//   default (--maxn N): print triangle rows + verify Σ_H == known a(n) for n≤N
-//   --fold-check: verify fold==unfold byte-identical (gate_fold)
-//   --oracle-tma PATH --out FILE: write triangle for comparison with old engine
+//   default (--maxn N, default 14): verify Σ_H T(n,H) == known a(n) for n≤N
+//   --fold-check: verify the folded and unfolded sweeps give identical totals
 
 #include <algorithm>
 #include <cassert>
@@ -22,6 +21,7 @@
 #include <vector>
 
 #include "core/libenum.h"
+#include "cpp/argparse.h"
 
 // Load known a(n) from an OEIS b-file ("n value" per line, '#'-comment lines
 // skipped, e.g. fixtures/b006770.txt). Returns a vector indexed by n (entry 0
@@ -62,14 +62,11 @@ static std::vector<uint64_t> sweepHeight(int H, int maxn, bool fold) {
 }
 
 // Sweep every height and sum the rows into the triangle total T[n] = Σ_H T(n,H).
-// If allRows is non-null, each height's row is stored there for later output.
-static std::vector<uint64_t> accumTriangle(
-    int maxn, bool fold, std::vector<std::vector<uint64_t>>* allRows = nullptr) {
+static std::vector<uint64_t> accumTriangle(int maxn, bool fold) {
   std::vector<uint64_t> total(maxn + 1, 0);
   for (int H = 1; H <= maxn; ++H) {
-    auto row = sweepHeight(H, maxn, fold);
+    const auto row = sweepHeight(H, maxn, fold);
     for (int n = 0; n <= maxn; ++n) total[n] += row[n];
-    if (allRows) (*allRows)[H] = std::move(row);
   }
   return total;
 }
@@ -78,22 +75,21 @@ int main(int argc, char** argv) {
   int  maxn      = 14;
   bool fold      = false;
   bool foldCheck = false;
-  const char* oracleTma = nullptr; // reserved for future oracle-diff mode
-  const char* outFile   = nullptr;
 
+  // Counts are u64, which holds a(n) through n = 20 with room to spare.
   for (int i = 1; i < argc; ++i) {
-    if (!std::strcmp(argv[i], "--maxn") && i + 1 < argc)
-      maxn = std::atoi(argv[++i]);
-    else if (!std::strcmp(argv[i], "--fold"))
+    if (!std::strcmp(argv[i], "--maxn") && i + 1 < argc) {
+      maxn = static_cast<int>(argparse::ArgInt(argv[++i], "--maxn", 1, 20));
+    } else if (!std::strcmp(argv[i], "--fold")) {
       fold = true;
-    else if (!std::strcmp(argv[i], "--fold-check"))
+    } else if (!std::strcmp(argv[i], "--fold-check")) {
       foldCheck = true;
-    else if (!std::strcmp(argv[i], "--oracle-tma") && i + 1 < argc)
-      oracleTma = argv[++i];
-    else if (!std::strcmp(argv[i], "--out") && i + 1 < argc)
-      outFile = argv[++i];
+    } else {
+      std::fprintf(stderr, "driver0: unknown argument '%s'\n"
+                           "usage: driver0 [--maxn N] [--fold] [--fold-check]\n", argv[i]);
+      return 2;
+    }
   }
-  (void)oracleTma;
 
   if (foldCheck) {
     // Verify fold == unfold byte-identical for all n <= maxn.
@@ -113,19 +109,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  std::vector<std::vector<uint64_t>> allRows(maxn + 1);
-  const auto total = accumTriangle(maxn, fold, &allRows);
-
-  // Write triangle if output file requested
-  if (outFile) {
-    FILE* f = std::fopen(outFile, "w");
-    if (!f) { std::perror(outFile); return 1; }
-    for (int H = 1; H <= maxn; ++H)
-      for (int n = H; n <= maxn; ++n)
-        if (allRows[H][n])
-          std::fprintf(f, "%d %d %llu\n", n, H, (unsigned long long)allRows[H][n]);
-    std::fclose(f);
-  }
+  const auto total = accumTriangle(maxn, fold);
 
   // Verify against known a(n) from the pinned b-file fixture.
   const auto known = loadKnown("fixtures/b006770.txt");
