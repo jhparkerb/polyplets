@@ -18,7 +18,7 @@
 # COMMAND:
 #   scripts/dalby_perimeter_defect_k7_calib.sh
 #
-# TARGET: dalby (80 cores, 125 GB), alongside Confetti (cutcount_b1, 1 core,
+# TARGET: dalby (80 cores, 125 GB), alongside the coloring recount at H = 18 (cutcount_b1, 1 core,
 #   ~62 GB). This job takes 12 cores and a few MB each, so it fits with room to
 #   spare on both counts. NOT ayr -- ayr was unreachable 2026-08-18.
 #

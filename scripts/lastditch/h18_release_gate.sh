@@ -5,7 +5,7 @@
 # comparisons).  ayr's five-prime H=18 reproduction used the OLD binary, with
 # release OFF.  So the release path has never run near its own size, and
 # the coloring recount C_19 would be the first time -- which is the wrong place to find out.
-# H = 18 has a banked Confetti residue row to compare against byte for byte.
+# H = 18 has a banked H = 18 residue row to compare against byte for byte.
 #
 # Target: dalby, 80 cores, idle.  Predicted: census ~8 min (H=18 has
 # 72,487,711 states MEASURED), pass ~26 min EXTRAPOLATED from H=14/80t = 11.8 s
@@ -24,7 +24,7 @@ mkdir -p "$O"; echo $$ > "$O/pid"
   "$B" --modp 18 40 "$P" "$O/C18.p$P.out" --threads 80 --sizes "$O/sizes.txt" \
   >/dev/null 2>>"$O/log"
 if cmp -s "$O/C18.p$P.out" "$HOME/var/C18.p$P.out"; then
-  echo "H=18 RELEASE PATH: IDENTICAL to the banked Confetti residue row -- GREEN" >>"$O/log"
+  echo "H=18 RELEASE PATH: IDENTICAL to the banked H = 18 residue row -- GREEN" >>"$O/log"
 else
   echo "H=18 RELEASE PATH: DIFFERS from banked -- RED" >>"$O/log"; exit 2
 fi

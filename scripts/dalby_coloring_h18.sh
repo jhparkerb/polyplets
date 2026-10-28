@@ -1,5 +1,5 @@
 #!/bin/bash
-# the coloring recount rung 2 (Confetti) production run: C_18(n) mod 5 primes, n <= 40.
+# The coloring recount at H = 18, production run: C_18(n) mod 5 primes, n <= 40.
 #
 # Purpose: T(n,18) = C_18 - 2*C_17 + C_16, closing a(n) rule-independently
 # for n <= 35.  Payload: the committed --modp mode (2 streams, u32), five
@@ -25,7 +25,7 @@
 # Kill/resume: the unit is one prime pass.  Kill any pass by PID; re-running
 # the script skips passes whose output file exists and runs the rest.
 #
-# Exact command:  ./dalby_confetti_h18.sh
+# Exact command:  ./dalby_coloring_h18.sh
 #
 # Fail-closed: set -e; engine exits 2 on q0_nonzero_modp; the assembly
 # refuses on CRT overflow (>= 2^112), held-out mismatch, any T(n,18)
@@ -35,12 +35,12 @@ set -euo pipefail
 
 # Paths overridable via env for the fail-closed self-test
 # (synthetic-fixture RED runs); production uses the defaults.
-BIN="${CONFETTI_BIN:-$HOME/src/pm-halfmeasure/build/cutcount_b1}"
+BIN="${COLORING_BIN:-$HOME/src/pm-halfmeasure/build/cutcount_b1}"
 RECEIPT="$BIN.confetti-receipt"
-OUT="${CONFETTI_OUT:-$HOME/var/motley-h18}"
-C16="${CONFETTI_C16:-$HOME/var/motley-step0/rows/C16.out}"
-C17="${CONFETTI_C17:-$HOME/var/motley-h17/C17.out}"
-TRIANGLE="${CONFETTI_TRIANGLE:-$HOME/var/motley-h17/triangle.txt}"
+OUT="${COLORING_OUT:-$HOME/var/motley-h18}"
+C16="${COLORING_C16:-$HOME/var/motley-step0/rows/C16.out}"
+C17="${COLORING_C17:-$HOME/var/motley-h17/C17.out}"
+TRIANGLE="${COLORING_TRIANGLE:-$HOME/var/motley-h17/triangle.txt}"
 NMAX=40
 H=18
 PRIMES=(2147483647 2147483629 2147483587 2147483579 2147483563)
@@ -132,5 +132,5 @@ with open(f"{outdir}/C18.out", "w") as f:
 print(f"T(n,18) vs results/triangle.txt: {match} match, {mismatch} mismatch")
 if mismatch or match == 0:
     sys.exit(2)
-print("CONFETTI H=18: GREEN")
+print("COLORING H=18: GREEN")
 PY

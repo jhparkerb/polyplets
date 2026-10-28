@@ -7,7 +7,7 @@ are for.  The assembly
 
     T(n,H) = C_H(n) - 2 C_{H-1}(n) + C_{H-2}(n)      (C_0 = C_{-1} = 0)
 
-lived only inside scripts/dalby_confetti_h18.sh, a runner that executes on dalby
+lived only inside scripts/dalby_coloring_h18.sh, a runner that executes on dalby
 and that `make` never touches.  So the claim "T(n,18) matches the incumbent at
 all 23 cells" rested on a log line, and a corrupted row would have sat in
 results/ indefinitely without anything noticing.  Same shape as the front-page
@@ -19,7 +19,7 @@ Two checks, both from files in the tree:
   ASSEMBLY   every banked row results/coloring-recount/rows/C<H>.out, H = 1..18,
              assembled and compared against results/triangle.txt.  567 cells.
 
-  HELD-OUT   Confetti ran five primes: C_18 is reconstructed by CRT from four
+  HELD-OUT   the H = 18 run ran five primes: C_18 is reconstructed by CRT from four
              of them and the fifth is PREDICTED and compared against its
              measured row.  This is the run's decisive internal check and until
              the residue rows were banked (same day) it could not be re-run off
@@ -95,11 +95,11 @@ def triangle_nmax():
 NMAX = triangle_nmax()
 # Pinned coverage.  These are what the tree holds today; a rung that banks a new
 # row must move them deliberately, which is the point.
-EXPECT_TOP_H = 18                      # results/second-sources.md (Confetti)
+EXPECT_TOP_H = 18                      # results/second-sources.md (the coloring recount, H = 18)
 EXPECT_CELLS = 567                     # rows H=1..18 against the triangle
 EXPECT_PRIMES = 5                      # four for the CRT, one held out
 CRT_BOUND = 1 << 112                   # the runner's overflow guard
-PRIME_CHECK = ROOT / "scripts" / "confetti_prime_check.py"
+PRIME_CHECK = ROOT / "scripts" / "coloring_prime_check.py"
 EXPECT_PER_PRIME_CELLS = 23            # n = 18..40, the cells the triangle has
 
 # The Nmax-41 ladder (results/coloring-recount/rows41/README.md).
@@ -263,7 +263,7 @@ def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
                   nmax: int = NMAX) -> tuple[list[str], int]:
     """CRT all primes but one, predict that one, tie the result to the banked
     exact row, at every n = 1..nmax.  `heldout` picks the prime the RUN held
-    out: Confetti's runner held out the last of its list, the smallest (min);
+    out: the H = 18 runner held out the last of its list, the smallest (min);
     the Nmax-41 ladder used scripts/coloring_crt.py, which holds out the largest
     (max)."""
     bad = []
@@ -278,7 +278,7 @@ def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
     # keeps checking the same thing if the set is ever regenerated.
     # TODO(2026-08-19, from the simplify pass): "last" and "smallest" coincide
     # only because the current list happens to be sorted descending, and
-    # CRT_BOUND re-types the runner's own bound (dalby_confetti_h18.sh:98).
+    # CRT_BOUND re-types the runner's own bound (dalby_coloring_h18.sh:98).
     # Both belong in a manifest beside the residue rows, written by the run and
     # read here, so a regenerated prime set cannot leave this gate verifying a
     # different contract than the run enforced.  That is a change to banked
@@ -351,7 +351,7 @@ def check_heldout41(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
 
 def check_per_prime(res_dir: Path, rows_dir: Path,
                     triangle: Path) -> tuple[list[str], int]:
-    """Run Confetti's own checker, as delivered, on each of the five rows.
+    """Run the H = 18 run's own checker, as delivered, on each of the five rows.
 
     A different direction from the CRT pass: for each prime separately it
     predicts C_H(n) mod p from the incumbent triangle and compares against the
@@ -406,7 +406,7 @@ def run(rows_dir=ROWS, res_dir=RESIDUES, triangle=TRIANGLE, verbose=True,
               "other four, and equal to the banked exact row"
               % (checked, NMAX))
         print("  per-prime    %d cells over %d residue rows, each against the "
-              "incumbent triangle via scripts/confetti_prime_check.py"
+              "incumbent triangle via scripts/coloring_prime_check.py"
               % (per_prime, EXPECT_PRIMES))
         print("  assembly-41  %d cells from rows41 H = 1..%d vs results/triangle.txt"
               % (cells41, EXPECT41_TOP_H))

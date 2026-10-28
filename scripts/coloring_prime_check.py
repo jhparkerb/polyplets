@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Early single-prime check on a Confetti residue row, before all 5 land.
+"""Early single-prime check on a residue row of the H = 18 run, before all 5 land.
 
 For each n with a banked T(n,H) in the incumbent triangle, predict
     C_H(n) = T(n,H) + 2 C_{H-1}(n) - C_{H-2}(n)   (mod p)
 and compare against the measured residue.  Necessary condition only: it does
 not test the CRT reconstruction and is blind to errors that are multiples
 of p.  The decisive check remains the held-out prime in
-scripts/dalby_confetti_h18.sh.
+scripts/dalby_coloring_h18.sh.
 
-Usage: confetti_prime_check.py H p C_H.p<p>.out C_{H-1}.out C_{H-2}.out triangle.txt
+Usage: coloring_prime_check.py H p C_H.p<p>.out C_{H-1}.out C_{H-2}.out triangle.txt
 Exits 2 on any mismatch or on zero cells compared (fail-closed).
 """
 import sys

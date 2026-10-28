@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Reconstruct an exact the coloring recount C_H row from its mod-p residue rows.
 
-WHY THIS FILE EXISTS.  The CRT reconstruction that turned Confetti's five
+WHY THIS FILE EXISTS.  The CRT reconstruction that turned the H = 18 run's five
 residue rows into the banked exact C_18 lived inside a heredoc in
-scripts/dalby_confetti_h18.sh -- a runner that executes on dalby and that
+scripts/dalby_coloring_h18.sh -- a runner that executes on dalby and that
 `make` never touches.  That is the same defect scripts/cutcount_assembly_gate.py
 was written to fix one level up, and it means the next ladder has nothing to
 run.  This is that code, extracted, generalized over the prime count, and
-given a self-test against the banked Confetti data.
+given a self-test against the banked H = 18 data.
 
 THE METHOD.  Run the engine once per prime.  Reconstruct C_H(n) by CRT over
 all but one of them; the LAST prime is held out, its residue PREDICTED from
@@ -29,7 +29,7 @@ Usage:
         "n value" lines.
 
   coloring_crt.py --selftest
-        Reconstructs C_18 from results/coloring-recount/residues/ (Confetti, five
+        Reconstructs C_18 from results/coloring-recount/residues/ (the H = 18 run, five
         primes) and C_19 from results/coloring-recount/residues41/ (the Nmax-41
         ladder, nine primes), requires each to equal its banked exact row
         exactly, then checks at both heights that a corrupted residue is caught.
@@ -145,12 +145,12 @@ def selftest_height(H, res_dir, banked, expect_common, label):
 
 
 def selftest():
-    """Both banked ladders: Confetti (H = 18, five ~31-bit primes, Nmax 40)
+    """Both banked ladders: the H = 18 run (five ~31-bit primes, Nmax 40)
     and the Nmax-41 ladder (H = 19, nine ~16-bit primes; AUDIT-2026-09-02 M3).
     The cell count each compares is pinned, so a truncated row cannot pass."""
     cb = os.path.join(ROOT, "results", "coloring-recount")
     selftest_height(18, os.path.join(cb, "residues"),
-                    os.path.join(cb, "rows", "C18.out"), 40, "Confetti")
+                    os.path.join(cb, "rows", "C18.out"), 40, "H=18")
     selftest_height(19, os.path.join(cb, "residues41"),
                     os.path.join(cb, "rows41", "C19.out"), 41, "Nmax-41 ladder")
 
