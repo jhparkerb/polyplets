@@ -26,6 +26,7 @@
 
 #include "core/fdlimit.h"
 #include "core/libenum.h"
+#include "cpp/argparse.h"
 #include "worker/worker_util.h"
 
 // SIGTERM handling (cooperative work-stealing stop) is shared with
@@ -49,13 +50,13 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       return tokens[i] == flag && i + 1 < n;
     };
     if (arg("--in"))           in_str      = tokens[++i];
-    else if (arg("--H"))       H           = std::atoi(tokens[++i].c_str());
+    else if (arg("--H"))       H           = static_cast<int>(argparse::ArgInt(tokens[++i].c_str(), "--H", 1, 255));
     else if (arg("--out"))     out_path    = tokens[++i];
     else if (arg("--counter")) counter_arg = tokens[++i];
     else if (arg("--klo"))     klo_hex     = tokens[++i];
     else if (arg("--khi"))     khi_hex     = tokens[++i];
     else if (arg("--rev"))     rev         = tokens[++i];
-    else if (arg("--keylen"))  keyLen      = std::atoi(tokens[++i].c_str());
+    else if (arg("--keylen"))  keyLen      = static_cast<int>(argparse::ArgInt(tokens[++i].c_str(), "--keylen", 0, 255));
     else {
       std::fprintf(stderr, "merge_worker: unknown arg: %s\n", tokens[i].c_str());
       return 1;

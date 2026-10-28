@@ -130,6 +130,43 @@ static void testOneColumnMatchesColumnKernel(int H, int maxn) {
   runOrDie("rm -rf " + dir);
 }
 
+// A request number with trailing garbage is refused, not read as its leading
+// digits: each command below is valid but for one such argument, and
+// atoi would have run it. Control: the same commands with the clean number
+// succeed.
+static void testMalformedNumbersRefused() {
+  const int H = 4, maxn = 8;
+  const std::string dir = "/tmp/gate_kink_worker_cli_args";
+  runOrDie("rm -rf " + dir + " && mkdir -p " + dir);
+  const std::string seedPath = dir + "/seed.bin";
+  {
+    RunFileWriter<W> w(seedPath, H, maxn, "", "", "test");
+    w.append(seedRecord<W>(H));
+    w.finalize();
+  }
+  const std::string map = "./build/ns/map_worker --in " + seedPath +
+                          " --maxn " + std::to_string(maxn) +
+                          " --fold 0 --ram 134217728 --spill " + dir +
+                          " --counter u64 --out " + dir + "/out.bin";
+  const std::string merge = "./build/ns/merge_worker --in " + seedPath +
+                            " --H " + std::to_string(H) + " --out " + dir + "/m.bin";
+  const std::string quiet = " > /dev/null 2>&1";
+  const std::vector<std::pair<std::string, std::string>> cases = {
+      {map + " --H 4" + quiet, map + " --H 4x" + quiet},
+      {map + " --H 4 --kernel kink --stage seed" + quiet,
+       map + " --H 4 --kernel kink --stage 1x" + quiet},
+      {merge + " --keylen 6" + quiet, merge + " --keylen 6x" + quiet},
+  };
+  for (const auto& [good, bad] : cases) {
+    runOrDie(good);
+    if (std::system(bad.c_str()) == 0) {
+      std::fprintf(stderr, "gate_kink_worker_cli FAIL: accepted %s\n", bad.c_str());
+      std::abort();
+    }
+  }
+  runOrDie("rm -rf " + dir);
+}
+
 // H=8 (maxn 12) costs about as much as H=4 and H=6 together, and these two
 // gates are 21 s of a 46 s push -- the serial half the hook runs before
 // anything else. What they assert holds at every H: the persistent/CLI-driven
@@ -143,5 +180,6 @@ int main(int argc, char** argv) {
   for (int H : heights) {
     testOneColumnMatchesColumnKernel(H, H + 4);
   }
+  testMalformedNumbersRefused();
   std::puts("gate_kink_worker_cli PASS");
 }

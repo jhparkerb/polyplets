@@ -34,6 +34,7 @@
 // --holes is column-kernel only: the holes Euler accumulator and the kink
 // carry byte would share one key byte (core/kink.h).
 
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -43,6 +44,7 @@
 #include "core/kink.h"
 #include "core/kink_column.h"
 #include "core/libenum.h"
+#include "cpp/argparse.h"
 #include "worker/worker_util.h"
 
 // Read+range-filter+merge a set of POLYRUN files into one sorted,
@@ -113,10 +115,10 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       return tokens[i] == name;
     };
     if (arg("--in"))          in_str      = tokens[++i];
-    else if (arg("--H"))      H           = std::atoi(tokens[++i].c_str());
-    else if (arg("--maxn"))   maxn        = std::atoi(tokens[++i].c_str());
-    else if (arg("--fold"))   fold        = std::atoi(tokens[++i].c_str());
-    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(std::strtoull(tokens[++i].c_str(), nullptr, 10));
+    else if (arg("--H"))      H           = static_cast<int>(argparse::ArgInt(tokens[++i].c_str(), "--H", 1, 255));
+    else if (arg("--maxn"))   maxn        = static_cast<int>(argparse::ArgInt(tokens[++i].c_str(), "--maxn", 1, 255));
+    else if (arg("--fold"))   fold        = argparse::ArgFlag(tokens[++i].c_str(), "--fold");
+    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(argparse::ArgInt(tokens[++i].c_str(), "--ram", 0, LONG_MAX));
     else if (arg("--spill"))  spill_dir   = tokens[++i];
     else if (arg("--out"))    out_path    = tokens[++i];
     else if (arg("--counter"))counter_arg = tokens[++i];
@@ -163,12 +165,7 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
     } else if (stage_arg == "finalize") {
       kink_stage = -2;
     } else {
-      kink_stage = std::atoi(stage_arg.c_str());
-      if (kink_stage < 0 || kink_stage >= H) {
-        std::fprintf(stderr,
-          "map_worker: --stage must be seed, finalize, or an int in [0, H)\n");
-        return 1;
-      }
+      kink_stage = static_cast<int>(argparse::ArgInt(stage_arg.c_str(), "--stage", 0, H - 1));
     }
   }
 

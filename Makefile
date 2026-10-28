@@ -996,7 +996,7 @@ endif
 
 # Every ns binary is header-only against core/; depend on the whole set so an
 # edit to any header (incl. the trusted-math copies) triggers the right rebuilds.
-NS_HEADERS = $(wildcard core/*.h)
+NS_HEADERS = $(wildcard core/*.h) cpp/argparse.h
 
 build/ns:
 	mkdir -p build/ns
