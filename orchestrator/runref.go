@@ -668,18 +668,12 @@ func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 	if rev == "" {
 		rev = "unknown"
 	}
-	// Header.
-	fmt.Fprintf(f, "POLYRUN 1\n")
-	fmt.Fprintf(f, "height %d\n", H)
-	fmt.Fprintf(f, "maxn %d\n", maxn)
-	fmt.Fprintf(f, "counter %s\n", counterTag)
-	fmt.Fprintf(f, "classifier triangle\n")
-	fmt.Fprintf(f, "keylo \n")
-	fmt.Fprintf(f, "keyhi \n")
-	fmt.Fprintf(f, "records %018d\n", 1)
-	fmt.Fprintf(f, "rev %s\n", rev)
-	fmt.Fprintf(f, "byteorder 1\n")
-	fmt.Fprintf(f, "\n")
+	header := fmt.Sprintf("POLYRUN 1\nheight %d\nmaxn %d\ncounter %s\nclassifier triangle\n"+
+		"keylo \nkeyhi \nrecords %018d\nrev %s\nbyteorder 1\n\n",
+		H, maxn, counterTag, 1, rev)
+	if _, err := f.WriteString(header); err != nil {
+		return err
+	}
 
 	// One binary record: sig=(H+2 zero bytes), lo=0, len=1, counts[0]=1 as a
 	// single-byte LEB128 varint (0x01), matching core/run.h encodeVarint. The

@@ -1586,8 +1586,8 @@ func mapPhase(
 // opens and binary-searches every file in `frontier`/`mapOuts` FROM SCRATCH
 // on every single steal, while still holding the scheduler mutex (blocking
 // every other pool goroutine for that I/O). Cheap when steals are rare, but
-// merge-steal now fires hundreds of times per column on a real production
-// column (measured this session) -- that's thousands of redundant file
+// merge-steal fires hundreds of times per column on a real production
+// column (measured) -- that's thousands of redundant file
 // opens/seeks per phase call for a fixed file set that doesn't change
 // across steals within one mapPhase/mergePhase invocation. Two independent
 // fixes, either worth doing on its own: (1) parse each .idx sidecar once
