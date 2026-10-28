@@ -118,9 +118,8 @@ func TestResumeCompletedHeightPreservesPerHeight(t *testing.T) {
 		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
 }
 
-// TestAllZeroPerHeightRefusalIsFatal — red-first regression for
-// AUDIT-2026-07-30 O9 ("Advisory Refusal"). Every writePerHeight error,
-// INCLUDING the Zero Harvest all-zero refusal, was stderr-only: the run
+// TestAllZeroPerHeightRefusalIsFatal — red-first regression: every
+// writePerHeight error, including the all-zero refusal, was stderr-only: the run
 // continued and exited 0, so the driver's $RC saw success and marched on to
 // combine. That is precisely how the a(40) incident stayed silent for 36h.
 // The refusal must still preserve the good file on disk (the safe direction)

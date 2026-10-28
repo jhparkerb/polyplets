@@ -35,8 +35,7 @@ func TestFastMapReservationRace(t *testing.T) {
 	}
 }
 
-// TestFastMapFloorEnvFailsLoudly — red-first regression for AUDIT-2026-07-30
-// O5 ("Floor Guards the Wrong Resource", env-parse half). An unparseable
+// TestFastMapFloorEnvFailsLoudly — red-first regression: an unparseable
 // POLY_FASTMAP_FLOOR_GB silently fell back to the 24GB default: an operator
 // who wrote "40GB" or "40g" got a floor 16GB lower than the one they thought
 // they had set, on the exact knob whose misconfiguration is implicated in the

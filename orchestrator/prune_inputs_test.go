@@ -1,7 +1,7 @@
 // Fan-In Tax (docs/engine-record.md): every map unit opened EVERY input range
 // file of the prior round (~80 files x ~640 units x ~0.45ms of header+idx+
 // buffer setup per open = ~50k opens/round), measured as ~75% of all worker
-// CPU on the dalby H15/maxn30 bench -- drowning the real transition work.
+// CPU on an H15/maxn30 benchmark -- drowning the real transition work.
 // Inputs are disjoint [keylo,keyhi) range files the orchestrator itself
 // partitioned, so a unit covering [lo,hi) can only draw records from files
 // whose stamped range overlaps it. These tests pin the pruning predicate

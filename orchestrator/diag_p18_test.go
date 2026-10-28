@@ -10,8 +10,7 @@ import (
 // (results/ns_a37) and T(38,20) from the a(38) run (results/ns_a38).
 // Its first independent holdout has since landed and is pinned below:
 // T(39,21), from the a(40) run's real H21 sweep, was not in the fit and
-// matches exactly. (This comment previously said there was none, which was
-// true at wiring time and stale by a(40); AUDIT-2026-07-30 D5.) Certification
+// matches exactly. Certification
 // also rests on the proven grand form. Wiring makes H = maxn-18 closed-form,
 // keeping a(39)'s top real height at H20.
 func TestDiagonalP18Formula(t *testing.T) {
@@ -21,7 +20,7 @@ func TestDiagonalP18Formula(t *testing.T) {
 	}{
 		{37, "7418664369542642927200487045"},  // T(37,19), fit point (results/ns_a37)
 		{38, "39207474138446972682720171554"}, // T(38,20), fit point (results/ns_a38)
-		// HOLDOUT: real swept cell that was NOT in the fit (D5).
+		// HOLDOUT: real swept cell that was NOT in the fit.
 		{39, "203342057467470725522863434005"}, // T(39,21), real H21 sweep in the a(40) run
 	}
 	for _, c := range cases {

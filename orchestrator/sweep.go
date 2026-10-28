@@ -152,12 +152,12 @@ func overlapModeName(overlap bool) string {
 
 // checkResumeConfig hard-fails a resume whose checkpoint was written under a
 // different run config. A mismatched --maxn/--counter/--fold silently corrupts
-// the triangle (B1); a --heights list that no longer contains the checkpoint
+// the triangle; a --heights list that no longer contains the checkpoint
 // height makes startIdx fall back to 0 and re-sweep completed heights, double-
-// counting (B7); a mismatched --max-diag-k changes which strips are injected
-// vs really swept (O3); a mismatched sweep MODE makes the checkpoint form
-// unreadable to the resuming driver (O4); and a pre-htri checkpoint cannot
-// serve a mid-height resume with per-height output (O2). Every one of them
+// counting; a mismatched --max-diag-k changes which strips are injected
+// vs really swept; a mismatched sweep MODE makes the checkpoint form
+// unreadable to the resuming driver; and a pre-htri checkpoint cannot
+// serve a mid-height resume with per-height output. Every one of them
 // must abort rather than produce a wrong answer.
 func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error {
 	if resume == nil {
@@ -175,7 +175,7 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	if want, got := kernelName(cfg.Kernel), kernelName(resume.Kernel); got != want {
 		return fmt.Errorf("resume: checkpoint kernel=%s != --kernel %s", got, want)
 	}
-	// O3 "Strict Route Amnesia": --max-diag-k decides, per height, INJECTED vs
+	// --max-diag-k decides, per height, INJECTED vs
 	// REALLY SWEPT. A mismatch across a resume silently changes which cells the
 	// run computes — and can manufacture self-confirming holdout evidence (a
 	// strip swept for real before the crash, injected from the very formula it
@@ -189,7 +189,7 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	} else {
 		fmt.Fprintf(os.Stderr, "resume: checkpoint predates the maxdiagk stamp; assuming it ran at the default (no cap), which this run also uses\n")
 	}
-	// O4 "Mode Amnesia": the two checkpoint FORMS are not interchangeable. The
+	// The two checkpoint FORMS are not interchangeable. The
 	// stamp is authoritative when present; otherwise the form itself is exact
 	// (markDone is runOverlap's only writer, so an overlap checkpoint always
 	// names at least one completed height).
@@ -207,8 +207,8 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	if len(resume.Done) > 0 {
 		return nil
 	}
-	// O2 "Legacy Ledger": a version-1 checkpoint predates the Zero Harvest fix
-	// and carries no htri, so a resume landing MID-height (columns already
+	// A version-1 checkpoint predates the per-height-row fix
+	// (results/ns_a40/PROVENANCE.md) and carries no htri, so a resume landing MID-height (columns already
 	// completed, frontier still live) can only rewrite h<H>.out from the
 	// post-resume columns — a short but NONZERO row. writePerHeight's all-zero
 	// refusal cannot see it (it fires only when zero columns were swept) and
@@ -218,7 +218,7 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	// preserved a(40) POLYCKPT.B shape, where no columns remain and the
 	// all-zero refusal already protects the good file on disk).
 	if cfg.PerHeightOut != "" && resume.Version < 2 && resume.Col >= 0 && len(resume.Frontier) > 0 {
-		return fmt.Errorf("resume: checkpoint %s is POLYCKPT v%d (predates the Zero Harvest fix, no htri) and is MID-height at H=%d col=%d — resuming would write a short h%d.out with only the post-resume columns; re-run height %d from scratch (delete the checkpoint) or resume without --per-height-out",
+		return fmt.Errorf("resume: checkpoint %s is POLYCKPT v%d (predates the per-height-row fix, no htri) and is MID-height at H=%d col=%d — resuming would write a short h%d.out with only the post-resume columns; re-run height %d from scratch (delete the checkpoint) or resume without --per-height-out",
 			cfg.CheckpointPath, resume.Version, resume.H, resume.Col, resume.H, resume.H)
 	}
 	for _, H := range heights {
@@ -296,11 +296,11 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	// height's partial contributions (hTri).  Both are needed: the outer triangle
 	// holds completed heights; hTri holds the current height's progress so far.
 	//
-	// Returns whether the write actually PERSISTED (O1 "Ghost Checkpoint"). The
+	// Returns whether the write actually PERSISTED. The
 	// callers feed that outcome — not the throttle decision — to frontierGuard:
 	// Checkpoint.Write is temp+rename, so a failed write leaves the STALE
-	// checkpoint on disk naming the OLD frontier, and GCing that frontier is
-	// exactly G1's stranding shape on the error path.
+	// checkpoint on disk naming the OLD frontier, and deleting that frontier
+	// would leave the checkpoint pointing at files that are gone.
 	writeCheckpoint := func(H, col int, frontier []string, hTri []*big.Int) bool {
 		// Combine outer accumulated triangle with current height's contribution.
 		combined := copyBigRow(triangle)
@@ -469,7 +469,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// Per-height row (multi-machine combine + direct cross-check vs the old
 		// engine's h<H>.out). Written only on a fully completed height. hSeed
 		// restores the pre-resume columns' share after a mid-height resume —
-		// hTri alone holds only THIS process's columns (Zero Harvest).
+		// hTri alone holds only THIS process's columns.
 		if err := emitPerHeight(cfg, H, maxn, addRows(maxn, hTri, hSeed)); err != nil {
 			return nil, err
 		}
@@ -576,7 +576,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			// Each is a completed height -> markDone + checkpoint under mu.
 			//
 			// contribute runs one of them under mu and marks the height done
-			// UNCONDITIONALLY, even when its per-height write failed (O9): the
+			// UNCONDITIONALLY, even when its per-height write failed: the
 			// strip is already folded into triangle, and the checkpoint's
 			// invariant is "folded <=> in the Done set" — breaking it would let
 			// a sibling height's snapshot carry a contribution the Done set does
@@ -647,7 +647,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			mu.Unlock()
 			fireAfterHeight(H)
 			// Written AFTER markDone so the checkpoint invariant above holds;
-			// a failure still fails the run (O9).
+			// a failure still fails the run (emitPerHeight).
 			if werr := emitPerHeight(cfg, H, cfg.Maxn, hTri); werr != nil {
 				mu.Lock()
 				if firstErr == nil {
@@ -705,7 +705,7 @@ func sweepHeight(
 	// call site; the cancel/error paths call writeCheckpoint directly and
 	// deliberately skip the notification (the test drives cancellation through
 	// afterColumn, so notifying there would recurse). Returns whether the
-	// checkpoint actually persisted — see writeCheckpoint (O1).
+	// checkpoint actually persisted — see writeCheckpoint.
 	forwardCheckpoint := func(col int, frontier []string) bool {
 		ok := writeCheckpoint(H, col, frontier, hTri)
 		if cfg.afterColumn != nil {
@@ -816,7 +816,7 @@ func sweepHeight(
 		// a throttled column never strands the last checkpoint's frontier.
 		// `wrote` is the write OUTCOME, not the throttle decision: a checkpoint
 		// that failed to persist leaves the previous one — and the frontier it
-		// names — load-bearing (O1). lastCkpt only advances on success, so the
+		// names — load-bearing. lastCkpt only advances on success, so the
 		// next column retries immediately instead of waiting out the interval.
 		wrote := false
 		if interval := cfg.CheckpointEvery; interval == 0 || time.Since(lastCkpt) >= interval {
@@ -894,7 +894,7 @@ func (g *frontierGuard) afterColumn(wroteCheckpoint bool, oldFrontier, newFronti
 }
 
 // sweepHeightKink sweeps one height H from startCol using the kink kernel
-// (Design 14): a column is one H+2-keyed "seed" round (harvest this column's
+// (core/kink.h): a column is one H+2-keyed "seed" round (harvest this column's
 // completions, append the carry/touch suffix, keyLen H+2->H+4), H sequential
 // H+4-keyed mid-column stage rounds (the per-cell king-adjacency transfer),
 // and one H+4-keyed "finalize" round (drop the carry with a stranding check,
@@ -924,7 +924,7 @@ func sweepHeightKink(
 	lastCkpt := time.Now()
 
 	// See sweepHeight's forwardCheckpoint: the bool is whether the checkpoint
-	// actually persisted, which is what frontierGuard must gate GC on (O1).
+	// actually persisted, which is what frontierGuard must gate GC on.
 	forwardCheckpoint := func(col int, frontier []string) bool {
 		ok := writeCheckpoint(H, col, frontier, hTri)
 		if cfg.afterColumn != nil {
@@ -1082,7 +1082,7 @@ func sweepHeightKink(
 			break
 		}
 
-		// See sweepHeight: `wrote` is the write OUTCOME (O1), and lastCkpt
+		// See sweepHeight: `wrote` is the write OUTCOME, and lastCkpt
 		// advances only on a persisted checkpoint.
 		wrote := false
 		if interval := cfg.CheckpointEvery; interval == 0 || time.Since(lastCkpt) >= interval {
@@ -1120,7 +1120,7 @@ type runningUnit struct {
 // seeded with the SAME flat estTotal (frontierIn/n0, mapPhase's estPer) —
 // SampleKeysMulti cuts by record-quantile from a SAMPLED index, and a skewed
 // key distribution can make one range (typically the last, open-ended [lo,""))
-// hold far more real records than that average predicts. Measured: dalby
+// hold far more real records than that average predicts. Measured: an
 // H17 col3's kink stage rounds routinely gave unit 319 (hi="") tens of
 // millions of records against a ~64K flat estimate, once even ~590M against
 // ~64K — a ~9000x miss. Once processed exceeds a too-low estTotal, clamping
@@ -1260,7 +1260,7 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 }
 
 // mapPhase maps the source frontier to the next column via a dynamic work-stealing
-// pool (DESIGN 08, T2.3).  numUnits = Cores*UnitMult key-range units seed a pull
+// pool.  numUnits = Cores*UnitMult key-range units seed a pull
 // queue worked by Cores goroutines.  When the queue drains and a core goes idle
 // while another unit is still grinding (the straggler tail), the idle worker
 // signals the longest-remaining unit to stop at a key cursor; that unit finalizes
@@ -1297,11 +1297,9 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // unitMult/minPerUnit capping, triContribs, the seed/finalize
 // stealConfigured exclusion above). A shared `runStealPool` parameterized
 // by a per-unit dispatch closure would cut this to ~one scheduler instead
-// of two hand-synced copies -- worth doing, but deliberately NOT done as
-// part of the merge-steal work itself (concurrency-critical code, real
-// regression risk, needs its own careful pass with full gate+ASan+real
-// dalby validation, not a bolt-on cleanup while both copies were still
-// fresh and only just validated at production scale).
+// of two hand-synced copies -- worth doing, but not done as a cleanup: it
+// is concurrency-critical, and would need its own pass
+// with the full checks, ASan and a production-scale run.
 func mapPhase(
 	ctx context.Context,
 	cfg SweepConfig,
@@ -1354,7 +1352,7 @@ func mapPhase(
 	// files are disjoint stamped ranges, so a unit needs only the ~1-2 files
 	// overlapping its [lo,hi) -- not all of them. One header parse per file
 	// here replaces (units x files) header+idx+buffer setups in the workers,
-	// measured ~75% of all worker CPU on dalby's H15/maxn30 bench.
+	// measured ~75% of all worker CPU on an H15/maxn30 benchmark.
 	inBounds := loadKeyBounds(frontier, keyLen)
 
 	// Transient map outputs: tmpfs only if this round's projection can be
@@ -1598,10 +1596,7 @@ func mapPhase(
 // subsequent steals instead of reopening the file; (2) compute `children`
 // outside the mutex (copy the fields this function needs, unlock, split,
 // relock only to splice into queue/outstanding) so the I/O doesn't block
-// the whole pool regardless. Not done here (found via a /simplify pass
-// after merge-steal was already validated at real dalby scale) -- real,
-// worth a dedicated follow-up, not a scope-creep addition to a cleanup
-// pass on already-working code.
+// the whole pool regardless. Neither is done yet.
 func splitRemainder(frontier []string, H, keyLen int, cursor, hi string, freeCores int,
 	remaining, grainRecs uint64, nextIdx *int) []mapUnit {
 
@@ -1654,14 +1649,9 @@ func splitBounds(lo, hi string, cuts []string) (los, his []string) {
 // several rounds at the same (H,col) and the rounds' outputs would otherwise
 // collide on name (see mapPhase's matching outName comment).
 // mergePhase merges via the same dynamic queue+work-stealing pool as
-// mapPhase (Bottleneck: Merge Range Straggler — merge ranges are split by
-// SampleKeysMulti exactly like map units and suffer the same RGS-driven
-// cost skew, but until this fix merge had ZERO rebalancing: all ranges
-// launched as fixed goroutines up front with no requeue path, so whichever
-// range was intrinsically expensive just ran alone while idle cores waited
-// — the same "one process busy in htop" shape map had before its own
-// steal-eligibility bug was fixed, just with no mechanism at all here
-// rather than a broken one). Reuses mapUnit/runningUnit/splitRemainder
+// mapPhase: merge ranges are split by SampleKeysMulti exactly like map units
+// and have the same cost skew, so without stealing one expensive range runs
+// alone while idle cores wait. Reuses mapUnit/runningUnit/splitRemainder
 // (all already generic key-range types, not map-specific) against mapOuts
 // as the source files instead of frontier.
 func mergePhase(
@@ -1866,7 +1856,7 @@ func mergePhase(
 func writePerHeight(dir string, H, maxn int, hTri []*big.Int) error {
 	// Fail closed on an all-zero row: T(H,H)=3^(H-1)>0, so a completed height
 	// can NEVER produce one — an all-zero hTri means a harvest bug upstream
-	// (Zero Harvest overwrote a good h20.out with zeros in the a(40) run,
+	// (such a bug overwrote a good h20.out with zeros in the a(40) run,
 	// results/ns_a40/PROVENANCE.md). Refuse rather than clobber whatever is
 	// on disk.
 	allZero := true
@@ -1877,7 +1867,7 @@ func writePerHeight(dir string, H, maxn int, hTri []*big.Int) error {
 		}
 	}
 	if allZero {
-		return fmt.Errorf("refusing to write all-zero per-height row h%d.out (Zero Harvest guard: T(%d,%d)>0 always; harvest bug upstream)", H, H, H)
+		return fmt.Errorf("refusing to write all-zero per-height row h%d.out (T(%d,%d)>0 always; harvest bug upstream)", H, H, H)
 	}
 	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return err
@@ -1979,12 +1969,9 @@ func contributeLowHeight(H, maxn int, triangle []*big.Int, cfg SweepConfig) erro
 }
 
 // emitPerHeight writes a height's row when --per-height-out is set, turning a
-// failure into a RUN failure (O9 "Advisory Refusal"). Every per-height write
-// error used to be stderr-only, including writePerHeight's all-zero Zero
-// Harvest refusal: the run continued and exited 0, so the driver's $RC saw
-// success and went on to combine — exactly how the a(40) incident stayed
-// silent for 36h. The refusal still preserves whatever is on disk; it is just
-// no longer advisory.
+// failure into a RUN failure, so the driver's exit status sees it (a
+// stderr-only refusal let the a(40) all-zero row go unnoticed for 36 h). The
+// refusal still preserves whatever is on disk.
 func emitPerHeight(cfg SweepConfig, H, maxn int, row []*big.Int) error {
 	if cfg.PerHeightOut == "" {
 		return nil

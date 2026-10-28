@@ -9,7 +9,7 @@ import (
 )
 
 // Acct accumulates resource usage across workers and across checkpoint segments.
-// cpu_s and wall_s SUM; rss_max is MAX (per DESIGN §9 / checkpoint.go fold rule).
+// cpu_s and wall_s SUM; rss_max is MAX (the same fold checkpoint.go uses).
 type Acct struct {
 	CPUS   float64
 	WallS  float64

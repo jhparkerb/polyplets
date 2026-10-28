@@ -60,8 +60,7 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 	// is called once per SampleKeys call -- i.e. once per file per map/merge
 	// round -- so the oversized default buffer showed up as the largest
 	// remaining allocator in a real heap profile after fixing the two
-	// wasted-reader call sites above (docs/engine-record.md
-	// Bottleneck #4).
+	// wasted-reader call sites above.
 	br := bufio.NewReaderSize(f, 256)
 	var hdr PolyrunHeader
 	var offset int64
@@ -429,7 +428,7 @@ const (
 // header before switching to positioned f.ReadAt calls were each allocating
 // a full bufio.Reader (4KB default buffer) just to decode 19 bytes, then
 // discarding it -- confirmed via a real heap-alloc profile as ~35% of a real
-// run's total allocation (docs/engine-record.md Bottleneck #4).
+// run's total allocation.
 func readIndexHeader(r io.Reader, wantKeyLen int) (uint64, error) {
 	var hdr [idxHeaderBytes]byte
 	if _, err := io.ReadFull(r, hdr[:]); err != nil {

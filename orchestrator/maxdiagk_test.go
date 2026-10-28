@@ -36,8 +36,8 @@ func TestMaxDiagKForcesRealSweep(t *testing.T) {
 	checkTriangle(t, "max-diag-k-capped", known, res.Triangle)
 }
 
-// TestMaxDiagKZeroDisablesInjection — red-first regression for
-// AUDIT-2026-07-30 D7 ("Cap Zero Inverts"). The dispatch predicate read
+// TestMaxDiagKZeroDisablesInjection — red-first regression: the dispatch
+// predicate read
 // `MaxDiagK == 0 || k <= MaxDiagK`, so an operator asking for NO injection
 // with `--max-diag-k 0` got the MAXIMUM instead: every wired diagonal fired.
 // The accidental disable value was 1 (which still injects k=1, itself a
@@ -72,8 +72,7 @@ func TestMaxDiagKZeroDisablesInjection(t *testing.T) {
 }
 
 // TestPhasedRecipeDiagCap pins the height/cap algebra of the recorded a(N>=40)
-// reproduction recipe (scripts/term.sh, AUDIT-2026-07-30 D1 "Phase C
-// Phantom"). The diagonal index is k = N-H and the phase split uses fixed
+// reproduction recipe (scripts/term.sh). The diagonal index is k = N-H and the phase split uses fixed
 // offsets from N, so the same k ranges hold for every N >= 40:
 //
 //	phase A  H = 1..N-21  (k >= 21, past the fence) and H = N-18..N (k <= 18,
@@ -90,7 +89,7 @@ func TestPhasedRecipeDiagCap(t *testing.T) {
 	for _, N := range []int{40, 41, 44} {
 		cfg := SweepConfig{Maxn: N, MaxDiagK: phaseDiagCap}
 		// The cap is load-bearing, not decorative: uncapped, phase C's
-		// strip IS injected. This is the defect D1 found.
+		// strip IS injected. This is the defect the test pins.
 		if !diagonalStripEnabled(SweepConfig{Maxn: N, MaxDiagK: maxDiagKNoCap}, 19) {
 			t.Fatalf("N=%d: k=19 does not dispatch uncapped — the cap would be a no-op and this test is vacuous", N)
 		}

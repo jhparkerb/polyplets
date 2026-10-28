@@ -132,12 +132,12 @@ func TestStealEligibleWallTimeFloor(t *testing.T) {
 }
 
 // TestRemainingFallsBackWhenEstimateGrosslyExceeded — measured regression
-// test for the actual dominant bug (found via a real dalby H17 column, worse
+// test for the actual dominant bug (found on a production H17 column, worse
 // than the record-vs-wall-time floor issue above): every unit is seeded with
 // the SAME flat estTotal (frontierIn/n0), but SampleKeysMulti's record-
 // quantile cuts from a sampled index can badly misjudge a skewed key
 // distribution. Measured: unit 319 (the last, open-ended [lo,"") range) on
-// dalby H17 col3 held up to ~590M records against a ~64K flat estimate — a
+// an H17 col3 held up to ~590M records against a ~64K flat estimate — a
 // ~9000x miss. Pre-fix, remaining() clamped to 0 the instant processed
 // exceeded that too-low estimate, making the unit look FINISHED and
 // permanently invisible to the stealer for the rest of its run — explaining
@@ -170,7 +170,7 @@ func TestRemainingFallsBackWhenEstimateGrosslyExceeded(t *testing.T) {
 
 // TestRefGrainSecondsStableAcrossElapsedTime — measured regression test for
 // the bug the FIRST version of the wall-time floor shipped with (caught on a
-// real dalby H17 column, docs/engine-record.md): using
+// production H17 column, docs/engine-record.md): using
 // totalDone/elapsedSincePhaseStart as the reference rate is self-defeating —
 // as a straggler drags on, elapsed keeps growing while total-done plateaus,
 // so the "average" DEGRADES the longer the tail runs, inflating grainSeconds

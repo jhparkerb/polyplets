@@ -1,4 +1,4 @@
-// checkpoint.go — POLYCKPT write and read (DESIGN §9).
+// checkpoint.go — POLYCKPT write and read.
 //
 // POLYCKPT format (docs/formats.md; version history there too):
 //   POLYCKPT 2
@@ -34,8 +34,7 @@ import (
 // The version is stamped explicitly because absence of `htri` is NOT a usable
 // discriminator: the row is sparse-encoded, so a legitimately all-zero partial
 // row from a version-2 writer looks exactly like a version-1 ledger. Resume
-// refuses the one combination it cannot serve (O2 "Legacy Ledger", see
-// checkResumeConfig).
+// refuses the one combination it cannot serve (see checkResumeConfig).
 const checkpointVersion = 2
 
 // Checkpoint is the resumable state after completing one column.
@@ -72,17 +71,16 @@ type Checkpoint struct {
 	Counter string // normalized "u64"/"u128"
 	Fold    bool
 	Kernel  string // normalized "column"/"kink"
-	// MaxDiagK is --max-diag-k as resolved at write time (O3 "Strict Route
-	// Amnesia"): it decides per height whether a strip is INJECTED from its
+	// MaxDiagK is --max-diag-k as resolved at write time: it decides per height whether a strip is INJECTED from its
 	// closed form or REALLY SWEPT, so a resume under a different cap computes
 	// a different set of cells than the run it continues — and can manufacture
 	// self-confirming holdout evidence. Meaningful only when MaxDiagKSet;
 	// checkpoints written before this field existed leave it false.
 	MaxDiagK    int
 	MaxDiagKSet bool
-	// Overlap is --overlap-heights at write time (O4 "Mode Amnesia"). The two
+	// Overlap is --overlap-heights at write time. The two
 	// checkpoint FORMS are not interchangeable: an overlap (Done-set)
-	// checkpoint resumed sequentially short-circuits the B7 height check and
+	// checkpoint resumed sequentially short-circuits the height-in-list check and
 	// re-sweeps everything onto a populated triangle; a sequential checkpoint
 	// resumed in overlap mode has no Done set and discards all progress. When
 	// OverlapSet is false the mode is inferred from the form (len(Done) > 0),
@@ -94,8 +92,8 @@ type Checkpoint struct {
 
 // Write serializes the checkpoint to path atomically (write-then-rename),
 // terminated by an `end <ntri> <nhtri>` line and fsynced before the rename so
-// a crash can never leave a durable PREFIX under the real checkpoint name
-// (O7 "Truncated Ledger"). All writes go through a bufio.Writer whose Flush
+// a crash can never leave a durable PREFIX under the real checkpoint name.
+// All writes go through a bufio.Writer whose Flush
 // reports the first error, so a full disk fails the write instead of
 // publishing a short file.
 func (ck *Checkpoint) Write(path string) error {
@@ -261,7 +259,7 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		return nil, err
 	}
 	// The terminator is a version-2 line, so version-1 files are read without
-	// it (they never had one, and O2/O3 already restrict what a version-1
+	// it (they never had one, and the version and --max-diag-k checks already restrict what a version-1
 	// checkpoint may be resumed into). Every file this build writes must have
 	// it: no terminator = the file is a prefix, not a checkpoint.
 	if !sawEnd && ck.Version >= 2 {

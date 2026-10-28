@@ -43,7 +43,7 @@ func writePolyrun(t *testing.T, path string) {
 	}
 }
 
-// TestVerifyCRCDetectsCorruptBody locks in the B3 corruption backstop: the
+// TestVerifyCRCDetectsCorruptBody locks in the corruption backstop: the
 // verify tool's independent full-body CRC pass must accept an intact run file
 // and reject one with a flipped body byte. This is the out-of-band check that
 // covers seeked production reads (which skip the body CRC by design).

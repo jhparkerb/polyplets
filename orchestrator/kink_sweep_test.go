@@ -1,6 +1,6 @@
 package orchestrator
 
-// kink_sweep_test.go — Design 14 Phase 2.6 cheap pre-check: sweepHeightKink
+// kink_sweep_test.go — cheap pre-check: sweepHeightKink
 // must reproduce sweepHeight's per-height triangle row byte-for-byte, driven
 // through the REAL compiled map_worker/merge_worker binaries (not synthesized
 // in-process), before trusting the kink kernel to a full a(20) --kernel kink

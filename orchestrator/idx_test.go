@@ -55,7 +55,7 @@ func TestIdxReaderSkipsCppMagicHeader(t *testing.T) {
 	}
 	got, err := indexKeysInRange(idxPath, keyLen, lo, true, hi, true, 10)
 	if err != nil {
-		t.Fatalf("indexKeysInRange errored on a valid C++ .idx (Magic Misread): %v", err)
+		t.Fatalf("indexKeysInRange errored on a valid C++ .idx: %v", err)
 	}
 	want := []string{"0000000003", "0000000005"}
 	if len(got) != len(want) {
@@ -153,7 +153,7 @@ func TestSampleKeysUsesIndexNotBody(t *testing.T) {
 		t.Fatalf("SampleKeys: %v", err)
 	}
 	if len(cuts) == 0 {
-		t.Fatalf("SampleKeys returned no cuts — it scanned the (absent) body instead of the .idx (Body Crawl)")
+		t.Fatalf("SampleKeys returned no cuts — it scanned the (absent) body instead of the .idx")
 	}
 	if !sort.StringsAreSorted(cuts) {
 		t.Errorf("cuts not sorted: %v", cuts)
@@ -161,7 +161,7 @@ func TestSampleKeysUsesIndexNotBody(t *testing.T) {
 }
 
 // TestSampleKeysExplicitKeyLen — RED before de-hardcoding SampleKeys off an
-// internal H+2 assumption (Design 14 Phase 2, step 2.1). SampleKeys must use
+// internal H+2 assumption. SampleKeys must use
 // the caller-supplied keyLen, not silently re-derive H+2, so it works on the
 // kink kernel's H+4-keyed mixed-state stage tables. Builds a run+idx pair at
 // keyLen=H+4 (kink's width) and asserts SampleKeys reads it correctly; before

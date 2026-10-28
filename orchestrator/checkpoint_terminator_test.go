@@ -1,7 +1,6 @@
 package orchestrator
 
-// checkpoint_terminator_test.go — red-first regression for AUDIT-2026-07-30
-// O7 ("Truncated Ledger"). ReadCheckpoint accepted any PREFIX of a checkpoint:
+// checkpoint_terminator_test.go — red-first regression: ReadCheckpoint accepted any PREFIX of a checkpoint:
 // there was no terminator and no record count, so a file cut short mid-`tri`
 // parsed cleanly into a checkpoint whose triangle is missing its tail. Resume
 // would then continue from a silently under-counted ledger. Write also never

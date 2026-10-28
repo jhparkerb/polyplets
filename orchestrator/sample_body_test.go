@@ -1,7 +1,7 @@
 package orchestrator
 
 // sample_body_test.go — regression pin for the varint-migration miss in
-// sampleBodyKeys (AUDIT-2026-07-13). The run body encodes counts as LEB128
+// sampleBodyKeys. The run body encodes counts as LEB128
 // varint, but sampleBodyKeys skipped each record's counts as a fixed
 // length*wordBytes (the pre-varint layout). After the first record the byte
 // stream desynced and every sampled key was read from mid-record.

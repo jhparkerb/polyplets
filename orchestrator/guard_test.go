@@ -11,11 +11,11 @@ import (
 
 // TestResumeConfigGuard proves a resume hard-fails when the checkpoint's
 // stamped config (maxn/counter/fold) disagrees with the CLI, or when the
-// checkpoint height is no longer in the --heights list (B7: startIdx would fall
+// checkpoint height is no longer in the --heights list (startIdx would fall
 // back to 0 and double-count completed heights). A matching resume must pass.
 func TestResumeConfigGuard(t *testing.T) {
 	// MaxDiagK is spelled out because SweepConfig's zero value means "no
-	// diagonal injection" (D7) — a real CLI config always carries the resolved
+	// diagonal injection" — a real CLI config always carries the resolved
 	// flag, and checkResumeConfig compares it against the checkpoint's stamp.
 	cfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true, MaxDiagK: maxDiagKNoCap}
 	heights := []int{17, 18, 19, 20}
@@ -36,10 +36,10 @@ func TestResumeConfigGuard(t *testing.T) {
 	mismatch("counter", func(c *Checkpoint) { c.Counter = "u128" })
 	mismatch("fold", func(c *Checkpoint) { c.Fold = false })
 	mismatch("height-not-in-list", func(c *Checkpoint) { c.H = 5 })
-	mismatch("maxdiagk", func(c *Checkpoint) { c.MaxDiagK = 16 })   // O3
-	mismatch("overlap-mode", func(c *Checkpoint) { c.Overlap = 8 }) // O4
+	mismatch("maxdiagk", func(c *Checkpoint) { c.MaxDiagK = 16 })
+	mismatch("overlap-mode", func(c *Checkpoint) { c.Overlap = 8 })
 
-	// O3 back-compat: a checkpoint written before the maxdiagk stamp resumes
+	// Back-compat: a checkpoint written before the maxdiagk stamp resumes
 	// under the default cap (with a warning) but not under a non-default one.
 	legacy := *base
 	legacy.MaxDiagKSet = false
@@ -123,7 +123,7 @@ func TestRejectUnknownCounter(t *testing.T) {
 	}
 }
 
-// TestCounterWidthGuard proves the FR-7 refuse-at-start guard rejects a maxn
+// TestCounterWidthGuard proves the refuse-at-start guard rejects a maxn
 // the counter cannot hold exactly: u64 is valid to a(25), u128 to ~a(48).
 // Without the guard an overflowing run starts and wraps silently.
 func TestCounterWidthGuard(t *testing.T) {

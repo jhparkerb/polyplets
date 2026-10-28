@@ -1,8 +1,7 @@
 package orchestrator
 
-// ghost_checkpoint_test.go — red-first regression for AUDIT-2026-07-30 O1
-// ("Ghost Checkpoint"): the residual G1 stranding hole on the checkpoint
-// ERROR path.
+// ghost_checkpoint_test.go — red-first regression for the frontier-deletion
+// hole on the checkpoint ERROR path.
 //
 // writeCheckpoint used to swallow Checkpoint.Write errors (log + continue),
 // and the sweep loops passed the THROTTLE decision — "was a write attempted?"
@@ -11,7 +10,7 @@ package orchestrator
 // regime), the guard concluded the on-disk checkpoint now named the NEW
 // frontier and GC'd the old one — while Checkpoint.Write's temp+rename means
 // the STALE checkpoint, naming exactly those deleted files, survived on disk.
-// That is G1's stranding shape reintroduced: resume fails loudly with "cannot
+// That reintroduces the stranding bug: resume fails loudly with "cannot
 // read input" and the height re-runs from column 0.
 //
 // The test forces every checkpoint write to fail by pointing CheckpointPath
@@ -25,7 +24,7 @@ package orchestrator
 //	--- FAIL: TestFailedCheckpointWriteRetainsFrontier (0.62s)
 //	    ghost_checkpoint_test.go:63: seed frontier ".../seed_h3.bin" was GC'd
 //	        after every checkpoint write failed: the surviving on-disk
-//	        checkpoint names files that no longer exist (G1 stranding on the
+//	        checkpoint names files that no longer exist (stranding on the
 //	        error path)
 //	--- FAIL: TestFailedCheckpointWriteRetainsFrontierKink (0.55s)
 //	    ghost_checkpoint_test.go:63: seed frontier ".../seed_h3.bin" was GC'd ...
@@ -59,7 +58,7 @@ func checkFrontierRetainedOnCheckpointFailure(t *testing.T, cfg SweepConfig) {
 	for _, H := range []int{3, 4} {
 		seed := filepath.Join(cfg.RunDir, fmt.Sprintf("seed_h%d.bin", H))
 		if _, err := os.Stat(seed); err != nil {
-			t.Fatalf("seed frontier %q was GC'd after every checkpoint write failed: the surviving on-disk checkpoint names files that no longer exist (G1 stranding on the error path)", seed)
+			t.Fatalf("seed frontier %q was GC'd after every checkpoint write failed: the surviving on-disk checkpoint names files that no longer exist (stranding on the error path)", seed)
 		}
 	}
 }

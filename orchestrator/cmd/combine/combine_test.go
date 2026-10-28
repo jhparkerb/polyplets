@@ -164,7 +164,7 @@ func TestCombineWidth(t *testing.T) {
 
 // TestRunDiffMatches proves two identical per-height directory sets diff
 // clean — the baseline runCombine's summed-total check can't distinguish
-// (Design 14 2.7: cell-by-cell, not just the sum).
+// (cell by cell, not just the sum).
 func TestRunDiffMatches(t *testing.T) {
 	a, b := t.TempDir(), t.TempDir()
 	for H := 1; H <= 4; H++ {

@@ -1,11 +1,9 @@
 // gomemlimit.go — soft memory limit for the orchestrator process.
 //
-// AUDIT-2026-07-30 O6 "Unbounded Orchestrator Heap", closing the open item in
-// docs/engine-record.md. The orchestrator sets GOGC=1000 (the
-// utilization work: default GOGC=100 churned ~8000 GC cycles against a tiny
-// heap goal for no reason). GOGC alone is a RATIO, with no ceiling: the heap
-// is allowed to grow to 11x live before a collection, which is how head #4
-// reached 4.4 GB and climbing. The audit found NO leak — telemetry is
+// The orchestrator sets GOGC=1000 (the default GOGC=100 churned ~8000 GC
+// cycles against a tiny heap goal). GOGC alone is a RATIO, with no ceiling:
+// the heap may grow to 11x live before a collection, and one run's
+// orchestrator reached 4.4 GB and climbing. There is no leak — telemetry is
 // streamed and every pool is capped — so the fix is a bound, not a hunt:
 // GOGC=1000 keeps the low GC rate, debug.SetMemoryLimit caps what that ratio
 // can cost. Go's soft limit makes the collector work harder as the limit is
@@ -30,7 +28,7 @@ const goMemLimitDefaultGB = 4
 // value applied. POLY_GO_MEMLIMIT_GB overrides the default; 0 disables the
 // limit entirely (math.MaxInt64, Go's own default). A set-but-unusable value
 // is an error rather than a silent fallback — same posture as
-// POLY_FASTMAP_FLOOR_GB (O5).
+// POLY_FASTMAP_FLOOR_GB.
 func ApplyGoMemoryLimit() (int64, error) {
 	gb := goMemLimitDefaultGB
 	if e, set := os.LookupEnv("POLY_GO_MEMLIMIT_GB"); set {

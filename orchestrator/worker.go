@@ -137,7 +137,7 @@ func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func
 // result. onProgress/stop have the same work-stealing contract as
 // RunMapWorker (may be nil): stop closing sends SIGTERM, which merge_worker
 // treats as a cooperative early stop, reporting its cursor in
-// result.StopKey (Bottleneck: Merge Range Straggler).
+// result.StopKey.
 func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	return runWorker(ctx, bin.MergeWorker, mergeArgsTokens(a), onProgress, stop)
 }

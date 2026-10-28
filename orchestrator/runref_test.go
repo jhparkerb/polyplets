@@ -336,7 +336,7 @@ func TestCheckpointNilFrontier(t *testing.T) {
 // TestSampleKeysCompressedBodyFailsClosed: a compressed run file with no
 // usable .idx must ERROR out of SampleKeys, never fall back to the body scan
 // — the Go side cannot decompress, and scanning zstd bytes as records would
-// sample garbage keys (silent mis-partitioning, the exact failure the D6
+// sample garbage keys (silent mis-partitioning, the exact failure the
 // header checks exist to prevent).
 func TestSampleKeysCompressedBodyFailsClosed(t *testing.T) {
 	dir := t.TempDir()

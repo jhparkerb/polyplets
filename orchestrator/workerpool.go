@@ -1,14 +1,10 @@
-// workerpool.go — persistent map_worker/merge_worker process pools
-// (Bottleneck #5: eliminating per-unit fork+exec).
+// workerpool.go — persistent map_worker/merge_worker process pools, so a
+// work unit costs a line on a pipe rather than a fork and exec.
 //
-// Every map unit and merge range used to spawn a brand-new OS process via
-// exec.CommandContext, run for a fraction of a second, and exit -- paying
-// real fork+exec+arg-marshal cost on every single work item, thousands of
-// times per real run. A heap-alloc profile confirmed os/exec's own
-// machinery (SlicePtrFromStrings, dedupEnvCase, Cmd.Start, startProcess)
-// as a real, substantial share of total allocation, on top of the direct
-// process-creation syscall cost -- not just a hunch, see
-// docs/engine-record.md Bottleneck #5.
+// A run has thousands of sub-second work units. Spawning a process for each
+// one paid fork, exec and argument marshalling every time, and a heap
+// profile showed os/exec's own machinery as a substantial share of total
+// allocation on top of the syscall cost (docs/engine-record.md).
 //
 // WorkerPool holds `size` long-lived slots. Each slot lazily starts (at
 // most) one persistent map_worker and one persistent merge_worker process

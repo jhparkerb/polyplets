@@ -1,8 +1,7 @@
 package orchestrator
 
 // frontier_guard_test.go — regression pin for the throttled-checkpoint /
-// unconditional-frontier-GC stranding bug (AUDIT-2026-07-13, corroborated by two
-// independent audit passes). Before the fix, sweepHeight/sweepHeightKink deleted
+// unconditional-frontier-GC stranding bug. Before the fix, sweepHeight/sweepHeightKink deleted
 // each column's consumed frontier unconditionally, even when that column's
 // checkpoint was throttled away — so the last persisted checkpoint pointed at
 // files a later column had already deleted, and a crash-resume failed loudly

@@ -1,4 +1,4 @@
-// telemetry_test.go — D3 (Even Keel): per-round effective-cores telemetry.
+// telemetry_test.go — per-round effective-cores telemetry.
 package orchestrator
 
 import (

@@ -131,8 +131,7 @@ func TestApplyPow3ExactnessAssertion(t *testing.T) {
 
 // TestHornerDiagKFactExactnessAssertion proves hornerDiag panics when the Horner
 // numerator is not exactly divisible by k!, rather than silently truncating it
-// with Quo — closing the fail-closed-armor gap the AUDIT-2026-07-13 pass found
-// (applyPow3 guards only the 3-power divide; on positive-exponent record cells it
+// with Quo (applyPow3 guards only the 3-power divide; on positive-exponent record cells it
 // merely multiplies, so this k!-divide is the only check on the divide path). A
 // coefficient-transcription error that breaks k!-divisibility must surface, not
 // bank a wrong cell.

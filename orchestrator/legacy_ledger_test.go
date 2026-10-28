@@ -1,8 +1,7 @@
 package orchestrator
 
-// legacy_ledger_test.go — red-first regression for AUDIT-2026-07-30 O2
-// ("Legacy Ledger"): a checkpoint written BEFORE the Zero Harvest fix
-// (c789bfb) carries no `htri` lines, so resume.HTri is nil and a MID-HEIGHT
+// legacy_ledger_test.go — red-first regression: a checkpoint written BEFORE
+// the per-height-row fix (commit c789bfb) carries no `htri` lines, so resume.HTri is nil and a MID-HEIGHT
 // resume rewrites h<H>.out from the post-resume columns alone — a short but
 // NONZERO row. Nothing catches it: writePerHeight's all-zero refusal only
 // fires when zero columns were swept, and combine's guards are blind to a
@@ -30,7 +29,7 @@ import (
 
 // writeLegacyCheckpoint rewrites a checkpoint in the pre-Zero-Harvest format:
 // header forced to version 1, every `htri` line dropped, and the `end`
-// terminator removed (version 1 had none — see O7). Returns the new path (the
+// terminator removed (version 1 had none). Returns the new path (the
 // original is left intact).
 func writeLegacyCheckpoint(t *testing.T, path string) string {
 	t.Helper()
@@ -118,12 +117,12 @@ func TestLegacyCheckpointMidHeightResumeRefused(t *testing.T) {
 	}
 }
 
-// TestLegacyCheckpointCompletedHeightResumeAllowed pins the state O2 must NOT
-// over-refuse: a legacy checkpoint at a COMPLETED height (nil frontier — the
+// TestLegacyCheckpointCompletedHeightResumeAllowed pins the state the legacy
+// refusal must NOT over-refuse: a legacy checkpoint at a COMPLETED height (nil frontier — the
 // preserved a(40) POLYCKPT.B shape). checkResumeConfig lets it through; the
 // sweep then finds no columns left, writePerHeight's all-zero refusal fires,
-// and the good h<H>.out on disk survives. Since O9 that refusal also fails the
-// run — the failure must be the write refusal, never O2's start-time refusal.
+// and the good h<H>.out on disk survives. That refusal also fails the run —
+// the failure must be the write refusal, never the start-time refusal.
 func TestLegacyCheckpointCompletedHeightResumeAllowed(t *testing.T) {
 	want := refPerHeightRow(t, zeroHarvestH)
 
@@ -144,10 +143,10 @@ func TestLegacyCheckpointCompletedHeightResumeAllowed(t *testing.T) {
 	resumed.CheckpointPath = legacy
 	_, err = Run(context.Background(), resumed, ck)
 	if err != nil && strings.Contains(err.Error(), "predates the Zero Harvest fix") {
-		t.Fatalf("O2 refused a legacy COMPLETED-height checkpoint at start; only the MID-height case is unserveable: %v", err)
+		t.Fatalf("the legacy-checkpoint check refused a legacy COMPLETED-height checkpoint at start; only the MID-height case is unserveable: %v", err)
 	}
 	if err == nil || !strings.Contains(err.Error(), "refusing to write all-zero") {
-		t.Fatalf("resume of a legacy COMPLETED-height checkpoint: got %v, want the all-zero write refusal (fatal since O9)", err)
+		t.Fatalf("resume of a legacy COMPLETED-height checkpoint: got %v, want the all-zero write refusal (fatal)", err)
 	}
 	checkPerHeightRow(t, "legacy-completed-height-resume", want,
 		readPerHeightRow(t, resumed.PerHeightOut, zeroHarvestH))

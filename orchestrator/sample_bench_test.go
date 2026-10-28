@@ -7,11 +7,10 @@ import (
 
 // BenchmarkSampleIndexKeys measures the hot allocation path SampleKeysMulti
 // exercises on every map/merge round of every column of every height
-// (docs/engine-record.md Bottleneck #4). A real dalby A/B for
-// an allocation-only question is a ~5min round trip; this gives the same
-// signal (via -benchmem) in milliseconds, locally, no dalby needed. Use this
-// for iterating on this hot path; reserve real dalby runs for confirming a
-// promising local result at production scale/concurrency.
+// (docs/engine-record.md). A production-scale A/B for an allocation-only
+// question is a ~5 min round trip; this gives the same signal (via
+// -benchmem) in milliseconds, locally. Use this for iterating on this hot
+// path, and production runs for confirming a result at scale.
 func BenchmarkSampleIndexKeys(b *testing.B) {
 	dir := b.TempDir()
 	keyLen := 20 // realistic kink stage width, H~16-18
