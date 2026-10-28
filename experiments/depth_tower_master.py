@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ridgeline 1: the depth tower in closed form -- G(Y,t) = t*(Phat + Bhat^2/(t-3-Shat)).
+"""Depth tower, part 1: the depth tower in closed form -- G(Y,t) = t*(Phat + Bhat^2/(t-3-Shat)).
 
 Derivation (no fitting, no series input).  The proved chain identity
 (docs/proofs/diagonal-law.md Step 2, quoted in experiments/depth_defects.py)
@@ -55,7 +55,7 @@ This script verifies (M') against depth_defects.D_series (which computes the
 same defects through the independent route (C)/(D)) and, at j = 1, against
 depth1_gap_walk's (II).  RED control included.
 
-Run from repo root:  python3 experiments/ridgeline_master.py [K] [JMAX]
+Run from repo root:  python3 experiments/depth_tower_master.py [K] [JMAX]
 """
 import os
 import re

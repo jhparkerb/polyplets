@@ -430,7 +430,7 @@ D_j(k) = [Y^k t^(j-1)] G,      valid for j-1 ≤ k.                       (M′)
 
 The formula part of `R_k` reaches only `t`-powers `≥ k+1`, and a type of
 excess `e` has `k ≥ e+1`, so the grading is legitimate.
-`experiments/ridgeline_master.py`: (M′) reproduces the depth-1 to depth-4
+`experiments/depth_tower_master.py`: (M′) reproduces the depth-1 to depth-4
 series at all 74 exact entries with `k ≤ 19`; its `t^0` slice is (II) at
 `k = 1..19`; perturbing one excess-1 pure weight by `+1` breaks it. Depth is
 a marker for cluster excess, a perturbation of the gap walk's row transfer.
@@ -439,7 +439,7 @@ a marker for cluster excess, a perturbation of the gap walk's row transfer.
 
 `D_j(k) ~ C_j 9^k k^(j-3/2)` gives `F_j(Y) ~ C_j Γ(j-1/2)(1-9Y)^(-(j-1/2))`,
 one scaling variable `τ = t/(1-9Y)`. At fixed chain length `L`
-(`experiments/ridgeline_scaling.py`, checked term by term for `M ≤ 4`),
+(`experiments/depth_tower_scaling.py`, checked term by term for `M ≤ 4`),
 `G/t ~ C_1 Σ_L (9Y)^L L^(-1/2) 𝒜(tL)`, `𝒜(ξ) = Σ_M (C_(M+1)/C_1) ξ^M`. If
 the dominant singularity is a square-root branch point whose location moves
 analytically with `t`, `1 - 9Y_c(t) = αt + O(t²)`, exponent fixed, then
@@ -477,7 +477,7 @@ leaves: `λ = 9Y + Y² t Σ/9`, so
 Σ = Σ over 3-cell rows R out of the bulk state of (# 2-cell rows after R).
 ```
 
-`experiments/ridgeline_vertex.py` counts both with
+`experiments/depth_tower_vertex.py` counts both with
 `depth_defects.transitions`, the vetted row transfer (a row is legal
 iff every pending block of the previous row has a cell adjacent to it):
 
@@ -497,15 +497,15 @@ restoring it returns 450.
 
 | quantity | value | script |
 |---|---|---|
-| (M′) vs (C)/(D), depths 1–4, `k ≤ 19` | 74/74 exact | `ridgeline_master.py` |
-| (M) at `t^0` vs (II) | `k = 1..19` exact | `ridgeline_master.py` |
-| one perturbed excess-1 weight | breaks the identity | `ridgeline_master.py` |
-| `C_1` from `D_1`, `k ≤ 60` | 0.0511843184401, relative `2.46e-12` from `√6/(27√π)` | `ridgeline_scaling.py 60 1` |
-| `α_1`, amplitude form, `k ≤ 60` | 0.617283951065, `7.25e-10` from 50/81 | `ridgeline_scaling.py 60 1` |
-| `α_1`, derivative form, `k ≤ 60` | 0.61728395128067, `1.07e-09` from 50/81 | `ridgeline_scaling.py 60 1` |
-| `α_1, α_2`, `k ≤ 29` | 0.61728401849, 0.61728123436; deviations `1.10e-07`, `-4.40e-06`; calibrated bias `2.7e-06`, `5.8e-06` | `ridgeline_scaling.py 29 2` |
-| `α_3`, `k ≤ 19` | 0.61725242246, `-5.11e-05` from 50/81; calibrated bias `1.1e-04` | `ridgeline_scaling.py 19 3` |
-| `Σ`, `α` | 450, 50/81 exactly | `ridgeline_vertex.py` |
+| (M′) vs (C)/(D), depths 1–4, `k ≤ 19` | 74/74 exact | `depth_tower_master.py` |
+| (M) at `t^0` vs (II) | `k = 1..19` exact | `depth_tower_master.py` |
+| one perturbed excess-1 weight | breaks the identity | `depth_tower_master.py` |
+| `C_1` from `D_1`, `k ≤ 60` | 0.0511843184401, relative `2.46e-12` from `√6/(27√π)` | `depth_tower_scaling.py 60 1` |
+| `α_1`, amplitude form, `k ≤ 60` | 0.617283951065, `7.25e-10` from 50/81 | `depth_tower_scaling.py 60 1` |
+| `α_1`, derivative form, `k ≤ 60` | 0.61728395128067, `1.07e-09` from 50/81 | `depth_tower_scaling.py 60 1` |
+| `α_1, α_2`, `k ≤ 29` | 0.61728401849, 0.61728123436; deviations `1.10e-07`, `-4.40e-06`; calibrated bias `2.7e-06`, `5.8e-06` | `depth_tower_scaling.py 29 2` |
+| `α_3`, `k ≤ 19` | 0.61725242246, `-5.11e-05` from 50/81; calibrated bias `1.1e-04` | `depth_tower_scaling.py 19 3` |
+| `Σ`, `α` | 450, 50/81 exactly | `depth_tower_vertex.py` |
 
 Every `α_M` deviation is within the estimator's bias, measured on synthetic
 families obeying (*) exactly with a `1 + c₁/k + c₂/k²` correction of
@@ -759,15 +759,15 @@ python3 experiments/depth1_parametric.py
 make gate-cluster-weights gate-depth1-kernel gate-depth-defects
 build/cluster_weight_families 19 3                      # 146 s, results/cluster_weight_families_K19_e3.txt
 python3 experiments/depth_defects_modp.py; python3 experiments/depth_tower_field.py
-python3 experiments/ridgeline_master.py; python3 experiments/ridgeline_vertex.py
-python3 experiments/ridgeline_dump_families.py 60 1   # 395 s; writes results/cluster_weight_families_K60_e1.txt
-python3 experiments/ridgeline_scaling.py 60 1         # 4 s with the cache; also 29 2 and 19 3
+python3 experiments/depth_tower_master.py; python3 experiments/depth_tower_vertex.py
+python3 experiments/dump_cluster_weight_families.py 60 1   # 395 s; writes results/cluster_weight_families_K60_e1.txt
+python3 experiments/depth_tower_scaling.py 60 1         # 4 s with the cache; also 29 2 and 19 3
 python3 experiments/defect_bivariate.py; python3 experiments/boundary_layer.py
 python3 experiments/allpairs_kernel.py                # ρ at any gmax
 ```
 
 `depth_defects._load_table` scans only `K_table < 40`; the `K = 60`
-cache is read by `ridgeline_master.load_families` and reproduces the
+cache is read by `depth_tower_master.load_families` and reproduces the
 uncached run exactly. Data formats:
 `results/ns_a40/perheight/h{H}.out` is `n count`;
 `results/bbox_square4_n21.txt` is `n H W count`, both orientations;

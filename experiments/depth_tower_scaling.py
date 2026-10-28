@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Ridgeline 2: the depth family is a one-parameter law -- a branch point moving at
+"""Depth tower, part 2: the depth family is a one-parameter law -- a branch point moving at
 constant velocity in the excess variable.
 
-Builds on experiments/ridgeline_master.py, which verifies the closed form
+Builds on experiments/depth_tower_master.py, which verifies the closed form
 
     D_j(k) = [Y^k t^(j-1)] ( Phat(Y,t) + Bhat(Y,t)^2 / (t - 3 - Shat(Y,t)) )   (M)
 
@@ -75,7 +75,7 @@ three agree -- and what the j = 5 rivals 35/8 and 118/27 demand of alpha.
 RED controls: synthetic towers built to obey (*) exactly must be accepted, and a
 synthetic tower built to violate it must be rejected.
 
-Run from repo root:  python3 experiments/ridgeline_scaling.py [K] [EMAX]
+Run from repo root:  python3 experiments/depth_tower_scaling.py [K] [EMAX]
 """
 import os
 import sys
@@ -84,7 +84,7 @@ import time
 import mpmath as mp
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ridgeline_master import master_G                              # noqa: E402
+from depth_tower_master import master_G                              # noqa: E402
 
 mp.mp.dps = 60
 ALPHA = mp.mpf(50) / 81
@@ -241,7 +241,7 @@ def main():
 
     print()
     print("== RED controls")
-    print("   the test is: every alpha_M equals the DERIVED 50/81 (ridgeline_vertex.py)")
+    print("   the test is: every alpha_M equals the DERIVED 50/81 (depth_tower_vertex.py)")
     print("   within tolerance.  Controls must be rejected.  Note M = 1 is definitional")
     print("   (alpha_1 := C_2/C_1), so the constancy rivals only bite from M = 2.")
     ctl = []

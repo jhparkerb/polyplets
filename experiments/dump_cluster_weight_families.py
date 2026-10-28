@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """Dump an excess-graded family table in the format depth_defects._load_table reads.
 
-The Python family DP is the cost of every Ridgeline run at large K
+The Python family DP is the cost of every the depth-tower derivation run at large K
 (families(60, emax=1) is ~6.5 min); caching it makes reruns instant.  Format is
 exactly the one cpp/cluster_weight_families writes:
 
     # cluster_weight_families K=<K> emax=<E>
     e k sig bb pp
 
-Written to results/cluster_weight_families_K<K>_e<E>.txt.  ridgeline_master.
+Written to results/cluster_weight_families_K<K>_e<E>.txt.  depth_tower_master.
 load_families picks it up for any K' <= K at the same emax;
 depth_defects._load_table also does, but only for K < 40, which is why the
-Ridgeline reader exists (the useful excess-1 table is K = 60).
+the depth-tower derivation reader exists (the useful excess-1 table is K = 60).
 
-Run from repo root:  python3 experiments/ridgeline_dump_families.py K EMAX [outdir]
+Run from repo root:  python3 experiments/dump_cluster_weight_families.py K EMAX [outdir]
 """
 import os
 import sys
@@ -44,9 +44,9 @@ def main():
     print("wrote %s" % path)
     # read it straight back and insist it reproduces the arrays.  Note
     # depth_defects._load_table only scans K < 40, so the reader used here
-    # is ridgeline_master.load_families, which accepts any K.
+    # is depth_tower_master.load_families, which accepts any K.
     W._FAM.clear()
-    from ridgeline_master import load_families                     # noqa: E402
+    from depth_tower_master import load_families                     # noqa: E402
     got = load_families(K, emax)
     assert got[0] == sig and got[1] == bb and got[2] == pp, \
         "round-trip through the table file changed the families"

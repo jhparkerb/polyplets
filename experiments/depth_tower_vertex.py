@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Ridgeline 3: alpha = 50/81 derived from the excess vertex of the gap walk.
+"""Depth tower, part 3: alpha = 50/81 derived from the excess vertex of the gap walk.
 
-experiments/ridgeline_scaling.py reduces the whole depth-amplitude family to ONE
+experiments/depth_tower_scaling.py reduces the whole depth-amplitude family to ONE
 constant.  If the dominant singularity of G(Y,t) is a square-root branch point
 whose location moves analytically with the excess marker t, then
 
@@ -43,7 +43,7 @@ of the next row can be adjacent to two blocks at once when they are close, so a
 blocks loses 72 of the 450 and gives 14/27, not 50/81.  The unfiltered count is
 the one the transfer demands, and it is what the enumeration reports.
 
-Run from repo root:  python3 experiments/ridgeline_vertex.py [G]
+Run from repo root:  python3 experiments/depth_tower_vertex.py [G]
 """
 import os
 import sys
@@ -192,10 +192,10 @@ def main():
     print()
     print("== independent check: the derived alpha against the exact defect series")
     import mpmath as mp                                            # noqa: E402
-    from ridgeline_master import master_G                          # noqa: E402
-    from ridgeline_scaling import alpha_by_derivative              # noqa: E402
+    from depth_tower_master import master_G                          # noqa: E402
+    from depth_tower_scaling import alpha_by_derivative              # noqa: E402
     from depth1_gap_walk import walk_families, series_D1           # noqa: E402
-    KM = int(os.environ.get("RIDGELINE_K", "19"))
+    KM = int(os.environ.get("DEPTH_TOWER_K", "19"))
     Gm = master_G(KM, 1)
     D2 = {k: Gm[1][k] for k in range(KM + 1)}
     D1 = series_D1(walk_families(KM + 3), KM + 3)
