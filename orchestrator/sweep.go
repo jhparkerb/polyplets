@@ -2041,8 +2041,8 @@ type diagCoeffs struct {
 // coefficients from theory alone, 4 from 4 of 7 real points n=19-22, 3 held
 // out n=23-25 matched exactly; P_10: 7 of 11 from theory+the b7 recovered
 // from P_9's own n^3 coefficient, 4 from 4 of 5 structurally-valid real
-// points n=21-24, 1 held out n=25 matched exactly — see
-// docs/a26-a30-diagonal-plan.md (deleted)); j=11..19 from scripts/derive_pk_fast.py,
+// points n=21-24, 1 held out n=25 matched exactly); j=11..19 from
+// scripts/derive_pk_fast.py,
 // each documented at its own table entry below. All cases share one big.Int Horner
 // evaluator (hornerDiag) instead of j=1..6 doing native int64/uint64
 // arithmetic, since the guard-threshold fix (n>=2k+1, see applyPow3) invokes
@@ -2211,9 +2211,9 @@ var diagCoeffTable = map[int]diagCoeffs{
 	// k!-integrality confirmed. P_18's first independent holdout landed with
 	// a(40): real T(39,21) == the P_18 closed form exactly (part of the mass
 	// P_0..P_18 holdout certification, results/ns_a40/PROVENANCE.md). P_19
-	// itself is PERMANENTLY fitted-no-holdout: its first holdout T(41,22)
-	// would need a real H22 sweep (a(42)-scale) and the project closes at
-	// a(40). Certification rests on the proven grand form.
+	// itself has no holdout: its first, T(41,22), would need a real H22 sweep
+	// at n=41, which has not been run. Certification rests on the proven
+	// grand form.
 	19: {[]string{
 		"363797880709171295166015625", "-33244723454117774963378906250", "1424357847310602664947509765625", "-38591730438798666000366210937500",
 		"727030595527446770668029785156250", "-9771393162653867410812377929687500", "89995638539151550436367248535156250", "-453004710082909127087411116406250000",
@@ -2314,19 +2314,14 @@ func diagonalStripEnabled(cfg SweepConfig, k int) bool {
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..19
-// (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
-// principles; j=3..19 are data-pinned from the triangle (leading 25^j/j!,
-// integer-exact), each of j<=18 holdout-validated (a diagonal deliberately
-// swept unwired) before wiring; j=19 is permanently fitted-no-holdout (its
-// first holdout T(41,22) would need an a(42)-scale run — see its table entry). j=3..10 were additionally VALIDATED at scale by the
-// a(23)/a(24)/a25 sweeps (their swept H=16..18 == k=5..7 reproduce the formulas
-// exactly; j=8 is pinned from
-// a(24)'s T(24,16), matched the pre-a(24) falsifiable sum-of-roots prediction
-// exactly -- see results/diagonal-formula.md, scripts/pin_diagonal_k8_final.py; j=9
-// and j=10 are P_9/P_10 from scripts/derive_p9.py / derive_p10.py, see
-// diagCoeffTable). Each is a degree-j polynomial in n times a power of 3; the
-// numerator is divisible by j! for all valid n (verified), so the integer
-// division is exact. The true validity threshold is n >= 2j+1
+// (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from
+// first principles; for j=3..19 the shape is proven and two constants per j
+// are fitted to enumerated entries (leading 25^j/j!, integer-exact). Each of
+// j<=18 was checked against an entry swept with that diagonal unwired before
+// it was wired; j=19 has no such check yet (see its table entry). Each is a
+// degree-j polynomial in n times a power of 3; the numerator is divisible by
+// j! for all valid n, so the integer division is exact (and hornerDiag
+// panics if it is not). The true validity threshold is n >= 2j+1
 // (docs/proofs/T-n-nm2-and-general.md); below n=3j+1 the exponent n-1-3j is
 // negative, handled by applyPow3's exact division path. diagonalStripValid's
 // dispatch guard guarantees n >= 2j+1.
