@@ -13,11 +13,14 @@ The three order-4 subgroups are each a quotient-domain family of size
 ~lambda^(n/4), so the right-hand side is reachable at n = 40 while a(40)
 itself took the full engine.  That is what makes this an independent check.
 
-Checks, in printed order:
-  1. Python symcount subgroup counts == brute oracle, n <= 8
-  2. C++ symcount_fast == Python, n <= 11
-  3. the mod-4 congruence vs the published A006770 b-file, n <= 11
+Checks, in printed order (depths are the defaults; --deep adds one to each):
+  1. Python symcount subgroup counts == brute oracle, n <= 7
+  2. C++ symcount_fast == Python, n <= 10
+  3. the mod-4 congruence vs the published A006770 b-file, n <= 10, and the
+     mod-8 companion
   4. CONTROLS that must diverge (a check with no teeth passes vacuously)
+  5. height-graded parity, T(n,H) = I_H(D2ax) (mod 2)
+  6. the per-cell mod-4 refinement, when symtm is built
 """
 
 import os
@@ -32,11 +35,10 @@ from symcount import (HMIRROR_PLACEMENTS, SUBGROUP_TYPES,  # noqa: E402
                       SYMMETRY_TYPES, _anchor_xmin0, count_symmetry_type)
 from g1_naive import count_by_box, count_symmetry  # noqa: E402
 
-# Brute force generates every animal, so this is the wall. ~4x per n; --deep
-# restores 8.
+# Brute force generates every animal, so this is the slowest part, ~4x per n.
 ORACLE_MAXN = 8 if "--deep" in sys.argv else 7
-# Python reference depth and the C++ cross-check depth. Same ~3x per n as
-# gate_sym, whose table this duplicates. Push tier 10; --deep restores 11.
+# Python reference depth and the C++ cross-check depth, ~3x per n as in
+# gate_sym, whose table this duplicates.
 MAXN = 11 if "--deep" in sys.argv else 10
 
 FAST_BIN = os.path.join(ROOT, "build", "symcount_fast")
