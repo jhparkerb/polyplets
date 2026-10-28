@@ -1,4 +1,4 @@
-// Reader fan-in (docs/engine-record.md ง6.1): every map unit opened EVERY input range
+// Reader fan-in (docs/engine-record.md ยง6.1): every map unit opened EVERY input range
 // file of the prior round (~80 files x ~640 units x ~0.45ms of header+idx+
 // buffer setup per open = ~50k opens/round), measured as ~75% of all worker
 // CPU on an H15/maxn30 benchmark -- drowning the real transition work.
