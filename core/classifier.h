@@ -2,10 +2,10 @@
 //
 // The classifier handles the "closing column" path (cpp/tma/sweep8.h): when a
 // state's empty-next-column closure is a valid complete animal, it contributes
-// to the output. Two classifier tags for v1:
+// to the output. Two classifiers:
 //
-//   ClassifyTriangle — O1: T(n,H) for each (n, H). a(n) = Σ_H T(n,H).
-//   ClassifyHoles    — O2: per (n, H, holes). Reuses euler.h closedEulerDelta4.
+//   ClassifyTriangle — T(n,H) for each (n, H). a(n) = Σ_H T(n,H).
+//   ClassifyHoles    — per (n, H, holes), from euler.h's closedEulerDelta4.
 //
 // Usage: map_shard<W, Classifier>(src, cfg, output)
 // The Classifier must provide a static method:
@@ -15,6 +15,8 @@
 #pragma once
 
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <vector>
 #include "core/signature.h"
 #include "core/run.h"
@@ -32,7 +34,7 @@ struct TriangleRow {
   explicit TriangleRow(int H, int maxn) : H(H), row(maxn + 1, W{0}) {}
 };
 
-// ─── Triangle classifier (O1) ────────────────────────────────────────────────
+// ─── Triangle classifier ────────────────────────────────────────────────
 
 // Mirrors cpp/tma/sweep8.h:
 //   if comps == 1 && touch_top && touch_bottom:
@@ -55,7 +57,7 @@ struct ClassifyTriangle {
   }
 };
 
-// ─── Holes output accumulator (O2) ───────────────────────────────────────────
+// ─── Holes output accumulator ───────────────────────────────────────────
 
 // Per (n, holes) count for one height H.
 // Stored as a vector of (n, holes, count) triples (sparse; fills in at completion).
@@ -70,18 +72,11 @@ struct HolesRow {
     : H(H), byNHoles(maxn + 1, std::vector<W>(maxholes + 1, W{0})) {}
 };
 
-// ─── Holes classifier (O2) ───────────────────────────────────────────────────
+// ─── Holes classifier ───────────────────────────────────────────────────
 //
-// The holes count for a completed animal = Euler-characteristic holes.
-// In the transfer-matrix approach, the hole delta accumulates per column step
-// via closedEulerDelta4 (euler.h). The holes count must be carried in the
-// RunRecord value alongside the cell-count-vec — for v1 this is implemented
-// as an extended RunRecord or a separate parallel structure.
-//
-// Note: for the in-RAM driver, the holes classifier is scaffolded but not
-// fully wired (holes need the Euler delta accumulated per-step, which requires
-// threading it through the map loop in mapreduce.h). The skeleton here ensures
-// the seam compiles cleanly.
+// The holes count for a completed animal = Euler-characteristic holes. The
+// hole delta accumulates per column step via closedEulerDelta4 (euler.h) into
+// key byte sig.b[H+2] (core/mapreduce.h, keyLen H+3), which is read here.
 
 struct ClassifyHoles {
   template <class W>
@@ -97,7 +92,13 @@ struct ClassifyHoles {
     for (int i = 0; i < rec.len; ++i) {
       const int n = static_cast<int>(rec.lo) + i;
       if (n < 1 || n >= static_cast<int>(out.byNHoles.size())) continue;
-      if (holes >= static_cast<int>(out.byNHoles[n].size())) continue;
+      if (holes >= static_cast<int>(out.byNHoles[n].size())) {
+        // An n-cell animal has fewer than n holes, so this cannot happen;
+        // dropping the count would be a silent undercount, so stop instead.
+        std::fprintf(stderr, "ClassifyHoles: %d holes at n=%d exceeds the table\n",
+                     holes, n);
+        std::abort();
+      }
       out.byNHoles[n][holes] += rec.counts[i];
     }
   }

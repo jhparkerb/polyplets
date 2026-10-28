@@ -1,8 +1,8 @@
-// worker_util.h — small shared helpers for the thin worker CLIs (M1).
+// worker_util.h — small shared helpers for the two worker CLIs.
 //
-// argv plumbing + rusage/timing readouts used identically by map_worker and
-// merge_worker (and the serial driver). Kept header-only and dependency-free
-// beyond libc so the workers stay thin.
+// argv plumbing, rusage and timing readouts, output formatting, the SIGTERM
+// stop flag and the --persistent request loop, shared by map_worker and
+// merge_worker. Header-only, and depends on nothing in core/.
 
 #pragma once
 
@@ -105,9 +105,8 @@ inline double peakRssMB() {
 }
 
 // ─── SIGTERM handling: cooperative work-stealing stop ────────────────────────
-// Shared by map_worker.cpp and merge_worker.cpp (identical in both before
-// this extraction): the orchestrator raises SIGTERM to ask a straggler unit
-// to stop early and hand its remainder to idle cores. `g_workerTerminate`
+// The orchestrator raises SIGTERM to ask a straggler unit to stop early and
+// hand its remainder to idle cores. `g_workerTerminate`
 // (a `volatile sig_atomic_t`, the only signal-safe flag width) is checked
 // cooperatively inside the hot loop; the SIGTERM handler itself just sets
 // the flag, does not exit -- a clean, successful stop (status 0) is
@@ -125,13 +124,10 @@ inline void installWorkerSigtermHandler() {
 // elapsed_s=T" line every ~2s, EXCEPT the very first call, which fires
 // immediately regardless of elapsed time. The orchestrator streams these
 // to drive the within-column heartbeat AND gates work-stealing eligibility
-// on processed>0 (stealEligible, orchestrator/sweep.go) -- with a flat 2s
-// throttle including the first call, any unit whose whole runtime fell
-// under 2s reported processed=0 for its entire life, making it permanently
-// un-stealable no matter how much of the pool was waiting on it (found
-// investigating why work-stealing measured near-zero even with an idle
-// pool and a lone straggler: picked=false because processed=0 the whole
-// time). Construct one per request (not once per process): `t0` should be
+// on processed>0 (stealEligible, orchestrator/sweep.go), so the first call
+// must not wait: a unit that ran under 2s would otherwise report nothing
+// and never be stealable. Construct one per request (not once per process):
+// `t0` should be
 // the request's own start time, and `emitted_once` must reset per request
 // so a fast request doesn't inherit a slow one's "already emitted" state.
 class ThrottledProgressEmitter {
@@ -176,9 +172,8 @@ inline std::vector<std::string> tokenizeLine(const std::string& line) {
 // contract) or loops over stdin lines calling it (persistent mode,
 // resetting g_workerTerminate between requests so a prior request's
 // SIGTERM doesn't bleed into the next -- see g_workerTerminate's comment).
-// Callers still call installWorkerSigtermHandler() and raiseFdLimitToHard()
-// themselves before this (the latter kept out of worker_util.h to preserve
-// its "no core/ dependency" contract stated at the top of this file).
+// Callers call installWorkerSigtermHandler() and raiseFdLimitToHard()
+// (core/fdlimit.h) themselves before this.
 inline int runWorkerMain(
     int argc, char** argv,
     const std::function<int(const std::vector<std::string>&)>& runOneRequest) {
@@ -194,9 +189,9 @@ inline int runWorkerMain(
   if (!persistent) return runOneRequest(filtered);
 
   // POSIX getline, not std::getline(std::cin): cin's stdio_sync_filebuf pulls
-  // one BYTE per virtual underflow call, and a merge request line listing
-  // every map output of a round runs to tens of KB — measured as a top-3
-  // merge_worker cost at fan-in scale (Fan-In Tax, docs/engine-record.md).
+  // one byte per virtual underflow call, and a merge request line listing
+  // every map output of a round runs to tens of KB, which measured as one of
+  // merge_worker's three largest costs (docs/engine-record.md).
   char* line = nullptr;
   size_t cap = 0;
   ssize_t n;
@@ -209,11 +204,9 @@ inline int runWorkerMain(
     std::fflush(stdout);
 #ifdef __GLIBC__
     // Return freed arena pages to the OS between requests. A persistent
-    // worker otherwise RETAINS its peak heap forever: after a big H20 round,
-    // 64 idle merge workers each held ~1GB while the 64 map workers ran
-    // their own ~1.3GB round — the two fleets' retained peaks summed past
-    // 125GB and the kernel OOM killer fired (5th a(40) death, 2026-07-26;
-    // docs/engine-record.md). Cost: ~ms per request, paid off-round.
+    // worker otherwise keeps its peak heap: 64 idle merge workers holding
+    // ~1 GB each beside 64 map workers at ~1.3 GB each exceeded 125 GB during
+    // a(40) (docs/engine-record.md). Cost: ~ms per request.
     malloc_trim(0);
 #endif
   }

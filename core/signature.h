@@ -10,7 +10,6 @@
 // CROSSING partitions (labels may interleave arbitrarily), which the
 // square-8 (polyplet) transition will need; for square-4 the reachable
 // partitions happen to be non-crossing, but nothing here assumes it.
-// The compact Motzkin encoding (T1(b)) is a later drop-in optimization.
 
 #pragma once
 
@@ -49,7 +48,7 @@ struct Sig {
 // big-endian u64s (one CPU compare per 8 bytes instead of memcmp's per-byte
 // setup), falling back to memcmp on the <8-byte tail. Used by the sort
 // comparator and both k-way merge heaps — a measured chunk of the map terminal
-// sort and ~19% of merge (results/{map-profile,merge-ledger}.md). The big-endian
+// sort and ~19% of merge (measured). The big-endian
 // load makes the numeric u64 order equal the byte order on any host endianness.
 inline int sigCmp(const unsigned char* a, const unsigned char* b, int keyLen) {
   int i = 0;

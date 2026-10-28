@@ -7,17 +7,12 @@
 //                      column's mixed-state sweep.
 //   kinkFinalizeColumn — column end: after H stage transitions, drop the
 //                      final carry (with its stranding check), canonicalize,
-//                      admissibility-prune, R1-fold, and dedup back down to
-//                      the next column's end-of-column Run<W>.
+//                      admissibility-prune, fold by reflection (foldSig), and
+//                      dedup back down to the next column's end-of-column Run<W>.
 //
 // Harvest happens at column start (via a per-column-start completion check
 // on the state being seeded), not column end; finalize itself never
-// classifies. Both header comments below cite the exact invariant kept.
-//
-// Deliberately a separate header from core/kink.h: kink.h's map_shard_stage
-// is already committed and gated (tests/engine/gate_kink.cpp); keeping these two
-// column-boundary functions here means this phase's gate (tests/engine/gate_kink_column.cpp)
-// cannot regress Phase 1's.
+// classifies. tests/engine/gate_kink_column.cpp checks these two steps.
 
 #pragma once
 
@@ -69,8 +64,8 @@ Run<W> kinkSeedStage0(const Run<W>& src, int H, Output& out_classified) {
 // path, not an extend -- mirrors map_shard's nonzero-mask contract), then
 // stranding-check the outgoing carry (its component must still be reachable
 // via the boundary once the carry itself is dropped), zero the two
-// mixed-state bytes, canonicalize, admissibility-prune, and (if cfg.fold)
-// R1-fold. No classify here -- harvest already happened in kinkSeedStage0.
+// mixed-state bytes, canonicalize, admissibility-prune, and (if fold) fold
+// by reflection. No classify here -- harvest already happened in kinkSeedStage0.
 // Distinct mixed states can collapse to the same H+2 key after canonicalize/
 // fold, so (unlike the seed transform) this DOES need a final sort+dedup.
 template <class W>

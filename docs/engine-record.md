@@ -79,7 +79,7 @@ The guard is live only because `NSFLAGS` carries no `-DNDEBUG` (section 8).
 
 **Counter width.** Two compile-time tags: `u64`, exact to a(25); `u128`, exact
 to about a(48). The orchestrator refuses to start with an undersized counter
-for the requested `maxn` (`core/counter.h`, `orchestrator/runref.go`). Every
+for the requested `maxn` (`orchestrator/runref.go`). Every
 production run from a(26) on used `u128` (`results/ns_a26/PROVENANCE.md`).
 There is no modular arithmetic anywhere in the production path (section 7).
 
@@ -1117,8 +1117,8 @@ reduction.
 The `u128` ceiling: `orchestrator/runref.go` refuses `u128` above `maxn` 48
 on the final row sum alone, while intermediate multi-component counts exceed
 the row sum; silent wrap is prevented only by the `assert(slot >= prev)`
-guards in `core/run.h`, live because `NSFLAGS` has no `-DNDEBUG`, and
-`core/counter.h` still says overflow is silent. Any run at `Nmax ≥ 45` should
+guards in `core/run.h`, live because `NSFLAGS` has no `-DNDEBUG`. Any run at
+`Nmax ≥ 45` should
 first measure the largest per-state count in an existing run.
 
 ## 8. What the checks cover

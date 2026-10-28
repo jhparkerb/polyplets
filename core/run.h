@@ -27,7 +27,7 @@
 
 #include "core/signature.h"
 
-// REFUSE AT START (V5): every key in this engine lives in a fixed SIGMAX-byte
+// Refuse at start: every key in this engine lives in a fixed SIGMAX-byte
 // Sig and is copied through SIGMAX-sized stack arrays (mergeRunFiles' lo_sig/
 // hi_sig, map_shard_file, map_shard_stage_file, map_worker's range filter,
 // seekToKey's probe buffer), and deserializeRecord zero-pads the tail with
@@ -68,7 +68,7 @@ struct RunRecord {
   // kink.h) construct successor records against a monotonic_buffer_resource
   // arena scoped to one spill epoch, instead of one malloc/free per
   // successor (measured: 415.8M allocations in a34's swept portion,
-  // ~14% of map cycles, map-profile.md B2). Default-constructed (no
+  // ~14% of map cycles). Default-constructed (no
   // allocator argument) it behaves EXACTLY like std::vector -- uses the
   // global default_resource, same semantics, same cost, zero change for
   // every other call site (deserializeRecord, seedRecord, tests, ...).
@@ -150,7 +150,7 @@ struct RunRecord {
   }
 };
 
-// Successor-counts arena sizing (map-profile.md B2): the map hot loop
+// Successor-counts arena sizing: the map hot loop
 // (mapreduce.h's map_shard_file, kink.h's map_shard_stage_file) bump-allocates
 // RunRecord::counts from a std::pmr::monotonic_buffer_resource sized to the
 // spill/ram budget, one arena per spill epoch instead of one malloc/free per
@@ -182,7 +182,7 @@ inline bool decodeVarint(const uint8_t* data, size_t size, size_t* pos, W* out) 
   W result = 0; unsigned shift = 0; uint8_t byte;
   do {
     if (*pos >= size) return false;
-    // WIDTH-BOUNDED (V3): a valid varint for W needs at most
+    // Width-bounded: a valid varint for W needs at most
     // ceil(8*sizeof(W)/7) bytes, so shift can never legitimately reach the
     // counter width. Without this bound a corrupt run of continuation bytes
     // shifts past it -- undefined behavior, and on hardware that merely masks
@@ -251,11 +251,9 @@ inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
   // triggered whenever an incoming record's lo is BEFORE the accumulator's
   // current lo). With lo ascending within a key group, the accumulator's lo
   // is always the group minimum, so every combine sees o.lo >= lo and the
-  // expensive path can never fire for this call site. Confirmed the
-  // mechanism first with a real benchmark (experiments/bench_dedup.cpp) --
-  // collision rate x window width was shown to compound combine() cost;
-  // this is the fix for why, not a guess (docs/engine-record.md
-  // Bottleneck #6). mergeRunFiles' cross-file k-way merge doesn't get the
+  // expensive path can never fire for this call site (benchmarked:
+  // collision rate x window width compounds combine() cost). mergeRunFiles'
+  // cross-file k-way merge doesn't get the
   // full benefit (per-file order still depends on which file a record came
   // from) but each file's OWN prior sortRun already carries this tiebreak,
   // so it's a pure win with no downside there either.

@@ -4,12 +4,14 @@
 // that nothing reaches past this seam into core internals.
 //
 // Exposes:
-//   Trusted math (copied verbatim from cpp/tma/, never edited here):
+//   The transition math, derived from the older column engine in cpp/tma/
+//   (euler.h is byte-identical to cpp/tma/euler.h; signature.h and
+//   transition.h add sigCmp, a SIGMAX override and mask-width templates):
 //     Sig, canonicalizeSig, foldSig, reflectSig, completionLowerBound  [signature.h]
 //     stepColumnSquare8, forEachViableMask                              [transition.h]
 //     closedEulerDelta4, quadColumnPair                                 [euler.h]
-//   New-system API:
-//     Counter<W>, Classifier<Tag>, ShardCfg                            [counter.h, classifier.h]
+//   The enumerator's own API:
+//     Classifier<Tag>, ShardCfg                                         [classifier.h, mapreduce.h]
 //     RunRecord, RunWriter, RunReader                                   [run.h]
 //     map_shard(), merge()                                              [mapreduce.h]
 
@@ -18,7 +20,6 @@
 #include "core/signature.h"
 #include "core/transition.h"
 #include "core/euler.h"
-#include "core/counter.h"
 #include "core/classifier.h"
 #include "core/run.h"
 #include "core/mapreduce.h"

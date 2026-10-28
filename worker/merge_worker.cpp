@@ -1,4 +1,4 @@
-// merge_worker.cpp — thin CLI wrapper for mergeRunFiles (DESIGN §8, T1.2).
+// merge_worker.cpp — thin CLI wrapper for mergeRunFiles.
 //
 // Usage:
 //   merge_worker --in PATH[,PATH,...] --H N --out PATH
@@ -15,18 +15,12 @@
 // pass --keylen explicitly — merge_worker itself has no kernel awareness,
 // it just merges whatever fixed-width keys the caller tells it about.
 //
-// --persistent: read one whitespace-tokenized request per line from stdin
-// and process it, looping until EOF, instead of a single argv-derived
-// request -- eliminates the fork+exec cost paid on every single merge
-// range (see map_worker.cpp's runOneRequest comment for the full
-// rationale; same fix, same reasoning, applied here).
+// --persistent: read one whitespace-tokenized request per stdin line until
+// EOF instead of a single argv request, saving a fork and exec per merge
+// range (as in map_worker.cpp).
 
-#include <cctype>
-#include <csignal>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -41,9 +35,8 @@
 // stop_key_out params -- stopping early just means "re-merge with
 // lo_hex=stop_key," no partial-tree-state problem to solve.
 
-// runOneRequest does everything a one-shot merge_worker invocation always
-// did: parse one request's args, merge the shard files, emit accounting.
-// `tokens` is the flag/value list with no program name.
+// One request: parse its flags, merge the shard files, print the accounting
+// line. `tokens` is argv without the program name, or one stdin line.
 static int runOneRequest(const std::vector<std::string>& tokens) {
   std::string in_str, out_path, klo_hex, khi_hex, rev;
   std::string counter_arg = "u64";
@@ -83,10 +76,6 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  // Throttled progress emitter (worker_util.h): first call fires
-  // immediately (not gated by elapsed time), so a merge range's
-  // processed>0 becomes visible to the orchestrator's stealEligible within
-  // one progress stride, not up to 2s late.
   ThrottledProgressEmitter on_progress(t0_wall);
 
   size_t body_bytes, out_recs;

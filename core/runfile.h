@@ -1,4 +1,4 @@
-// runfile.h — POLYRUN file format: streaming read/write of sorted runs (M1).
+// runfile.h — POLYRUN file format: streaming read/write of sorted runs.
 //
 // Wire format:
 //   POLYRUN 1\n
@@ -62,10 +62,9 @@ inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 // INTEGRITY of a compression-2 (or -1) file is the zstd frame checksum, in
 // band, not the FNV trailer plain files carry — and it is enforced fail-closed
 // HERE: RunFileReader aborts on any decode or checksum failure and on any body
-// that ends before the header's record count (E1). No independent out-of-band
+// that ends before the header's record count. No independent out-of-band
 // check exists for these files: verify.go and runcat are Go and decode plain
-// bodies only, and there is no C++ dump tool (an audit reader is deferred, see
-// AUDIT-2026-07-30 E2). The manual recovery/inspection path is
+// bodies only, and there is no C++ dump tool. The manual recovery/inspection path is
 // `tail -c +<body offset+1> FILE | zstd -d`, which those two tools now print.
 //
 // Frame size in RECORDS (env POLY_FRONTIER_ZSTD_BLOCK, default 256).
@@ -76,7 +75,7 @@ inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 //  - ratio on identical live a(39) H20 records (plain 158.8 B/rec):
 //    64 -> 1.45x, 256 -> 1.72x, 512 -> 1.78x, 1024 -> 1.81x
 //    (experiments/reframe_measure.cpp);
-//  - gympie H15/maxn30 bench (plain 486s/6.0k cpu-s):
+//  - laptop H15/maxn30 bench (plain 486s/6.0k cpu-s):
 //    64 -> 684s/7.1k, 256 -> 576s/6.9k, 512 -> 778s/8.5k.
 //    Below ~256, per-frame overhead (decompressBegin + checksum epilogue)
 //    dominates; above it, (merge-range x input) seek-overshoot decompression
@@ -138,8 +137,8 @@ inline int frontierZstdLevel() {
 // workspace — an mmap-class allocation whose kernel-side cost showed up as
 // WALL (not cpu) at fan-in scale: (ranges x inputs) reader opens per round,
 // each paying mach_vm/page-fault traps on macOS's allocator (sampled:
-// mach_vm_reclaim under ZSTD_createDStream; the glibc-mmap-threshold Fan-In
-// Tax lesson replayed through zstd). Workers are single-threaded and
+// mach_vm_reclaim under ZSTD_createDStream; the same per-open cost as the
+// glibc mmap threshold below, through zstd). Workers are single-threaded and
 // persistent, so a thread-local free list reaches steady state with zero
 // context allocation. A k-way merge holds many readers open concurrently —
 // hence a pool, not a single cached context.
@@ -400,7 +399,7 @@ class RunFileWriter {
     // Assemble the whole record in a stack buffer and emit ONCE. Field-at-a-time
     // emit() was ~10-35 stdio calls per record (worst: one per varint byte), and
     // per-call FILE-lock + dispatch overhead dominated map/merge worker busy time
-    // (measured ~90% of busy samples on gympie, docs/engine-record.md). Max
+    // (measured ~90% of busy samples on a laptop). Max
     // record size: keyLen<=SIGMAX-2+... sig (<=34) + lo,len (2) + up to
     // (maxn+1)<=40 counts x <=19 varint bytes = well under the 1KB below.
     uint8_t rec[1024];
@@ -682,7 +681,7 @@ class RunFileReader {
     // (body reads are explicit >=kFirstFillBytes freads, which glibc serves
     // directly). The default 4KB buffer made every open cost a 4KB read —
     // material at merge fan-in scale, where a round is ranges x inputs opens
-    // for one-record peeks (Fan-In Tax, docs/engine-record.md).
+    // for one-record peeks.
     std::setvbuf(fp_, nullptr, _IOFBF, 512);
     if (!parseHeader()) {
       std::fprintf(stderr, "RunFileReader: bad header in %s\n", path.c_str());
@@ -734,7 +733,7 @@ class RunFileReader {
       uint8_t byte;
       do {
         if (!bodyRead(&byte, 1)) failShort("count varint");
-        // WIDTH-BOUNDED (V3), mirroring core/run.h's decodeVarint: a corrupt
+        // Width-bounded, mirroring core/run.h's decodeVarint: a corrupt
         // run of continuation bytes must not shift past the counter width.
         if (shift >= 8 * sizeof(W)) failShort("over-wide count varint");
         v |= (static_cast<W>(byte & 0x7f) << shift);
@@ -919,7 +918,7 @@ class RunFileReader {
         // vector per reader put every allocation over glibc's mmap threshold,
         // so ranges x inputs reader instances per round each paid an
         // mmap+page-zero+munmap cycle (gdb-sampled as brk/sbrk churn in
-        // reader destructors; Fan-In Tax, docs/engine-record.md). An 8KB peek
+        // reader destructors). An 8KB peek
         // buffer stays arena-served and gets reused across readers.
         const size_t want = std::min(next_fill_, kSpillBlockBytes);
         if (rbuf_.size() < want) rbuf_.resize(want);
@@ -942,9 +941,8 @@ class RunFileReader {
   // BOTH buffers fill adaptively (kFirstFillBytes doubling to
   // kSpillBlockBytes, reset on open/seek) for the same reason as rawRead's
   // plain path: a merge heap-init peek is (ranges x inputs) reader opens per
-  // round, and a fixed 256KB read+decompress per open re-created the Fan-In
-  // Tax through the compressed path — measured 4.7x wall on the gympie
-  // H15/maxn30 bench before this fix.
+  // round, and a fixed 256KB read+decompress per open cost 4.7x wall on an
+  // H15/maxn30 benchmark through the compressed path.
   bool refillD() {
     const size_t dwant = std::min(zout_fill_, kZReaderMaxFill);
     if (dbuf_.size() < dwant) dbuf_.resize(dwant);

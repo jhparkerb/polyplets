@@ -60,7 +60,7 @@ Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified)
   Run<W> buf;
   buf.reserve(src.size()); // at least one successor per source; skips early doublings
 
-  // TODO(perf, M1+): the inner lambda allocates succ.counts per successor (millions
+  // TODO(perf): the inner lambda allocates succ.counts per successor (millions
   // at scale) and the trailing sortRun re-sorts data the sorted frontier already
   // partly orders. Hoist a reusable scratch record and replace sort+dedup with a
   // structure-aware k-way merge once the spill engine makes this the bottleneck.
@@ -297,7 +297,7 @@ std::pair<size_t, size_t> map_shard_file(
   size_t total_spill_bytes = 0;
   int spill_seq = 0;
 
-  // Successor-counts arena (map-profile.md B2: succ.counts.assign() was the
+  // Successor-counts arena (succ.counts.assign() was the
   // sole per-successor heap allocation, ~14% of map cycles; measured 415.8M
   // allocations in a34's swept portion). Bump-allocates from a chunk sized
   // to the spill budget; every succ this epoch shares it (all with EQUAL
@@ -464,7 +464,7 @@ std::pair<size_t, size_t> map_shard_file(
 
       if (cfg.fold) foldSig(out_sig, H);
 
-      RunRecord<W> succ(&succArena);  // arena-backed counts (map-profile.md B2)
+      RunRecord<W> succ(&succArena);  // arena-backed counts
       succ.sig    = out_sig;
       succ.H      = H;
       succ.keyLen = keyLen;

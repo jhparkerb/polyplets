@@ -1,10 +1,9 @@
-// map_worker.cpp — thin CLI wrapper for map_shard_file (DESIGN §8, T1.2),
-// plus the kink-carry kernel (Design 14 Phase 2.4).
+// map_worker.cpp — one unit of work on one height's column sweep.
 //
 // Usage (column kernel, default):
 //   map_worker --in PATH[,PATH,...] --H N --maxn N [--fold 0|1]
 //              --ram BYTES --spill DIR --out PATH
-//              [--counter u64|u128] [--lo HEX] [--hi HEX] [--rev GITREV]
+//              [--counter u64|u128] [--lo HEX] [--hi HEX] [--rev GITREV] [--holes]
 //
 // Usage (kink kernel):
 //   map_worker --kernel kink --stage seed|<int>|finalize
@@ -12,46 +11,31 @@
 //              --ram BYTES --spill DIR --out PATH
 //              [--counter u64|u128] [--lo HEX] [--hi HEX] [--rev GITREV]
 //
-// Column kernel: reads POLYRUN source run(s), applies the king-column
-// transition with disk spill, writes one sorted POLYRUN output run. Emits
-// accounting + triangle contributions to stdout.
+//   map_worker --persistent   reads one such request per stdin line instead.
 //
-// Kink kernel: --stage selects which of the column's H+2 steps this
-// invocation performs (mirrors sweepHeightKink's per-column stage
-// sub-loop, orchestrator/sweep.go):
+// Column kernel: reads POLYRUN source run(s), applies the king-column
+// transition with disk spill, writes one sorted POLYRUN output run, and
+// prints the triangle contributions ("tri H n count") and an accounting line.
+//
+// Kink kernel: the column is H+2 steps, and --stage selects one
+// (orchestrator/sweep.go's sweepHeightKink drives them in order):
 //   seed      column start: harvest (classify) the previous column's
 //             end-of-column records (--in keyed H+2), seed stage 0
-//             (--out keyed H+4). In-RAM (kinkSeedStage0) -- no spill.
+//             (--out keyed H+4). In RAM, no spill.
 //   <int> r   one of the H mid-column stage transitions (--in/--out both
-//             keyed H+4). File-backed, spills past --ram
-//             (map_shard_stage_file) -- the parallel-shard/merge-barrier
-//             path Design 14 is actually about.
+//             keyed H+4). File-backed, spills past --ram.
 //   finalize  column end: drop the carry, stranding-check, canonicalize,
-//             prune, fold (--in keyed H+4, --out keyed H+2). In-RAM
-//             (kinkFinalizeColumn) -- no spill, no classify (harvest
-//             already happened at seed).
-// seed/finalize are in-RAM: no spill path and no work-stealing (K1, the
-// standing deferral). The old note here scoped that to "a(20)-gate scale",
-// 20 terms stale by the close. The true envelope, measured: it survived the
-// whole a(21)..a(40) chain, because the PHASED production layout bounds how
-// much of a column is co-resident, not because a unit's slice is bounded --
-// a single seed/finalize unit still loads its entire assigned key range with
-// unbounded RSS, and BalancedCutsMulti's open-ended last range is documented
-// to skew ~9000x. So the exposure is unchanged and still deferred (phasing
-// masks it, it does not remove it); see AUDIT-2026-07-13 K1 and
-// AUDIT-2026-07-30's standing-deferrals section. Both still respect --lo/--hi
-// so a sharded unit only processes its own key range, matching the column
-// kernel's contract.
-// v1 = triangle only: rejects --holes with --kernel kink (the holes Euler
-// accumulator collides with the kink carry byte at the same sig offset,
-// see core/kink.h).
+//             prune, fold (--in keyed H+4, --out keyed H+2). In RAM, no
+//             spill, no classify (the harvest happened at seed).
+// seed and finalize load their whole --lo/--hi key range into RAM. The
+// orchestrator's phased layout bounds how much of a column is resident at
+// once, and that carried a(21)..a(40), but one unit's footprint is not
+// bounded by anything in this file.
+// --holes is column-kernel only: the holes Euler accumulator and the kink
+// carry byte would share one key byte (core/kink.h).
 
-#include <cctype>
-#include <csignal>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -107,27 +91,16 @@ static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
   return w.finalize();
 }
 
-// SIGTERM handling (cooperative work-stealing stop, DESIGN 08, T2.3) is
-// shared with merge_worker.cpp: see worker_util.h's g_workerTerminate/
-// installWorkerSigtermHandler. map_shard_file watches g_workerTerminate,
-// stops reading at the next key boundary (the cursor), and finalizes a
-// fully valid sorted output over [lo, cursor); the cursor comes back in
-// stop_key. This is a clean, successful exit (status 0) — distinct from a
-// hard SIGKILL (used by the orchestrator's ctx-cancel for checkpoint/
-// shutdown), which is uncatchable and discards the partial column for a
-// later --resume.
+// SIGTERM is a request to stop early (worker_util.h): map_shard_file stops
+// at the next key boundary and finalizes a valid sorted output over
+// [lo, cursor), reporting the cursor as stop_key, and the worker exits 0.
+// The orchestrator requeues [cursor, hi). SIGKILL, used for checkpoint and
+// shutdown, discards the partial column for a later --resume.
 
-// runOneRequest does everything a one-shot map_worker invocation always did:
-// parse one request's args, do the map/merge-shard work, emit accounting.
-// Factored out of main() so --persistent (below) can call it once per line
-// read from stdin instead of once per process -- eliminating the fork+exec
-// cost paid on every single work unit (thousands of sub-second invocations
-// per real run; confirmed the dominant real cost via a real heap-alloc
-// profile plus direct observation, not a hunch -- see
-// docs/engine-record.md Bottleneck #5).
-// `tokens` is the flag/value list with no program name (argv+1..argc in the
-// one-shot path; a tokenized stdin line in persistent mode) -- byte-for-byte
-// the same flags, same semantics, same output contract either way.
+// One request: parse its flags, do the work, print the accounting line.
+// `tokens` is argv without the program name, or one stdin line in
+// --persistent mode, which saves a fork and exec per work unit (thousands
+// of sub-second units per run; docs/engine-record.md).
 static int runOneRequest(const std::vector<std::string>& tokens) {
   // ─── Arg parsing ────────────────────────────────────────────────────────────
   std::string in_str, out_path, spill_dir, lo_hex, hi_hex, rev;
@@ -181,7 +154,7 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   const bool kink = (kernel_arg == "kink");
   if (kink && holes) {
     std::fprintf(stderr, "map_worker: --kernel kink does not support --holes "
-                         "(v1 is triangle-only; the carry byte and the holes "
+                         "(the carry byte and the holes "
                          "Euler accumulator collide at the same sig offset)\n");
     return 1;
   }
@@ -205,7 +178,7 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
     }
   }
 
-  // REFUSE AT START (V5): the key width this request implies must fit SIGMAX
+  // Refuse at start: the key width this request implies must fit SIGMAX
   // before any file is opened. The kink kernel's H+4 key is the reachable case
   // (H >= 29 at SIGMAX=32); the column kernel's H+2 / holes H+3 are checked by
   // the same call so no path is exempt. Every SIGMAX-sized stack buffer
@@ -230,31 +203,7 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  // Throttled progress emitter: at most one event=progress line every ~2s,
-  // EXCEPT the very first call, which fires immediately regardless of
-  // elapsed time. The orchestrator streams these to drive the within-column
-  // heartbeat AND gates work-stealing eligibility on processed>0
-  // (stealEligible, orchestrator/sweep.go) -- with the old unconditional 2s
-  // throttle, any unit whose whole runtime was under 2s reported
-  // processed=0 for its entire life, making it permanently un-stealable no
-  // matter how much of the pool was waiting on it (found investigating why
-  // a single-unit-inflight column with idle thief-workers spinning on
-  // pickVictim never actually stole anything: picked=false because
-  // processed=0 the whole time, elapsed well under 2s). The wall-time-floor
-  // fix (Bottleneck #1, commit 208864b) never reached this -- it only
-  // patched stealEligible's record-count gate, downstream of this earlier,
-  // harder processed==0 early return.
-  double last_emit = t0_wall;
-  bool emitted_once = false;
-  auto on_progress = [&](size_t n) {
-    const double now = wallSeconds();
-    if (!emitted_once || now - last_emit >= 2.0) {
-      emitted_once = true;
-      last_emit = now;
-      std::printf("event=progress processed=%zu elapsed_s=%.1f\n", n, now - t0_wall);
-      std::fflush(stdout);
-    }
-  };
+  ThrottledProgressEmitter on_progress(t0_wall);  // worker_util.h
 
   size_t spill_bytes, out_recs;
   std::string stop_key;  // set iff SIGTERM stopped us early (work-stealing cursor)
@@ -292,8 +241,7 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       }
     } else {
       // mid-column stage r: H+4-keyed table -> H+4-keyed table for stage+1.
-      // File-backed, spills past --ram (the parallel-shard/merge-barrier
-      // path Design 14 is actually about) -- unlike seed/finalize above.
+      // File-backed, spills past --ram, unlike seed/finalize above.
       KinkStageCfg kcfg{H, maxn, kink_stage, ram_bytes, spill_dir};
       if (counter_arg == "u128") {
         std::tie(spill_bytes, out_recs) = map_shard_stage_file<u128>(
@@ -349,7 +297,6 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   return 0;
 }
 
-// Whitespace-split a stdin request line into tokens. Paths are orchestrator-
 int main(int argc, char** argv) {
   raiseFdLimitToHard();  // the spill/merge path fans out to many open files
   installWorkerSigtermHandler();

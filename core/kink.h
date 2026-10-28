@@ -17,18 +17,16 @@
 // Canonicalisation covers b[0..H) AND the carry byte together (canonMixed);
 // the touch/placed flags are never relabeled.
 //
-// Scope v1 = triangle only: the holes path's Euler-count accumulator lives in
-// sig.b[H+2] (core/mapreduce.h), which collides with the carry byte here.
-// Holes stays on the whole-column kernel (an a19/a20-era concern).
+// Triangle only: the holes path's Euler-count accumulator lives in sig.b[H+2]
+// (core/mapreduce.h), the byte the carry uses here, so holes stay on the
+// whole-column kernel.
 //
 // map_shard_stage is the single-stage analogue of core/mapreduce.h's
 // map_shard: it consumes a shard of the CURRENT stage's mixed-state table and
 // produces that shard's successor records for stage+1 as a sorted,
 // deduplicated Run<W> — same Run<W>/mergeRuns contract, just keyed on the
-// mixed state instead of the end-of-column state. Column-boundary harvest
-// (classify + seed stage 0) and finalize (drop the last carry, stranding
-// check, canonicalize, admissibility prune, R1 fold) are Phase 2 concerns
-// (orchestrator wiring); this header only ports the per-stage fan-out.
+// mixed state instead of the end-of-column state. The column-boundary steps
+// (harvest and seed stage 0; finalize) are in core/kink_column.h.
 
 #pragma once
 
@@ -150,15 +148,14 @@ struct KinkStageCfg {
   std::string spill_dir;
 };
 
-// map_shard_stage: one micro-stage of the kink-carry sweep. Consumes a shard of the current stage's mixed-state table (keyLen
-// H+4) and produces that shard's successor records for stage+1 as a sorted,
-// deduplicated Run<W> -- the same Run<W>/mergeRuns contract core/mapreduce.h's
-// map_shard uses, just keyed on the mixed state instead of the end-of-column
-// state. Applies kinkStageTransition per source record, shifting each ranged
+// map_shard_stage: one micro-stage of the kink-carry sweep, in RAM. Consumes
+// a shard of the current stage's mixed-state table (keyLen H+4) and produces
+// that shard's successor records for stage+1 as a sorted, deduplicated Run<W>.
+// Applies kinkStageTransition per source record, shifting each ranged
 // count-vec window by the transition's per-choice cell count (0 or 1) and
 // clipping to maxn, exactly as map_shard shifts by forEachViableMask's cell
-// count. Orchestrator wiring (partition/parallel/merge over H stages,
-// column-start harvest+seed, end-of-column finalize) is Phase 2.
+// count. Production runs use map_shard_stage_file below; this in-RAM version
+// is what tests/engine/gate_kink.cpp checks it against.
 template <class W>
 Run<W> map_shard_stage(const Run<W>& src, const KinkStageCfg& cfg) {
   const int H    = cfg.H;
@@ -269,10 +266,9 @@ std::pair<size_t, size_t> map_shard_stage_file(
   const size_t record_est = sizeof(RunRecord<W>) +
                             static_cast<size_t>(maxn) * sizeof(W) + 32;
 
-  // Successor-counts arena -- same rationale as mapreduce.h's map_shard_file
-  // (map-profile.md B2): one bump-allocator per spill epoch instead of one
-  // malloc/free per successor. Released at each do_spill(), matching
-  // buf.clear()'s epoch boundary.
+  // Successor-counts arena, as in mapreduce.h's map_shard_file: one bump
+  // allocator per spill epoch instead of one malloc/free per successor.
+  // Released at each do_spill(), matching buf.clear()'s epoch boundary.
   std::pmr::monotonic_buffer_resource succArena(succArenaHint(cfg.ram_budget_bytes));
 
   auto do_spill = [&]() {

@@ -581,7 +581,7 @@ func bytesToHex(b []byte) string {
 }
 
 // u64ExactMaxN and u128ExactMaxN are the largest maxn each counter word can
-// hold exactly (per DESIGN/counter.h); beyond that the count wraps silently
+// hold exactly; beyond that the count wraps silently
 // (only detectable post-hoc via the mod-p shadow). Shared by CheckCounterWidth
 // and resultPipelineMaxN (via u128ExactMaxN) so the two guards can't drift
 // apart the way the two independently-hardcoded diagonal dispatch guards
@@ -591,7 +591,7 @@ const (
 	u128ExactMaxN = 48
 )
 
-// CheckCounterWidth refuses at start (FR-7) if the configured counter word
+// CheckCounterWidth refuses at start if the configured counter word
 // cannot hold a(maxn), so the orchestrator refuses before spawning workers
 // rather than run for hours and produce a wrong number.
 func CheckCounterWidth(counter string, maxn int) error {
