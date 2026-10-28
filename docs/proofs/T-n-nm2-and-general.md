@@ -1,6 +1,6 @@
 # Proof: T(n, n−2), and the general height-diagonal structure
 
-Companion to `T-n-nm1.md`. T(n,H) = fixed polyplets (polyplets) of n cells,
+Companion to `T-n-nm1.md`. T(n,H) = fixed polyplets of n cells,
 bounding-box height exactly H. Here: the second sub-diagonal H = n−2, and the
 general T(n, n−k).
 

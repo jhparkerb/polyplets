@@ -1,6 +1,6 @@
 """triangle.py -- exact-int loader for the banked T(n,H) polyplet triangle.
 
-T(n,H) = number of fixed polyplets (polyplets) with n cells and bounding-box
+T(n,H) = number of fixed polyplets with n cells and bounding-box
 height exactly H, banked for n,H in 1..40 by the a(40) close-out run.
 
 Data source (authoritative, verified by the team lead):

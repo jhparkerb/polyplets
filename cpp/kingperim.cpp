@@ -1,4 +1,4 @@
-// Exhaustive minimal-site-perimeter polyplets (polyplets) for small n.
+// Exhaustive minimal-site-perimeter polyplets for small n.
 // For each bounding-box shape, enumerate all subsets, keep connected ones whose
 // bounding box is exactly the grid (dedup across grids + translations), and
 // record perimeter |P| and border |B| under 8-neighbor adjacency.

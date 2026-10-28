@@ -2,7 +2,7 @@
 """Cone anchor -- directed polyplets: enumerate+filter vs Bacher's closed form.
 
 Purpose: close the "validation hook (feasible, not yet built)" of
-results/subclasses.md. Filter the fixed polyplet (polyplet)
+results/subclasses.md. Filter the fixed polyplet
 enumeration down to DIRECTED polyplets and check the result against the
 exact generating function D(t) = 1/4 * ((1+t)/sqrt(1-6t+t^2) - 1) = A047781.
 Write-up: results/subclasses.md.

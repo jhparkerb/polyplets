@@ -26,7 +26,7 @@ namespace Polyplets
 BREAKTHROUGH section; `experiments/king_bui.py`).
 
 The intended witnesses are the marked-corner counting functions
-`φ i n = #(P, c)` — `P` an `n`-cell polyplet (fixed polyplet), `c` a cell
+`φ i n = #(P, c)` — `P` an `n`-cell fixed polyplet, `c` a cell
 of `P` whose neighborhood avoids type `i`'s forbidden set (the type table is
 in `Upper/BuiData2.lean`) — with type `0` the G8 corner type (W, SW, S, SE
 forbidden). For them:

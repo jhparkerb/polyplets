@@ -1,6 +1,6 @@
 # The growth constant λ of polyplets
 
-A polyplet (polyplet) is a finite set of cells of the square lattice,
+A polyplet is a finite set of cells of the square lattice,
 connected through shared edges or corners, counted up to translation; a(n) is
 the number with n cells (OEIS A006770). The growth constant is
 λ = lim a(n)^(1/n). It exists by Fekete's lemma applied to

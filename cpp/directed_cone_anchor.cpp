@@ -1,5 +1,5 @@
 // directed_cone_anchor.cpp -- the "Cone anchor" validation hook of
-// results/subclasses.md: filter the fixed polyplet (polyplet)
+// results/subclasses.md: filter the fixed polyplet
 // enumeration down to DIRECTED polyplets and check it against Bacher's
 // closed form D(t) = (1/4)((1+t)/sqrt(1-6t+t^2) - 1)  [OEIS A047781].
 //

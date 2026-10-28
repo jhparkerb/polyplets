@@ -1,6 +1,6 @@
 # Subclasses of polyplets: directed, convex, stratified
 
-A polyplet (polyplet) is a finite set of cells of `Z²` connected under king
+A polyplet is a finite set of cells of `Z²` connected under king
 moves, counted up to translation; `a(n)` = A006770 is the number with `n`
 cells. This file records what is known about the subclasses obtained by
 restricting the shape: the five directedness predicates crossed with the four

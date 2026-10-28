@@ -20,7 +20,7 @@ altogether, and depths 8 and 9.
 
 ## Definitions
 
-- **T(n,H)** is the number of fixed polyplets (polyplets) with n cells whose
+- **T(n,H)** is the number of fixed polyplets with n cells whose
   bounding box has height H; T is the triangle, stored as `results/triangle.txt`
   for n <= 40 and as per-height rows `h<H>.out`. A value of T is an entry.
 - **The main program** is the transfer-matrix enumeration `orchestrate`
