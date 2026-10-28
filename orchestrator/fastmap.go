@@ -7,11 +7,10 @@
 // a tmpfs-backed dir (e.g. /dev/shm/<run>) removes the round trip — measured
 // 1.5x on a(39)'s H20 pole columns.
 //
-// tmpfs pages ARE RAM. The original per-round statfs check was a TOCTOU race
-// under --overlap-heights: N heights' rounds each passed a point-in-time
-// "enough free" check, collectively overfilled /dev/shm, and the OOM killer
-// took out the tmux server (a(40) launch, 2026-07-25 — the second occurrence
-// of the a(35) tmpfs failure class). Routing therefore goes through a
+// tmpfs pages ARE RAM. A per-round point-in-time statfs check races under
+// --overlap-heights: N heights' rounds each pass an "enough free" check and
+// collectively overfill /dev/shm (this ran a(40)'s launch out of memory).
+// Routing therefore goes through a
 // RESERVER: a round reserves its projection under a lock before touching
 // tmpfs and releases when its map phase ends, with a hard floor of RAM slack
 // kept free at all times. Uncertain cases (statfs error, floor breach) fall
@@ -74,15 +73,14 @@ func (r *fastMapReserver) release(need uint64) {
 // starved the a(40) launch.
 //
 // An UNSET variable takes the default; a SET but unusable one ("40GB", "40g",
-// "", "0", "-8") is an error, not a fallback. Silently reverting to 24GB on a typo hands the operator a floor
-// 16GB below the one they believe they configured, on the exact knob whose
-// misconfiguration is implicated in the four-OOM history.
+// "", "0", "-8") is an error, not a fallback: silently reverting to 24GB on a
+// typo would hand the operator a floor below the one they configured.
 //
 // Not fixed: the floor measures tmpfs headroom via
 // statfs on the fast dir, not system RAM. Those coincide on a dedicated
 // /dev/shm and diverge as soon as anything else is resident, so the guard can
-// pass while the box is already out of memory. Redesigning it to budget
-// against real RAM is the deferred half of this finding.
+// pass while the box is already out of memory. Budgeting against real RAM
+// instead is not done.
 func newFastMapReserverFor(fastDir string) (*fastMapReserver, error) {
 	floorGB := 24
 	if e, set := os.LookupEnv("POLY_FASTMAP_FLOOR_GB"); set {
