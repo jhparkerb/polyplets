@@ -663,30 +663,20 @@ static void readAllCrc() {
   while (r.next(rec)) ++n;
   if (n != 100) _exit(4);
 }
+static void removeCrcFiles() {
+  std::remove(kCrcPath);
+  std::remove((std::string(kCrcPath) + ".idx").c_str());
+}
+
 static void testBodyChecksumMismatchAborts() {
   writeRun(kCrcPath, 3, 100);
   assert(runInChild(readAllCrc) == 0 && "control: an intact file must read to the end");
-  std::vector<char> bytes;
-  {
-    FILE* f = std::fopen(kCrcPath, "rb");
-    assert(f);
-    int c;
-    while ((c = std::fgetc(f)) != EOF) bytes.push_back(static_cast<char>(c));
-    std::fclose(f);
-  }
-  const std::string text(bytes.begin(), bytes.end());
-  const size_t body = text.find("\n\n") + 2;
+  const auto bytes = readAll(kCrcPath);
+  const size_t body = std::string(bytes.begin(), bytes.end()).find("\n\n") + 2;
   assert(body > 2 && body + 2 < bytes.size());
-  bytes[body + 1] ^= 0x40;  // record 0's second key byte
-  {
-    FILE* f = std::fopen(kCrcPath, "wb");
-    assert(f);
-    std::fwrite(bytes.data(), 1, bytes.size(), f);
-    std::fclose(f);
-  }
+  flipByteAt(kCrcPath, body + 1);  // record 0's second key byte
   assert(runInChild(readAllCrc) != 0 && "a body checksum mismatch must stop the program");
-  std::remove(kCrcPath);
-  std::remove((std::string(kCrcPath) + ".idx").c_str());
+  removeCrcFiles();
 }
 
 // Bytes after the checksum trailer mean the file is not what the writer
@@ -694,15 +684,11 @@ static void testBodyChecksumMismatchAborts() {
 static void testBytesAfterTrailerAbort() {
   writeRun(kCrcPath, 3, 100);
   assert(runInChild(readAllCrc) == 0 && "control: an intact file must read to the end");
-  {
-    FILE* f = std::fopen(kCrcPath, "ab");
-    assert(f);
-    std::fputc(0, f);
-    std::fclose(f);
-  }
+  auto bytes = readAll(kCrcPath);
+  bytes.push_back(0);
+  writeAll(kCrcPath, bytes);
   assert(runInChild(readAllCrc) != 0 && "a byte after the trailer must stop the program");
-  std::remove(kCrcPath);
-  std::remove((std::string(kCrcPath) + ".idx").c_str());
+  removeCrcFiles();
 }
 
 // A count that wraps the counter word, or a combined window past the byte
