@@ -412,7 +412,8 @@ static void census(int H, int Nmax) {
   if (!g_sizes_out.empty()) {
     FILE* f = fopen(g_sizes_out.c_str(), "w");
     if (!f) { perror(g_sizes_out.c_str()); std::exit(1); }
-    fprintf(f, "# coloring_recount sizes H=%d Nmax=%d steps=%zu\n", H, Nmax, g_sizes.size());
+    // The header word is the program's old name; stored sizes files carry it.
+    fprintf(f, "# motley_par sizes H=%d Nmax=%d steps=%zu\n", H, Nmax, g_sizes.size());
     for (size_t v : g_sizes) fprintf(f, "%zu\n", v);
     fclose(f);
     printf("sizes -> %s (%zu cell-steps)\n", g_sizes_out.c_str(), g_sizes.size());
@@ -429,7 +430,7 @@ static std::vector<size_t> load_sizes(const std::string& path, int H, int Nmax) 
   int hh = -1, nn = -1;
   size_t want = 0;
   if (!fgets(line, sizeof line, f) ||
-      sscanf(line, "# coloring_recount sizes H=%d Nmax=%d steps=%zu", &hh, &nn, &want) != 3 ||
+      sscanf(line, "# motley_par sizes H=%d Nmax=%d steps=%zu", &hh, &nn, &want) != 3 ||
       hh != H || nn != Nmax) {
     fprintf(stderr, "FATAL sizes_header %s (H=%d Nmax=%d)\n", path.c_str(), hh, nn);
     std::exit(4);

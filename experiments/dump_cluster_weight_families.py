@@ -5,7 +5,7 @@ The Python family DP is the cost of every the depth-tower derivation run at larg
 (families(60, emax=1) is ~6.5 min); caching it makes reruns instant.  Format is
 exactly the one cpp/cluster_weight_families writes:
 
-    # cluster_weight_families K=<K> emax=<E>
+    # severance_w3_families K=<K> emax=<E>
     e k sig bb pp
 
 Written to results/cluster_weight_families_K<K>_e<E>.txt.  depth_tower_master.
@@ -36,7 +36,7 @@ def main():
     print("families(%d, %d) in %.1fs" % (K, emax, time.time() - t0))
     tmp = path + ".partial"
     with open(tmp, "w") as fh:
-        fh.write("# cluster_weight_families K=%d emax=%d\n" % (K, emax))
+        fh.write("# severance_w3_families K=%d emax=%d\n" % (K, emax))
         for e in range(emax + 1):
             for k in range(K + 1):
                 fh.write("%d %d %d %d %d\n" % (e, k, sig[e][k], bb[e][k], pp[e][k]))

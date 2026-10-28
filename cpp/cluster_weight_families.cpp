@@ -15,7 +15,7 @@
 //     build/cluster_weight_families types  2,3 4,2 5 ...      [validation mode]
 //
 //   stdout, families mode (the contract with depth_defects.py::_load_table):
-//       # cluster_weight_families K=<K> emax=<EMAX>
+//       # severance_w3_families K=<K> emax=<EMAX>   (header word kept from the program's old name; stored tables carry it)
 //       <e> <k> <sig> <bb> <pp>            one line per (excess e, surplus k)
 //     with sig = sum of interior weights over all cluster types of surplus k and
 //     excess e, bb = bottom-edge (cluster + q above, no p below), pp = pure
@@ -371,7 +371,7 @@ void families(int K, int emax, int threads, obs::Reporter& rep) {
     rep.beat(static_cast<double>(ell), ex, true);
   }
 
-  std::printf("# cluster_weight_families K=%d emax=%d\n", K, emax);
+  std::printf("# severance_w3_families K=%d emax=%d\n", K, emax);
   for (int e = 0; e <= emax; ++e)
     for (int k = 1; k <= K; ++k)
       std::printf("%d %d %s %s %s\n", e, k, to_dec(sig[e][k]).c_str(),

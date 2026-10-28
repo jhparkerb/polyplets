@@ -1,5 +1,5 @@
-# cluster_weight_families K=60 emax=1
-# produced by experiments/dump_cluster_weight_families.py (Python family DP, 395 s on dalby), not by cpp/cluster_weight_families; format identical
+# severance_w3_families K=60 emax=1
+# produced by experiments/ridgeline_dump_families.py (Python family DP, 395 s on dalby), not by cpp/severance_w3_families; format identical
 0 0 0 0 0
 0 1 25 5 1
 0 2 339 66 13

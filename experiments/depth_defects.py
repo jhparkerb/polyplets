@@ -297,7 +297,7 @@ def _load_table(K, emax):
 
     Written by build/cluster_weight_families (cpp/cluster_weight_families.cpp), a
     straight port of families() below: header line
-    '# cluster_weight_families K=<K> emax=<E>' then one 'e k sig bb pp' line per
+    '# severance_w3_families K=<K> emax=<E>' then one 'e k sig bb pp' line per
     (excess, surplus) cell.  Only the e <= 3 / K = 19 pass needs it (section 3);
     everything else stays on the Python path.
 
@@ -315,7 +315,7 @@ def _load_table(K, emax):
         pp = [[0] * (K + 1) for _ in range(emax + 1)]
         with open(path) as fh:
             head = fh.readline().split()
-            assert head[:4] == ["#", "cluster_weight_families", f"K={Kt}", f"emax={emax}"], \
+            assert head[:4] == ["#", "severance_w3_families", f"K={Kt}", f"emax={emax}"], \
                 f"{path}: unexpected header {head}"
             for line in fh:
                 if line.startswith("#"):

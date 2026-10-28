@@ -1,4 +1,4 @@
-# cluster_weight_families K=19 emax=3
+# severance_w3_families K=19 emax=3
 0 1 25 5 1
 0 2 339 66 13
 0 3 4778 919 177

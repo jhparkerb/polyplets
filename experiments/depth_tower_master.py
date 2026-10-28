@@ -90,7 +90,7 @@ def load_families(K, emax):
     pp = [[0] * (K + 1) for _ in range(emax + 1)]
     with open(os.path.join(TABLE_DIR, best[1])) as fh:
         head = fh.readline().split()
-        assert head[:4] == ["#", "cluster_weight_families",
+        assert head[:4] == ["#", "severance_w3_families",
                             "K=%d" % best[0], "emax=%d" % emax], head
         for line in fh:
             if line.startswith("#"):
