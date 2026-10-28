@@ -35,12 +35,12 @@
 //
 // Both the identity and the monotonicity are cross-checked rather than trusted:
 // --verify replays the search unpruned and compares every (n, k) cell against
-// build/g2's --siteperim census.
+// build/redelmeier's --siteperim census.
 //
-// The counted objects and the growth discipline are g2's (cpp/g2_redelmeier.cpp):
+// The counted objects and the growth discipline are redelmeier's (cpp/redelmeier.cpp):
 // each fixed animal is generated exactly once with its scan-minimal cell at the
-// origin.  This is a separate binary rather than a g2 flag because the prune
-// changes the search itself, not the bookkeeping, and g2's hot kernel is tuned
+// origin.  This is a separate binary rather than a redelmeier flag because the prune
+// changes the search itself, not the bookkeeping, and redelmeier's hot kernel is tuned
 // for the unpruned frontier.
 
 #include <cstdint>
@@ -64,7 +64,7 @@ struct Search {
   const Offset* offs = nullptr;
   bool prune = true;               // false => unpruned control run (--verify)
 
-  // Deterministic subtree partition, ported from g2's --split (cpp/g2_redelmeier.cpp).
+  // Deterministic subtree partition, ported from redelmeier's --split (cpp/redelmeier.cpp).
   // Every shard walks the tree identically down to animal size splitS and
   // increments the same counter at that level, so the shards agree on the
   // numbering without communicating; a shard owns -- counts AND descends into --

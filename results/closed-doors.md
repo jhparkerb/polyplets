@@ -855,7 +855,7 @@ The pairing is foreground `a`-connectivity against background
 matching-`a`-connectivity. The perimeter is same-lattice: a set `C` is a
 maximal `a`-connected cluster exactly when every site `a`-adjacent to `C` is
 vacant, so its weight is `p^|C| q^(t_a(C))` with `t_a` the `a`-site
-perimeter; the Redelmeier program's `--siteperim` (`cpp/g2_redelmeier.cpp`,
+perimeter; the Redelmeier program's `--siteperim` (`cpp/redelmeier.cpp`,
 checked against Mertens 1990 Table IVB) uses this convention. Per site there
 are 2 rook edge classes, 4 king edge classes, 1 block and 4 king triangles,
 so the Euler densities are `p − 2p² + p⁴` and `p − 4p² + 4p³ − p⁴`, and with

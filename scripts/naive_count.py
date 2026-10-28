@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G1: the naive oracle.
+"""The naive oracle.
 
 Enumerates fixed lattice animals by brute force: grow every animal of size n
 by every adjacent cell, normalize to a translation-canonical form, deduplicate
@@ -12,7 +12,7 @@ Lattices:
   tri6     polyhexes     (A001207)   site animals on the triangular lattice,
                                      axial coordinates
 
-Usage:  g1_naive.py LATTICE MAXN
+Usage:  naive_count.py LATTICE MAXN
 Output: one "n count" line per size, b-file format.
 """
 
@@ -55,7 +55,7 @@ def count_by_box(lattice, maxn):
     """Return {(n, w, h): count} where w, h are bounding-box dimensions.
 
     For tri6 the "box" is the axial-coordinate bounding parallelogram; the
-    definition only has to be translation-invariant and shared with G2.
+    definition only has to be translation-invariant and shared with the Redelmeier enumerator.
     Deliberately duplicates the growth loop of count_fixed: in the oracle,
     boring beats DRY.
     """

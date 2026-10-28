@@ -22,7 +22,7 @@ generated before the check below).
    production run used 64-bit, which is exact only to a(25)). All fourteen
    rows are identical to `swept_rows.txt`.
 3. Heights 3..16 for n ≤ 17 enumerated by the Redelmeier program
-   (`build/g2 square8`), which shares no code with the transfer matrix: all
+   (`build/redelmeier square8`), which shares no code with the transfer matrix: all
    119 cells agree.
 
 Heights 1 and 2 and the diagonals k = 0, 1, 2 are proved closed forms

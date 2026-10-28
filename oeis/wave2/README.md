@@ -44,7 +44,7 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 - Terms 1,2,6,36,148,882,4648,27025,159490,951160,5803942,35903114,223968746,1411623422,
   8978749222,57490061438 for n=1..16.
 - Definition: fixed n-cell polyplets whose minimal bounding box is square (w == h).
-- Provenance: generated 2026-06-22 by Redelmeier enumeration (`build/g2 square8 N --per-box`),
+- Provenance: generated 2026-06-22 by Redelmeier enumeration (`build/redelmeier square8 N --per-box`),
   binning each fixed polyplet by bounding-box (w,h) and summing the w==h diagonal. n=1..14
   on the laptop; n=15,16 via a 20-worker `--split` run (scripts/bbox_split.sh,
   bbox_combine.py). The FULL (w,h) marginal was verified term-by-term == A006770(n)

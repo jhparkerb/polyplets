@@ -2155,8 +2155,8 @@ polyplets with `k` holes; the exact table to `n = 18` is
 `results/holes_n18.txt`, produced by `tma_holes square8 18 --holes` on ayr (x86,
 44 h single core, commit `8e41a63`), reproduced identically on dalby
 (`results/holes_n18.dalby.txt`), single-engine at `n = 18` and cross-checked
-against `g2 --holes` at small `n` by `tests/gate_holes.py` and
-`tests/gate_g2.py`.
+against `redelmeier --holes` at small `n` by `tests/gate_holes.py` and
+`tests/gate_redelmeier.py`.
 
 ### Hole-free polyplets are exponentially rare
 
@@ -2267,7 +2267,7 @@ lattice with the failure of injectivity spelled out.
 ### Maximum enclosed hole area, M(n)
 
 `M(n)` = maximum total enclosed empty area over `n`-cell polyplets. Exact by
-`g2 --maxhole` for `n ≤ 17` (`results/maxhole.txt`; `M(17) = 28` matched the
+`redelmeier --maxhole` for `n ≤ 17` (`results/maxhole.txt`; `M(17) = 28` matched the
 prediction).
 
 **Theorem (all holes).** For every `n`-cell king animal `F`, the total area of

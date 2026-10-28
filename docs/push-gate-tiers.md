@@ -36,10 +36,10 @@ derived is read from a stored value on the push and re-derived in the deep tier.
   the gap-walk series rebuilt from an independent enumeration through x^80,
   with a perturbed candidate as the control that must fail) and defers only the
   sympy derivation, which is 550 s of its 583 s under cProfile.
-- `gate-g2` hole checks at n=9 on the push: they assert identities, and
+- `gate-redelmeier` hole checks at n=9 on the push: they assert identities, and
   A389193 is 0,0,0,0,0,0,4,41,272, so n=9 has holey animals at three sizes.
   Deep tier: three `--holes` runs at n=11.
-- `gate-s2` stops one term short on square8 (n=9 in deep tier, 10.5M canon
+- `gate-free-counts` stops one term short on square8 (n=9 in deep tier, 10.5M canon
   calls), the lattice where each further term costs ~4x.
 - `gate-modp` at n=11 on the push: a(11) = 39,299,408 keeps the primes four
   orders below the count and seven below their product, so the CRT
@@ -60,8 +60,8 @@ Deep-tier costs of the gates that take `--deep`:
 | `gate-perimeter-min` | 418.4 s | 16.8 s |
 | `gate-tma` | 325.3 s | 21 s |
 | `gate-depth1-kernel` | 173.4 s | 12 s |
-| `gate-g2` | 138.1 s | |
-| `gate-s2` | 85.8 s | |
+| `gate-redelmeier` | 138.1 s | |
+| `gate-free-counts` | 85.8 s | |
 | `gate-modp` | 73.8 s | |
 
 ## Gates that run at full size in both tiers

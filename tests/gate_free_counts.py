@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Gate S2: free / one-sided counting via Burnside, brute-force ground truth.
+"""Gate FREE-COUNTS: free / one-sided counting via Burnside, brute-force ground truth.
 
 Establishes the D4 Burnside machinery and the symmetry-class definitions
 that the (future) efficient symmetric enumerator must reproduce. Checks:
 
   A. free polyominoes  == A000105   (square4)
-  B. free polyplets    == A030222   (square8)   <- the S2 target sequence
+  B. free polyplets    == A030222   (square8)   <- the free-polyplet target
   C. Burnside identity: sum(Fix(g))/8 == direct free dedup (both lattices)
   D. one-sided identity: sum_{rotations} Fix(g)/4 == direct one-sided dedup
   E. conjugacy equalities: Fix(r90)==Fix(r270), Fix(h)==Fix(v),
@@ -19,7 +19,7 @@ from common import ROOT, Gate, read_bfile
 
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from g1_naive import count_symmetry  # noqa: E402
+from naive_count import count_symmetry  # noqa: E402
 
 # Bounded by fixed-count explosion. count_symmetry is a pure-Python canonical
 # form over every fixed animal under all 8 symmetries: square8 n=9 alone was
@@ -63,7 +63,7 @@ def main():
         ok = all(cf[a][n] == cf[b][n] for a, b, _ in eqs for n in cf[a])
         gate.check(ok, f"conjugacy {lat}: " + ", ".join(e[2] for e in eqs))
 
-    return gate.verdict("S2")
+    return gate.verdict("FREE-COUNTS")
 
 
 if __name__ == "__main__":

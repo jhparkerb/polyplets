@@ -9,7 +9,7 @@ appends it as two trailing columns after the existing 20 directedness x
 convexity counts: minSPKing then minSPRook.
 
 Convention (pinned BEFORE the reduce was written, per the plan): KING
-(8-)adjacency, transcribed from cpp/g2_redelmeier.cpp's `--siteperim` header
+(8-)adjacency, transcribed from cpp/redelmeier.cpp's `--siteperim` header
 comment -- "the percolation perimeter for the king/nnSquare lattice",
 cross-checked there against Mertens 1990 Table IVB. minSPRook uses orthogonal
 (4-)adjacency instead: a deliberately WRONG convention, kept as the RED
@@ -18,7 +18,7 @@ control this phase's acceptance requires.
 This gate is RED-first in the literal sense: it was run against the
 unmodified binary (no minSPKing/minSPRook columns at all) before the C++
 change landed, and failed by construction (parts[21:] was empty). It also
-carries an independent-oracle cross-check: build/g2's square8 lattice grows
+carries an independent-oracle cross-check: build/redelmeier's square8 lattice grows
 KING-connected animals with KING-adjacency growth AND (via --siteperim, which
 uses the lattice's own connectivity degree for both) KING-adjacency site
 perimeter -- the same population and the same convention, computed by
@@ -29,7 +29,7 @@ Acceptance, all required:
   - minSPKing reproduces 4k+4 at every perfect square n=k^2 in range (a k*k
     solid block's king site-perimeter: Minkowski sum with the 3x3 king ball
     is a (k+2)x(k+2) square, minus the k^2 occupied cells).
-  - minSPKing agrees with the g2 square8 --siteperim independent oracle at
+  - minSPKing agrees with the redelmeier square8 --siteperim independent oracle at
     every n in range.
   - minSPRook diverges from minSPKing at every n in range (the RED control
     must fail to reproduce the real convention).
@@ -40,7 +40,7 @@ import sys
 from common import ROOT, Gate, run, require_binary
 
 BIN = os.path.join(ROOT, "build", "directed_cone_anchor")
-G2 = os.path.join(ROOT, "build", "g2")
+REDELMEIER = os.path.join(ROOT, "build", "redelmeier")
 
 ACCEPT_N = 9
 SQUARES = [1, 4, 9]  # k=1,2,3 within ACCEPT_N
@@ -58,7 +58,7 @@ def run_grid(n, threads=4):
 
 
 def run_g2_siteperim_min(n):
-    out = run(G2, "square8", n, "--siteperim")
+    out = run(REDELMEIER, "square8", n, "--siteperim")
     mn = {}
     for line in out.strip().splitlines():
         n_, p, c = (int(x) for x in line.split())
@@ -71,7 +71,7 @@ def main():
     gate = Gate()
     if not require_binary(BIN, "build/directed_cone_anchor"):
         return 1
-    if not require_binary(G2, "build/g2"):
+    if not require_binary(REDELMEIER, "build/redelmeier"):
         return 1
 
     king, rook = run_grid(ACCEPT_N)
@@ -85,7 +85,7 @@ def main():
     oracle = run_g2_siteperim_min(ACCEPT_N)
     bad = [n for n in range(1, ACCEPT_N + 1) if king.get(n) != oracle.get(n)]
     gate.check(not bad,
-               f"minSPKing vs g2 square8 --siteperim oracle n<={ACCEPT_N}"
+               f"minSPKing vs redelmeier square8 --siteperim oracle n<={ACCEPT_N}"
                + (f"  MISMATCH at n={bad}" if bad else ""))
 
     same = [n for n in range(1, ACCEPT_N + 1) if king.get(n) == rook.get(n)]

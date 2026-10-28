@@ -1,4 +1,4 @@
-// G2: Redelmeier fixed-animal counter.
+// Redelmeier fixed-animal counter.
 //
 // Counts fixed lattice animals without duplicates: each animal is generated
 // exactly once, translated so that its scan-minimal cell (smallest (y,x)
@@ -6,7 +6,7 @@
 // compare >= origin in that order; the classic untried/tried discipline does
 // the rest. Lattice-generic: the neighbor table is the only per-lattice part.
 //
-// CLI:  g2 LATTICE MAXN [mode] [--split S K IDX]
+// CLI:  redelmeier LATTICE MAXN [mode] [--split S K IDX]
 //   default:        lines "n count"
 //   --per-box:      lines "n w h count"   (w,h = bounding box dims)
 //   --rook-bishop:  lines "n count rook-connected bishop-connected"
@@ -17,9 +17,9 @@
 //   --split S K IDX: deterministic subtree partition at animal size S into K
 //       classes; worker IDX counts its classes' subtrees, worker 0 also
 //       counts all nodes of size < S. Summing all workers' outputs
-//       elementwise equals the unsplit run (tests/gate_g2.py check C); for
+//       elementwise equals the unsplit run (tests/gate_redelmeier.py check C); for
 //       --maxhole the workers combine by elementwise max instead.
-// tests/gate_g2.py checks every mode against published sequences, a brute
+// tests/gate_redelmeier.py checks every mode against published sequences, a brute
 // force oracle, or another mode.
 //
 // Counts are unsigned 64-bit; safe through ~9e18, far beyond any run this
@@ -566,7 +566,7 @@ int main(int argc, char** argv) {
 
   // One recursive call with no natural unit to heartbeat on, so only the
   // start and done events (docs/observability.md).
-  std::string job = "g2-" + lattice + "-N" + std::to_string(c.maxn);
+  std::string job = "redelmeier-" + lattice + "-N" + std::to_string(c.maxn);
   std::string extra = "lattice=" + lattice;
   if (c.splitK > 1) {
     job += "-s" + std::to_string(c.splitIdx);

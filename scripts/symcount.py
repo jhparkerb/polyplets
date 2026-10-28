@@ -1,4 +1,4 @@
-"""S2 symmetric-animal counter (corrected design, June 13, 2026).
+"""Symmetric-animal counter (corrected design, June 13, 2026).
 
 Counts connected g-symmetric lattice animals by size, for a symmetry group g
 acting on the square (king) lattice with its center/axis pinned at a fixed

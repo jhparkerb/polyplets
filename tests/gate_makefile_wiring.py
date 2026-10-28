@@ -92,7 +92,7 @@ RED_LINE_CASES = [
     ("make[1]: *** [Makefile:126: timed-gate-cluster-weights] Error 1",
      "gate-cluster-weights"),
     # a red PREREQUISITE names no gate, and must not invent one
-    ("make: *** [build/g2] Error 1", None),
+    ("make: *** [build/redelmeier] Error 1", None),
     ("ok   H holes-sum square8 n<=9", None),
 ]
 

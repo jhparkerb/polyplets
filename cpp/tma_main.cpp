@@ -269,7 +269,7 @@ int main(int argc, char** argv) {
   }
 
   // (size, edge-perimeter) joint distribution via the column transfer matrix
-  // (square8 only) -- isolated path, cross-checked against `g2 --perimeter`.
+  // (square8 only) -- isolated path, cross-checked against `redelmeier --perimeter`.
   if (perimeter) {
     if (lattice != "square8") {
       std::fprintf(stderr, "--perimeter is supported for square8 only\n");
@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
 
   // (size, #holes) joint distribution via the column transfer matrix (square8
   // only), primary 4-connected-background convention -- removes the per-animal
-  // flood, so it reaches the bare count's n. Cross-checked vs `g2 --holes`.
+  // flood, so it reaches the bare count's n. Cross-checked vs `redelmeier --holes`.
   //   default: "n holes count" (summed over heights)
   //   --per-height: "h n holes count" (the per-(height,holes) slices the GF
   //                 recovery consumes)

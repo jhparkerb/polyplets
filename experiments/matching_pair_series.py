@@ -60,7 +60,7 @@ def fixed_animals(nmax, nbrs):
     """All fixed animals of 1..nmax cells, by naive growth + canonical dedup.
 
     Deliberately the simplest correct thing: this is a control and a small-n
-    probe, not an enumerator.  Redelmeier lives in cpp/g2_redelmeier.cpp.
+    probe, not an enumerator.  Redelmeier lives in cpp/redelmeier.cpp.
     """
     levels = [set(), {canon([(0, 0)])}]
     for _ in range(2, nmax + 1):

@@ -2,8 +2,8 @@
 """Re-verify every fixture against OEIS, over the network. NOT a gate.
 
 `docs/engine-record.md` finding F5: `fixtures/` is protected by
-`SHA256SUMS`, and `tests/gate_g1.py` checks it before doing anything else --
-corrupting `fixtures/b006770.txt` by 1 turns gate-g1, gate-g2 and gate-sym red.
+`SHA256SUMS`, and `tests/gate_naive.py` checks it before doing anything else --
+corrupting `fixtures/b006770.txt` by 1 turns gate-naive, gate-redelmeier and gate-sym red.
 But SHA256SUMS is itself regenerable, so the pinning is against ACCIDENT and not
 against a deliberate edit of both, and nothing re-checks a fixture against the
 source it came from.

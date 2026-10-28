@@ -1,7 +1,7 @@
 # Rows 1..22 by the Redelmeier enumerator
 
 Rows n = 1..22 of the triangle, counted by the Redelmeier program
-(`build/g2`; kernel changes in `docs/engine-record.md`), which shares no
+(`build/redelmeier`; kernel changes in `docs/engine-record.md`), which shares no
 counting logic with the transfer-matrix engine. The work was split into
 24,000 shards by measured all-core throughput and run on three machines
 from 2026-07-11 13:41 EDT:
@@ -13,8 +13,8 @@ from 2026-07-11 13:41 EDT:
 - gympie (Apple, 10 workers): shards [19460, 24000), 440,628 s, done 2026-07-16
   19:17 EDT
 
-Gathered by `scripts/g2_fleet_gather.sh 22 24000` and summed by
-`scripts/g2_combine.sh`, which fails if any shard is missing; all 24,000
+Gathered by `scripts/redelmeier_fleet_gather.sh 22 24000` and summed by
+`scripts/redelmeier_combine.sh`, which fails if any shard is missing; all 24,000
 were present. Output: `combined.txt`.
 
 Every row n = 1..22 matches the transfer-matrix values, including row 21 =

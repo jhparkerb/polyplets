@@ -1,6 +1,6 @@
 // Hole-resolved square-8 sweep: the (size, #holes) joint distribution by the
 // column transfer matrix (#28). Method-B counterpart to the generator's
-// `g2 square8 --holes`; removes the per-animal flood, so it reaches the same n
+// `redelmeier square8 --holes`; removes the per-animal flood, so it reaches the same n
 // as the bare count instead of capping at n=14.
 //
 // ISOLATED from the production counting path, exactly like sweep8_perim.h: it
@@ -21,7 +21,7 @@
 // so a completed animal is harvested at its current hole index as-is.
 //
 // PRIMARY convention only (Conn::FG8 -> 4-connected-background holes, the Jordan
-// dual / OEIS-A389193 convention = `g2 --holes`). The companion 8-bg count needs
+// dual / OEIS-A389193 convention = `redelmeier --holes`). The companion 8-bg count needs
 // the animal's 4-adjacency component count, which this 8-adjacency union-find
 // does not track; it stays on the flood (capped at n=14) for now.
 

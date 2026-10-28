@@ -19,7 +19,7 @@ from common import ROOT, Gate, free_and_one_sided, read_bfile
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from symcount import SYMMETRY_TYPES, count_symmetry_type  # noqa: E402
-from g1_naive import count_symmetry  # noqa: E402
+from naive_count import count_symmetry  # noqa: E402
 
 # How far the brute oracle (generates every animal) reaches. Building it was
 # 21.2 s on a laptop, at ~4x per n.
@@ -29,7 +29,7 @@ ORACLE_MAXN = 8 if "--deep" in sys.argv else 7
 MAXN = 11 if "--deep" in sys.argv else 10
 
 # brute oracle D4 fixed-point index per symmetry type.
-# D4 order in g1_naive.py: e(0) r90(1) r180(2) r270(3) h(4) v(5) d1(6) d2(7)
+# D4 order in naive_count.py: e(0) r90(1) r180(2) r270(3) h(4) v(5) d1(6) d2(7)
 ORACLE_INDEX = {
     "90-degree rotation": 1,
     "180-degree rotation": 2,

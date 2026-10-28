@@ -1,6 +1,6 @@
 // Perimeter-resolved square-8 sweep: the (size, edge-perimeter) joint
 // distribution by the column transfer matrix. Method-B counterpart to the
-// generator's `g2 --perimeter`; cross-checking the two distributions exercises
+// generator's `redelmeier --perimeter`; cross-checking the two distributions exercises
 // the transfer matrix at finer grain than totals (task #18).
 //
 // ISOLATED from the production counting path: it reuses the validated

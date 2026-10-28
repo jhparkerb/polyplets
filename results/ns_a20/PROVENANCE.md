@@ -11,4 +11,4 @@ Files: `summary.txt` (per-height job statistics), `a20.log` (the run log),
 `columns.tsv`, and `perheight/` (one file per height).
 
 Check: a(1)..a(22) agree between this family of transfer-matrix programs and
-the Redelmeier enumerator `build/g2` (`results/redelmeier_row22/`).
+the Redelmeier enumerator `build/redelmeier` (`results/redelmeier_row22/`).

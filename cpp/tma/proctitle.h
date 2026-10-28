@@ -26,7 +26,7 @@
 
 // TODO(simplify): this is an engine-agnostic util (argv-overwrite + prctl + a refresh
 // thread) parked under tma/ with a tma-specific format string. It could live beside obs.h
-// with a caller-supplied label so other long opaque runs (e.g. g2_redelmeier) can reuse it.
+// with a caller-supplied label so other long opaque runs (e.g. redelmeier) can reuse it.
 namespace proctitle {
 using u64 = std::uint64_t;
 

@@ -31,7 +31,7 @@ census is priced at two to six months of a 76-core pool per lattice, not run.
 ## Minimum site perimeter, n = 1..14
 
 King convention: empty cells king-adjacent to the animal, the percolation
-perimeter of the king lattice, as in `cpp/g2_redelmeier.cpp` (`--siteperim`),
+perimeter of the king lattice, as in `cpp/redelmeier.cpp` (`--siteperim`),
 cross-checked there against Mertens, J. Stat. Phys. 58 (1990) 1095–1108, Table
 IVB; the rook variant is a control that must differ. Measured by
 `build/directed_cone_anchor grid 14 8` (`cpp/directed_cone_anchor.cpp`;
@@ -39,7 +39,7 @@ IVB; the rook variant is a control that must differ. Measured by
 `results/subclass_siteperim_n14.txt`, whose other columns equal
 `results/subclass_grid20_n14.txt` and `fixtures/b006770.txt` through `n = 14`.
 `tests/gate_site_perim.py` (`make gate-site-perim`) cross-checks the king
-minima for `n = 1..9` against `build/g2 square8 --siteperim`, a different
+minima for `n = 1..9` against `build/redelmeier square8 --siteperim`, a different
 search, and requires the rook column to differ at every `n`.
 
 | n | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
@@ -54,7 +54,7 @@ A027709(n) + 4 = `2⌈2√n⌉ + 4` on all 14 terms, checked integer-exactly
 (`isqrt(4n)`, no float) by `experiments/min_site_perim_closed_form.py`; A027709
 is the minimal edge perimeter of an n-omino, `2⌈2√n⌉`, and the `+4` is the four
 corner cells of the king ring that rook adjacency never counts. The rook row is
-**A261491** = `⌈2 + √(8n − 4)⌉`, matched by `build/g2 square4 --siteperim` for
+**A261491** = `⌈2 + √(8n − 4)⌉`, matched by `build/redelmeier square4 --siteperim` for
 `n = 1..14`. Both closed forms are published and verified here only to
 `n = 14`; A235382's comment credits "the students Daring, et al." by an
 unfetched link. Adding the two minima to the grid pass cost, at 8 threads,
@@ -87,7 +87,7 @@ search abandoning a partial animal once `k > kmax` is exact. A candidate's
 about 20x (king `n = 20`, `k ≤ 5`: 2.4e8 nodes to 1.4e7). A row transfer cannot
 replace this, since the defect does not bound the transverse extent of a scan
 (a U with distant arms has `k = 3`). `cpp/perimeter_defect.cpp`, checked by
-`scripts/perimeter_defect_gate.sh` against `build/g2 --siteperim`
+`scripts/perimeter_defect_gate.sh` against `build/redelmeier --siteperim`
 (`results/siteperim_square4_n20.txt`, `results/siteperim_square8_n14.txt`), an
 unpruned control and the `(c, H)` marginals, reaches `n = 70` at `k ≤ 5` on one
 core (913 s square, 2017 s king); brute force stops at `n = 14` on king.
@@ -361,7 +361,7 @@ Completeness rests on hypothesis (H1), every animal's perimeter is at least its
 filled hull's, so deficit `i` means at most `i` removals. (H1) is asserted at
 runtime and tested by `make gate-perimeter-min`
 (`scripts/perimeter_min_gate.sh`) with removals unbounded on small boxes, a
-complete brute force there, against `build/g2 --siteperim`: 33 and 52 `(n, p)`
+complete brute force there, against `build/redelmeier --siteperim`: 33 and 52 `(n, p)`
 entries agree on the two square-based lattices, 35 on `tri6`
 (`results/siteperim_tri6_n12.txt`); a control confirms the square and king modes
 differ, and an over-limit frame is refused.
@@ -702,12 +702,12 @@ thread.
     python3 experiments/diamond_free_removals.py
     ./build/perimeter_min square4 99 6 --only 11 11 0        # a single large box
 
-    make build/directed_cone_anchor build/g2
+    make build/directed_cone_anchor build/redelmeier
     make gate-site-perim
     scripts/run_site_perim_n14.sh                           # 689.8 s wall, 8 threads
     python3 experiments/min_site_perim_closed_form.py
-    build/g2 square4 14 --siteperim
-    build/g2 square8 9  --siteperim
+    build/redelmeier square4 14 --siteperim
+    build/redelmeier square8 9  --siteperim
 
 Data: `results/perimdefect_square8_n70_k5.txt`,
 `results/perimdefect_square4_n70_k5.txt`,

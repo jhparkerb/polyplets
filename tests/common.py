@@ -35,7 +35,7 @@ def read_terms_file(path):
     return vals
 
 
-# TODO: gate_g2, gate_holes, gate_modp and gate_tma each grew their own guard
+# TODO: gate_redelmeier, gate_holes, gate_modp and gate_tma each grew their own guard
 # against an engine that prints nothing or dies after printing.  The shared
 # fix is for run() to
 # refuse empty stdout and parse_counts() an empty table, with gate_holes moved

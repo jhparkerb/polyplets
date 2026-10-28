@@ -5,7 +5,7 @@
 # perimeter at least that of its own filled frame bounding box -- and only for
 # removal counts within RMAX.  Both are checked here where they CAN be checked:
 # run with RMAX unbounded on small boxes, where the program degenerates to a
-# complete brute force, and compare cell for cell against build/g2's --siteperim
+# complete brute force, and compare cell for cell against build/redelmeier's --siteperim
 # census, an entirely different search (growth, not complementation).
 #
 # A missing animal is what an (H1) violation would look like from outside, so
@@ -22,7 +22,7 @@ case "${1:-}" in --deep) DEEP=1 ;; esac
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-make -s build/perimeter_min build/g2
+make -s build/perimeter_min build/redelmeier
 
 fail=0
 
@@ -61,7 +61,7 @@ nmax = max(n for n, _ in g)
 keys = {k for k in set(e) | set(g) if k[1] <= pmax and k[0] <= nmax}
 bad = [(k, e.get(k, 0), g.get(k, 0)) for k in sorted(keys) if e.get(k, 0) != g.get(k, 0)]
 if bad:
-    print("  MISMATCH (n,p): enum vs g2")
+    print("  MISMATCH (n,p): enum vs redelmeier")
     for k, a, b in bad[:20]:
         print("   ", k, a, b)
     sys.exit(1)

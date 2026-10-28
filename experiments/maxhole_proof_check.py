@@ -2,7 +2,7 @@
 """Numerical support for the max-hole theorem  M(n) = round((n-2)^2/8).
 
 M(n) = max total enclosed empty area over n-cell king-polyplets (4-connected
-background). Confirmed exactly by g2 --maxhole for n<=17 (results/maxhole.txt).
+background). Confirmed exactly by redelmeier --maxhole for n<=17 (results/maxhole.txt).
 
 This checks the proof strategy (results/subclasses.md):
   - CONSTRUCTION (lower bound): the diamond ring |x|+|y|=r has n=4r cells and

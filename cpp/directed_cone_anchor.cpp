@@ -62,7 +62,7 @@
 // already generates every fixed king animal of every size <= N, so a per-n
 // MIN-REDUCE of the site perimeter rides for free (no new search). Site
 // perimeter = the number of distinct EMPTY cells adjacent to the animal.
-// Convention pinned from cpp/g2_redelmeier.cpp's `--siteperim` (its own
+// Convention pinned from cpp/redelmeier.cpp's `--siteperim` (its own
 // header comment): KING (8-)adjacency -- "the percolation perimeter for the
 // king/nnSquare lattice", cross-checked there against Mertens 1990 Table IVB.
 // That is what the two new trailing columns' first value is (minSPKing).

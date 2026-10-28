@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Whole-row Redelmeier a(N) via g2 --split on the fleet (dalby, 80 cores).
+# Whole-row Redelmeier a(N) via redelmeier --split on the fleet (dalby, 80 cores).
 #
 # PURPOSE: independent whole-row confirmation of the polyplet count a(N)=A006770(N)
-#   (and, with --per-box, the h-resolved triangle T(N,w,h)). g2 is the standalone
+#   (and, with --per-box, the h-resolved triangle T(N,w,h)). redelmeier is the standalone
 #   Redelmeier enumerator -- a different algorithm from the transfer-matrix engine --
 #   so a match is a two-algorithm confirmation. See docs/redelmeier-tall-plan.md (deleted) sec.5.
 #
 # Each worker enumerates a deterministic 1/K share of the size>=S subtrees (worker 0
 # also counts the size<S nodes); summing all workers elementwise == the unsplit run
-# (g2 --split contract, gate-g2 check C). RAM per worker is tiny (~3 MB), so K=80 is
+# (redelmeier --split contract, gate-redelmeier check C). RAM per worker is tiny (~3 MB), so K=80 is
 # ~250 MB total -- cores, not RAM, are the constraint.
 #
-# USAGE:  scripts/g2_wholerow.sh N [S] [K] [JOBS] [--per-box]
+# USAGE:  scripts/redelmeier_wholerow.sh N [S] [K] [JOBS] [--per-box]
 #   N         target size (whole row: computes a(1..N))
 #   S         split size (default 10; a(S) subtrees round-robined over K shards)
 #   K         shard count (default nproc). Oversplit K > cores for finer resume and
@@ -38,7 +38,7 @@ case "$JOBS" in ''|*[!0-9]*) JOBS="$(nproc)";; esac   # if arg 4 was a flag, fal
 #                        ran which shard). Default 0..K.
 #   --no-combine         run the shards but skip combine/verify (fleet: combine
 #                        centrally after gathering every box's w*.out; see
-#                        scripts/g2_combine.sh).
+#                        scripts/redelmeier_combine.sh).
 PERBOX=""; TAG=""; NOCOMBINE=0; FROM=0; TO="$K"
 args=("$@"); i=0
 while [ $i -lt ${#args[@]} ]; do
@@ -53,8 +53,8 @@ RANGE=$((TO - FROM))
 
 DIR="runs/g2row_N${N}${TAG}"; mkdir -p "$DIR"; echo $$ > "$DIR/driver.pid"
 LOG="$DIR/driver.log"
-echo ">>> g2 whole-row N=$N S=$S K=$K range=[$FROM,$TO) jobs=$JOBS perbox=${PERBOX:-no} host=$(hostname -s) @ $(date +%FT%T%z)" | tee -a "$LOG"
-echo ">>> g2 rev: $(build/g2 square8 1 2>&1 | grep -o 'git=[^ ]*' | head -1)" | tee -a "$LOG"
+echo ">>> redelmeier whole-row N=$N S=$S K=$K range=[$FROM,$TO) jobs=$JOBS perbox=${PERBOX:-no} host=$(hostname -s) @ $(date +%FT%T%z)" | tee -a "$LOG"
+echo ">>> redelmeier rev: $(build/redelmeier square8 1 2>&1 | grep -o 'git=[^ ]*' | head -1)" | tee -a "$LOG"
 START=$(date +%s)
 
 # Background ETA monitor: shards are near-uniform work, so done-count over elapsed
@@ -72,7 +72,7 @@ launched=0
 for IDX in $(seq "$FROM" $((TO - 1))); do
   if [ -f "$DIR/w$IDX.done" ]; then continue; fi        # resume: skip completed shard
   while [ "$(jobs -rp | wc -l)" -ge "$((JOBS + 1))" ]; do wait -n; done   # +1 for the monitor
-  ( build/g2 square8 "$N" $PERBOX --split "$S" "$K" "$IDX" > "$DIR/w$IDX.out" 2> "$DIR/w$IDX.log" \
+  ( build/redelmeier square8 "$N" $PERBOX --split "$S" "$K" "$IDX" > "$DIR/w$IDX.out" 2> "$DIR/w$IDX.log" \
       && touch "$DIR/w$IDX.done" ) &
   launched=$((launched + 1))
 done
@@ -87,7 +87,7 @@ for IDX in $(seq "$FROM" $((TO - 1))); do [ -f "$DIR/w$IDX.done" ] || { echo "!!
 [ "$missing" = 1 ] && { echo "!!! re-run to finish missing shards" | tee -a "$LOG"; exit 3; }
 
 if [ "$NOCOMBINE" = 1 ]; then
-  echo ">>> range [$FROM,$TO) complete; --no-combine (combine centrally with scripts/g2_combine.sh) @ $(date +%FT%T%z)" | tee -a "$LOG"
+  echo ">>> range [$FROM,$TO) complete; --no-combine (combine centrally with scripts/redelmeier_combine.sh) @ $(date +%FT%T%z)" | tee -a "$LOG"
   exit 0
 fi
 echo ">>> combining @ $(date +%FT%T%z)" | tee -a "$LOG"

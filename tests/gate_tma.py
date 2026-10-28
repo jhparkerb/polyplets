@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Gate TMA: first transfer-matrix engine vs fixtures and the G2 engine.
+"""Gate TMA: first transfer-matrix engine vs fixtures and the Redelmeier engine.
 
 Validation target is square-4 (polyominoes) per the implementation plan:
 no new terms wanted, just the richest external truth available.
 
   A. totals: TMA counts equal b001168 (deeper than the oracle can reach)
-  B. per-height: TMA's by-height counts equal G2's per-box height marginals
+  B. per-height: TMA's by-height counts equal Redelmeier's per-box height marginals
      (cross-ENGINE structural check: transfer matrix vs generation)
   C. ASan/UBSan build runs clean and agrees with the optimized build
 
@@ -24,12 +24,12 @@ from common import ROOT, Gate, parse_counts, read_bfile, run, spawn
 TMA = os.path.join(ROOT, "build", "tma")
 TMA_ASAN = os.path.join(ROOT, "build", "tma_asan")
 TMA_HOLES = os.path.join(ROOT, "build", "tma_holes")  # holes/--modp engine (same source)
-G2 = os.path.join(ROOT, "build", "g2")
+REDELMEIER = os.path.join(ROOT, "build", "redelmeier")
 
 
 def main():
     gate = Gate()
-    for b in (TMA, TMA_ASAN, TMA_HOLES, G2):
+    for b in (TMA, TMA_ASAN, TMA_HOLES, REDELMEIER):
         if not os.path.exists(b):
             print(f"FAIL missing binary {b} (run: make)")
             return 1
@@ -63,7 +63,7 @@ def main():
     # runs to finish -- 16.0 s on gympie, and the floor under this whole gate no
     # matter what else is trimmed. It is a backend-swap byte oracle (see check N),
     # not a regression check: what it would catch, checks A/D/E/G/H already catch
-    # against b-files and against G2, on every push. Deep tier.
+    # against b-files and against REDELMEIER, on every push. Deep tier.
     f_smoke = spawn(TMA, "square8", 14, "--only-height", 12) if deep else None
 
     # A. totals vs fixture
@@ -74,14 +74,14 @@ def main():
     gate.check(not bad, f"A totals      square4 n<={depth_a} vs b001168.txt"
           + (f"  MISMATCH at n={bad}" if bad else ""))
 
-    # B. per-height vs G2 per-box marginals
+    # B. per-height vs Redelmeier per-box marginals
     depth_b = 10
     tma_h = parse_counts(run(TMA, "square4", depth_b, "--per-height"))
     marg = {}
-    for (n, w, h), c in parse_counts(run(G2, "square4", depth_b, "--per-box")).items():
+    for (n, w, h), c in parse_counts(run(REDELMEIER, "square4", depth_b, "--per-box")).items():
         marg[(h, n)] = marg.get((h, n), 0) + c
     gate.check(tma_h == marg,
-          f"B per-height  square4 n<={depth_b} vs G2 per-box marginals "
+          f"B per-height  square4 n<={depth_b} vs Redelmeier per-box marginals "
           f"({len(marg)} (h,n) classes)")
 
     # C. sanitizer build agrees and runs clean
@@ -100,15 +100,15 @@ def main():
     gate.check(not bad8, f"D totals      square8 n<={depth_d} vs b006770.txt"
           + (f"  MISMATCH at n={bad8}" if bad8 else ""))
 
-    # E. per-height vs G2 per-box marginals (transfer matrix vs generation)
+    # E. per-height vs Redelmeier per-box marginals (transfer matrix vs generation)
     depth_e = 9
     tma8_h = parse_counts(run(TMA, "square8", depth_e, "--per-height"))
     marg8 = {}
     for (n, w, h), c in parse_counts(
-            run(G2, "square8", depth_e, "--per-box")).items():
+            run(REDELMEIER, "square8", depth_e, "--per-box")).items():
         marg8[(h, n)] = marg8.get((h, n), 0) + c
     gate.check(tma8_h == marg8,
-          f"E per-height  square8 n<={depth_e} vs G2 per-box marginals "
+          f"E per-height  square8 n<={depth_e} vs Redelmeier per-box marginals "
           f"({len(marg8)} (h,n) classes)")
 
     # F. square-8 sanitizer build clean + equal
@@ -122,10 +122,10 @@ def main():
     #    carries perimeter as a second DP index (cpp/tma/sweep8_perim.h).
     depth_g = 11
     tma_p = parse_counts(run(TMA, "square8", depth_g, "--perimeter"))
-    g2_p = parse_counts(run(G2, "square8", depth_g, "--perimeter"))
-    gate.check(tma_p == g2_p,
-          f"G perimeter   square8 n<={depth_g} TMA==G2 "
-          f"({len(g2_p)} (n,perimeter) cells)")
+    redelmeier_p = parse_counts(run(REDELMEIER, "square8", depth_g, "--perimeter"))
+    gate.check(tma_p == redelmeier_p,
+          f"G perimeter   square8 n<={depth_g} TMA==Redelmeier "
+          f"({len(redelmeier_p)} (n,perimeter) cells)")
 
     # H. (size, #holes) joint distribution: transfer matrix == the validated
     #    per-animal flood oracle (results/holes_n14.txt, #24). The hole count is

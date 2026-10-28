@@ -36,7 +36,7 @@ Flattened: 1, 1,3, 1,10,9, 1,27,55,27, 1,68,248,240,81, …
 
 **Regenerate / extend:** `results/triangle.txt` holds `T(n,H)` for all
 `n <= 40`; `results/provenance-table.md` says which independent computations
-agree with each entry. `build/g2 --per-box` recomputes small `n`.
+agree with each entry. `build/redelmeier --per-box` recomputes small `n`.
 
 Not in OEIS as of 2026-07-10 (no height-refined triangle of A006770).
 

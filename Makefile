@@ -32,24 +32,24 @@ endif
 CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 
 # -Wno-error=restrict is a gcc-only workaround (gcc-12 false positive on the
-# Redelmeier generator, see build/g2 below). clang rejects the unknown flag, so
+# Redelmeier generator, see build/redelmeier below). clang rejects the unknown flag, so
 # apply it only when the compiler is gcc; empty for clang.
 ifeq ($(MAKELEVEL),0)
 RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 export RESTRICT_FLAG
 endif
 
-# The Redelmeier kernel (build/g2) is measurably faster built with clang on
+# The Redelmeier kernel (build/redelmeier) is measurably faster built with clang on
 # aarch64: ~9% over gcc-15 on Neoverse-N1 (measured), and gcc PGO / -mcpu
-# gave nothing. Prefer clang for the optimized g2 only, per box (clang++-19
+# gave nothing. Prefer clang for the optimized redelmeier only, per box (clang++-19
 # where it is versioned, else clang++), falling back to $(CXX) where clang is
-# absent. g2_asan stays on $(CXX): keeping the two
-# builds on different compilers turns gate-g2 check D into a two-compiler count
+# absent. redelmeier_asan stays on $(CXX): keeping the two
+# builds on different compilers turns gate-redelmeier check D into a two-compiler count
 # cross-check for free.
 ifeq ($(MAKELEVEL),0)
-G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
-G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
-export G2CXX G2_RESTRICT
+REDELMEIER_CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
+REDELMEIER_RESTRICT := $(if $(findstring clang,$(shell $(REDELMEIER_CXX) --version 2>/dev/null)),,-Wno-error=restrict)
+export REDELMEIER_CXX REDELMEIER_RESTRICT
 endif
 
 .PHONY: gates gates-deep gates-force timed-% print-% clean install ns-gates ns-gate-arch \
@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-column-convex gate-subclass-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
+GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-naive gate-redelmeier gate-sig-fold gate-tma gate-free-counts gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-column-convex gate-subclass-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -128,7 +128,7 @@ endif
 # so BSD and GNU sed both take it) and anchors on the last "gate-" in the
 # bracket, which covers all three; tests/gate_makefile_wiring.py holds it to
 # that.  A run that names no gate says so rather than printing an empty
-# heading: a failed prerequisite ("*** [build/g2]") is named by no gate line.
+# heading: a failed prerequisite ("*** [build/redelmeier]") is named by no gate line.
 # Ask make for the value of any variable: `make print-GATE_TARGETS`. Tools that
 # need these lists should read them this way rather than sed the Makefile --
 # which is how scripts/profile_gates.sh broke the day `ns-gate-fast:` grew a
@@ -156,13 +156,13 @@ gates-force:
 
 # Everything the gates need built, built once before the timed run below.
 # The timed run is a sub-make per gate, and two sub-makes that share a binary --
-# build/g2 is a prerequisite of three gates -- would otherwise race to compile
+# build/redelmeier is a prerequisite of three gates -- would otherwise race to compile
 # it into the same output file. Building them first in a single make process
 # makes that impossible. tests/gate_makefile_wiring.py holds this list to being
 # a superset of every gate-*: prerequisite, so it cannot drift out from under
 # the gates it protects.
-GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
-  build/g2_asan build/perimeter_defect build/perimeter_min build/prec_guess \
+GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/redelmeier \
+  build/redelmeier_asan build/perimeter_defect build/perimeter_min build/prec_guess \
   build/cluster_weights build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
   build/strip_mu_kink build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
@@ -222,7 +222,7 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 # they read by name. tests/gate_makefile_wiring.py checks the import side of
 # that mechanically -- every repo-local module these scripts import,
 # transitively, has to be listed.
-DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/g2 \
+DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/redelmeier \
                 tests/gate_tma.py tests/common.py \
                 $(FIXTURES) results/holes_n14.txt
 # Every declared gate that reads any fixture takes the whole directory. The
@@ -256,16 +256,16 @@ DEPS_gate-king-grid = build/directed_cone_anchor tests/gate_king_grid.py \
                 tests/common.py $(FIXTURES)
 DEPS_gate-multidirected = build/directed_cone_anchor tests/gate_multidirected.py \
                 tests/common.py experiments/multidirected_king.py $(FIXTURES)
-DEPS_gate-g1 = tests/gate_g1.py tests/common.py scripts/g1_naive.py $(FIXTURES)
+DEPS_gate-naive = tests/gate_naive.py tests/common.py scripts/naive_count.py $(FIXTURES)
 
-DEPS_gate-s2  = tests/gate_s2.py tests/common.py scripts/g1_naive.py $(FIXTURES)
+DEPS_gate-free-counts  = tests/gate_free_counts.py tests/common.py scripts/naive_count.py $(FIXTURES)
 DEPS_gate-sym = build/symcount_fast tests/gate_sym.py tests/common.py \
-                scripts/g1_naive.py scripts/symcount.py $(FIXTURES)
+                scripts/naive_count.py scripts/symcount.py $(FIXTURES)
 DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
-                tests/common.py scripts/g1_naive.py scripts/symcount.py $(FIXTURES)
+                tests/common.py scripts/naive_count.py scripts/symcount.py $(FIXTURES)
 DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
-DEPS_gate-reference = build/g2 build/strip_tm build/coloring_recount \
+DEPS_gate-reference = build/redelmeier build/strip_tm build/coloring_recount \
                 build/symcount_fast build/symtm build/dmirror_spine \
                 build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
                 build/ns/combine scripts/term.sh tests/gate_reference.py \
@@ -278,7 +278,7 @@ DEPS_gate-coloring-crt = scripts/coloring_crt.py \
                 $(wildcard results/coloring-recount/residues41/*) \
                 results/coloring-recount/rows41/C19.out
 DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py tests/common.py
-DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
+DEPS_gate-perimeter-min = build/perimeter_min build/redelmeier \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
                 results/siteperim_square8_n14.txt results/siteperim_square4_n20.txt \
                 results/siteperim_tri6_n12.txt
@@ -288,8 +288,8 @@ DEPS_gate-depth1-kernel = experiments/depth1_kernel_gate.py \
                 experiments/depth1_kernel.py experiments/depth1_recurrence.py \
                 experiments/depth1_gap_walk.py experiments/cluster_weight_dp.py \
                 experiments/slope2_law_vs_truth.py
-DEPS_gate-g2  = build/g2 build/g2_asan \
-                tests/gate_g2.py tests/common.py scripts/g1_naive.py $(FIXTURES)
+DEPS_gate-redelmeier  = build/redelmeier build/redelmeier_asan \
+                tests/gate_redelmeier.py tests/common.py scripts/naive_count.py $(FIXTURES)
 # orchestrate by its sources, not the binary: the binary is phony and links the
 # commit hash in, so every commit gives it a new mtime and the gate never skipped.
 DEPS_gate-kink-oracle = $(GO_SRC) build/ns/map_worker \
@@ -511,26 +511,26 @@ gate-makefile-wiring:
 	python3 tests/gate_makefile_wiring.py --selftest
 	python3 tests/gate_makefile_wiring.py
 
-# Gate PERIMETER-DEFECT: the pruned max-end search vs g2 --siteperim (A), vs
+# Gate PERIMETER-DEFECT: the pruned max-end search vs redelmeier --siteperim (A), vs
 # its own unpruned control (B), marginal consistency (C), and --split shards
 # summing elementwise to the unsplit run (D). D is what makes a sharded
 # production run trustworthy -- a shard that drops or double-counts a subtree
 # looks perfectly healthy in its own output. ~40 s.
-gate-perimeter-defect: build/perimeter_defect build/g2
+gate-perimeter-defect: build/perimeter_defect build/redelmeier
 	./scripts/perimeter_defect_gate.sh
 
 # Gate PERIMETER-MIN: build/perimeter_min enumerates the isoperimetric end of
 # the perimeter table by COMPLEMENTATION, which is complete only under a
 # hypothesis (every animal's perimeter is at least its filled bounding box's).
 # Run with removals unbounded on small boxes it degenerates to a complete brute
-# force, so it can be compared cell for cell against build/g2's --siteperim
+# force, so it can be compared cell for cell against build/redelmeier's --siteperim
 # census -- a different search entirely. A hypothesis violation shows up as a
 # missing animal. Includes a RED control.
 #
 # The three census cross-checks are ~1 s together; the gate measures 417 s
 # on an 80-core ARM server because of check E's W=13 second-source case, run
 # twice. See the script.
-gate-perimeter-min: build/perimeter_min build/g2
+gate-perimeter-min: build/perimeter_min build/redelmeier
 	./scripts/perimeter_min_gate.sh $(GATE_DEEP)
 
 # Gate PERIMETER-MIN-SHARD: the sharded driver that makes a min-end census
@@ -605,17 +605,17 @@ gate-p-paper-verifier:
 	python3 tests/gate_p_paper_verifier.py --selftest
 	python3 tests/gate_p_paper_verifier.py
 
-# Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
-gate-g1:
-	python3 tests/gate_g1.py
+# Gate NAIVE: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
+gate-naive:
+	python3 tests/gate_naive.py
 
 # Gate DRIVER: reach driver/combine reject crashed/raced/corrupt sweeps (no silent zeros)
 gate-driver: build/tma
 	python3 tests/gate_driver_robust.py
 
-# Gate G2: C++ Redelmeier engine vs oracle + fixtures (+ split, + sanitizers)
-gate-g2: build/g2 build/g2_asan
-	python3 tests/gate_g2.py $(GATE_DEEP)
+# Gate REDELMEIER: C++ Redelmeier engine vs oracle + fixtures (+ split, + sanitizers)
+gate-redelmeier: build/redelmeier build/redelmeier_asan
+	python3 tests/gate_redelmeier.py $(GATE_DEEP)
 
 build:
 	mkdir -p build
@@ -623,14 +623,14 @@ build:
 # -Wno-error=restrict on the Redelmeier generator: works around a gcc-12 false
 # positive in <bits/char_traits.h> (bogus -Wrestrict on std::string ops; clang and
 # gcc-15 don't trip it). Scoped here so -Werror stays strict everywhere else.
-build/g2: cpp/g2_redelmeier.cpp cpp/argparse.h | build
-	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
+build/redelmeier: cpp/redelmeier.cpp cpp/argparse.h | build
+	$(REDELMEIER_CXX) $(CXXFLAGS) $(REDELMEIER_RESTRICT) -O3 $< -o $@
 
 # Defect-pruned Redelmeier for the site-perimeter grading. Separate binary
 # because the prune changes the search, not the bookkeeping, and it needs
-# NMAX far past g2's 40.
+# NMAX far past redelmeier's 40.
 build/perimeter_defect: cpp/perimeter_defect.cpp cpp/obs.h | build
-	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
+	$(REDELMEIER_CXX) $(CXXFLAGS) $(REDELMEIER_RESTRICT) -O3 $< -o $@
 
 # Minimum-perimeter (isoperimetric-end) enumerator. Complementation, not
 # growth: the min-side defect is not monotone under cell addition, so
@@ -648,7 +648,7 @@ build/kinginflate: cpp/kinginflate.cpp | build
 
 # perimeter_defect's prune has no analogue here (cpp/perimeter_min.cpp).
 build/perimeter_min: cpp/perimeter_min.cpp cpp/obs.h | build
-	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
+	$(REDELMEIER_CXX) $(CXXFLAGS) $(REDELMEIER_RESTRICT) -O3 $< -o $@
 
 # Independent strip transfer-matrix engine (the second source for T(n,H),
 # H<=14). -std=c++17 and no $(CXXFLAGS) deliberately: mirrors the build line
@@ -687,7 +687,7 @@ gate-coloring-recount: build/coloring_recount
 
 # Every program behind the published counts prints exactly what it printed
 # before the rewrite (docs/code-target.md, tests/reference/).
-gate-reference: build/g2 build/strip_tm build/coloring_recount build/symcount_fast \
+gate-reference: build/redelmeier build/strip_tm build/coloring_recount build/symcount_fast \
                 build/symtm build/dmirror_spine build/ns/orchestrate \
                 build/ns/map_worker build/ns/merge_worker build/ns/combine
 	python3 tests/gate_reference.py --selftest
@@ -727,7 +727,7 @@ build/gf_modp: cpp/gf_modp.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 # fixed-height KNIGHT-animal transfer matrix over Z/pZ (horizontal-reach test)
-build/g2_asan: cpp/g2_redelmeier.cpp | build
+build/redelmeier_asan: cpp/redelmeier.cpp | build
 	$(CXX) $(CXXFLAGS) $(RESTRICT_FLAG) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@
 
@@ -757,8 +757,8 @@ gate-sig-fold: build/sig_fold_unit
 build/sig_fold_unit: tests/sig_fold_unit.cpp cpp/tma/signature.h cpp/tma/transition_square8.h | build
 	$(CXX) $(CXXFLAGS) -O2 $< -o $@
 
-# Gate TMA: transfer-matrix engine vs fixtures + G2 height marginals
-gate-tma: build/tma build/tma_asan build/tma_holes build/g2
+# Gate TMA: transfer-matrix engine vs fixtures + Redelmeier height marginals
+gate-tma: build/tma build/tma_asan build/tma_holes build/redelmeier
 	python3 tests/gate_tma.py $(GATE_DEEP)
 
 
@@ -816,10 +816,10 @@ gate-king-grid: build/directed_cone_anchor
 
 # Gate SITE-PERIM: the grid-mode min-reduce of site perimeter (king
 # adjacency, minSPKing) vs the 4k+4 perfect-square hand check and an
-# independent oracle (build/g2's square8 lattice, same population/convention,
+# independent oracle (build/redelmeier's square8 lattice, same population/convention,
 # different code), plus the rook-adjacency control (minSPRook) which must
 # diverge.
-gate-site-perim: build/directed_cone_anchor build/g2
+gate-site-perim: build/directed_cone_anchor build/redelmeier
 	python3 tests/gate_site_perim.py
 
 # Gate MULTIDIRECTED: Bacher's Definition 2 brute force ("mdir") vs the
@@ -959,13 +959,13 @@ gate-subclass-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/direc
 gate-dir4-perim-alg: build/prec_guess
 	python3 tests/gate_dir4_perim_alg.py
 
-# Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
-gate-s2:
-	python3 tests/gate_s2.py $(GATE_DEEP)
+# Gate FREE-COUNTS: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
+gate-free-counts:
+	python3 tests/gate_free_counts.py $(GATE_DEEP)
 
 # ─── Next-system (ns-*) targets ──────────────────────────────────────────────
 # All new-system code lives under core/ worker/ orchestrator/ verify/ tests/engine/.
-# Oracle (build/tma, build/g2) stays in cpp/; both coexist.
+# Oracle (build/tma, build/redelmeier) stays in cpp/; both coexist.
 
 NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
           -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
@@ -1004,11 +1004,11 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths can't rot undetected.
-# gate-g2 is included so the g2 Redelmeier oracle (the independent cross-check
+# gate-redelmeier is included so the Redelmeier oracle (the independent cross-check
 # for T(n,H) and the polyplet totals) has an automatic correctness gate: its hot
 # kernel took a burst of perf work (L1..L4, dropped reachedUndo) with no routine
 # gate covering it — a miscount would otherwise rely on a dev running `make gates`.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-redelmeier
 
 # Diagonal-pin gate: re-derives nothing, but checks every wired P_k (k=1..19)
 # against every real-swept in-onset cell of results/triangle.txt (H <= 21),
@@ -1196,7 +1196,7 @@ build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # ASan/UBSan builds of the ACTUAL production workers (map_worker/merge_worker,
-# both kernels) — see gate-tma/gate-g2 for the same pattern on the oracle
+# both kernels) — see gate-tma/gate-redelmeier for the same pattern on the oracle
 # engines. Separate build dir so --workers-dir can point orchestrate at these
 # without disturbing the -O3 production binaries.
 build/ns_asan:
@@ -1214,7 +1214,7 @@ build/ns_asan/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns_asa
 # kernels) under sanitizers, small n, --compare against fixtures. This is what
 # makes the paper's "engines are ASan/UBSan clean" claim actually cover the
 # production pipeline, not just the legacy oracle binaries (build/tma_asan,
-# build/g2_asan).
+# build/redelmeier_asan).
 ns-gate-asan: build/ns_asan/map_worker build/ns_asan/merge_worker build/ns/orchestrate
 	rm -rf /tmp/ns_asan_column && mkdir -p /tmp/ns_asan_column/spill
 	./build/ns/orchestrate --maxn 14 --cores 4 --ram 67108864 --workers-dir build/ns_asan \

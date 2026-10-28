@@ -38,7 +38,7 @@ enumerated entries.
 24,000 disjoint pieces on three machines of different architectures,
 reproduced every row n ≤ 22 exactly. It shares no counting logic with the
 transfer matrix. Its cost grows with the number of polyplets, so whole-term
-checks stop at n = 22 (`results/redelmeier_row22/`, `make gate-g2`).
+checks stop at n = 22 (`results/redelmeier_row22/`, `make gate-redelmeier`).
 
 **A strip transfer matrix, H ≤ 14.** A second transfer matrix computes, for a
 strip of fixed height, the number of placements of polyplets of height at most

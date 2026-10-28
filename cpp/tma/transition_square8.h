@@ -11,7 +11,7 @@
 //
 // Operates on the fixed-size Sig (no allocation on the hot path). No published
 // signature tables exist for this lattice (it is new), so the gate validates
-// against animal COUNTS (A006770) and the G2 oracle.
+// against animal COUNTS (A006770) and the Redelmeier oracle.
 
 #pragma once
 

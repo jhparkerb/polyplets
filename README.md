@@ -65,7 +65,7 @@ with hundreds of gigabytes of memory and disk; `results/ns_a40/PROVENANCE.md`
 records how a(40) was run. Two unrelated algorithms, with no closed forms
 involved:
 
-    build/g2 square8 12      # Redelmeier enumeration, a(1)..a(12)
+    build/redelmeier square8 12      # Redelmeier enumeration, a(1)..a(12)
     make gate-kink-oracle    # the transfer matrix enumerating every height, a(1)..a(18)
 
 The second takes about a minute on 8 cores and compares its sums with the

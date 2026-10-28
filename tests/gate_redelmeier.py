@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Gate G2: the C++ Redelmeier engine vs oracle and fixtures.
+"""Gate REDELMEIER: the C++ Redelmeier engine vs oracle and fixtures.
 
 Four checks:
-  A. aggregate counts equal pinned b-files (deeper than G1 can reach)
-  B. per-bounding-box histograms equal the G1 oracle exactly
+  A. aggregate counts equal pinned b-files (deeper than the naive oracle can reach)
+  B. per-bounding-box histograms equal the naive oracle exactly
   C. split-mode invariance: the K split workers' outputs sum to the full run
   D. the ASan/UBSan build runs clean and agrees with the optimized build
 
-Written before the engine exists (TDD); expects binaries at build/g2 and
-build/g2_asan with the CLI:
-    g2 LATTICE MAXN [--per-box] [--split S K IDX]
+Written before the engine exists (TDD); expects binaries at build/redelmeier and
+build/redelmeier_asan with the CLI:
+    redelmeier LATTICE MAXN [--per-box] [--split S K IDX]
 emitting "n count" lines (or "n w h count" with --per-box).
 """
 
@@ -20,10 +20,10 @@ from common import ROOT, Gate, parse_counts, read_bfile, run
 
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from g1_naive import count_by_box  # noqa: E402
+from naive_count import count_by_box  # noqa: E402
 
-G2 = os.path.join(ROOT, "build", "g2")
-G2_ASAN = os.path.join(ROOT, "build", "g2_asan")
+REDELMEIER = os.path.join(ROOT, "build", "redelmeier")
+REDELMEIER_ASAN = os.path.join(ROOT, "build", "redelmeier_asan")
 
 # check A: lattice -> (b-file, depth) -- a few seconds each, optimized build
 FIXTURE_CASES = {
@@ -31,7 +31,7 @@ FIXTURE_CASES = {
     "square8": ("b006770.txt", 11),
     "tri6":    ("b001207.txt", 12),
 }
-# check B: per-box equality vs G1 (G1 runtime bounds the depth)
+# check B: per-box equality vs the naive oracle (the naive oracle's runtime bounds the depth)
 PERBOX_CASES = {"square4": 9, "square8": 7, "tri6": 7}
 # check C: split invariance
 SPLIT_CASE = ("square8", 9, 4, 3)  # lattice, maxn, split size S, K workers
@@ -41,15 +41,15 @@ ASAN_CASES = {"square4": 11, "square8": 8, "tri6": 9}
 
 def main():
     gate = Gate()
-    for b in (G2, G2_ASAN):
+    for b in (REDELMEIER, REDELMEIER_ASAN):
         if not os.path.exists(b):
-            print(f"FAIL missing binary {b} (run: make build/g2 build/g2_asan)")
+            print(f"FAIL missing binary {b} (run: make build/redelmeier build/redelmeier_asan)")
             return 1
 
     # A. fixtures
     for lattice, (bfile, depth) in FIXTURE_CASES.items():
         expected = read_bfile(bfile)
-        got = parse_counts(run(G2, lattice, depth))
+        got = parse_counts(run(REDELMEIER, lattice, depth))
         bad = [n for n in range(1, depth + 1)
                if n in expected and got.get((n,)) != expected[n]]
         gate.check(not bad, f"A fixtures  {lattice:8s} n<={depth}  vs {bfile}"
@@ -59,17 +59,17 @@ def main():
     for lattice, depth in PERBOX_CASES.items():
         oracle = count_by_box(lattice, depth)
         engine = {k: v for k, v in
-                  parse_counts(run(G2, lattice, depth, "--per-box")).items()}
+                  parse_counts(run(REDELMEIER, lattice, depth, "--per-box")).items()}
         gate.check(engine == oracle,
-              f"B per-box   {lattice:8s} n<={depth}  vs G1 oracle "
+              f"B per-box   {lattice:8s} n<={depth}  vs naive oracle "
               f"({len(oracle)} box classes)")
 
     # C. split invariance
     lattice, maxn, S, K = SPLIT_CASE
-    full = parse_counts(run(G2, lattice, maxn))
+    full = parse_counts(run(REDELMEIER, lattice, maxn))
     summed = {}
     for idx in range(K):
-        part = parse_counts(run(G2, lattice, maxn, "--split", S, K, idx))
+        part = parse_counts(run(REDELMEIER, lattice, maxn, "--split", S, K, idx))
         for k, v in part.items():
             summed[k] = summed.get(k, 0) + v
     gate.check(summed == full,
@@ -84,8 +84,8 @@ def main():
     #    false) and drives the per-cell split path through the terminal level; it
     #    must still sum to the full run.
     for lattice, depth in (("square8", 13), ("square4", 14), ("tri6", 13)):
-        agg = parse_counts(run(G2, lattice, depth))
-        pbox = parse_counts(run(G2, lattice, depth, "--per-box"))
+        agg = parse_counts(run(REDELMEIER, lattice, depth))
+        pbox = parse_counts(run(REDELMEIER, lattice, depth, "--per-box"))
         rowsum = {}
         for (n, w, h), c in pbox.items():
             rowsum[(n,)] = rowsum.get((n,), 0) + c
@@ -93,10 +93,10 @@ def main():
               f"I terminal  {lattice:8s} n<={depth}: aggregate(pure-count)==per-box rowsums")
 
     mx = 9
-    full_m = parse_counts(run(G2, "square8", mx))
+    full_m = parse_counts(run(REDELMEIER, "square8", mx))
     summed_m = {}
     for idx in range(3):
-        part = parse_counts(run(G2, "square8", mx, "--split", mx, 3, idx))
+        part = parse_counts(run(REDELMEIER, "square8", mx, "--split", mx, 3, idx))
         for k, v in part.items():
             summed_m[k] = summed_m.get(k, 0) + v
     gate.check(summed_m == full_m,
@@ -104,8 +104,8 @@ def main():
 
     # D. sanitizer build agrees and runs clean
     for lattice, depth in ASAN_CASES.items():
-        opt = parse_counts(run(G2, lattice, depth))
-        san = parse_counts(run(G2_ASAN, lattice, depth))
+        opt = parse_counts(run(REDELMEIER, lattice, depth))
+        san = parse_counts(run(REDELMEIER_ASAN, lattice, depth))
         gate.check(opt == san, f"D asan      {lattice:8s} n<={depth}  clean + equal")
 
     # E. rook/bishop + perimeter cross-checks (independent structural checks on
@@ -121,7 +121,7 @@ def main():
     # An all() over an empty loop is True, so an engine that printed nothing
     # would pass this check and F below.  Every row 1..E_DEPTH must be present.
     rb_rows = {}
-    for line in run(G2, "square8", E_DEPTH, "--rook-bishop").strip().splitlines():
+    for line in run(REDELMEIER, "square8", E_DEPTH, "--rook-bishop").strip().splitlines():
         n, tot, rook, bish = (int(x) for x in line.split())
         rb_rows[n] = (tot, rook, bish)
     rb_ok = all(n in rb_rows and rb_rows[n][0] == a006770[n]
@@ -132,7 +132,7 @@ def main():
           + ("" if len(rb_rows) == E_DEPTH else f"  ({len(rb_rows)} rows, not {E_DEPTH})"))
 
     psum, p4n = {}, {}
-    for line in run(G2, "square8", E_DEPTH, "--perimeter").strip().splitlines():
+    for line in run(REDELMEIER, "square8", E_DEPTH, "--perimeter").strip().splitlines():
         n, p, c = (int(x) for x in line.split())
         psum[n] = psum.get(n, 0) + c
         if p == 4 * n:
@@ -147,7 +147,7 @@ def main():
     #    must satisfy byBox[n][w][h] == byBox[n][h][w]. A free internal invariant
     #    (no external sequence) that catches any width/height-asymmetric miscount.
     F_DEPTH = 11
-    box = parse_counts(run(G2, "square8", F_DEPTH, "--per-box"))
+    box = parse_counts(run(REDELMEIER, "square8", F_DEPTH, "--per-box"))
     rowsum_box = {}
     for (n, w, h), c in box.items():
         rowsum_box[n] = rowsum_box.get(n, 0) + c
@@ -167,7 +167,7 @@ def main():
     #        A006724 (simply-connected fixed polyominoes) and the with-holes count
     #        must equal A389193 (fixed polyominoes with holes). This pins the flood
     #        logic and the 4-connected-hole definition to OEIS's own convention.
-    # Three g2 --holes runs at n=11 were 114 s of this gate's 138 s
+    # Three redelmeier --holes runs at n=11 were 114 s of this gate's 138 s
     # (measured) -- the flood-fill hole census is the whole cost of
     # the gate. What checks H assert are IDENTITIES (the hole partition sums to
     # the total; hole-free and holey match A006724/A389193), and n=9 already
@@ -177,7 +177,7 @@ def main():
 
     def hole_table(args):
         tbl = {}
-        for line in run(G2, *args).strip().splitlines():
+        for line in run(REDELMEIER, *args).strip().splitlines():
             n, h, c = (int(x) for x in line.split())
             tbl.setdefault(n, {})[h] = c
         return tbl
@@ -206,7 +206,7 @@ def main():
     gate.check(conv_ok,
           f"H holes-conv square4 n<={H_DEPTH}: hole-free=A006724, holey=A389193")
 
-    return gate.verdict("G2")
+    return gate.verdict("REDELMEIER")
 
 
 if __name__ == "__main__":

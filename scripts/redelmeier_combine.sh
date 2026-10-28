@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Central combine for a fleet whole-row g2 run (dalby + ayr + gympie).
+# Central combine for a fleet whole-row redelmeier run (dalby + ayr + gympie).
 #
-# Each box runs scripts/g2_wholerow.sh with a disjoint --range and --no-combine,
+# Each box runs scripts/redelmeier_wholerow.sh with a disjoint --range and --no-combine,
 # so every shard IDX in [0,K) is computed exactly once across the fleet (split-sum
-# invariance, gate-g2 check C). Gather every box's w*.out AND w*.done into one DIR,
+# invariance, gate-redelmeier check C). Gather every box's w*.out AND w*.done into one DIR,
 # then this script verifies all K shards are present and sums them.
 #
-# USAGE:  scripts/g2_combine.sh DIR N K [--per-box]
+# USAGE:  scripts/redelmeier_combine.sh DIR N K [--per-box]
 #   DIR        directory holding the gathered w<IDX>.out / w<IDX>.done from all boxes
 #   N          target size (a(N) is read off the n==N line[s])
 #   K          shard count of the split (all of 0..K-1 must be present)

@@ -1159,7 +1159,7 @@ almost certainly have caught it, but it is a residual. No manifest or
 `build/ns/verify` pass is recorded for a(40) or a(41). The `H = 20` identical
 re-run of a(40) is determinism on the same reader, not independence.
 
-**Fixtures.** `fixtures/` is protected by `SHA256SUMS`, which `gate_g1` checks
+**Fixtures.** `fixtures/` is protected by `SHA256SUMS`, which `gate_naive` checks
 first; the checksum file is regenerable, so the protection is against
 accident, not a deliberate edit of both. The b-file headers record the OEIS
 revision and date checked (`b006770.txt`: revision 44, 2026-05-30);
@@ -1167,10 +1167,10 @@ revision and date checked (`b006770.txt`: revision 44, 2026-05-30);
 
 ## 9. The Redelmeier program's throughput
 
-`build/g2` is the independent Redelmeier enumerator used to confirm rows by a
+`build/redelmeier` is the independent Redelmeier enumerator used to confirm rows by a
 second algorithm (`results/redelmeier_row22/PROVENANCE.md`).
 
-Profile of rev `7eab237`, `build/g2 square8 15`, one core, 167.1 s:
+Profile of rev `7eab237`, `build/redelmeier square8 15`, one core, 167.1 s:
 
 | counter | value | derived |
 |---|---|---|
@@ -1201,7 +1201,7 @@ engine's IPC and miss rates were never captured (section 3.8).
 | plus branchless probe | 89.4 s | 1.87× | no, reverted |
 | plus u16 untried list | 88.7 s | 1.88× | kept for footprint |
 | plus gcc PGO | 91.0 s | 1.84× | no, worse than `-O3` |
-| plus clang++-19 `-O3` | 81.3 s | 2.06× | yes, in the Makefile as `G2CXX` |
+| plus clang++-19 `-O3` | 81.3 s | 2.06× | yes, in the Makefile as `REDELMEIER_CXX` |
 | plus clang PGO | | | blocked: no `libclang-rt-19-dev` or `llvm-19` on that machine |
 
 Settled at 2.06×. Fusing the size `maxn − 2` level was estimated at about 3%
@@ -1219,7 +1219,7 @@ Fleet throughput, single core, `N = 15`, clang builds:
 The single-core shares over-predicted the 32-core server: under all-core load
 its Threadripper reaches memory over Infinity Fabric for half its cores and
 ran at 0.92× the ARM server per core (1.275 against 1.386 shards per hour per
-core), the laptop at 2.62×. The row-22 run (`scripts/g2_fleet_launch.sh 22 12
+core), the laptop at 2.62×. The row-22 run (`scripts/redelmeier_fleet_launch.sh 22 12
 24000`, launched 2026-07-11) was rebalanced 2.9 h in to contiguous ranges
 [0, 14300) on the ARM server, [14300, 19460) on the 32-core server and
 [19460, 24000) on the laptop, with about 1% of shards redone, and completed
@@ -1255,7 +1255,7 @@ all-core load before allocating shares.
 - **Indirect sort, radix sort, in-place left extension, a counts pool, a
   per-successor arena**: sections 4.4 and 4.2.
 - **Smaller modular counters**: slower per pass and more passes (section 7).
-- **PGO** on `build/g2`: worse than `-O3`; `-mcpu=native` or
+- **PGO** on `build/redelmeier`: worse than `-O3`; `-mcpu=native` or
   `-mcpu=neoverse-n1`: a wash for both compilers and both programs.
 - **tmpfs run directories past a(34)**: out of memory (section 6.4).
 - **The 4-bit signature pack**: after varint the key is about 20% of record
@@ -1423,8 +1423,8 @@ Benchmarks and profiles:
     GODEBUG=gctrace=1 ... ; POLY_MEMPROFILE=... ; go test -bench -benchmem ./orchestrator (sample_bench_test.go)
     experiments/reframe_measure.cpp                # frame-size curve on a real frontier file
     scripts/dalby_du_monitor.sh RUNDIR PID         # disk-footprint telemetry
-    build/g2 square8 15                            # the Redelmeier profile target
-    scripts/g2_fleet_launch.sh 22 12 24000 ; scripts/g2_combine.sh runs/g2row_N22 22 24000
+    build/redelmeier square8 15                            # the Redelmeier profile target
+    scripts/redelmeier_fleet_launch.sh 22 12 24000 ; scripts/redelmeier_combine.sh runs/g2row_N22 22 24000
 
 Data: `results/ns_a26/cost_profile.tsv`,
 `results/ns_a27/cost_profile_dalby.tsv`,

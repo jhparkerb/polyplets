@@ -13,7 +13,7 @@ and what no recount reaches.
 |---|---|---|---|
 | strip transfer matrix | `cpp/strip_tm.cpp`; reference `experiments/strip_engine.py` | `H ≤ 14`, `n ≤ 40` | the connectivity rule (union-find over a column, stranded-component death); no code, frontier or state encoding |
 | the coloring recount | rule `results/coloring-recount/cutcount_b1.cpp.59e90660` lines 93–173; parallel engine `cpp/coloring_recount.cpp` | `H ≤ 19`, `n ≤ 41` | nothing: it never decides connectivity |
-| Redelmeier enumeration | `cpp/g2_redelmeier.cpp` (`build/g2`) | whole rows `n ≤ 22` | nothing; its cost grows with the count |
+| Redelmeier enumeration | `cpp/redelmeier.cpp` (`build/redelmeier`) | whole rows `n ≤ 22` | nothing; its cost grows with the count |
 
 Which program reached which entry is generated in `results/provenance-table.md`
 (`make gate-provenance`); the entries no exact recount reaches, in
@@ -165,11 +165,11 @@ its `H = 19` census is 224,529,648 states.
 
 ## Redelmeier whole-row recounts
 
-`build/g2` (`cpp/g2_redelmeier.cpp`) generates every fixed polyplet once and
+`build/redelmeier` (`cpp/redelmeier.cpp`) generates every fixed polyplet once and
 shares no counting logic with either transfer matrix.
 
 **Row 20** (`results/redelmeier_row20/`): dalby,
-`scripts/g2_wholerow.sh 20 10 800 80`, 2026-07-10, rev `7eab237`. Rows
+`scripts/redelmeier_wholerow.sh 20 10 800 80`, 2026-07-10, rev `7eab237`. Rows
 `n = 1..20` match `results/b006770_upload.txt`; a(20) = 1025573519362016 is
 confirmed by two algorithms, and A030233, A030222 and A194596 inherit the
 confirmation at `n = 20`.
@@ -295,4 +295,4 @@ on small boards against the C++ at `H ≤ 6`, as
     python3 scripts/coloring_crt.py --dir results/coloring-recount/residues41 --height 19
     python3 experiments/below_onset_fit_ri.py --hmax 19 --jmax 4 --rowdir results/coloring-recount/rows41 --rows 39,40,41
     make build/coloring_recount && make gate-coloring-recount    # needs -fopenmp
-    scripts/g2_wholerow.sh 20 10 800 80              # Redelmeier row 20 on 80 workers
+    scripts/redelmeier_wholerow.sh 20 10 800 80              # Redelmeier row 20 on 80 workers

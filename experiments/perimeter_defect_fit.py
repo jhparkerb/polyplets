@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Grade a site-perimeter census by defect and fit each defect class.
 
-Input is g2's `--siteperim` table, one `n p count` row per line.  The defect is
+Input is build/redelmeier's `--siteperim` table, one `n p count` row per line.  The defect is
 k = pmax(n) - p with pmax(n) = 2n+2 on square4 and 4n+4 on square8 (the second
 is measured, not proved -- see docs/perimeter-defect-plan.md (deleted)).
 
@@ -35,7 +35,7 @@ SPARE_PER_CLASS = 2
 
 
 def load(path):
-    """-> {n: {p: count}}, ignoring the observability lines g2 emits."""
+    """-> {n: {p: count}}, ignoring the observability lines redelmeier emits."""
     table = defaultdict(dict)
     with open(path) as fh:
         for line in fh:

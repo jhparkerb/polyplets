@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from symcount import (HMIRROR_PLACEMENTS, SUBGROUP_TYPES,  # noqa: E402
                       SYMMETRY_TYPES, _anchor_xmin0, count_symmetry_type)
-from g1_naive import count_by_box, count_symmetry  # noqa: E402
+from naive_count import count_by_box, count_symmetry  # noqa: E402
 
 # Brute force generates every animal, so this is the slowest part, ~4x per n.
 ORACLE_MAXN = 8 if "--deep" in sys.argv else 7

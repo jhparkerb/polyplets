@@ -35,8 +35,8 @@ def strip_events(text):
                    if not ln.startswith("event="))
 
 
-def g2():
-    return strip_events(run(f"{BUILD}/g2", "square8", 12, "--per-box"))
+def redelmeier():
+    return strip_events(run(f"{BUILD}/redelmeier", "square8", 12, "--per-box"))
 
 
 def per_height(binary, args_for, hmax):
@@ -104,7 +104,7 @@ def term26():
 
 
 CASES = [
-    ("g2_square8_12", "build/g2 square8 12 --per-box", g2),
+    ("redelmeier_square8_12", "build/redelmeier square8 12 --per-box", redelmeier),
     ("strip_tm_h10_n24", "build/strip_tm single H 24, H = 1..10", strip_tm),
     ("coloring_recount_h10_n24", f"build/coloring_recount --modp H 24 {P}, H = 1..10", coloring_recount),
     ("symcount_fast_16", "build/symcount_fast TYPE 16, all eight types", symcount_fast),

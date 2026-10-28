@@ -32,7 +32,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from g1_naive import NEIGHBORS, normalize  # noqa: E402
+from naive_count import NEIGHBORS, normalize  # noqa: E402
 
 NBRS = NEIGHBORS["square8"]
 

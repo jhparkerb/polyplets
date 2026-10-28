@@ -208,7 +208,7 @@ it requires trusting prose.
   5-reflection-class sum == A030234 re-verified numerically for all 19 terms;
   A389193 is verified by the gate suite itself (gate H).
 - **2026-07-17 green board**: full `make ns-gates` suite GREEN (incl. the
-  newly-wired gate-g2); the paper's self-contained claim checker passes
+  newly-wired gate-redelmeier); the paper's self-contained claim checker passes
   412/412; the paper compiles warning-free.
 
 ## 6. AI use: the guideline and what editors did (checked 2026-10-23)

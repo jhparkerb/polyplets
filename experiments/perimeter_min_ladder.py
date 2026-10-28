@@ -81,7 +81,7 @@ def read_census(path):
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("census", help="`n p count` table from build/g2 --siteperim")
+    ap.add_argument("census", help="`n p count` table from build/redelmeier --siteperim")
     ap.add_argument("--lattice", required=True, choices=sorted(PMIN))
     ap.add_argument("--jmax", type=int, default=8, help="ladder depth to print")
     args = ap.parse_args()

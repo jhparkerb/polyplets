@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Gate G1: the oracle must reproduce the pinned OEIS b-files.
+"""Gate NAIVE: the oracle must reproduce the pinned OEIS b-files.
 
 This is the project's first green gate (implementation-plan.md section 3).
 Exits nonzero on any mismatch. Depth per lattice is chosen so the whole gate
-runs in about a minute; deeper validation belongs to G2.
+runs in about a minute; deeper validation belongs to the Redelmeier gate.
 """
 
 import os
@@ -15,7 +15,7 @@ from common import ROOT, Gate, read_bfile
 
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from g1_naive import count_fixed  # noqa: E402
+from naive_count import count_fixed  # noqa: E402
 
 # lattice -> (b-file, max n for the quick gate)
 CASES = {
@@ -81,7 +81,7 @@ def main():
             gate.check(got[n] == expected[n],
                        f"{lattice:8s} n={n:2d}  got {got[n]:>10d}  "
                        f"expect {expected[n]:>10d}  [{bfile}]")
-    return gate.verdict("G1")
+    return gate.verdict("NAIVE")
 
 
 if __name__ == "__main__":

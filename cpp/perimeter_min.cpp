@@ -30,7 +30,7 @@
 // program emits is checked against pbox at runtime (a violation aborts), and
 // scripts/perimeter_min_gate.sh runs the whole thing with RMAX = unbounded on
 // small boxes, where it degenerates to a complete brute force, and compares it
-// cell for cell against build/g2's --siteperim census.  A (H1) violation would
+// cell for cell against build/redelmeier's --siteperim census.  A (H1) violation would
 // show up there as a missing animal.
 //
 // THE ROTATED FRAME.  On square8 (king) the fat shapes are L-infinity balls,
@@ -125,7 +125,7 @@ static constexpr Offset kKing[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
 // square4 in the rotated frame: the 4 rook neighbors become the 4 diagonals.
 static constexpr Offset kDiag[] = {{-1,-1},{1,-1},{-1,1},{1,1}};
 // tri6, the 6-neighbor triangular/hex lattice, in axial coordinates -- the
-// same offsets g2 uses, so its --siteperim census gates this one too.
+// same offsets redelmeier uses, so its --siteperim census gates this one too.
 static constexpr Offset kTri6[] = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
 
 // A HULL is a range on each of a few linear functionals of (u,v). The

@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
-# Gate for build/perimeter_defect: the pruned search must reproduce build/g2's
+# Gate for build/perimeter_defect: the pruned search must reproduce build/redelmeier's
 # site-perimeter census cell for cell, on both lattices, before any number it
-# produces past g2's reach is believed.  docs/perimeter-defect-plan.md (deleted), Task B.
+# produces past redelmeier's reach is believed.  docs/perimeter-defect-plan.md (deleted), Task B.
 #
 # Three checks, all fail-closed:
-#   A  pruned counts == g2 --siteperim, for every (n, k) with k <= KMAX
+#   A  pruned counts == redelmeier --siteperim, for every (n, k) with k <= KMAX
 #   B  pruned == unpruned on the same range (isolates the prune from the rewrite)
 #   C  the (k, c, H) marginals sum back to the (n, k) totals
-#   D  --split shards sum elementwise to the unsplit run (mirrors g2's gate C).
+#   D  --split shards sum elementwise to the unsplit run (mirrors redelmeier's gate C).
 #      A sharded production run is only as trustworthy as this check: a shard
 #      that double-counts or drops a subtree is invisible in its own output.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 WORK=${WORK:-$(mktemp -d)}
-NSQ=${NSQ:-13}          # g2 square4 --siteperim is cheap to here
+NSQ=${NSQ:-13}          # redelmeier square4 --siteperim is cheap to here
 NKI=${NKI:-11}          # square8 costs 7.4x per n; 11 is ~3s
 KMAX=${KMAX:-5}
 fail=0
 
-make -s build/g2 build/perimeter_defect
+make -s build/redelmeier build/perimeter_defect
 
 for spec in "square4 $NSQ" "square8 $NKI"; do
   set -- $spec
   lat=$1 n=$2
   echo "== $lat, n <= $n, k <= $KMAX =="
 
-  ./build/g2 "$lat" "$n" --siteperim > "$WORK/g2.$lat" 2>/dev/null
+  ./build/redelmeier "$lat" "$n" --siteperim > "$WORK/g2.$lat" 2>/dev/null
   ./build/perimeter_defect "$lat" "$n" "$KMAX" > "$WORK/pd.$lat" 2>"$WORK/pd.$lat.log"
   ./build/perimeter_defect "$lat" "$n" "$KMAX" --no-prune \
       > "$WORK/np.$lat" 2>"$WORK/np.$lat.log"
@@ -61,10 +61,10 @@ unp, _ = load(npf)
 
 bad = [key for key in set(want) | set(got) if want.get(key, 0) != got.get(key, 0)]
 if bad:
-    print(f"  A FAIL {lat}: {len(bad)} cells differ from g2, e.g. "
+    print(f"  A FAIL {lat}: {len(bad)} cells differ from redelmeier, e.g. "
           f"{[(k, want.get(k,0), got.get(k,0)) for k in sorted(bad)[:5]]}")
     sys.exit(1)
-print(f"  A ok  {len(want)} (n,k) cells match g2 --siteperim")
+print(f"  A ok  {len(want)} (n,k) cells match redelmeier --siteperim")
 
 bad = [key for key in set(unp) | set(got) if unp.get(key, 0) != got.get(key, 0)]
 if bad:

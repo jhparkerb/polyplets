@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Parallel M(n) = max enclosed empty area over all fixed n-cell polyplets.
 
-Fans `build/g2 square8 N --maxhole` across K workers using the enumerator's own
+Fans `build/redelmeier square8 N --maxhole` across K workers using the enumerator's own
 --split subtree partition, then combines the per-worker outputs by elementwise
 MAX (max combines that way -- counts would sum). This supersedes the slow,
 RAM-heavy pure-Python amax_brute.py (deleted): the C++ Redelmeier+flood enumerator
@@ -28,7 +28,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-G2 = os.path.join(ROOT, "build", "g2")
+REDELMEIER = os.path.join(ROOT, "build", "redelmeier")
 KNOWN = [0, 0, 0, 1, 1, 2, 3, 5, 6]            # M(1..9), exact
 
 sys.path.insert(0, ROOT)
@@ -70,7 +70,7 @@ def main():
     # launch only the un-banked workers concurrently (one core each; caller nices us)
     procs = {}
     for idx in todo:
-        cmd = [G2, "square8", str(n), flag]
+        cmd = [REDELMEIER, "square8", str(n), flag]
         if k > 1:
             cmd += ["--split", str(s), str(k), str(idx)]
         procs[idx] = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
@@ -109,7 +109,7 @@ def main():
         f.write(obs.file_header("maxhole_split", job, __file__))
         f.write(f"# M(n) = max enclosed empty area over fixed n-cell polyplets "
                 f"({conv} convention).\n")
-        f.write(f"# build/g2 square8 N --maxhole{'8' if bg8 else ''}, "
+        f.write(f"# build/redelmeier square8 N --maxhole{'8' if bg8 else ''}, "
                 f"{k}-way --split (S={s}), combined by elementwise max.\n")
         f.write(body + "\n")
     print(f"\n-> wrote {out_path}", file=sys.stderr)
