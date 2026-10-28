@@ -626,9 +626,8 @@ func RAMAdvisory(ram uint64) string {
 }
 
 // resultPipelineMaxN is the largest maxn the Go result pipeline can hold
-// exactly. BUGS-OF-SHAME A2 widened accounting/triangle/checkpoint/known/
-// combine from uint64 to big.Int, so the Go side itself is now unbounded; the
-// real remaining ceiling is the widest counter available (u128, exact to
+// exactly. Accounting, triangle, checkpoint, known values and combine all
+// hold big.Int, so the Go side itself is unbounded; the real ceiling is the widest counter available (u128, exact to
 // u128ExactMaxN), not a Go-side type limit.
 const resultPipelineMaxN = u128ExactMaxN
 
@@ -733,7 +732,7 @@ func loadKeyBounds(paths []string, keyLen int) []keyBounds {
 // overlaps the unit range [loHex, hiHex) ("" = open end). The writer stamps
 // the REQUESTED range, so every record in a file lies inside its stamp; a
 // file whose stamp misses the unit range cannot contribute a record and is
-// safely dropped (Fan-In Tax, docs/engine-record.md). Unstamped files are
+// safely dropped. Unstamped files are
 // always kept. If nothing overlaps (a steal-child remnant can shrink past
 // every file), the FULL list is returned: the unit then range-filters to an
 // empty output, byte-identical to pre-prune behavior.
@@ -770,7 +769,7 @@ func sigLE(a, b []byte) bool {
 // mergeRangeCount caps a round's merge fan-out so each range carries at
 // least minPerRange records, mirroring mapPhase's minPerUnit cap: a tiny
 // stage table must not be cut into cores*mult ranges each paying the full
-// per-range open-every-input cost (Fan-In Tax's merge half).
+// per-range open-every-input cost.
 func mergeRangeCount(base int, totalIn uint64, nOuts int) int {
 	const minPerRange = 2048
 	n := base

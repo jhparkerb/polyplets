@@ -1128,10 +1128,8 @@ type runningUnit struct {
 // ~64K — a ~9000x miss. Once processed exceeds a too-low estTotal, clamping
 // to 0 makes such a unit look FINISHED and permanently invisible to the
 // stealer for the rest of its run, even with millions of records left — the
-// real reason zero steals fired on a real H17/H18-shaped column despite an
-// obvious, massive, wall-clock-dominating imbalance (not the record-vs-wall-
-// time floor distinction the earlier version of this fix targeted, which was
-// real but not what was actually starving this run). Falling back to `p`
+// reason zero steals fired on a real H17/H18-shaped column despite an
+// obvious, wall-clock-dominating imbalance. Falling back to `p`
 // itself once the estimate is exceeded keeps the unit visible with a
 // remaining estimate that tracks how long it's already run (so its implied
 // stealScore keeps growing the longer it actually goes), instead of
@@ -1148,7 +1146,7 @@ func (r *runningUnit) remaining() uint64 {
 	// overshoots its rough average estimate by a few percent (real per-unit
 	// sizes vary around the mean), and that shouldn't spuriously flag every
 	// normal unit's final instant as steal-worthy. Below 2x, treat it as
-	// genuinely near-done (the pre-fix behavior).
+	// genuinely near-done.
 	if p < 2*r.u.estTotal {
 		return 0
 	}
@@ -1163,7 +1161,7 @@ const indexStride = 64
 // progress, not already stopped/un-splittable, and at least 2 index strides of
 // records remaining so the .idx can actually cut the remnant (without this
 // clause the stealer stops a victim it then cannot split, paying the
-// stop+respawn overhead for zero fan-out — Stop-Then-Shrug). Above that floor,
+// stop+respawn overhead for zero fan-out). Above that floor,
 // eligibility is granted by EITHER of two signals:
 //
 //   - the fast path: remaining RECORDS alone exceed grainRecs (the common
@@ -1177,7 +1175,7 @@ const indexStride = 64
 //
 // grainSeconds<=0 (no usable pool-wide reference rate yet, e.g. column just
 // started) disables the slow path, NOT the whole check — falls back to
-// record-only, same as before this fix.
+// record-only.
 func stealEligible(r *runningUnit, grainRecs uint64, grainSeconds float64, now time.Time) bool {
 	if r.stopped || r.u.noSteal || r.processed.Load() == 0 {
 		return false
@@ -1291,9 +1289,8 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // output.
 //
 // TODO(scheduler-unification): mapPhase and mergePhase's queue+pickVictim+
-// thief-goroutine scheduler bodies are ~90% structurally identical (a
-// /simplify pass on the merge-steal work found this independently from 3 of
-// 4 review angles) -- differing only in per-unit dispatch (MapArgs/RunMap
+// thief-goroutine scheduler bodies are ~90% structurally identical,
+// differing only in per-unit dispatch (MapArgs/RunMap
 // vs MergeArgs/RunMerge), the source-file list used for split math
 // (frontier vs mapOuts), and a few map-only extras (H==maxn short-circuit,
 // unitMult/minPerUnit capping, triContribs, the seed/finalize
@@ -1350,7 +1347,7 @@ func mapPhase(
 	los, his := cutsToBounds(cuts)
 	n0 := len(los)
 
-	// Per-unit input pruning (Fan-In Tax, docs/engine-record.md): frontier
+	// Per-unit input pruning (docs/engine-record.md): frontier
 	// files are disjoint stamped ranges, so a unit needs only the ~1-2 files
 	// overlapping its [lo,hi) -- not all of them. One header parse per file
 	// here replaces (units x files) header+idx+buffer setups in the workers,

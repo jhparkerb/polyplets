@@ -241,9 +241,7 @@ func (p *WorkerPool) RunMerge(a MergeArgs, onProgress func(uint64), stop <-chan 
 // total shutdown time the SUM of every process's exit latency instead of
 // the max -- real, since Close() runs synchronously before the run's wall
 // clock is reported (orchestrate/main.go), directly padding the measured
-// number on every --persistent-workers run (found via /simplify, not a
-// hypothetical: this is a utilization-sensitive branch where that padding
-// mattered to what was being measured).
+// number on every --persistent-workers run.
 func (p *WorkerPool) Close() {
 	slots := make([]*slot, p.size)
 	for i := range slots {
