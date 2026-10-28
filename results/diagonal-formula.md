@@ -5,7 +5,7 @@ cells whose bounding box has height exactly H. For fixed k the diagonal
 T(n, n−k) is a polynomial in n times a power of 3: shape, range and
 integrality are theorems (`docs/proofs/diagonal-law.md`, Lean-checked), the
 polynomials are the coefficients of one exponential in n
-(`docs/proofs/grand-form.md`), and the same holds on every row-local lattice
+(`docs/proofs/product-form.md`), and the same holds on every row-local lattice
 (`docs/proofs/universal-diagonal-law.md`). This file records the mechanism
 behind those theorems (the row model and its cluster weights, exact order by
 order, carrying the mod-3 structure), the measured facts about the
@@ -26,7 +26,7 @@ polynomial P_k of degree k with
     T(n, n−k) = P_k(n) · 3^(n−1−3k)   for all n ≥ 2k+1,
 
 and P_k takes integer values at every integer. [n^k]P_k = 25^k/k!
-(`docs/proofs/grand-form.md`, Corollary 2). The formula fails at n = 2k for
+(`docs/proofs/product-form.md`, Corollary 2). The formula fails at n = 2k for
 every k ≥ 1 (`results/below-onset.md`).
 
 | k | closed form | onset |
@@ -56,7 +56,7 @@ predicted
 
 which the enumeration then confirmed exactly
 (`results/ns_a40/perheight/h16.out`, row n = 24). Above k = 8 each P_k is
-fixed from two values in range by the grand form
+fixed from two values in range by the product form
 (`scripts/derive_pk_fast.py`); k ≤ 18 is verified on further entries,
 k = 19 has none withheld and certifies nothing.
 
@@ -168,11 +168,11 @@ per-row log is 347/54 both ways). With μ = 3H(u), u = yμ/27:
     H(u) = 1 + Σ_c Ŵ_c u^(k_c) H^(−(k_c+ℓ_c)),   Ŵ_c = W_c · 3^(2k_c−ℓ_c−1).
 
 H(u) = 1 + 25u + 208u² + 1483u³ + 20688u⁴ + 130208u⁵ + … is the series the
-grand form calls e^B. The k = 2 numbers 441 = 49·9 and 1017 = 339·3 are the
+product form calls e^B. The k = 2 numbers 441 = 49·9 and 1017 = 339·3 are the
 natural weights Ŵ. Exact through u³: h_2 = −2·25² + 441 + 1017 =
 208; h_3 = 1483 from Ŵ = 6561, 25110, 25110, 43002 (`check_master()`). With
 all 31 types of surplus ≤ 5 the equation returns H = [1, 25, 208, 1483,
-20688, 130208] (`check_grand_form()` in `experiments/cluster_weight_dp.py`).
+20688, 130208] (`check_product_form()` in `experiments/cluster_weight_dp.py`).
 Two pathologies: fixed-point iteration of μ in exact rationals blows up on
 pre-convergence garbage, so solve order by order; the u-series H is not the
 y-series μ, and mixing them breaks the residue formula at order 1.
@@ -243,7 +243,7 @@ drifting toward about 24); the general proof came by another route
 (`results/below-onset.md`).
 
 Grade: chain identity exact; master equation and G by the Lagrange step of
-`docs/proofs/grand-form.md`; each mod-3^j statement rests on the finitely
+`docs/proofs/product-form.md`; each mod-3^j statement rests on the finitely
 many weights entering that modulus (five integers mod 27).
 
 ## Holes
@@ -571,7 +571,7 @@ Verdict: μ_2 ≈ 41.8–42.5 by fitting, rising with the window (41.76, 41.90,
 θ is no small non-negative integer, so the slice is not a low-degree
 polynomial times an exponential.
 
-**Growth constants from the grand form** (`experiments/grand_form_saddle.py`).
+**Growth constants from the product form** (`experiments/product_form_saddle.py`).
 Σ_k P_k(n) y^k = exp(A(y) + nB(y)); a_j, b_j extracted for j = 1..19 from the
 engine's P_1..P_19 come out linear in n, b_1 = 25, a_1 = −45, an independent
 test only for k ≤ 8 (partly 9, 10), since `scripts/derive_pk_fast.py` builds
@@ -595,7 +595,7 @@ elimination (`experiments/slope2_law_vs_truth.py`):
 
 | route | μ_2 |
 |---|---|
-| grand-form saddle | 42.39460 |
+| product-form saddle | 42.39460 |
 | ratios, order 2 (H = 18..20) | 42.39549 |
 | ratios, order 3 (H = 17..20) | 42.39426 |
 | ratios, order 4 (H = 16..20) | 42.39455 |
@@ -605,7 +605,7 @@ parts in 100,000. The raw ratio at H = 20 is 41.445, which is why the fits
 drifted up.
 Higher slopes (b_19 y*^19 reaches 1.1·10^(−3) at s = 5):
 
-| s | grand form | last measured ratio | Richardson | points |
+| s | product form | last measured ratio | Richardson | points |
 |---|---|---|---|---|
 | 2 | 42.3946 | 41.445 (H = 20) | 42.278 | 19 |
 | 3 | 330.83 | 327.41 (H = 13) | 318.45 | 12 |
@@ -617,7 +617,7 @@ saddle cannot reach past P_19; the b_j alternate irregularly and |b_j|^(1/j)
 still climbs at j = 19 (20.83), so the radius of B is unresolved and the
 saddle is safe only because y* is an order of magnitude inside it.
 
-**λ from the production constants** (`experiments/lambda_from_grand_form.py`).
+**λ from the production constants** (`experiments/lambda_from_product_form.py`).
 A ray n = sH contributes μ_s^(n/s), so λ = sup_s μ_s^(1/s), attained as
 s → ∞ since the typical box has H ~ c√n; then y_c B′(y_c) = 1 and
 
@@ -632,7 +632,7 @@ with no enumeration count in it.
 The direct s → ∞ form solves for 7 of J = 10..19 (J = 13, 15, 18 have no
 solution, the truncated series not being monotone there): 7.065, 7.015,
 7.134, 7.147, 7.079, 7.127, 7.118, midrange 7.081, spread ±0.066. So
-λ = 7.08 ± 0.07 from the grand form alone, against 7.110(1) from series
+λ = 7.08 ± 0.07 from the product form alone, against 7.110(1) from series
 analysis (`results/growth-constant.md`); the interval is the result. Two
 caveats: |b_j|^(1/j) puts the radius of B near 0.048 while y_c ≈ 0.0373 and
 the last term is 8·10^(−3); and the limit needs the formula to track the
@@ -689,7 +689,7 @@ symmetry-refined triangles, perimeter- or component-refined statistics.
 All scripts run as `python3 <path>` with no arguments unless shown.
 
     experiments/defect_gas.py, cluster_weight_dp.py [pair A B], spine_deeper.py, holefree_gas.py, hole_strata_gas.py
-    experiments/diagonal_law_proof_check.py, grand_form_check.py, Pk_explicit.py; scripts/derive_pk_fast.py, verify_diagonal_pins.py
+    experiments/diagonal_law_proof_check.py, product_form_check.py, Pk_explicit.py; scripts/derive_pk_fast.py, verify_diagonal_pins.py
     experiments/hex_gas.py, hex_diag_deep.py, polyiamond_diagonal.py, polyiamond_fibre_check.py
     experiments/universal_law_check.py, gas_cumulants.py, cross_lattice.py
     experiments/production_matrix_probe.py, band_constants_3adic.py, Pk_denominator_check.py, Pk_newton_3adic.py
@@ -697,5 +697,5 @@ All scripts run as `python3 <path>` with no arguments unless shown.
     experiments/gf_head_check.py; gf_h11_validate.py [H] [--perturb DEG]; mu_H_from_atoms.py; ./build/strip_mu 10 11
     git show 91bdcdc^:gf/modp_recover.py > experiments/modp_recover.py && POLY_MAX_WORKERS=10 python3 experiments/modp_recover.py 11 11 194 <outfile>
     experiments/slope_slices.py, slope_onset.py, pfinite_slices.py, slope2_ansatz.py
-    experiments/grand_form_saddle.py, slope2_law_vs_truth.py, lambda_from_grand_form.py
+    experiments/product_form_saddle.py, slope2_law_vs_truth.py, lambda_from_product_form.py
     experiments/triangle_combinations.py, alt_sign_runs.py, parity_amplitude.py

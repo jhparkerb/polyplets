@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Can lambda be read off the grand form?
+"""Can lambda be read off the product form?
 
-experiments/grand_form_saddle.py gives, for the ray n = sH (kappa = s-1),
+experiments/product_form_saddle.py gives, for the ray n = sH (kappa = s-1),
    ln mu_s = (1-2 kappa) ln3 + (1+kappa) B(y*) - kappa ln y*,   y* B'(y*) = kappa/(1+kappa).
 A ray contributes exp(n * ln(mu_s)/s) animals, so lambda = sup_s mu_s^(1/s).
 As s -> infinity the saddle condition tends to y_c B'(y_c) = 1 and
@@ -15,7 +15,7 @@ import math, os, re, sys
 from fractions import Fraction as F
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT,"experiments"))
-from grand_form_saddle import read_pk, ymul, padd, pmul, pscale, ptrim
+from product_form_saddle import read_pk, ymul, padd, pmul, pscale, ptrim
 
 KMAX = 19
 P = read_pk()

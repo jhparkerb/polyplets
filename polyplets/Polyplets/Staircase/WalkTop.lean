@@ -9,7 +9,7 @@ import Polyplets.King
 /-!
 # WalkTop: the staircase for `d` (the core theorem)
 
-The mathematical heart of the staircase (`docs/proofs/grand-form.md`): one
+The mathematical heart of the staircase (`docs/proofs/product-form.md`): one
 transfer step multiplies the walk-top diagonal family `d k H` by the fixed
 multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 

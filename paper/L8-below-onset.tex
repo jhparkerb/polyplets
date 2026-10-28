@@ -22,7 +22,7 @@
 %
 %  Source material, all in this repository:
 %    docs/proofs/diagonal-law.md              the law, its onset, its proof
-%    docs/proofs/grand-form.md                two constants per level, Lean
+%    docs/proofs/product-form.md                two constants per level, Lean
 %    results/below-onset.md      how the law fails below onset
 %    results/below-onset.md              rate 9, exponent j-3/2, amplitude
 %    results/below-onset.md    the quartic, and every j=1 constant
@@ -68,7 +68,7 @@ own; the construction of \S\ref{sec:tower} was searched 2026-08-23 and
 \emph{The diagonal formula itself, its degree, its onset and its sharpness} ---
 proved elsewhere (companion paper L1), used here as stated.
 \emph{That a level carries exactly two new constants} (\S\ref{sec:frame}) ---
-\textbf{proved}, and formalized: \repo{docs/proofs/grand-form.md} is
+\textbf{proved}, and formalized: \repo{docs/proofs/product-form.md} is
 Lean-complete against the standard axioms.
 \emph{The exact frame of \S\ref{sec:frame}} --- proved: the entire below-onset
 content of column $k$ is the $k+1$ coefficients of one correction polynomial,
@@ -280,8 +280,8 @@ exist.
 \subsection{Two constants per level, and one equation per short entry}
 \label{sec:pin}
 
-\paragraph{Two constants.} The grand form
-(\repo{docs/proofs/grand-form.md}) states that the diagonal generating function
+\paragraph{Two constants.} The product form
+(\repo{docs/proofs/product-form.md}) states that the diagonal generating function
 factorizes as $F(n,u) = C(u)\cdot H(u)^n$, from which level $k$ carries exactly
 two new constants over the levels below it. Any two independent linear
 equations in those constants therefore determine $P_k$ completely.
@@ -579,7 +579,7 @@ its source, and its most useful finding is this:
 \begin{quote}
 Two routes through the formulas agreeing is \emph{not} two confirmations.
 Every formula statement about $T(40,19)$ contains $D_3(21)$, and the two
-routes share the grand form and most of the defect values. Only agreement
+routes share the product form and most of the defect values. Only agreement
 against an enumeration crosses assumption families.
 \end{quote}
 
@@ -762,7 +762,7 @@ order. Two things differ here.
 comes from a bounded-excess family enumeration that never reads the triangle
 and never reads $P_k$ (\S\ref{sec:tower}); it is not fitted to the object it
 corrects, and it carries no ansatz.
-\item The number of unknowns per level is proved, not assumed. The grand form
+\item The number of unknowns per level is proved, not assumed. The product form
 gives exactly two constants per level, so ``two equations suffice'' is a
 theorem rather than a working hypothesis.
 \end{itemize}

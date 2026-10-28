@@ -45,7 +45,7 @@ an exact source recomputed the cell by other means; F means the cell's value
 came from a closed form whose other cells were checked against real sweeps, so
 the formula is corroborated and this cell is not; U means the cell is
 reproduced by the diagonal tower refitted to the recount's cells, a
-formula-level check that shares the depth tables D_j and the grand form with
+formula-level check that shares the depth tables D_j and the product form with
 the wired route, so it is not an exact recount either; C is a congruence,
 which catches an error only if it is nonzero mod 4.  U is derived by running
 the tower, not by a rule, and is claimed only at the recount's measured reach.

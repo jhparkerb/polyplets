@@ -1,7 +1,7 @@
 # Below the onset: the diagonal formula's error term
 
 The diagonal formula `T(n, n-k) = P_k(n)·3^(n-1-3k)` is a theorem for
-`n ≥ 2k+1` (`docs/proofs/diagonal-law.md`, `docs/proofs/grand-form.md`). The
+`n ≥ 2k+1` (`docs/proofs/diagonal-law.md`, `docs/proofs/product-form.md`). The
 line `n = 2k+1` is its **onset**, the first row at fixed `k` from which the
 formula holds. This file records what happens below it. Results and grades:
 a column's below-onset content is `k+1` integers (proved); the depth-1

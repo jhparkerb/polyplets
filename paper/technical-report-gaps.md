@@ -64,7 +64,7 @@ Open, in rough order of how much machinery the statement needs:
 - The bracket 6.543 ≤ λ ≤ 9.3154, both ends exact-arithmetic certificates
   (`results/growth-constant.md`, `docs/proofs/polyplet-upper-bound.md`).
 - The diagonal formula is proved, not fitted: the paper says "fitted"
-  (`docs/proofs/diagonal-law.md`, `docs/proofs/grand-form.md`). The author
+  (`docs/proofs/diagonal-law.md`, `docs/proofs/product-form.md`). The author
   will fix the wording by asking questions, not by taking wording.
 - The diagonal-mirror triangle: d(S,S+k) quasi-polynomial in S, period 2,
   conjectural (`results/symmetry-classes.md`).
@@ -120,7 +120,7 @@ not asserted by the text and is not required.
    Proved: `docs/proofs/diagonal-law.md` and Lean; not in the paper.
    Needs 2, 3.
 8. **Leading coefficient 25^k/k!**, so deg P_k = k exactly. Stated line 135.
-   Proved: `docs/proofs/grand-form.md`, taking 25 from item 6. Not in the
+   Proved: `docs/proofs/product-form.md`, taking 25 from item 6. Not in the
    paper. Needs 6, 7.
 9. **P_k pinned by rows 2k+1..3k.** With the leading coefficient fixed, k
    unknowns, k in-onset cells, nonsingular Vandermonde. Stated line 136.

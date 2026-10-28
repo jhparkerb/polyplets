@@ -122,7 +122,7 @@ m = 1:
 
 Let p be a prime dividing b, and let w = W_pair mod p, where W_pair is the
 total weight of the one-surplus single-row cluster (the pair-row). Then,
-mod p, the grand series H(u) of the law satisfies
+mod p, the series H(u) of the law satisfies
 
     H = 1 + w u H^{-2},  i.e.  H^3 = H^2 + w u  over F_p .
 
@@ -300,7 +300,7 @@ when w == 0) is exactly sharp, with the branch condition now closed-form:
 degenerate iff p = 2 and 4 | b (for interval D).
 
 **Degree sharpening.** deg q_k = k exactly, with leading
-coefficient [n^k]P_k = W_pair^k / k!: proved for king (grand-form
+coefficient [n^k]P_k = W_pair^k / k!: proved for king (product-form
 Corollary 2, Lean `IsDiagonalPoly.coeff_eq` in `LeadingCoeff.lean`; the
 argument is uniform in the weights
 with 25 -> W_pair, not written out for general b), and measured: k = 1 at

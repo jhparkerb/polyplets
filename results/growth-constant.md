@@ -754,9 +754,9 @@ exponent collapse against H/n^ν prefers ν_eff ≈ 0.71 at these n, so the
 shape statement is the robust one and the exponent is finite-size
 renormalized.
 
-**The tall flank is a large-deviation rate from the grand form
-(semi-analytic).** For H = (1−α)n with α < 1/2, the diagonal formula's grand
-form G(y) H(y)^n (`docs/proofs/grand-form.md`) gives by steepest descent
+**The tall flank is a large-deviation rate from the product form
+(semi-analytic).** For H = (1−α)n with α < 1/2, the diagonal formula's product
+form G(y) H(y)^n (`docs/proofs/product-form.md`) gives by steepest descent
 
 (1/n) ln T(n,(1−α)n) → ψ(α) = (1−3α) ln 3 + min_{y>0} [ln H(y) − α ln y],
 

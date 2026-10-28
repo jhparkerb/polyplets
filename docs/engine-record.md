@@ -1324,8 +1324,8 @@ entry.
 
 Level `k` of the diagonal formulas needs two entries at or above its onset, the
 two tallest entries on its diagonal; for `P_19` those were `T(39,20)` and
-`T(40,21)`, the latter being a(40)'s 36.4-hour phase C. The grand form
-(`docs/proofs/grand-form.md`, its content proved in Lean) makes each level carry
+`T(40,21)`, the latter being a(40)'s 36.4-hour phase C. The product form
+(`docs/proofs/product-form.md`, its content proved in Lean) makes each level carry
 exactly two new constants, so any two independent linear equations determine it,
 and the below-onset defect identity (`results/below-onset.md`) supplies such
 equations from entries `j` rows shorter than the onset, with the defect `D_j(k)`

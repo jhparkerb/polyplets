@@ -56,4 +56,4 @@ The coloring recount covers `h ≤ H` from below; the closed-form band covers `h
 
 ## Where this stops
 
-Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM in any memory layout tried (`results/second-sources.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/grand-form.md`) — is ten levels past the k ≤ 9 for which the constants have been computed from cluster weights.
+Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM in any memory layout tried (`results/second-sources.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/product-form.md`) — is ten levels past the k ≤ 9 for which the constants have been computed from cluster weights.

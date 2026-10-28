@@ -508,13 +508,13 @@ comes from the anti-spine half. The floor(k/2) reading predicted 183 and 1124
 at k = 3, 4 before S = 15 was computed, the degrees at k = 5, 6 before
 S = 16..19, and 51, 219, 1532 at k = 2, 3, 4 for S = 19, all exactly.
 
-### The grand form does not transfer
+### The product form does not transfer
 
-The grand form of the main triangle says T(H+k,H) = [y^k] C(y) mu(y)^H,
+The product form of the main triangle says T(H+k,H) = [y^k] C(y) mu(y)^H,
 equivalently that every cumulant of the level series is linear in the size
 parameter. For each parity class form A_S(y) = sum_k P_k(S) y^k and take the
 logarithm in Q[[y]] with coefficients polynomial in S
-(`experiments/dmirror_grand_form.py`):
+(`experiments/dmirror_product_form.py`):
 
 | | c_1 | c_2 | c_3 | c_4 | c_5 |
 |---|---|---|---|---|---|
@@ -526,7 +526,7 @@ pattern deg(c_j) = 2 floor(j/2) for j >= 2 is what a sum of exactly two
 exponential families produces. Controls: planted single-family data is
 reported linear, planted two-family data with different growth rates
 nonlinear, and the polynomials reproduce the leading coefficients 1/k!. So
-the summed family has no grand form, and level k does not carry two new
+the summed family has no product form, and level k does not carry two new
 constants over the levels below.
 
 The same test on each family (`experiments/dmirror_spine_cumulants.py` on the
@@ -539,8 +539,8 @@ enumerator's output, the same two controls):
 
 Both families are linear at c_2, where the sum is not; d_anti fails at c_3,
 which needs level 3 on both parities (S = 16 even, S = 17 odd). So the
-two-spine sum is not the whole obstruction: d_main is of grand-form shape as
-far as five levels reach, and whatever breaks the grand form lives in the
+two-spine sum is not the whole obstruction: d_main is of product-form shape as
+far as five levels reach, and whatever breaks the product form lives in the
 anti-diagonal family, whose cells are only diagonally adjacent and have
 slack. With the split, four constants per level fit inside the 7 even and 6
 odd entries at k = 6, so what blocks a test of T4 there is only that the
@@ -608,7 +608,7 @@ in D(33):
   k = 6; the test needs d(27,33) and d(29,35). The degree at k = 6 is itself
   unconfirmed.
 - d_main's degree floor(k/2), parity independence and linear cumulants
-  through c_5 are measured, not proved. What breaks the grand form in d_anti
+  through c_5 are measured, not proved. What breaks the product form in d_anti
   at c_3 is open.
 - The coefficients of P_k are not derived; a segment grammar over spine runs,
   anti-diagonal excursions, connectors and defects would derive them.
@@ -635,7 +635,7 @@ in D(33):
     python3 scripts/dmirror_diagonals.py
     python3 scripts/dmirror_pk_exp.py 6
     python3 experiments/dmirror_onset_probe.py
-    python3 experiments/dmirror_grand_form.py
+    python3 experiments/dmirror_product_form.py
     python3 experiments/dm_sym_enum.py
     python3 experiments/dm_phase_census.py
     build/dmirror_spine --gate

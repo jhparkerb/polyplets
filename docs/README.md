@@ -9,7 +9,7 @@ how the computation works, and the notes used to maintain the repository.
 | file | what |
 |---|---|
 | `docs/proofs/diagonal-law.md` | the closed form for the diagonals of the height triangle: shape, onset and integrality |
-| `docs/proofs/grand-form.md` | the exponential form the diagonal polynomials share, and what determines each one |
+| `docs/proofs/product-form.md` | the exponential form the diagonal polynomials share, and what determines each one |
 | `docs/proofs/universal-diagonal-law.md` | the same argument for any lattice whose neighbors lie in adjacent rows |
 | `docs/proofs/dm-diagonal-law.md` | the triangle of diagonally symmetric polyplets |
 | `docs/proofs/T-n-nm1.md`, `docs/proofs/T-n-nm2-and-general.md` | the first two diagonals by hand, and the general shape |

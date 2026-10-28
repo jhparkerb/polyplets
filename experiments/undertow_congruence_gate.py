@@ -49,7 +49,7 @@ from fractions import Fraction as F
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from undertow_pin import all_pairs, grand_form, peval, pow3      # noqa: E402
+from undertow_pin import all_pairs, product_form, peval, pow3      # noqa: E402
 from undertow_a41 import build                                   # noqa: E402
 
 JMAX = 4
@@ -68,7 +68,7 @@ def pin_cells(tri, jmax=JMAX, hmax=HMAX_PIN):
 
 def run_gate(ab, Dj, tri, quiet=False):
     """Returns (n_banked, n_free); raises AssertionError on any violation."""
-    E = grand_form(ab, KMAX)
+    E = product_form(ab, KMAX)
     used = pin_cells(tri)
     n_banked = n_free = 0
     for k in range(1, KMAX + 1):

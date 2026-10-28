@@ -45,8 +45,8 @@ The **diagonal formula** for level `k` is `T(n, n−k) = P_k(n) · 3^(n−1−3k
 with `P_k` a polynomial of degree `k` and leading coefficient `25^k / k!`. It
 holds for `n ≥ 2k+1`, and `n = 2k+1` is the **onset** of level `k`. An entry
 with `n ≤ 2k` is below the onset; its **depth** is `j = 2k+1−n` and its
-**defect** `D_j(k)` is the entry minus the formula value. The **grand form**
-`F(n,u) = C(u) · H(u)^n` (`docs/proofs/grand-form.md`) makes the cumulants
+**defect** `D_j(k)` is the entry minus the formula value. The **product form**
+`F(n,u) = C(u) · H(u)^n` (`docs/proofs/product-form.md`) makes the cumulants
 `c_k(n) = A_k n + B_k` linear in `n`. The engine's coefficient table
 `diagCoeffTable` holds `P_1 … P_19`, fitted from enumerated entries; a height
 is *injected* when its entries come from that table instead of a run.
@@ -912,7 +912,7 @@ which covers depth 1 in place of 5.1.
 ### 5.1 The discarded terms
 
 With `μ := 1/z*` and `G := E_b · E_t · u^(−1) = Σ_i g_i(y) z^i` in the
-grand-form proof, `[z^H](F − P) = μ^(H+1) (Ĉ − ρ_H)`, `ρ_H := Σ_{i>H} g_i z*^i`,
+product-form proof, `[z^H](F − P) = μ^(H+1) (Ĉ − ρ_H)`, `ρ_H := Σ_{i>H} g_i z*^i`,
 so exactly
 
     T(H+k, H) = [y^k](C · μ^H)  −  [y^k](μ^(H+1) ρ_H)  +  [y^k][z^H] P
@@ -934,7 +934,7 @@ predicting `θ_j − θ_1 = j − 1`, consistent with the measured `θ_j = j −
 at depths 1..7 (`results/below-onset.md`), but a retrodiction resting on an
 asserted step. The cluster weights are Lean-verified only to `j ≤ 3`, which
 cannot give an asymptotic in `i`. Untested route: `P_1 … P_19` determine
-`a_j, b_j` to `j = 19` (`experiments/grand_form_saddle.py`), and if the
+`a_j, b_j` to `j = 19` (`experiments/product_form_saddle.py`), and if the
 proof's Lagrange map inverts, `μ(y)` and `z*(y)` follow to order 19 without
 new weights, leaving the edge series `E_b, E_t` unrecovered.
 
@@ -1037,7 +1037,7 @@ number to the fraction. The four-row clusters cost: `(2,2,2,2) = 68314` took
 between `k = 5, 6` and `k = 16, 17`; no explanation is offered. `c_k` is
 generically of degree `k` in `n`, so linearity requires `k − 1` vanishing
 coefficients at each order, 171 in all, and all 171 hold: a consistency
-check between extensivity (a consequence of the proved grand form) and a
+check between extensivity (a consequence of the proved product form) and a
 table fitted from enumerated entries. Adding 1 to `P_19`'s `n²` coefficient
 breaks linearity; a perturbation of a `P_k`'s constant or `n¹` term never
 can, so the check fixes the `n² … n^k` coefficients of each `P_k` and says

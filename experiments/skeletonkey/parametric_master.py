@@ -24,7 +24,7 @@ which is the king form with 3 -> b throughout, and the cumulant slopes are
 
     A_k = [u^k] log H       (c_k(n) = A_k n + B_k)
 
-because the grand form gives `F(n,u) = C(u) * H(u)^n`, so `log F` is linear in
+because the product form gives `F(n,u) = C(u) * H(u)^n`, so `log F` is linear in
 n with slope `log H`.
 
 This probe runs that on three lattices and checks A_k against the values

@@ -9,7 +9,7 @@ package orchestrator
 // below: T(37,20) from the a(38) run's real H20 sweep, and T(38,21) from the
 // a(40) run's real H21 sweep — neither in the fit, both matching exactly.
 // P_17's certification also rests on
-// the proven grand form (exp identity pins the whole polynomial given a17,b17;
+// the proven product form (exp identity pins the whole polynomial given a17,b17;
 // leading coeff 25^17/17! and k!-integrality both emerged, not assumed).
 // The out-of-onset point T(34,17)
 // (n=2k=34) does NOT lie on the polynomial — checked during derivation,

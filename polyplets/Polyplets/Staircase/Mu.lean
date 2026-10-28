@@ -11,12 +11,12 @@ import Polyplets.Weights
 # Mu: the root series `ν` and the multiplier `μ`
 
 The coefficient-form root/multiplier of the staircase
-(`docs/proofs/grand-form.md`). This layer sits on the convolution toolkit
+(`docs/proofs/product-form.md`). This layer sits on the convolution toolkit
 of `Series.lean` and the cluster weights of `Weights.lean`.
 
 * `vGuard ℓ` — the interior weights `V ℓ ·` as a `y`-sequence, guarded to vanish
   below index `ℓ` (and identically for `ℓ = 0`).
-* `nu` — the root series `z*` of `docs/proofs/grand-form.md`: `ν₀ = 1/3` and,
+* `nu` — the root series `z*` of `docs/proofs/product-form.md`: `ν₀ = 1/3` and,
   for `m ≥ 1`, the unique coefficient-by-coefficient solution of the root
   equation `eps = 3·ν + Σ_ℓ v_ℓ ∗ ν^{∗(ℓ+1)}`. A prefix-guarded well-founded
   recursion (the RHS reads `ν` only strictly below the index being defined).
@@ -54,7 +54,7 @@ lemma vGuard_eq {ℓ j : ℕ} (hle : ℓ ≤ j) (h1 : 1 ≤ ℓ) : vGuard ℓ j 
 /-! ## The root series `ν` -/
 
 set_option linter.unusedVariables false in
-/-- The root series `ν` (= `z*` of `docs/proofs/grand-form.md`): `ν₀ = 1/3`, and
+/-- The root series `ν` (= `z*` of `docs/proofs/product-form.md`): `ν₀ = 1/3`, and
 for `m ≥ 1` the unique solution of the root equation
 `eps = 3·ν + Σ_ℓ v_ℓ ∗ ν^{∗(ℓ+1)}` coefficient-by-coefficient. The recursion is
 well-founded: the RHS reads `ν s` only for `s ≤ m < m + 1` (the dependent guard

@@ -8,7 +8,7 @@ import Mathlib.RingTheory.PowerSeries.Basic
 /-!
 # Series: sequence convolution, as power-series coefficients
 
-The algebra layer under the staircase (`docs/proofs/grand-form.md`)
+The algebra layer under the staircase (`docs/proofs/product-form.md`)
 works with plain sequences `ℕ → ℚ`, so that `Mu.lean` can define the root
 series `ν` by a well-founded recursion on the index and pattern-match on the
 underlying functions.

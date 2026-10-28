@@ -11,7 +11,7 @@ Three things checked, all exact where exactness is possible:
   A. law vs truth on n = 2H for H = 2..19 (P_k wired to k=19): how many digits,
      and does ln(defect/T) fall linearly in H with the predicted slope?
   B. the law's OWN growth ratios on the slope-2 line, against the saddle-point
-     prediction mu_2 = 42.3946 from experiments/grand_form_saddle.py.
+     prediction mu_2 = 42.3946 from experiments/product_form_saddle.py.
   C. the truth's growth ratios, same line -- must track (B) to the precision of
      (A), which is the whole point: the measured slice growth and the analytic
      saddle are the same constant.

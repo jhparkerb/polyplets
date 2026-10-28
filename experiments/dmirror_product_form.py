@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Does a grand form hold for the dmirror family? -- docs/time-at-the-bar.md (deleted) A1.3
+"""Does a product form hold for the dmirror family? -- docs/time-at-the-bar.md (deleted) A1.3
 step 1, which the item says is the step that decides it.
 
-THE KING STATEMENT (docs/proofs/grand-form.md, a theorem, Lean-complete):
+THE KING STATEMENT (docs/proofs/product-form.md, a theorem, Lean-complete):
 
     T(H+k, H) = [y^k]( C(y) * mu(y)^H )
 
@@ -20,7 +20,7 @@ cannot be within k defects of both spines, since the two spines disagree in
 
     d(S, S+k) = d_main(S, S+k) + d_anti(S, S+k)     (disjoint, S large)
 
-and the grand form is a statement about a SINGLE exponential.  log of a sum of
+and the product form is a statement about a SINGLE exponential.  log of a sum of
 two exponentials is not linear in S unless the two are proportional.  This is
 not speculation: results/symmetry-classes.md already measured it -- "The
 cumulants u_j, v_j of the exp fit are messy -- expected, since they are the log
@@ -39,7 +39,7 @@ it is the same mechanism as the through-cell / between-cell axis split that
 results/symmetry-classes.md found in A030234.
 
 THE REPAIR THIS TESTS.  If the parity split already separates the two families'
-contributions cleanly, then EACH PARITY CLASS ON ITS OWN may satisfy a grand
+contributions cleanly, then EACH PARITY CLASS ON ITS OWN may satisfy a product
 form with two new constants per level.  That is directly checkable from the
 quasi-polynomials: form A^p_S(y) = sum_k P^p_k(S) y^k per parity p, take
 log in Q[[y]] with coefficients polynomial in S, and ask whether every cumulant
@@ -47,7 +47,7 @@ is linear in S.
 
 THE PAYOFF IF IT HOLDS.  results/symmetry-classes.md showed T4 cannot be
 tested at k = 6 because pinning a degree-6 polynomial needs 7 points and the
-odd class has 6.  Under a per-parity grand form, level 6 carries only TWO new
+odd class has 6.  Under a per-parity product form, level 6 carries only TWO new
 constants given levels below, so it needs 2 points, not 7 -- and there are 7
 even and 6 odd.  k = 6 becomes reachable with 5 and 4 holdouts, and T4 gets its
 first new test since 2026-07-31.
@@ -61,7 +61,7 @@ CONTROLS.
   (c) The P^p_k used must reproduce the banked leading coefficients 1/k!, the
       same anchor results/symmetry-classes.md uses.
 
-Usage: python3 experiments/dmirror_grand_form.py
+Usage: python3 experiments/dmirror_product_form.py
 
 Target machine: ayr or dalby.  Cost: instant, exact rational arithmetic.
 """
@@ -158,8 +158,8 @@ def report(name, polys, kmax):
         if d > 1:
             linear = False
         print("     c_%d(S) degree %d   %s" % (j, d, "linear" if d <= 1 else "NOT linear"))
-    print("     => %s" % ("GRAND FORM SHAPE" if linear
-                          else "no grand form: a cumulant is nonlinear in S"))
+    print("     => %s" % ("PRODUCT FORM SHAPE" if linear
+                          else "no product form: a cumulant is nonlinear in S"))
     return linear
 
 
@@ -216,7 +216,7 @@ def controls(kmax):
 
 def main():
     kmax = KMAX
-    print("Does a grand form hold for the dmirror family?  Controls first.\n")
+    print("Does a product form hold for the dmirror family?  Controls first.\n")
     if not controls(kmax):
         print("\nCONTROLS FAILED -- nothing below is worth reading")
         return 1
@@ -249,7 +249,7 @@ def main():
 
     print("\nVERDICT")
     if lin_even and lin_odd:
-        print("  Each parity class has the grand-form shape: every cumulant is")
+        print("  Each parity class has the product-form shape: every cumulant is")
         print("  linear in S, so level k carries TWO new constants per class.")
         print("  Consequence: P_6 needs 2 points per class, not 7. The banked")
         print("  data has 7 even and 6 odd above the onset, so T4 at k = 6")

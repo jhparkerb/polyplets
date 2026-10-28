@@ -6,7 +6,7 @@ above-onset anchors, T(2k+1, k+1) and T(2k+2, k+2) -- the two TALLEST cells on
 its diagonal.  That is what makes row 40 expensive: level 19's anchors are
 T(39,20) and T(40,21), and T(40,21) is the 36-hour cell.
 
-But the grand form (docs/proofs/grand-form.md, Lean-complete) says a level
+But the product form (docs/proofs/product-form.md, Lean-complete) says a level
 carries exactly two new constants,
 
     P_k(n) = [y^k] exp( sum_j (a_j + b_j n) y^j ),
@@ -125,19 +125,19 @@ def wired_poly(P, k):
     return [F(c, den) for c in reversed(coeffs)]
 
 
-# ------------------------------------------------------------------ grand form
+# ------------------------------------------------------------------ product form
 # exp(sum_j (a_j + b_j n) y^j) truncated at y^K; coefficient of y^k is a
 # polynomial in n.  Computed by the standard exp-of-series recurrence
 #   k * E_k = sum_{j=1..k} j * L_j * E_{k-j},   E_0 = 1.
 
-_GRAND = {}   # (ab, K) -> E; pin_level asks for the same E once per depth pair
+_PRODUCT = {}   # (ab, K) -> E; pin_level asks for the same E once per depth pair
 
 
-def grand_form(ab, K):
+def product_form(ab, K):
     """ab: dict j -> (a_j, b_j).  Returns list E[0..K] of polynomials in n.
     Cached: callers read E and must not mutate it."""
     key = (tuple((j, tuple(v)) for j, v in sorted(ab.items())), K)
-    if key not in _GRAND:
+    if key not in _PRODUCT:
         L = {j: [F(a), F(b)] for j, (a, b) in ab.items()}
         E = [[F(1)]]
         for k in range(1, K + 1):
@@ -146,20 +146,20 @@ def grand_form(ab, K):
                 if j in L:
                     acc = padd(acc, pmul([F(j) * c for c in L[j]], E[k - j]))
             E.append(ptrim([c / k for c in acc]))
-        _GRAND[key] = E
-    return _GRAND[key]
+        _PRODUCT[key] = E
+    return _PRODUCT[key]
 
 
 def extract_ab(P, kmax):
-    """(a_j, b_j) for j = 1..kmax from the wired table, with the grand form's
+    """(a_j, b_j) for j = 1..kmax from the wired table, with the product form's
     own consistency as the check: P_k - (lower-level part) must be LINEAR."""
     ab = {}
     for k in range(1, kmax + 1):
-        E = grand_form(ab, k)               # levels < k only; E[k] is the rest
+        E = product_form(ab, k)               # levels < k only; E[k] is the rest
         rem = ptrim(padd(wired_poly(P, k), [-c for c in E[k]]))
         if len(rem) > 2:
             raise AssertionError(
-                f"grand form violated at k={k}: residual degree {len(rem)-1} > 1")
+                f"product form violated at k={k}: residual degree {len(rem)-1} > 1")
         a = rem[0] if len(rem) > 0 else F(0)
         b = rem[1] if len(rem) > 1 else F(0)
         ab[k] = (a, b)
@@ -184,7 +184,7 @@ def pin_level(k, ab_lower, depths, tri, Dj):
     Dj: dict j -> list indexed by k of exact D_j(k).
     Returns (a_k, b_k), or raises if a cell is missing / the system is singular.
     """
-    E = grand_form(ab_lower, k)             # levels < k; E[k] = Q_k(n)
+    E = product_form(ab_lower, k)             # levels < k; E[k] = Q_k(n)
     Qk = E[k]
     rows, rhs = [], []
     for j in depths:
@@ -236,7 +236,7 @@ def verify(jmax=3, P=None, tri=None, Dj=None):
     tri = read_tri() if tri is None else tri
     kmax = max(P)
     ab = extract_ab(P, kmax)
-    print(f"grand form consistent on wired levels k = 1..{kmax} "
+    print(f"product form consistent on wired levels k = 1..{kmax} "
           f"(every residual linear in n)")
     Dj = load_depths(jmax, kmax) if Dj is None else Dj
     print(f"ab-initio depth series loaded for j = 1..{jmax}, k <= {kmax}")
@@ -303,7 +303,7 @@ def selftest(jmax=3):
         raise SystemExit("RED CONTROL FAILED: singular system accepted")
 
     # RED 3: a corrupted WIRED level must turn --verify red -- the wired table
-    # is the thing --verify re-derives.  The top level, so the grand-form
+    # is the thing --verify re-derives.  The top level, so the product-form
     # linearity check (which would catch a corrupted lower level on its own,
     # before verify compares anything) is not what fires.
     top = max(P)
@@ -346,7 +346,7 @@ def predict(jmax=3, kmax_new=21):
               f"({len(pairs)-1} independent checks); cells {cells}")
 
     print("\npredicted cells (formula vs banked where banked exists):")
-    E = grand_form(ab, max(ab))
+    E = product_form(ab, max(ab))
     for k in sorted(ab):
         for n in range(2 * k + 1, 43):
             H = n - k
@@ -382,7 +382,7 @@ def emit(jmax=4, kmax_new=21):
         if len(set(sols.values())) != 1:
             raise SystemExit(f"EMIT RED: depth pairs disagree at k={k}")
         ab[k] = next(iter(sols.values()))
-        poly = grand_form(ab, k)[k]                    # ascending in n
+        poly = product_form(ab, k)[k]                    # ascending in n
         kfact = math.factorial(k)
         desc = []
         for c in reversed(poly):
@@ -420,7 +420,7 @@ def audit(jmax=3):
         used = {(2 * k + 1 - j, k + 1 - j) for j in deep}
         lower = {j: ab[j] for j in ab if j < k}
         a, b = pin_level(k, lower, deep, tri, Dj)
-        E = grand_form({**lower, k: (a, b)}, k)
+        E = product_form({**lower, k: (a, b)}, k)
         ok = bad = 0
         for n in range(2 * k + 1, 41):          # in-onset cells only
             H = n - k

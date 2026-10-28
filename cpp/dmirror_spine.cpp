@@ -1,10 +1,10 @@
 // The dmirror spine split, in C++ and with a cell budget -- the enumerator
-// that reaches the levels the grand-form test needs.
+// that reaches the levels the product-form test needs.
 //
 // WHY.  results/symmetry-classes.md counts diagonal-mirror animals apart by
 // which ground-state spine they sit on, and finds each family separately
 // linear at c_2 where the summed family is quadratic.  The next cumulant, c_3,
-// is what would distinguish "has the grand form" from "agrees with it to
+// is what would distinguish "has the product form" from "agrees with it to
 // second order", and it needs level k = 3 pinned on both parities: S = 16 even
 // and S = 17 odd.  experiments/dmirror_spine_split.py is a hook transfer
 // matrix in pure Python and took 6 h 38 min for S = 14 alone.

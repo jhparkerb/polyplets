@@ -20,7 +20,7 @@
 %  Source material, all in this repository:
 %    docs/proofs/universal-diagonal-law.md   Theorems A and B, the instances
 %    docs/proofs/diagonal-law.md             the king case, written out first
-%    docs/proofs/grand-form.md               Theorem C and its corollaries
+%    docs/proofs/product-form.md               Theorem C and its corollaries
 %    docs/proofs/T-n-nm1.md                  P_1(n) = 25n - 45 from scratch
 %    docs/proofs/T-n-nm2-and-general.md      the king k = 2 hand derivation
 %    results/diagonal-formula.md             the b = 2 instance
@@ -480,7 +480,7 @@ the walk cell free above it.
 
 Precisely: $\deg q_k = k$ exactly, the coefficient of $n^k$ in $P_k$ is
 $\Wp^{\,k}/k!$, and in particular $[n^1]P_1 = \Wp$. That is
-Corollary~\ref{cor:lead}, proved in Section~\ref{sec:grand} once the product
+Corollary~\ref{cor:lead}, proved in Section~\ref{sec:product} once the product
 form is available. It is written out for the king lattice in full, and the
 argument is uniform in the weights, with $25$ replaced by $\Wp$ throughout.
 
@@ -553,7 +553,7 @@ modulo $2$ as $(W+1)((1+x)W+x)$, so $N_k$ is odd. The onset is sharp on all
 three row-local instances.
 
 \section{The product form}
-\label{sec:grand}
+\label{sec:product}
 
 Theorem~\ref{thm:A} says each diagonal is a polynomial. It says nothing about how
 the diagonals relate to each other, and each new $k$ costs exactly two new
@@ -993,9 +993,9 @@ $G(0) = H(0) = 1$ and
 \begin{equation}
   \sum_{k \ge 0} P_k(n)\,y^k \;=\; G(y)\,H(y)^n
   \qquad\text{for every } n \ge 2k+1 \text{ at order } y^k .
-  \label{eq:grand}
+  \label{eq:product}
 \end{equation}
-Equation \eqref{eq:grand} is what makes this part possible: it replaces
+Equation \eqref{eq:product} is what makes this part possible: it replaces
 infinitely many polynomials by two power series. The cubic of
 \S\ref{sec:cubic} is Theorem~\ref{thm:B} at $p = 3$, where the single-defect
 weight is $25 \equiv 1 \pmod 3$, so no rescaling is visible.
@@ -1025,7 +1025,7 @@ series with constant term $1$.
 \end{proposition}
 
 \begin{proof}
-Evaluate \eqref{eq:grand} at $n = 0$ and $n = 1$. Both left sides are integral
+Evaluate \eqref{eq:product} at $n = 0$ and $n = 1$. Both left sides are integral
 by Proposition~\ref{prop:polya}; $G$ has constant term $P_0(0) = 1$, so it is
 invertible in $\Z[[y]]$ by the geometric series.
 \end{proof}
@@ -1092,7 +1092,7 @@ Write $n = \sum_i n_i 3^i$ in base $3$. Then
 \end{theorem}
 
 \begin{proof}
-By $(\star a)$ and $(\star b)$, the product form \eqref{eq:grand} reduces modulo
+By $(\star a)$ and $(\star b)$, the product form \eqref{eq:product} reduces modulo
 $3$ to $\sum_k P_k(n)y^k \equiv W^n$. Frobenius over $\F_3$ gives
 $W(y)^{3^i} = W(y^{3^i})$, so $W^n = \prod_i \bigl(W^{3^i}\bigr)^{n_i} =
 \prod_i W(y^{3^i})^{n_i}$.
@@ -1355,7 +1355,7 @@ rather than for the $k \le 11$ the data reached.
 
 \begin{remark}[the frame this rests on]
 Theorem~\ref{thm:d3} is proved on an explicit frame and the frame is not all
-theorem. (A1) the diagonal-law shape theorem and the grand form
+theorem. (A1) the diagonal-law shape theorem and the product form
 $P_k(n) = [u^k]G(u)H(u)^n$ --- both proved and Lean-checked. (A2) $H$ congruent
 to the fixed point of the mod-$81$ master equation at all orders, derived from
 the renewal formalism with completeness from a proved row bound, and
@@ -1563,7 +1563,7 @@ the 342-cell digit-product mass check & \repo{experiments/ternary\_spine.py} \\
 Theorem~\ref{thm:deficit2} & \repo{experiments/deficit2\_proof.py} \\
 Table~\ref{tab:sleeve} & \repo{experiments/sleeve\_zero\_census.py} \\
 the enumerated triangle & \repo{results/triangle.txt} \\
-the underlying law and product form & Part I; \repo{docs/proofs/diagonal-law.md}, \repo{docs/proofs/grand-form.md} \\
+the underlying law and product form & Part I; \repo{docs/proofs/diagonal-law.md}, \repo{docs/proofs/product-form.md} \\
 the master equation and weights & \repo{results/diagonal-formula.md} \\
 \bottomrule
 \end{tabular}

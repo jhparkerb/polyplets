@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Machine checks for docs/proofs/grand-form.md (exact one-mode resummation).
+"""Machine checks for docs/proofs/product-form.md (exact one-mode resummation).
 
 From the Lean-verified aggregated cluster weights alone (V(l,j), Vt(l,j),
 j <= 3 — polyplets/Polyplets/Weights.lean, Weights3.lean, Weights3Heavy.lean),
@@ -16,7 +16,7 @@ constructs every object in the proof and verifies, to y-order 3:
      P_1..P_3 of orchestrator/sweep.go diagCoeffTable coefficient-exactly,
      and b_1 = 25, a_1 = -45 (leading coefficient 25^k/k! mechanism).
 
-All arithmetic exact (Fraction). Run: python3 experiments/grand_form_check.py
+All arithmetic exact (Fraction). Run: python3 experiments/product_form_check.py
 """
 import os
 import re

@@ -8,7 +8,7 @@ import Polyplets.Staircase.WalkTop
 /-!
 # Staircase: the T-diagonal transfer step
 
-The `T_of_d`-transported form of the μ-recursion (`docs/proofs/grand-form.md`): one
+The `T_of_d`-transported form of the μ-recursion (`docs/proofs/product-form.md`): one
 transfer step multiplies the *full* diagonal family `T (H + k) H` by the fixed
 multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 

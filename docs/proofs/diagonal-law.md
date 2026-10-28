@@ -116,16 +116,16 @@ leading one being 25^k/k!. What the engine's storage form relies on is the
 weaker k!·P_k ∈ ℤ[n], stated below. Nothing downstream needs either: every
 mod-3^j argument uses values.
 
-## Corollary — the grand form G·H^n
+## Corollary — the product form G·H^n
 
-This corollary is proved in full, with sharp onset, in `grand-form.md`
-(machine check: `experiments/grand_form_check.py`). The sketch:
+This corollary is proved in full, with sharp onset, in `product-form.md`
+(machine check: `experiments/product_form_check.py`). The sketch:
 
 D(z) has the single perturbed root z*(y) near 1/3 (unique as a formal
 series); the residue resummation of Step 5 across k gives formal series
 C(y), μ(y) = 1/z* with A_H(y) := Σ_k T(H+k,H) y^k = C(y)·μ(y)^H per y-order
 for H ≥ k+1. Taking logs, the cumulants of A_H are *exactly linear in H* in
-the law's range — this is the G(y)H(y)^n grand form used throughout
+the law's range — this is the G(y)H(y)^n product form used throughout
 (`results/diagonal-formula.md`), with H = μ/3 in the law's units, and
 it is what the master equation of `results/diagonal-formula.md` solves. The
 mod-3 spine's remaining conditionality therefore reduces to the finitely

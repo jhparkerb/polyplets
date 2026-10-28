@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""5-adic structure of the grand-form constants (v5 denominator problem).
+"""5-adic structure of the product-form constants (v5 denominator problem).
 
 Open question (results/closed-doors.md #2): D_k = k!/5^{c_k} is the minimal
 common denominator of P_k; measured c_k = 0 (k<=4), 1 (k=5..10,12..14),
 2 (k=11, 15..18).  Conjectured law c_k = ceil(v5(k!)/2), exception k=11.
 
-This probe extracts the exact grand-form constants a_j, b_j (j <= 18) from
+This probe extracts the exact product-form constants a_j, b_j (j <= 18) from
 the production polynomials (polyplets/pin-data.md, generated independently of
 this script) via the exp recurrence
 
@@ -95,7 +95,7 @@ def main():
         assert all(x == 0 for x in ck[2:]), f"c_{k} not linear"
         c[k] = ck[:2]
 
-    print("\n== grand-form constants: v5 profile ==")
+    print("\n== product-form constants: v5 profile ==")
     print(f"{'j':>2} {'v5(a_j)':>8} {'v5(b_j)':>8} {'v5(j!a_j)':>10} "
           f"{'v5(j!b_j)':>10} {'v5(j!)':>7}  a_j, b_j (den 5-part shown)")
     for j in range(1, kmax + 1):
@@ -231,7 +231,7 @@ def main():
 
 def check_k19():
     """Out-of-sample test: derive P_19 from real-swept cells (two-point pin,
-    grand form) and test the law at k = 19 -- no k=19 data touched the law."""
+    product form) and test the law at k = 19 -- no k=19 data touched the law."""
     sys.path.insert(0, os.path.join(ROOT, "scripts"))
     import derive_pk_fast as dpf
     import io

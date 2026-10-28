@@ -115,7 +115,7 @@ What §7 anticipated is proved:
 - The general law T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k = k, onset n ≥ 2k+1, is
   a theorem for all k (`RowLocal/DiagonalLaw.lean`, `King.lean`; paper proof
   `diagonal-law.md`), and the defect-gas structure is exact: the diagonals are
-  the exp of affine cumulants (`grand-form.md`; the Lean staircase route is
+  the exp of affine cumulants (`product-form.md`; the Lean staircase route is
   `Staircase/`).
 - The Poisson leading coefficient is proved: [n^k]P_k = 25^k/k! for all k
   (`LeadingCoeff.lean`, standard axioms only — the 25 of this file's §5).

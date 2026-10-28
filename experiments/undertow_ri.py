@@ -12,7 +12,7 @@ reads it inherits the incumbent's connectivity rule. This one is built from:
     docs/proofs/cutcount-identity.md;
   * the ab-initio depth defects D_j(k) of Severance W3, which read neither
     triangle nor wired table;
-  * the grand form, a Lean-complete theorem.
+  * the product form, a Lean-complete theorem.
 
 Each row is answered with a tower that EXCLUDES that row from its own pinning
 set, so no cell is ever predicted from itself. Motley covers H <= hmax, the
@@ -36,7 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
-from undertow_pin import (all_pairs, grand_form, load_depths, padd, ptrim,  # noqa: E402
+from undertow_pin import (all_pairs, product_form, load_depths, padd, ptrim,  # noqa: E402
                           peval, pin_level, pow3, read_tri_motley)
 from slope2_law_vs_truth import read_tri                                   # noqa: E402
 
@@ -55,10 +55,10 @@ def abinitio_levels():
     R = assemble_R(W, W1_ABINITIO)
     ab = {}
     for k in range(1, W1_ABINITIO + 1):
-        E = grand_form(ab, k)                       # levels < k
+        E = product_form(ab, k)                       # levels < k
         rem = ptrim(padd(pk_from_R(R[k], k), [-c for c in E[k]]))
         if len(rem) > 2:
-            raise SystemExit(f"grand form violated at k={k} on the ab-initio P_k")
+            raise SystemExit(f"product form violated at k={k} on the ab-initio P_k")
         ab[k] = (rem[0] if rem else F(0), rem[1] if len(rem) > 1 else F(0))
     return ab
 
@@ -120,7 +120,7 @@ def cover(hmax=18, jmax=4, rows=(40,), rowdir=None):
     out = []
     for row in rows:
         ab, reached = build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row=row)
-        E = grand_form(ab, reached)
+        E = product_form(ab, reached)
         agree, wrong, tower_h = [], [], []
         total = F(0)
         for H in range(max(hmax + 1, row - reached), row + 1):

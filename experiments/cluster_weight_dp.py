@@ -206,8 +206,8 @@ KNOWN_WEIGHTS = {  # (interior, boundary_bottom, boundary_top, pure), DP-compute
 }
 
 
-def check_grand_form(K=5):
-    """Ab-initio grand form through order K=5: H (master equation) and G
+def check_product_form(K=5):
+    """Ab-initio product form through order K=5: H (master equation) and G
     (boundary residue) from KNOWN_WEIGHTS alone, vs the banked series.
     All series algebra; runs in milliseconds. (2026-07-13)"""
     from fractions import Fraction as F
@@ -280,7 +280,7 @@ def check_grand_form(K=5):
     G = smul([3 * x for x in C], [F(1) - wHp[0]] + [-x for x in wHp[1:]])
     assert G == [F(1), F(-5), F(-62, 9), F(-1625, 81),
                  F(-56842, 729), F(-2170913, 6561)], G
-    print("grand form ab initio through u^5: H = [1,25,208,1483,20688,130208]"
+    print("product form ab initio through u^5: H = [1,25,208,1483,20688,130208]"
           " and G (g1..g5) both match banked  OK")
 
 
@@ -301,7 +301,7 @@ if __name__ == "__main__":
         if sum(v) - len(v) <= 3:
             assert (interior(v), boundary(v),
                     boundary(tuple(reversed(v))), pure(v)) == (wi, wb, wt, wp)
-    check_grand_form()
+    check_product_form()
     kmax = int(sys.argv[1]) if len(sys.argv) > 1 else 4
     for k in range(1, kmax + 1):
         t0 = time.time()

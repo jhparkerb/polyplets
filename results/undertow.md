@@ -43,7 +43,7 @@ altogether, and depths 8 and 9.
   says T(n, n-k) = P_k(n) 3^(n-1-3k) for n >= 2k+1, with P_k a polynomial of
   degree k. The smallest n at which it holds, 2k+1, is the onset; the onset
   is proved sharp for every k. Entries with n >= 2k+1 are at or above onset.
-- **The grand form** (`docs/proofs/grand-form.md`, Lean-complete) says
+- **The product form** (`docs/proofs/product-form.md`, Lean-complete) says
   P_k(n) = [y^k] exp(sum_j (a_j + b_j n) y^j), so level k adds exactly two
   rational constants (a_k, b_k) and P_k(n) = known_k(n) + a_k + b_k n with
   known_k fixed by the lower levels.
@@ -136,7 +136,7 @@ comparison is equality of rationals.
 | 342 | 189 | 153 | 0 |
 
   The 153 are identities: all 171 recorded in-onset entries at H >= 22 equal
-  the formula table's evaluation, and the extraction and the grand form are
+  the formula table's evaluation, and the extraction and the product form are
   exact inverses, so any assembly built on the table's levels evaluates to
   the same polynomial. The 189 include T(39,20) and T(40,21), the two entries
   P_19 was fitted from, predicted from a level 19 determined at H <= 18
@@ -168,7 +168,7 @@ nothing the main program produced, excluding the row from its own determining
 set: levels 1..9 from the cluster-weight enumeration through
 `experiments/severance_w1_assemble.py`; levels 10 and up from the coloring
 recount's entries, every determining entry at H <= hmax; D_j for j <= 4; the
-grand form. The main program's triangle and the OEIS b-file appear only as
+product form. The main program's triangle and the OEIS b-file appear only as
 comparison targets. Every input was traced to its file; none comes from the
 main program.
 
@@ -243,7 +243,7 @@ check in the real run is genuine.
 **Independent recount.** `experiments/lane_b_a41_recount.py` rebuilds the
 term by a route chosen to differ wherever it can: levels 1..19 fitted from
 their two onset entries in `results/triangle.txt` rather than read from the
-table; its own polynomial representation, grand-form recurrence, solver and
+table; its own polynomial representation, product-form recurrence, solver and
 assembly loop; D_j imported only at k >= 20 and first checked at every k <= 19
 against its own extraction from the recorded entries; level 20 determined
 from depths (1, 2) with depths 3 and 4 withheld and reproduced.
@@ -255,7 +255,7 @@ from depths (1, 2) with depths 3 and 4 withheld and reproduced.
 
 It is a second implementation, not a second count. It retires assembly,
 transcription and arithmetic error across two disjoint code bases. It shares
-with the assembler the enumerated files, the grand form, D_j at k = 20 and
+with the assembler the enumerated files, the product form, D_j at k = 20 and
 21, and level 21's determining entries T(40,19) and T(39,18).
 
 **Level 21.** With depths j <= 4, level 21 has one determining pair, T(40,19)
@@ -289,7 +289,7 @@ the e = 4 row of the K21_e4 table, a corrupted determining entry, and the
 enumerated T(41,20) shifted by 1 in a shadow copy of `results/a41`.
 
 Three pairs agreeing is agreement between fits that share D_j(20..21) and the
-grand form. The check that crosses assumption families is an enumeration of
+product form. The check that crosses assumption families is an enumeration of
 T(41,20).
 
 **The height-20 enumeration.** `scripts/dalby_a41_h20.sh`, rev
@@ -340,13 +340,13 @@ of buying a third level-21 equation.
 |---|---|---|---|
 | height 20 at size 41 | T(41,20); level 21 gets pairs (2,3), (2,4), (3,4) | validation of T(40,19), and an enumeration against P_21's prediction; no rule-independence (same program) | run |
 | height 21 at size 42 | T(42,21) | the same kind of evidence at more wall and disk (extrapolated 44 h, 443 GB from phase C times 1.22); P_19's first withheld entry, its other justification, was already met by the audit | not run (dominated) |
-| coloring recount at height 19 | T(40,19) directly under the other rule | rule-independence and validation in one act, through neither D_j nor the grand form | run |
+| coloring recount at height 19 | T(40,19) directly under the other rule | rule-independence and validation in one act, through neither D_j nor the product form | run |
 | depth 5 | level 21 from T(39,18), T(38,17), both H <= 18 | a rule-independent derivation, agreeing with the enumerated entry; weaker in kind, since the chain runs through D_3, D_4, D_5 at k = 21 | run |
 
 Where two routes look independent and are not: every formula statement about
 T(40,19) contains D_3(21); the two formula routes (determine from (2,4),
 predict depth 3; determine from (4,5), predict depth 3) share D_3(21),
-D_4(21) and the grand form, so their agreement checks the determining entries
+D_4(21) and the product form, so their agreement checks the determining entries
 and never the shared defect machinery. Re-running the assembly under the other
 rule adds nothing once the entries agree, because both rules' assemblies are
 determined from the same (n, H) entries. The family tables feed every depth at
@@ -443,7 +443,7 @@ the tables; the pair-agreement check does.
 Can the assembly be freed of every enumerated entry? Not past k of about 11,
 for a reason that belongs to the construction rather than to this lattice.
 
-- The grand form makes (a_k, b_k) equivalent to the aggregate cluster weights
+- The product form makes (a_k, b_k) equivalent to the aggregate cluster weights
   of surplus <= k, and those are connected-animal counts of the same species
   as the object being counted. Every known exact route to them carries a
   frontier connectivity partition (the state of `cpp/severance_w1.cpp` is the
@@ -598,7 +598,7 @@ defect is a valid equation for the diagonal polynomial on a lattice whose
 answers were published before this project existed. It does not establish the
 king D_j, which are separate derivations. The square test fits all k+1
 coefficients, so it validates "below-onset entries are equations" and not
-"two of them suffice", which is the grand form's part. D_2 here is measured
+"two of them suffice", which is the product form's part. D_2 here is measured
 against a P_k fitted by the onset rule, so it is not an independent route to
 D_2 and does not by itself make a square P_k cheaper. Six levels, tallest
 entry at height 13; the king case runs to k = 21. Reaching the square record

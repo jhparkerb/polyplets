@@ -50,8 +50,8 @@ the formula must reproduce.
 ([A000988](https://oeis.org/A000988)); rotations and reflections both
 identified ([A000105](https://oeis.org/A000105)).
 
-**grand form** — `P_k(n) = [y^k] exp(Σ_j (a_j + b_j n) y^j)`: each level adds
-exactly two rational constants (`docs/proofs/grand-form.md`).
+**product form** — `P_k(n) = [y^k] exp(Σ_j (a_j + b_j n) y^j)`: each level adds
+exactly two rational constants (`docs/proofs/product-form.md`).
 
 **growth constant** (λ; Klarner's constant) — `lim a(n)^(1/n)`. Polyominoes
 λ ≈ 4.0625696 (rigorously 4.0025 < λ < 4.5252); polyhexes τ ≈ 5.1831478;

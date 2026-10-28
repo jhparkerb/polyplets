@@ -69,7 +69,7 @@ only at k ≤ 19; the checks below are about that.
 differs wherever it can: levels k = 1..19 fitted from their two onset
 entries in `results/triangle.txt` rather than read from `diagCoeffTable`;
 level 20 fitted from depths (1, 2) with (3, 4) held out; its own polynomial,
-grand-form, solver and assembly code. It never reads `undertow_a41.py`.
+product-form, solver and assembly code. It never reads `undertow_a41.py`.
 
     anchor-pinned k<=19 predict banked in-onset cells: 342 ok, 0 wrong
     imported D_j vs own empirical extraction at k<=19: 70 ok, 0 wrong
@@ -83,7 +83,7 @@ Because it never touches the wired table, the agreement also says
 is a second implementation, not a second source: it retires assembly,
 transcription, fencing and arithmetic error across two codebases, but shares
 with the main route the D_j at k = 20, 21, the pinning cells T(40,19) and
-T(39,18), and the grand-form theorem (proved in Lean, so a shared theorem
+T(39,18), and the product form (proved in Lean, so a shared theorem
 rather than a shared risk).
 
 ### A check on D_2(21), modulo one prime power
@@ -141,7 +141,7 @@ and the enumerated T(41,20) + 1 in a shadow copy of this directory.
 ## The enumerated T(41,20)
 
 Three pairs agreeing is agreement between fits that share D_j(20..21) and
-the grand form, not an enumeration. The H = 20 run above supplies the
+the product form, not an enumeration. The H = 20 run above supplies the
 enumeration:
 
     T(41,20) = 18004779862205054677763902712770    enumerated

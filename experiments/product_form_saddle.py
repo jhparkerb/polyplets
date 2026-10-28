@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Grand-form saddle point: predict the growth of the slope-s slices analytically.
+"""Product-form saddle point: predict the growth of the slope-s slices analytically.
 
 Chain of reasoning being tested:
 
-  1. The grand form says  sum_k P_k(n) y^k = exp(A(y) + n B(y))  with
+  1. The product form says  sum_k P_k(n) y^k = exp(A(y) + n B(y))  with
      A = sum a_j y^j, B = sum b_j y^j.  Extract a_j, b_j exactly from the
      wired P_1..P_19 (orchestrator/sweep.go) by taking the log of the series
-     with coefficients that are polynomials in n.  The grand form's content is
+     with coefficients that are polynomials in n.  The product form's content is
      that every log coefficient is LINEAR in n -- checked here for j=1..19,
      which is a simultaneous consistency check on all 19 production polynomials.
 
@@ -27,7 +27,7 @@ Chain of reasoning being tested:
      triangle (results/diagonal-formula.md: mu ~ 41.85 at s=2, still drifting).
 
 Two independent estimators of the same constant, one from 19 exact polynomials
-and one from 20 raw counts.  Run: python3 experiments/grand_form_saddle.py
+and one from 20 raw counts.  Run: python3 experiments/product_form_saddle.py
 """
 import os
 import re
@@ -124,7 +124,7 @@ def main():
             L[j] = padd(L[j], pscale(Upow[j], sgn))
 
     print()
-    print("== grand-form check: is every log coefficient linear in n?")
+    print("== product-form check: is every log coefficient linear in n?")
     a = {}
     b = {}
     bad = 0
@@ -138,7 +138,7 @@ def main():
         a[j] = c[0]
         b[j] = c[1] if len(c) > 1 else F(0)
     if bad:
-        print("  %d violations -- grand form does not hold on this table" % bad)
+        print("  %d violations -- product form does not hold on this table" % bad)
         return 1
     print("  all j=1..%d linear in n: PASS" % KMAX)
     print("  b_1 = %s (expect 25), a_1 = %s (expect -45)" % (b[1], a[1]))
@@ -245,7 +245,7 @@ def main():
         (H1, r1), (H2, r2) = rats[-2], rats[-1]
         rich = (H2 * r2 - H1 * r1) / (H2 - H1)
         print("  s=%d  %2d pts  last ratio(H=%d)=%.4f  Richardson=%.4f  "
-              "grand-form=%s"
+              "product-form=%s"
               % (s, len(pts), last[0], last[1], rich,
                  ("%.4f" % preds[s]) if s in preds else "n/a"))
     return 0

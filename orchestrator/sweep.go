@@ -2177,7 +2177,7 @@ var diagCoeffTable = map[int]diagCoeffs{
 	// held-out points: T(37,20) from the a(38) run's real H20 sweep and
 	// T(38,21) from the a(40) run's real H21 sweep, neither in the fit, both
 	// matching exactly (pinned in diag_p17_test.go). Certification also rests
-	// on the proven grand form (the exp identity pins the whole polynomial once
+	// on the proven product form (the exp identity pins the whole polynomial once
 	// a17,b17 are set). The out-of-onset T(34,17) (n=2k) was checked and does
 	// NOT lie on the polynomial — sharp onset, consistent with every lower k.
 	// Wiring makes H=maxn-17 closed-form, keeping a(37)'s top real height at
@@ -2213,7 +2213,7 @@ var diagCoeffTable = map[int]diagCoeffs{
 	// P_0..P_18 holdout certification, results/ns_a40/PROVENANCE.md). P_19
 	// itself has no holdout: its first, T(41,22), would need a real H22 sweep
 	// at n=41, which has not been run. Certification rests on the proven
-	// grand form.
+	// product form.
 	19: {[]string{
 		"363797880709171295166015625", "-33244723454117774963378906250", "1424357847310602664947509765625", "-38591730438798666000366210937500",
 		"727030595527446770668029785156250", "-9771393162653867410812377929687500", "89995638539151550436367248535156250", "-453004710082909127087411116406250000",

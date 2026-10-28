@@ -49,7 +49,7 @@ $$A + B_{\text{sep}} + B_{\text{adj}} = \tfrac12(625n^{2}-2459n+1134)\,3^{\,n-7}
 bulk n ≥ 2k+1 (below that, boundary terms). The k=0,1,2 cases are proven from
 first principles (the single-cell chain, `T-n-nm1.md`, §1); the leading
 coefficient is 25ᵏ/k! — verified exactly for k=0…6 from the triangle, and
-proved for all k in `grand-form.md`.
+proved for all k in `product-form.md`.
 
 **Why a single structure — the defect gas.** The excess-k cells form *defect
 clusters* (maximal runs of multi-cell rows) placed on the n-row chain; clusters
@@ -79,7 +79,7 @@ the first 6 terms — an open question whether they are algebraic.
 - k=0 (the single-cell chain), k=1 (`T-n-nm1.md`) and k=2 (§1) are proved
   from first principles and checked against the triangle by the engine gates.
 - The law for general k is `diagonal-law.md`; each P_k is then determined
-  from two in-onset entries (`grand-form.md`), and the engine's formula table
+  from two in-onset entries (`product-form.md`), and the engine's formula table
   holds k ≤ 19.
 
 `T(n,n−k)` holds for `n ≥ 2k+1`; the engine falls back to a real sweep when

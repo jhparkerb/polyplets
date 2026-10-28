@@ -11,7 +11,7 @@ import (
 // Its first independent holdout has since landed and is pinned below:
 // T(39,21), from the a(40) run's real H21 sweep, was not in the fit and
 // matches exactly. Certification
-// also rests on the proven grand form. Wiring makes H = maxn-18 closed-form,
+// also rests on the proven product form. Wiring makes H = maxn-18 closed-form,
 // keeping a(39)'s top real height at H20.
 func TestDiagonalP18Formula(t *testing.T) {
 	cases := []struct {

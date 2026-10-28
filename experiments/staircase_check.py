@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Numeric validation for the staircase route to Lean grand-form pinning.
+"""Numeric validation for the staircase route to Lean product-form pinning.
 
 The planned Lean proof (polyplets/GRANDFORM-PLAN.md (deleted)) rests on:
 

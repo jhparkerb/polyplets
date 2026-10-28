@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does EACH spine family have a grand form? -- the second half of A1.3.
+"""Does EACH spine family have a product form? -- the second half of A1.3.
 
 `results/symmetry-classes.md` established that the dmirror family as a
 whole does not: every cumulant past the first is nonlinear in S, on both parity
@@ -9,12 +9,12 @@ families apart -- anchored on all 423 banked `dmirror_strip` cells, which it
 reproduces exactly.
 
 This asks the question that split was for: with d_main and d_anti separated,
-is EITHER of them a single-family object with the grand-form shape -- every
+is EITHER of them a single-family object with the product-form shape -- every
 cumulant exactly linear in S?
 
 If yes for both, the two-family reading is confirmed and the dmirror levels are
 finitely determined after all, just with four new constants per level instead of
-two.  If no, the diagnosis in dmirror-grand-form-fails.md is incomplete and the
+two.  If no, the diagnosis in dmirror-product-form-fails.md is incomplete and the
 obstruction is something other than the two-spine sum.
 
 INPUT is the log of a `dmirror_spine_split.py` run, parsed rather than
@@ -24,7 +24,7 @@ refuses to read a row outside that regime.
 
 CONTROLS.
   (a) A planted single family must report LINEAR, and a planted sum of two must
-      report NONLINEAR -- the same pair dmirror_grand_form.py uses, so a
+      report NONLINEAR -- the same pair dmirror_product_form.py uses, so a
       disagreement between the two scripts is visible.
   (b) A level pinned with no point to spare is reported as unpinned, never as a
       measurement.
@@ -41,7 +41,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from dmirror_grand_form import (  # noqa: E402
+from dmirror_product_form import (  # noqa: E402
     cumulants, pdeg, controls)
 from dmirror_onset_probe import newton_fit, evalpoly  # noqa: E402
 
@@ -133,7 +133,7 @@ def analyze(name, data, which, kmax):
         print("     %-5s %s  => %s"
               % ("even" if parity == 0 else "odd",
                  "  ".join("c_%d:deg %d" % (j, d) for j, d in sorted(degs.items())),
-                 "GRAND FORM SHAPE" if lin else "NOT linear"))
+                 "PRODUCT FORM SHAPE" if lin else "NOT linear"))
         out[parity] = lin
     return out
 
@@ -142,7 +142,7 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__)
         return 2
-    print("Do the spine families separately have a grand form?  Controls first.\n")
+    print("Do the spine families separately have a product form?  Controls first.\n")
     if not controls(4):
         print("\nCONTROLS FAILED -- nothing below is worth reading")
         return 1
@@ -157,7 +157,7 @@ def main():
 
     print("\nVERDICT")
     if m and a and all(m.values()) and all(a.values()):
-        print("  BOTH families have the grand-form shape.  The two-spine")
+        print("  BOTH families have the product-form shape.  The two-spine")
         print("  diagnosis is confirmed: the dmirror levels ARE finitely")
         print("  determined, with four new constants per level rather than two,")
         print("  and A1.3's step 1 fails only because the two were summed.")
@@ -166,7 +166,7 @@ def main():
         print("  larger S; c_2 is the discriminator and it needs k <= 2 pinned")
         print("  on both parities of both families.")
     else:
-        print("  At least one family is NOT of grand-form shape.  The")
+        print("  At least one family is NOT of product-form shape.  The")
         print("  two-spine sum is then not the whole obstruction, and")
         print("  results/symmetry-classes.md's diagnosis is incomplete.")
     return 0

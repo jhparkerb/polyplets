@@ -2,7 +2,7 @@
 """Split the dmirror count by which ground-state spine the animal sits on.
 
 docs/time-at-the-bar-report.md (deleted), A1.3's live half.  `results/symmetry-classes.md`
-showed the grand form does not transfer to the dmirror family, and diagnosed
+showed the product form does not transfer to the dmirror family, and diagnosed
 why: d(S, S) = 2 for every S >= 2, so the family is a SUM over two ground
 states -- the main diagonal and the anti-diagonal -- and the log of a sum of
 two exponentials is not linear in S.  The parity split was the natural repair
@@ -10,7 +10,7 @@ and it failed: every cumulant past the first is nonlinear on BOTH parity
 classes.  The degree pattern deg(c_j) = 2*floor(j/2) is the signature of
 exactly two families.
 
-So the question is whether EACH FAMILY SEPARATELY has a grand form, and that
+So the question is whether EACH FAMILY SEPARATELY has a product form, and that
 needs the two counted apart.  This does that.
 
 THE SPLIT IS FREE, ONCE YOU SEE IT.  Sweep the animal by HOOKS: hook k is the
@@ -28,7 +28,7 @@ with no geometry beyond what the sweep already tracks:
 For S > 2k those ranges are disjoint, which is exactly the regime the pinning
 happens in.
 
-AND IT TESTS SOMETHING THE DIAGNOSIS ASSUMED.  `dmirror-grand-form-fails.md`
+AND IT TESTS SOMETHING THE DIAGNOSIS ASSUMED.  `dmirror-product-form-fails.md`
 asserts d = d_main + d_anti for large S.  That is a claim about EXHAUSTIVENESS
 -- that no dmirror animal at level k sits near neither spine -- and it has
 never been checked.  The corner-count histogram checks it directly: any weight

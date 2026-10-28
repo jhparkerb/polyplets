@@ -11,7 +11,7 @@ import (
 // project's tallest real sweep). UNLIKE k<=18 there is no independent
 // held-out diagonal-19 point and never will be: the first, T(41,22), needs
 // a real H22 sweep (a(42)-scale) and the project closes at a(40). P_19 is
-// permanently fitted-no-holdout; certification rests on the proven grand
+// permanently fitted-no-holdout; certification rests on the proven product
 // form (the exp identity pins the whole polynomial once a19,b19 are set)
 // plus the leading-coeff 25^19/19! and k!-integrality checks.
 func TestDiagonalP19Formula(t *testing.T) {

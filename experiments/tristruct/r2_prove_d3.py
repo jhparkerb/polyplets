@@ -13,7 +13,7 @@ formula, PROVED on the mod-81 master curve.
 
 Method (the deficit2_proof.py route, one tower level up): the family GF
 S(v) = sum_{k>=0} P_k(3k-2) v^k is a diagonal of G(u) H(u)^n, so the formal
-Lagrange-Buermann lemma (grand-form.md Step 5, valid over Z and hence mod 81)
+Lagrange-Buermann lemma (product-form.md Step 5, valid over Z and hence mod 81)
 with Phi = G H^-2, phi = H^3, u0 = v H(u0)^3 gives
     S(v) = Phi(u0) / (1 - v phi'(u0)).
 Parametrizing by u (v = u/H^3, so u0(v(u)) = u by uniqueness of the fixed
@@ -29,7 +29,7 @@ denominators are power-series units mod 81, so the series identity and hence
 the theorem follow.
 
 Conditional frame (same as the proved d=1,2 cases): diagonal-law shape
-theorem + grand form (both proved, Lean-checked) + the defect-gas renewal
+theorem + product form (both proved, Lean-checked) + the defect-gas renewal
 formalism's master equation and boundary residue formula reduced mod 81
 (derived in results/diagonal-formula.md / results/triangle-r2-tower-mod81.md (deleted) from
 the exact chain identity; verified against banked g_k, h_k mod 81, k <= 17).
@@ -93,7 +93,7 @@ def main():
 
     # ---- 1. the target constants c0, c1, c2 (exact, below family onset) ----
     # S(v) = sum_{k>=0} P_k(3k-2) v^k with P_k(n) = [u^k] G H^n for ALL
-    # integer n (grand form for n >= 2k+1; both sides polynomial in n of
+    # integer n (product form for n >= 2k+1; both sides polynomial in n of
     # degree <= k, so the identity extends).  The family claim is k >= 3
     # (= onset 3k-2 >= 2k+1); k = 0,1,2 are fixed constants of the GF.
     c0 = 1                                    # P_0 = 1
@@ -161,7 +161,7 @@ def main():
 
     # ---- 5. numeric guard: the Lagrange-Buermann application ----
     # Claim: S(v(u)) == Phi(u)/(1 - 3uH'/H) with v(u) = u/H^3.  (The LB
-    # lemma itself is proved -- grand-form.md Step 5 -- this checks my
+    # lemma itself is proved -- product-form.md Step 5 -- this checks my
     # application of it, to series order KX.)
     def compose(a, b):
         assert b[0] == 0

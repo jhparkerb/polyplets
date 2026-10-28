@@ -1,4 +1,4 @@
-# The grand form is a theorem (exact one-mode resummation)
+# The product form is a theorem (exact one-mode resummation)
 
 Proves the Corollary of `diagonal-law.md` in full, with the sharp onset.
 Content: the diagonal cumulants are linear, each level k adding two new
@@ -8,14 +8,14 @@ is proved structure, not an ansatz. Combined with the shape theorem, the
 diagonals k = 10..19 in the formula table rest on proved structure plus two
 enumerated entries per level.
 
-Machine check: `experiments/grand_form_check.py` — constructs z*, u, C, μ
+Machine check: `experiments/product_form_check.py` — constructs z*, u, C, μ
 below ab initio from the Lean-verified cluster weights (j ≤ 3), reproduces
 the recorded triangle at every in-onset point it can reach, and
 reproduces the production P_1..P_3 coefficient-exactly.
 
 ## Statement
 
-**Theorem (grand form).** There are rational constants a_j, b_j (j ≥ 1),
+**Theorem (product form).** There are rational constants a_j, b_j (j ≥ 1),
 with (a_j, b_j) determined by the cluster weights of surplus ≤ j, such that
 
 > P_k(n) = [y^k] exp( Σ_{j≥1} (a_j + b_j n) y^j )  for every k ≥ 0, n ≥ 2k+1,
@@ -187,7 +187,7 @@ standard axioms only. The diagonal polynomials are determined for k ≤ 18 from
 two enumerated cells per level (`Staircase/Climb.lean`, `isDiagonalPoly_Pk`) —
 *conditional on those cells*: they are hypotheses of the Lean theorems, engine
 values assumed, not proved in Lean (`polyplets/README.md`). The exp-form
-statement itself (`grand_form`) is not in the current build, being a duplicate
+statement itself (`product_form`) is not in the current build, being a duplicate
 of the leading-coefficient route; it was last there at commit 697f376.
 
 ## What remains open

@@ -39,7 +39,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 from slope2_law_vs_truth import read_pk, read_tri                      # noqa: E402
-from undertow_pin import (all_pairs, extract_ab, grand_form, load_depths,  # noqa: E402
+from undertow_pin import (all_pairs, extract_ab, product_form, load_depths,  # noqa: E402
                           peval, pin_level, pow3)
 
 A40 = 56749893611764175164545926946127
@@ -106,7 +106,7 @@ def sweep_rows(perheight, n, hmax=None):
 def tower(ab, Dj, n, H):
     """T(n,H) from the tower, with the below-onset correction when needed."""
     k = n - H
-    E = grand_form(ab, k)
+    E = product_form(ab, k)
     val = peval(E[k], n) * pow3(n - 1 - 3 * k)
     j = 2 * k + 1 - n
     if j > 0:                       # below onset: add the exact depth defect

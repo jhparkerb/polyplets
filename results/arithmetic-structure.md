@@ -26,7 +26,7 @@ fitted P_k for k ≤ 17 are in `polyplets/pin-data.md` (k ≤ 3 also derived fro
 cluster weights); P_19 was derived from the enumerated entries T(39,20) and
 T(40,21).
 
-**The product form** (`docs/proofs/grand-form.md`, proved): series
+**The product form** (`docs/proofs/product-form.md`, proved): series
 G, Λ ∈ ℚ[[y]] with G(0) = Λ(0) = 1 and Σ_k P_k(n) y^k = G(y) Λ(y)^n, valid at
 order y^k for n ≥ 2k+1. Λ is the per-row transfer series of the cluster
 expansion (`results/diagonal-formula.md`); the paper and the mod-3 scripts

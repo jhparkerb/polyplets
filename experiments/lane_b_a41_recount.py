@@ -5,7 +5,7 @@ Route, chosen to be different where difference is possible:
   * levels k = 1..19 pinned from their two ONSET anchors T(2k+1,k+1),
     T(2k+2,k+2) in the banked triangle -- the classical rule, no wired
     diagCoeffTable, no defect series anywhere below k = 20;
-  * own polynomial representation (dict), own grand-form recurrence, own
+  * own polynomial representation (dict), own product-form recurrence, own
     2x2 solver, own assembly loop;
   * D_j imported from severance_w3_depths/depth1_gap_walk ONLY for k >= 20
     (unavoidable: no onset anchor exists there), and first cross-checked at
@@ -14,7 +14,7 @@ Route, chosen to be different where difference is possible:
   * swept heights read straight from results/a41/h*.out and re-verified
     against results/triangle.txt cell by cell for n <= 40.
 
-Shared with the lead's route, unavoidably: the grand-form theorem, the
+Shared with the lead's route, unavoidably: the product form, the
 D_series code at k = 20, 21, and the level-21 pinning cells T(40,19),
 T(39,18).  Everything else is disjoint.
 """
@@ -47,7 +47,7 @@ def pscale(u, s):
 def pev(u, n):
     return sum(c * F(n) ** d for d, c in u.items()) if u else F(0)
 
-# ---------- grand form: E_k from (a_j, b_j), j <= k ----------
+# ---------- product form: E_k from (a_j, b_j), j <= k ----------
 def gf(ab, K):
     """E[0..K], E_k = [y^k] exp(sum_j (a_j + b_j n) y^j), own recurrence."""
     E = [{0: F(1)}]

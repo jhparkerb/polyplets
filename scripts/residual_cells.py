@@ -527,7 +527,7 @@ def write_note(F: dict):
              "level 19's own two anchors are `T(39,20)` and `T(40,21)`, so "
              "pinning `P_19` from them to corroborate them is circular, and the "
              "non-circular route — `(a_19, b_19)` ab initio from surplus-19 "
-             "cluster weights (`docs/proofs/grand-form.md`) — is ten levels past "
+             "cluster weights (`docs/proofs/product-form.md`) — is ten levels past "
              "the k ≤ 9 for which the constants have been computed from cluster "
              "weights.\n")
 
