@@ -2,7 +2,7 @@
 //
 // Usage:
 //
-//	verify --n N [--data-dir DIR] [--workers-dir DIR] [--no-spotcheck] [--verbose]
+//	verify --n N [--data-dir DIR] [--verbose]
 //
 // Exits 0 if all checks pass, 1 if any fail.
 // Prints one line per check: "PASS row-sum n=21" or "FAIL crc path/to/run.bin".
@@ -19,8 +19,6 @@ import (
 func main() {
 	n := flag.Int("n", 0, "which a(N) to verify (required)")
 	dataDir := flag.String("data-dir", "data", "root data directory")
-	workersDir := flag.String("workers-dir", "build/ns", "directory containing map_worker (for spotcheck)")
-	noSpotcheck := flag.Bool("no-spotcheck", false, "skip the re-run spotcheck")
 	verbose := flag.Bool("verbose", false, "print PASS lines too")
 	flag.Parse()
 
@@ -30,11 +28,9 @@ func main() {
 	}
 
 	cfg := verify.Config{
-		N:           *n,
-		DataDir:     *dataDir,
-		WorkersDir:  *workersDir,
-		NoSpotcheck: *noSpotcheck,
-		Verbose:     *verbose,
+		N:       *n,
+		DataDir: *dataDir,
+		Verbose: *verbose,
 	}
 
 	results := verify.Run(cfg)

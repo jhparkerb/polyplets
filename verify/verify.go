@@ -10,9 +10,10 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/big"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -114,7 +115,7 @@ type ManifestFileEntry struct {
 // Manifest holds parsed manifest fields.
 type Manifest struct {
 	N          int
-	Value      uint64
+	Value      *big.Int // nil when the manifest has no value line
 	Rev        string
 	CPUS       float64
 	WallS      float64
@@ -167,7 +168,11 @@ func ParseManifest(path string) (Manifest, error) {
 		case "n":
 			m.N, _ = strconv.Atoi(v)
 		case "value":
-			m.Value, _ = strconv.ParseUint(v, 10, 64)
+			val, ok := new(big.Int).SetString(strings.TrimSpace(v), 10)
+			if !ok {
+				return Manifest{}, fmt.Errorf("%s: unparseable value %q", path, v)
+			}
+			m.Value = val
 		case "rev", "gitrev":
 			m.Rev = v
 		case "cpu_s":
@@ -228,8 +233,9 @@ func StoredCRC(path string) (uint64, error) {
 // ─── Record streaming ──────────────────────────────────────────────────────────
 
 // SumCountsInFile streams a POLYRUN file and returns a map[n]→sum of counts[n]
-// across all records, plus the actual record count.
-func SumCountsInFile(path string) (map[int]uint64, uint64, error) {
+// across all records, plus the actual record count. Counts and sums are
+// big.Int, so u128 runs and sums past 2^64 are read exactly.
+func SumCountsInFile(path string) (map[int]*big.Int, uint64, error) {
 	hdr, bodyOff, err := parsePolyrunHeader(path)
 	if err != nil {
 		return nil, 0, err
@@ -252,17 +258,14 @@ func SumCountsInFile(path string) (map[int]uint64, uint64, error) {
 	}
 
 	keyLen := hdr.Height + 2
-	sums := make(map[int]uint64)
+	sums := make(map[int]*big.Int)
 	var recCount uint64
 
 	br := bufio.NewReader(f)
 	sig := make([]byte, keyLen)
 	meta := make([]byte, 2)
 	// Read exactly hdr.Records records; the 8-byte CRC trailer follows immediately
-	// after. Counts are LEB128 varint (core/run.h encodeVarint == binary.Uvarint).
-	// Sums are u64: matches the pre-varint behavior, which read only the low 8
-	// bytes of each count; ReadUvarint errors on a >u64 value rather than
-	// silently truncating (verify runs at small scale where counts fit u64).
+	// after. Counts are LEB128 varints (core/run.h encodeVarint).
 	for recCount < hdr.Records {
 		if _, err := io.ReadFull(br, sig); err != nil {
 			if err == io.EOF || err == io.ErrUnexpectedEOF {
@@ -276,29 +279,53 @@ func SumCountsInFile(path string) (map[int]uint64, uint64, error) {
 		lo := int(meta[0])
 		length := int(meta[1])
 		for i := 0; i < length; i++ {
-			val, err := binary.ReadUvarint(br)
+			val, err := readBigUvarint(br)
 			if err != nil {
 				return nil, recCount, fmt.Errorf("reading counts in %s: %w", path, err)
 			}
-			sums[lo+i] += val
+			if sums[lo+i] == nil {
+				sums[lo+i] = new(big.Int)
+			}
+			sums[lo+i].Add(sums[lo+i], val)
 		}
 		recCount++
 	}
 	return sums, recCount, nil
 }
 
+// readBigUvarint decodes one LEB128 unsigned varint of any width. More than
+// 19 bytes (past u128) is corruption, not a count.
+func readBigUvarint(br io.ByteReader) (*big.Int, error) {
+	v := new(big.Int)
+	var shift uint
+	for i := 0; i < 19; i++ {
+		b, err := br.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+		v.Or(v, new(big.Int).Lsh(big.NewInt(int64(b&0x7f)), shift))
+		if b < 0x80 {
+			return v, nil
+		}
+		shift += 7
+	}
+	return nil, fmt.Errorf("varint longer than 19 bytes")
+}
+
 // ─── Triangle file ────────────────────────────────────────────────────────────
 
 // ReadTriangleFile reads data/triangle/a<N>.txt and returns a map[n]→value.
-// Lines have format: "tri <H> <n> <value>" — values are summed over all H.
-func ReadTriangleFile(path string) (map[int]uint64, error) {
+// Lines have format: "tri <H> <n> <value>" — values are summed over all H. A
+// tri line that does not parse is an error: skipping it would drop its n from
+// the row-sum check, which would then pass unchecked.
+func ReadTriangleFile(path string) (map[int]*big.Int, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	sums := make(map[int]uint64)
+	sums := make(map[int]*big.Int)
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		line := sc.Text()
@@ -306,13 +333,21 @@ func ReadTriangleFile(path string) (map[int]uint64, error) {
 			continue
 		}
 		parts := strings.Fields(line)
-		if len(parts) == 4 && parts[0] == "tri" {
-			n, err1 := strconv.Atoi(parts[2])
-			v, err2 := strconv.ParseUint(parts[3], 10, 64)
-			if err1 == nil && err2 == nil {
-				sums[n] += v
-			}
+		if len(parts) == 0 || parts[0] != "tri" {
+			continue
 		}
+		if len(parts) != 4 {
+			return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
+		}
+		n, err1 := strconv.Atoi(parts[2])
+		v, ok := new(big.Int).SetString(parts[3], 10)
+		if err1 != nil || !ok {
+			return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
+		}
+		if sums[n] == nil {
+			sums[n] = new(big.Int)
+		}
+		sums[n].Add(sums[n], v)
 	}
 	return sums, sc.Err()
 }
@@ -341,19 +376,28 @@ func ReadResiduesFile(path string) ([]Residue, error) {
 		if strings.HasPrefix(line, "#") || line == "" {
 			continue
 		}
-		parts := strings.Fields(line)
-		if len(parts) != 3 {
-			continue
+		res, ok := parseResidue(line)
+		if !ok {
+			return nil, fmt.Errorf("%s: malformed residue line %q", path, line)
 		}
-		n, e1 := strconv.Atoi(parts[0])
-		p, e2 := strconv.ParseUint(parts[1], 10, 64)
-		r, e3 := strconv.ParseUint(parts[2], 10, 64)
-		if e1 != nil || e2 != nil || e3 != nil {
-			continue
-		}
-		out = append(out, Residue{N: n, Prime: p, Residue: r})
+		out = append(out, res)
 	}
 	return out, sc.Err()
+}
+
+// parseResidue parses one "n prime residue" line.
+func parseResidue(line string) (Residue, bool) {
+	parts := strings.Fields(line)
+	if len(parts) != 3 {
+		return Residue{}, false
+	}
+	n, e1 := strconv.Atoi(parts[0])
+	p, e2 := strconv.ParseUint(parts[1], 10, 64)
+	r, e3 := strconv.ParseUint(parts[2], 10, 64)
+	if e1 != nil || e2 != nil || e3 != nil || p < 2 {
+		return Residue{}, false
+	}
+	return Residue{N: n, Prime: p, Residue: r}, true
 }
 
 // ─── Result ───────────────────────────────────────────────────────────────────
@@ -382,11 +426,9 @@ func warn(check, detail string) CheckResult {
 
 // Config holds verifier configuration.
 type Config struct {
-	N           int
-	DataDir     string
-	WorkersDir  string
-	NoSpotcheck bool
-	Verbose     bool
+	N       int
+	DataDir string
+	Verbose bool
 }
 
 // Run performs all verification checks for a(N) and returns the results.
@@ -406,7 +448,7 @@ func Run(cfg Config) []CheckResult {
 	results = append(results, pass("manifest", fmt.Sprintf("n=%d files=%d", mf.N, len(mf.Files))))
 
 	// ── Integrity: CRC + record count for each file ──
-	allSums := make(map[int]uint64) // n → sum across all heights
+	allSums := make(map[int]*big.Int) // n → sum across all heights
 	for _, fe := range mf.Files {
 		hdr, bodyOff, err := parsePolyrunHeader(fe.Path)
 		if err != nil {
@@ -456,18 +498,23 @@ func Run(cfg Config) []CheckResult {
 
 		// Accumulate sums for row-sum check.
 		for n, v := range sums {
-			allSums[n] += v
+			if allSums[n] == nil {
+				allSums[n] = new(big.Int)
+			}
+			allSums[n].Add(allSums[n], v)
 		}
 	}
 
 	// ── Row-sum: Σ_H T(n,H) for each n ──
 	// Use triangle file if available, else use manifest value for target n only.
 	triangleSums, triErr := ReadTriangleFile(trianglePath)
-	if triErr == nil && len(triangleSums) > 0 {
+	if triErr != nil && !os.IsNotExist(triErr) {
+		results = append(results, fail("row-sum", triErr.Error()))
+	} else if len(triangleSums) > 0 {
 		anyFail := false
 		for n, expected := range triangleSums {
-			got := allSums[n]
-			if got != expected {
+			got := bigOrZero(allSums[n])
+			if got.Cmp(expected) != 0 {
 				results = append(results, fail("row-sum", fmt.Sprintf("n=%d: runs sum %d triangle says %d", n, got, expected)))
 				anyFail = true
 			}
@@ -475,10 +522,10 @@ func Run(cfg Config) []CheckResult {
 		if !anyFail {
 			results = append(results, pass("row-sum", fmt.Sprintf("n=%d all %d sizes matched", cfg.N, len(triangleSums))))
 		}
-	} else if mf.Value != 0 {
+	} else if mf.Value != nil {
 		// No triangle file: check just a(N) against manifest value field.
-		got := allSums[cfg.N]
-		if got != mf.Value {
+		got := bigOrZero(allSums[cfg.N])
+		if got.Cmp(mf.Value) != 0 {
 			results = append(results, fail("row-sum", fmt.Sprintf("n=%d: runs sum %d manifest value=%d", cfg.N, got, mf.Value)))
 		} else {
 			results = append(results, pass("row-sum", fmt.Sprintf("n=%d sum=%d", cfg.N, got)))
@@ -496,21 +543,17 @@ func Run(cfg Config) []CheckResult {
 
 	// ── Residues ──
 	residues, resErr := ReadResiduesFile(residuesPath)
-	if resErr == nil && len(residues) > 0 {
+	if resErr != nil && !os.IsNotExist(resErr) {
+		results = append(results, fail("residue", resErr.Error()))
+	} else if len(residues) > 0 {
 		for _, r := range residues {
-			got := allSums[r.N]
-			gotMod := got % r.Prime
+			gotMod := new(big.Int).Mod(bigOrZero(allSums[r.N]), new(big.Int).SetUint64(r.Prime)).Uint64()
 			if gotMod != r.Residue {
 				results = append(results, fail("residue", fmt.Sprintf("n=%d mod %d: got %d expected %d", r.N, r.Prime, gotMod, r.Residue)))
 			} else {
 				results = append(results, pass("residue", fmt.Sprintf("n=%d mod %d = %d ok", r.N, r.Prime, r.Residue)))
 			}
 		}
-	}
-
-	// ── Spotcheck ──
-	if !cfg.NoSpotcheck && len(mf.Files) > 0 {
-		results = append(results, spotcheck(cfg, mf)...)
 	}
 
 	return results
@@ -520,25 +563,18 @@ func Run(cfg Config) []CheckResult {
 // A006770's ratios climb monotonically from ~4.0 (a2/a1) toward the growth
 // constant lambda ~ 7.10; high-n pairs sit at ~6.7-6.8 (a21/a20 ~ 6.78). The
 // band brackets the smallest legitimate ratio below and the asymptote above.
-func checkGrowthRatio(sums map[int]uint64) []CheckResult {
+func checkGrowthRatio(sums map[int]*big.Int) []CheckResult {
 	// Collect sorted keys with nonzero values.
 	var ns []int
 	for n, v := range sums {
-		if v > 0 {
+		if v != nil && v.Sign() > 0 {
 			ns = append(ns, n)
 		}
 	}
 	if len(ns) < 2 {
 		return nil
 	}
-	// Sort.
-	for i := 0; i < len(ns); i++ {
-		for j := i + 1; j < len(ns); j++ {
-			if ns[i] > ns[j] {
-				ns[i], ns[j] = ns[j], ns[i]
-			}
-		}
-	}
+	sort.Ints(ns)
 
 	var results []CheckResult
 	anyFail := false
@@ -547,11 +583,7 @@ func checkGrowthRatio(sums map[int]uint64) []CheckResult {
 		if b != a+1 {
 			continue // gap; skip
 		}
-		va, vb := float64(sums[a]), float64(sums[b])
-		if va == 0 {
-			continue
-		}
-		ratio := vb / va
+		ratio, _ := new(big.Float).Quo(new(big.Float).SetInt(sums[b]), new(big.Float).SetInt(sums[a])).Float64()
 		if ratio < 3.9 || ratio > 7.2 {
 			results = append(results, fail("growth", fmt.Sprintf("a(%d)/a(%d)=%.4f outside [3.9,7.2]", b, a, ratio)))
 			anyFail = true
@@ -563,39 +595,10 @@ func checkGrowthRatio(sums map[int]uint64) []CheckResult {
 	return results
 }
 
-// spotcheck re-runs up to 3 randomly selected run files via map_worker and compares.
-func spotcheck(cfg Config, mf Manifest) []CheckResult {
-	var results []CheckResult
-	mapWorker := filepath.Join(cfg.WorkersDir, "map_worker")
-	if _, err := os.Stat(mapWorker); err != nil {
-		results = append(results, warn("spotcheck", fmt.Sprintf("map_worker not found at %s, skipping", mapWorker)))
-		return results
+// bigOrZero returns v, or zero when v is nil (an n no file contributed to).
+func bigOrZero(v *big.Int) *big.Int {
+	if v == nil {
+		return new(big.Int)
 	}
-
-	// Pick up to 3 random files.
-	indices := rand.Perm(len(mf.Files))
-	if len(indices) > 3 {
-		indices = indices[:3]
-	}
-
-	for _, i := range indices {
-		fe := mf.Files[i]
-		result := spotcheckOne(cfg, mapWorker, fe)
-		results = append(results, result)
-	}
-	return results
-}
-
-func spotcheckOne(cfg Config, mapWorker string, fe ManifestFileEntry) CheckResult {
-	hdr, _, err := parsePolyrunHeader(fe.Path)
-	if err != nil {
-		return warn("spotcheck", fmt.Sprintf("cannot parse %s: %v", fe.Path, err))
-	}
-
-	// Find the previous column run. We look for the seed file or skip if not found.
-	// The spotcheck requires the input (previous column) run — if not available, warn.
-	// The map_worker input is the previous-col run for this H sweep. We don't have
-	// a reliable way to find it without the checkpoint, so we skip with a warning.
-	_ = hdr
-	return warn("spotcheck", fmt.Sprintf("skip %s: prev-col run not available without checkpoint", fe.Path))
+	return v
 }

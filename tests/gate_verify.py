@@ -148,7 +148,7 @@ def main():
         # ── Step 3: verify — expect PASS ──
         print("gate_verify: running verify (expect PASS) ...")
         r = subprocess.run(
-            [VERIFY, "--n", str(MAXN), "--data-dir", data_dir, "--no-spotcheck", "--verbose"],
+            [VERIFY, "--n", str(MAXN), "--data-dir", data_dir, "--verbose"],
             capture_output=True, text=True, cwd=ROOT,
         )
         sys.stdout.write(r.stdout)
@@ -164,7 +164,7 @@ def main():
         # ── Step 5: verify — expect FAIL ──
         print("gate_verify: running verify (expect FAIL) ...")
         r = subprocess.run(
-            [VERIFY, "--n", str(MAXN), "--data-dir", data_dir, "--no-spotcheck"],
+            [VERIFY, "--n", str(MAXN), "--data-dir", data_dir],
             capture_output=True, text=True, cwd=ROOT,
         )
         sys.stdout.write(r.stdout)
