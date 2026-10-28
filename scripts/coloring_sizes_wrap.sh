@@ -1,5 +1,5 @@
 #!/bin/bash
-# coloring_recount4 with the census-sizes pass folded in, so the gate exercises the
+# build/coloring_recount with the census-sizes pass folded in, so the gate exercises the
 # release path.  $1.. are the gate_coloring_recount.py argv for --modp.
 #
 # Two things this used to get wrong.  The sizes cache lived under /tmp, against
@@ -8,7 +8,7 @@
 # since landed out of -- pointing there would certify a stale build against the
 # in-tree gate.  COLORING_BIN still overrides, for the campaign's own binary.
 H=$2; N=$3
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIN=${COLORING_BIN:-$ROOT/build/coloring_recount}
 SZDIR=${SZDIR:-$HOME/var/motley_sizes}
 mkdir -p "$SZDIR"

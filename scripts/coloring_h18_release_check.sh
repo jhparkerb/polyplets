@@ -14,7 +14,7 @@
 # release OFF and needs ~2x the RAM, which changes the payload width.
 # Kill: kill the PID in ~/var/motley-h18-rel/pid.
 set -euo pipefail
-B=$HOME/src/pm-lastditch/build/coloring_recount4
+B=$HOME/src/pm-lastditch/build/motley_par4
 O=$HOME/var/motley-h18-rel
 P=2147483647
 mkdir -p "$O"; echo $$ > "$O/pid"

@@ -529,7 +529,7 @@ The K = 21 run is the one a(41) uses. Extrapolating the K ≤ 16 ladder
 under-predict memory. Memory scales with thread count as well as K, since
 the enumeration builds per-thread maps and merges them afterward, so a
 slope taken across thread counts is not a slope. Depth 6 was priced
-(`scripts/lastditch/emax5_kladder.sh`) at 36 to 44 h and 74 to 85 GB for
+(`scripts/cluster_weight_emax5_k_ladder.sh`) at 36 to 44 h and 74 to 85 GB for
 K = 21 and not run.
 
 ## The square lattice
@@ -646,9 +646,9 @@ and these five integers are its target.
     python3 experiments/depth6_cost_ladder.py
 
 All of the above run in seconds on the files in the tree. The measurements
-were `scripts/nmax_scaling.sh`, `scripts/lastditch/emax_ladder.sh`,
-`scripts/lastditch/emax4_kladder.sh`, the 8-thread series
+were `scripts/nmax_scaling.sh`, `scripts/cluster_weight_emax_ladder.sh`,
+`scripts/cluster_weight_emax4_k_ladder.sh`, the 8-thread series
 `./build/cluster_weight_families families K 4 8` for K = 8, 10, 12, 14, 16,
-`scripts/lastditch/emax5_kladder.sh` (about 2.2 h),
+`scripts/cluster_weight_emax5_k_ladder.sh` (about 2.2 h),
 `scripts/cluster_weight_families_e4_k21.sh` (4 h 54 m) and `scripts/dalby_a41_h20.sh`
 (9.63 h on 76 cores).
