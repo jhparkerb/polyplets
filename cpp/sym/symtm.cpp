@@ -77,6 +77,7 @@
 
 #include "core/signature.h"
 #include "core/transition.h"
+#include "../argparse.h"
 #include "../obs.h"
 
 using u64 = std::uint64_t;
@@ -1085,11 +1086,11 @@ int main(int argc, char** argv) {
     if (a == "--byheight") {
       byHeight = true;
     } else if (a == "--strips" && i + 2 < argc) {
-      hmin = std::atoi(argv[i + 1]);
-      hmax = std::atoi(argv[i + 2]);
+      hmin = static_cast<int>(argparse::ArgInt(argv[i + 1], "HMIN", 1, 255));
+      hmax = static_cast<int>(argparse::ArgInt(argv[i + 2], "HMAX", 1, 255));
       i += 2;
     } else if (a == "--maxwidth" && i + 1 < argc) {
-      wcap = std::atoi(argv[i + 1]);
+      wcap = static_cast<int>(argparse::ArgInt(argv[i + 1], "--maxwidth", 1, 255));
       ++i;
     } else {
       pos.push_back(a);
@@ -1108,38 +1109,34 @@ int main(int argc, char** argv) {
                  argv[0], argv[0], argv[0]);
     return 2;
   }
-  const int maxn = std::atoi(pos[1].c_str());
+  const int maxn = static_cast<int>(argparse::ArgInt(pos[1].c_str(), "MAXN", 1, isDm ? 34 : 40));
   // dmirror's unfolded-hook layout caps the bbox at 34 (POLY_SIGMAX=70 fits
   // 34 + 33 label bytes + flag); hmirror/r180 signatures are H + 2 bytes, so
   // they are limited only by the u64 masks and run to 40 for the subgroup
   // congruences (results/symmetry-classes.md).
-  if (maxn < 1 || maxn > (isDm ? 34 : 40)) {
-    std::fprintf(stderr, "MAXN out of range (1..%d for %s)\n",
-                 isDm ? 34 : 40, type.c_str());
-    return 2;
-  }
-  if (isDm && (byHeight || hmin > 0 || hmax > 0 || wcap > 0)) {
-    std::fprintf(stderr, "--byheight, --strips and --maxwidth are hmirror/r180 only\n");
+  if (isDm && (byHeight || hmin > 0 || hmax > 0)) {
+    std::fprintf(stderr, "--byheight and --strips are hmirror/r180 only\n");
     return 2;
   }
   if (wcap > 0 && type != "hmirror") {
     std::fprintf(stderr, "--maxwidth is hmirror only\n");
     return 2;
   }
-  if ((hmin > 0 || hmax > 0) && !(1 <= hmin && hmin <= hmax && hmax <= maxn)) {
+  if (hmin > 0 && !(hmin <= hmax && hmax <= maxn)) {
     std::fprintf(stderr, "bad strip range %d..%d (need 1<=HMIN<=HMAX<=MAXN)\n",
                  hmin, hmax);
     return 2;
   }
-  int nthreads = pc >= 3 ? std::atoi(pos[2].c_str()) : 1;
+  // THREADS 0 means 1.
+  int nthreads = pc >= 3 ? static_cast<int>(argparse::ArgInt(pos[2].c_str(), "THREADS", 0, 4096)) : 1;
   if (nthreads < 1) nthreads = 1;
   // dmirror strip range: farm exact-bbox strips across machines; the
   // partial totals of disjoint ranges sum to the full count.
   int smin = 1, smax = maxn;
   if (isDm && pc == 5) {
-    smin = std::atoi(pos[3].c_str());
-    smax = std::atoi(pos[4].c_str());
-    if (smin < 1 || smax > maxn || smin > smax) {
+    smin = static_cast<int>(argparse::ArgInt(pos[3].c_str(), "SMIN", 1, maxn));
+    smax = static_cast<int>(argparse::ArgInt(pos[4].c_str(), "SMAX", 1, maxn));
+    if (smin > smax) {
       std::fprintf(stderr, "bad strip range %d..%d (need 1<=SMIN<=SMAX<=MAXN)\n",
                    smin, smax);
       return 2;

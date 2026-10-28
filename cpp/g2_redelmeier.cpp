@@ -32,8 +32,10 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <climits>
 #include <array>
 
+#include "argparse.h"
 #include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
 
 using u64 = std::uint64_t;
@@ -529,11 +531,7 @@ int main(int argc, char** argv) {
   else if (lattice == "tri6")    { c.offs = kTri6;    c.deg = 6; }
   else { std::fprintf(stderr, "unknown lattice: %s\n", lattice.c_str()); return 2; }
 
-  c.maxn = std::atoi(argv[2]);
-  if (c.maxn < 1 || c.maxn > 40) {
-    std::fprintf(stderr, "MAXN out of range (1..40)\n");
-    return 2;
-  }
+  c.maxn = static_cast<int>(argparse::ArgInt(argv[2], "MAXN", 1, 40));
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-box") == 0) {
       c.perBox = true;
@@ -552,11 +550,11 @@ int main(int argc, char** argv) {
     } else if (std::strcmp(argv[i], "--siteperim") == 0) {
       c.siteperimCheck = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
-      c.splitS  = std::atoi(argv[i + 1]);
-      c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
-      c.splitIdx = std::strtoull(argv[i + 3], nullptr, 10);
+      c.splitS   = static_cast<int>(argparse::ArgInt(argv[i + 1], "--split S", 1, 40));
+      c.splitK   = static_cast<unsigned long long>(argparse::ArgInt(argv[i + 2], "--split K", 1, LONG_MAX));
+      c.splitIdx = static_cast<unsigned long long>(argparse::ArgInt(argv[i + 3], "--split IDX", 0, LONG_MAX));
       i += 3;
-      if (c.splitS < 1 || c.splitK < 1 || c.splitIdx >= c.splitK) {
+      if (c.splitIdx >= c.splitK) {
         std::fprintf(stderr, "bad --split arguments\n");
         return 2;
       }

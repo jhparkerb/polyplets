@@ -30,6 +30,7 @@
 #include <thread>
 #include <vector>
 
+#include "../argparse.h"
 #include "../obs.h"  // shared observability/provenance runtime (docs/observability.md)
 
 using u64 = std::uint64_t;
@@ -348,12 +349,12 @@ int main(int argc, char** argv) {
     return 2;
   }
   SymType type = makeType(pos[0]);
-  const int maxn = std::atoi(pos[1].c_str());
   // The grid is sized from maxn; the counts grow far slower than a(n), so
   // u64 holds them at any maxn this can reach.
-  if (maxn < 1 || maxn > 64) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
+  const int maxn = static_cast<int>(argparse::ArgInt(pos[1].c_str(), "MAXN", 1, 64));
 
-  int nthreads = pos.size() == 3 ? std::atoi(pos[2].c_str()) : 0;
+  // THREADS 0 (the default) means all hardware threads.
+  int nthreads = pos.size() == 3 ? static_cast<int>(argparse::ArgInt(pos[2].c_str(), "THREADS", 0, 4096)) : 0;
   if (nthreads <= 0) {
     nthreads = static_cast<int>(std::thread::hardware_concurrency());
     if (nthreads < 1) nthreads = 1;

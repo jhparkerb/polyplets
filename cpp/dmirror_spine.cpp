@@ -48,6 +48,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "argparse.h"
 #include "obs.h"
 
 namespace {
@@ -400,11 +401,15 @@ int main(int argc, char** argv) {
   const std::string root = repoRoot(argv[0]);
   if (std::strcmp(argv[1], "--gate") == 0) return gate(root, 11) ? 0 : 1;
 
-  const int S = std::atoi(argv[1]);
-  const int kmax = (argc > 2) ? std::atoi(argv[2]) : 6;
+  if (argc > 3) {
+    std::fprintf(stderr, "usage: dmirror_spine S [KMAX] | --gate\n");
+    return 2;
+  }
+  const int S = static_cast<int>(argparse::ArgInt(argv[1], "S", 2, MAXS));
+  const int kmax = (argc > 2) ? static_cast<int>(argparse::ArgInt(argv[2], "KMAX", 0, 255)) : 6;
   // State::n is a u8, so the cell cap S + KMAX must stay under 256.
-  if (argc > 3 || S < 2 || S > MAXS || kmax < 0 || S + kmax > 255) {
-    std::fprintf(stderr, "need 2 <= S <= %d, KMAX >= 0, S + KMAX <= 255\n", MAXS);
+  if (S + kmax > 255) {
+    std::fprintf(stderr, "need S + KMAX <= 255\n");
     return 2;
   }
   if (!gate(root, std::min(S, 11))) {

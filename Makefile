@@ -623,7 +623,7 @@ build:
 # -Wno-error=restrict on the Redelmeier generator: works around a gcc-12 false
 # positive in <bits/char_traits.h> (bogus -Wrestrict on std::string ops; clang and
 # gcc-15 don't trip it). Scoped here so -Werror stays strict everywhere else.
-build/g2: cpp/g2_redelmeier.cpp | build
+build/g2: cpp/g2_redelmeier.cpp cpp/argparse.h | build
 	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
 
 # Defect-pruned Redelmeier for the site-perimeter grading. Separate binary
@@ -654,7 +654,7 @@ build/perimeter_min: cpp/perimeter_min.cpp cpp/obs.h | build
 # H<=14). -std=c++17 and no $(CXXFLAGS) deliberately: mirrors the build line
 # in scripts/run_strip_h14.sh exactly, so the gate binary and the production
 # run binary are the same program built the same way.
-build/strip_tm: cpp/strip_tm.cpp | build
+build/strip_tm: cpp/strip_tm.cpp cpp/argparse.h | build
 	$(CXX) -O3 -std=c++17 $< -o $@
 
 # Strip growth-constant engines (mu_H, the rigorous lambda lower-bound ladder).
@@ -672,7 +672,7 @@ build/strip_mu: cpp/strip_mu.cpp | build
 # parallelism, the flat arena and the chunked release are accounting.  -fopenmp
 # is not optional -- the cell-step is an OpenMP loop -- and scripts/
 # gen_compile_commands.sh mirrors that so clangd and gate-compile-db agree.
-build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
+build/motley_par: cpp/motley_par.cpp cpp/argparse.h cpp/obs.h | build
 	$(OMPCXX) $(CXXFLAGS) -O2 -fopenmp -o $@ $<
 
 # Gate the parallel engine against the banked exact C_H rows at three payload
@@ -783,11 +783,11 @@ build/tma_tsan: cpp/tma_main.cpp cpp/tma/*.h | build
 build/tma_sample: cpp/tma_sample.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_sample.cpp -o $@
 
-build/symcount_fast: cpp/sym/symcount_fast.cpp | build
+build/symcount_fast: cpp/sym/symcount_fast.cpp cpp/argparse.h | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 # Symmetric transfer-matrix counter (Hall of Mirrors): symmetric counts to n~34
-build/symtm: cpp/sym/symtm.cpp core/signature.h core/transition.h | build
+build/symtm: cpp/sym/symtm.cpp cpp/argparse.h core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread -I. cpp/sym/symtm.cpp -o $@
 
 # Gate symtm: TM symmetric counter vs symcount_fast (cross-algorithm, live)
@@ -905,7 +905,7 @@ build/nkey_census: cpp/nkey_census.cpp cpp/obs.h | build
 # The dmirror spine split with a cell budget (A1.3's live half): the hook
 # transfer matrix that reaches S = 16, 17, where the Python takes hours at 14.
 # Gates against every banked dmirror_strip cell it can reach before reporting.
-build/dmirror_spine: cpp/dmirror_spine.cpp cpp/obs.h | build
+build/dmirror_spine: cpp/dmirror_spine.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
 
 # The Lean development (gympie only: the toolchain and vendored Mathlib live
@@ -1186,7 +1186,7 @@ ns-gate-regression: build/ns/driver0
 ns-gate-fold: build/ns/driver0
 	./build/ns/driver0 --maxn 12 --fold-check
 
-build/ns/driver0: tests/engine/driver0.cpp cpp/argparse.h $(NS_HEADERS) | build/ns
+build/ns/driver0: tests/engine/driver0.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns

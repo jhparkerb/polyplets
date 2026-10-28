@@ -34,6 +34,7 @@
 #include <chrono>
 #include <fstream>
 #include <sstream>
+#include "argparse.h"
 
 using u64 = uint64_t;
 using i128 = __int128;
@@ -199,10 +200,9 @@ int main(int argc, char** argv) {
   // by differencing afterwards.
   if (argc >= 2 && std::string(argv[1]) == "single") {
     if (argc != 5) { std::fputs(usage, stderr); return 1; }
-    int H = std::atoi(argv[2]);
-    int Nmax = std::atoi(argv[3]);
+    const int H = static_cast<int>(argparse::ArgInt(argv[2], "H", 1, 16));
+    const int Nmax = static_cast<int>(argparse::ArgInt(argv[3], "Nmax", 1, 10000));
     std::string out = argv[4];
-    if (H < 1 || H > 16 || Nmax < 1) { std::fprintf(stderr, "need 1 <= H <= 16, Nmax >= 1\n"); return 1; }
     std::printf("strip_tm single: H=%d Nmax=%d -> %s\n", H, Nmax, out.c_str());
     std::fflush(stdout);
     Engine e; e.H = H; e.N = Nmax;
@@ -221,10 +221,9 @@ int main(int argc, char** argv) {
   }
 
   if (argc < 3 || argc > 4) { std::fputs(usage, stderr); return 1; }
-  int Hmax = std::atoi(argv[1]);
-  int Nmax = std::atoi(argv[2]);
+  const int Hmax = static_cast<int>(argparse::ArgInt(argv[1], "Hmax", 1, 16));
+  const int Nmax = static_cast<int>(argparse::ArgInt(argv[2], "Nmax", 1, 10000));
   std::string bankdir = (argc > 3) ? argv[3] : "";
-  if (Hmax < 1 || Hmax > 16 || Nmax < 1) { std::fprintf(stderr, "need 1 <= Hmax <= 16, Nmax >= 1\n"); return 1; }
 
   std::printf("strip_tm (C++): Hmax=%d Nmax=%d\n", Hmax, Nmax);
   std::vector<std::vector<i128>> Ccols(Hmax + 1);

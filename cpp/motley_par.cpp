@@ -44,6 +44,7 @@
 #include <omp.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include "argparse.h"
 #include "obs.h"
 
 static obs::Reporter* g_rep = nullptr;
@@ -666,7 +667,7 @@ int main(int argc, char** argv) {
   std::vector<char*> pos;
   for (int i = 1; i < argc; i++) {
     if (!std::strcmp(argv[i], "--threads") && i + 1 < argc) {
-      omp_set_num_threads(atoi(argv[++i]));
+      omp_set_num_threads(static_cast<int>(argparse::ArgInt(argv[++i], "--threads", 1, 4096)));
     } else if (!std::strcmp(argv[i], "--ckpt") && i + 1 < argc) {
       ckptdir = argv[++i];
     } else if (!std::strcmp(argv[i], "--sizes") && i + 1 < argc) {
@@ -676,20 +677,16 @@ int main(int argc, char** argv) {
     } else pos.push_back(argv[i]);
   }
   if (pos.size() == 3 && !std::strcmp(pos[0], "--census")) {
-    int H = atoi(pos[1]), Nmax = atoi(pos[2]);
-    if (H < 1 || H > HMAX_KEY || Nmax < 1) {
-      fprintf(stderr, "limits: 1<=H<=%d, Nmax>=1\n", HMAX_KEY); return 1;
-    }
+    const int H = static_cast<int>(argparse::ArgInt(pos[1], "H", 1, HMAX_KEY));
+    const int Nmax = static_cast<int>(argparse::ArgInt(pos[2], "Nmax", 1, 10000));
     census(H, Nmax);
     rep.done("mode=census H=" + std::to_string(H));
     return 0;
   }
   if (pos.size() == 5 && !std::strcmp(pos[0], "--modp")) {
-    int H = atoi(pos[1]), Nmax = atoi(pos[2]);
-    u64 p = strtoull(pos[3], nullptr, 10);
-    if (H < 1 || H > HMAX_KEY || Nmax < 1 || p >= (1ull << 31) || p < 2) {
-      fprintf(stderr, "limits: 1<=H<=%d, Nmax>=1, 2<=p<2^31\n", HMAX_KEY); return 1;
-    }
+    const int H = static_cast<int>(argparse::ArgInt(pos[1], "H", 1, HMAX_KEY));
+    const int Nmax = static_cast<int>(argparse::ArgInt(pos[2], "Nmax", 1, 10000));
+    const u64 p = static_cast<u64>(argparse::ArgInt(pos[3], "p", 2, (1L << 31) - 1));
     // Payload width from the prime: the accumulator is u64, so the only
     // requirement is that a residue fits the stored type.
     if (p < (1ull << 8)) run_modp<uint8_t>(H, Nmax, p, pos[4], ckptdir, sizesfile);
