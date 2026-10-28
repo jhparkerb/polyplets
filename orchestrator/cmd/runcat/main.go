@@ -60,7 +60,7 @@ func catFile(path string) error {
 	fmt.Printf("# keylo=%s keyhi=%s\n", hdr.KeyLo, hdr.KeyHi)
 
 	// CRC check.
-	crcStatus, crcOK := crcCheck(path)
+	crcStatus, crcOK := crcCheck(path, bodyOff)
 	fmt.Printf("# CRC: %s\n", crcStatus)
 
 	f, err := os.Open(path)
@@ -118,25 +118,17 @@ func catFile(path string) error {
 	return nil
 }
 
-// crcCheck verifies the stored FNV-1a-64 CRC against the body bytes, returning a
-// human-readable status and whether it matched.
-func crcCheck(path string) (status string, ok bool) {
+// crcCheck verifies the stored FNV-1a-64 CRC against the body bytes, which
+// start at bodyOff, returning a human-readable status and whether it matched.
+func crcCheck(path string, bodyOff int64) (status string, ok bool) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Sprintf("ERROR: %v", err), false
 	}
-	// Find header end: first \n\n.
-	start := -1
-	for i := 0; i < len(data)-1; i++ {
-		if data[i] == '\n' && data[i+1] == '\n' {
-			start = i + 2
-			break
-		}
+	if int64(len(data))-bodyOff < 8 {
+		return "ERROR: file ends before the checksum trailer", false
 	}
-	if start < 0 || len(data)-start < 8 {
-		return "ERROR: cannot locate body", false
-	}
-	body := data[start : len(data)-8]
+	body := data[bodyOff : len(data)-8]
 	stored := binary.LittleEndian.Uint64(data[len(data)-8:])
 	computed := orchestrator.Fnv1a64(body)
 	if computed == stored {
