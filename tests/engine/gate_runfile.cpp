@@ -156,6 +156,23 @@ static void testHeaderRejectsBadByteorder() {
   std::remove((path + ".idx").c_str());
 }
 
+// A records count that does not parse must be rejected, not read as 0: a
+// zero count makes the reader return no records and skip the checksum, so
+// the file would read as empty.
+static void testHeaderRejectsBadRecords() {
+  const std::string path = "/tmp/gate_runfile_recs.bin";
+  writeRun(path, 3, 4);
+  {
+    RunFileReader<u64> r(path, 3);
+    assert(r.ok() && "control: an intact header must parse");
+  }
+  tamper(path, "records 000000000000000004", "records 00000000000000000x");
+  RunFileReader<u64> r(path, 3);
+  assert(!r.ok() && "reader accepted an unparseable records count");
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+}
+
 // D6 (header self-describing): parseHeader must reject a counter tag that does
 // not match the reader's word width (reading a u128 file as u64 = silent
 // misparse). u64's tag is "u64"; tampering it must be caught.
@@ -775,6 +792,7 @@ int main() {
   testAtomicPublish();
   testIndexHasMagic();
   testHeaderRejectsBadByteorder();
+  testHeaderRejectsBadRecords();
   testHeaderRejectsCounterMismatch();
   // Fail-closed spill I/O. These intentionally trigger "cannot open" on stderr
   // in the forked child — that noise is the behavior under test, not an error.

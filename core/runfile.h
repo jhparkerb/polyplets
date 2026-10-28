@@ -1021,6 +1021,19 @@ class RunFileReader {
   }
 #endif
 
+  // A header number must be all digits; anything else is reported and
+  // rejected, never read as 0.
+  bool headerNumber(const char* s, unsigned long long& out) const {
+    char* end = nullptr;
+    errno = 0;
+    out = std::strtoull(s, &end, 10);
+    if (end == s || *end != '\0' || errno != 0 || *s == '-') {
+      std::fprintf(stderr, "RunFileReader: %s: bad header number '%s'\n", path_.c_str(), s);
+      return false;
+    }
+    return true;
+  }
+
   bool parseHeader() {
     char line[512];
     bool saw_polyrun = false;
@@ -1039,22 +1052,29 @@ class RunFileReader {
         // spill). 2 = block-framed zstd (indexed frontier; .idx offsets are
         // frame starts). Anything else is from a newer format: REJECT rather
         // than misread the body as plain bytes.
-        int cv = std::atoi(line + 12);
+        unsigned long long cv = 0;
+        if (!headerNumber(line + 12, cv)) return false;
         compressed_   = (cv >= 1);
         block_framed_ = (cv == 2);
-        if (cv < 0 || cv > 2) {
+        if (cv > 2) {
           std::fprintf(stderr,
-                       "RunFileReader: %s has unknown compression %d "
+                       "RunFileReader: %s has unknown compression %llu "
                        "(newer format? rebuild required)\n", path_.c_str(), cv);
           return false;
         }
       }
-      else if (std::strncmp(line, "records ", 8) == 0)
-        records_ = static_cast<size_t>(std::strtoull(line + 8, nullptr, 10));
-      else if (std::strncmp(line, "byteorder ", 10) == 0)
-        // Self-describing (D6): the body is canonically little-endian; a file
-        // claiming any other order is rejected rather than silently misread.
-        byteorder_ok = (std::atoi(line + 10) == kRunByteOrderLE);
+      else if (std::strncmp(line, "records ", 8) == 0) {
+        unsigned long long n = 0;
+        if (!headerNumber(line + 8, n)) return false;
+        records_ = static_cast<size_t>(n);
+      }
+      else if (std::strncmp(line, "byteorder ", 10) == 0) {
+        // The body is canonically little-endian; a file claiming any other
+        // order is rejected rather than silently misread.
+        unsigned long long bo = 0;
+        if (!headerNumber(line + 10, bo)) return false;
+        byteorder_ok = (bo == static_cast<unsigned long long>(kRunByteOrderLE));
+      }
       else if (std::strncmp(line, "counter ", 8) == 0)
         // Reject a counter tag that doesn't match this reader's word width
         // (e.g. reading a u128 file as u64) instead of misparsing the records.
