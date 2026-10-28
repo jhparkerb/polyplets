@@ -1139,7 +1139,7 @@ checkpoints only a completed-height set and re-runs any in-flight height.
 `perheight/h20.out` from an empty in-memory table. The combiner refused the
 zeroed shard; the value was recovered from the checkpoint's count table, and a
 clean `H = 20`-only re-run reproduced it (`results/ns_a40/PROVENANCE.md`;
-`orchestrator/zero_harvest_test.go`).
+`orchestrator/perheight_resume_test.go`).
 
 **Kink kernel against independent values.** `make gate-kink-oracle` runs the
 kink kernel at `maxn = 18` with `--max-diag-k 0` against the published

@@ -68,7 +68,7 @@ func midHeightCheckpoint(t *testing.T, dir string) SweepConfig {
 	t.Helper()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	cfg := perHeightCfg(t, dir, perHeightH)
 	fired := false
 	cfg.afterColumn = func(H, col int) {
 		if !fired && col >= 1 {
@@ -86,7 +86,7 @@ func midHeightCheckpoint(t *testing.T, dir string) SweepConfig {
 }
 
 func TestLegacyCheckpointMidHeightResumeRefused(t *testing.T) {
-	want := refPerHeightRow(t, zeroHarvestH)
+	want := refPerHeightRow(t, perHeightH)
 
 	dir := t.TempDir()
 	cfg := midHeightCheckpoint(t, dir)
@@ -103,14 +103,14 @@ func TestLegacyCheckpointMidHeightResumeRefused(t *testing.T) {
 		t.Fatalf("legacy rewrite left %d htri entries: test is vacuous", len(ck.HTri))
 	}
 
-	resumed := perHeightCfg(t, dir, zeroHarvestH)
+	resumed := perHeightCfg(t, dir, perHeightH)
 	resumed.CheckpointPath = legacy
 	if _, err := Run(context.Background(), resumed, ck); err == nil {
-		got := readPerHeightRow(t, resumed.PerHeightOut, zeroHarvestH)
+		got := readPerHeightRow(t, resumed.PerHeightOut, perHeightH)
 		for n, w := range want {
 			if g := got[n]; g != w {
 				t.Fatalf("resume from a pre-htri mid-height checkpoint (H=%d col=%d) was ALLOWED and wrote a SHORT h%d.out: n=%d got %q want %q (whole row); nothing downstream catches a nonzero under-count",
-					ck.H, ck.Col, zeroHarvestH, n, g, w)
+					ck.H, ck.Col, perHeightH, n, g, w)
 			}
 		}
 		t.Fatalf("resume from a pre-htri mid-height checkpoint (H=%d col=%d) was ALLOWED", ck.H, ck.Col)
@@ -124,10 +124,10 @@ func TestLegacyCheckpointMidHeightResumeRefused(t *testing.T) {
 // and the good h<H>.out on disk survives. That refusal also fails the run —
 // the failure must be the write refusal, never the start-time refusal.
 func TestLegacyCheckpointCompletedHeightResumeAllowed(t *testing.T) {
-	want := refPerHeightRow(t, zeroHarvestH)
+	want := refPerHeightRow(t, perHeightH)
 
 	dir := t.TempDir()
-	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	cfg := perHeightCfg(t, dir, perHeightH)
 	if _, err := Run(context.Background(), cfg, nil); err != nil {
 		t.Fatalf("initial run: %v", err)
 	}
@@ -139,33 +139,33 @@ func TestLegacyCheckpointCompletedHeightResumeAllowed(t *testing.T) {
 	if len(ck.Frontier) != 0 {
 		t.Fatalf("checkpoint frontier=%v: height not complete, test is vacuous", ck.Frontier)
 	}
-	resumed := perHeightCfg(t, dir, zeroHarvestH)
+	resumed := perHeightCfg(t, dir, perHeightH)
 	resumed.CheckpointPath = legacy
 	_, err = Run(context.Background(), resumed, ck)
-	if err != nil && strings.Contains(err.Error(), "predates the Zero Harvest fix") {
+	if err != nil && strings.Contains(err.Error(), "predates the per-height-row fix") {
 		t.Fatalf("the legacy-checkpoint check refused a legacy COMPLETED-height checkpoint at start; only the MID-height case is unserveable: %v", err)
 	}
 	if err == nil || !strings.Contains(err.Error(), "refusing to write all-zero") {
 		t.Fatalf("resume of a legacy COMPLETED-height checkpoint: got %v, want the all-zero write refusal (fatal)", err)
 	}
 	checkPerHeightRow(t, "legacy-completed-height-resume", want,
-		readPerHeightRow(t, resumed.PerHeightOut, zeroHarvestH))
+		readPerHeightRow(t, resumed.PerHeightOut, perHeightH))
 }
 
 // TestLegacyCheckpointFreshHeightResumeAllowed pins the other legitimate
 // legacy state: a height that had not completed a single column (col=-1), so
 // there is nothing for htri to carry and the rewritten row is whole.
 func TestLegacyCheckpointFreshHeightResumeAllowed(t *testing.T) {
-	want := refPerHeightRow(t, zeroHarvestH)
+	want := refPerHeightRow(t, perHeightH)
 
 	dir := t.TempDir()
-	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	cfg := perHeightCfg(t, dir, perHeightH)
 	seed := filepath.Join(cfg.RunDir, "seed_h4.bin")
-	if err := WriteSeedPolyrun(seed, cfg.Rev, zeroHarvestH, cfg.Maxn, cfg.CounterWidth); err != nil {
+	if err := WriteSeedPolyrun(seed, cfg.Rev, perHeightH, cfg.Maxn, cfg.CounterWidth); err != nil {
 		t.Fatalf("write seed: %v", err)
 	}
 	ck := &Checkpoint{
-		Version: 1, H: zeroHarvestH, Col: -1, Frontier: []string{seed},
+		Version: 1, H: perHeightH, Col: -1, Frontier: []string{seed},
 		Maxn: cfg.Maxn, Counter: counterName(cfg.CounterWidth),
 		Fold: cfg.Fold, Kernel: kernelName(cfg.Kernel),
 	}
@@ -173,5 +173,5 @@ func TestLegacyCheckpointFreshHeightResumeAllowed(t *testing.T) {
 		t.Fatalf("resume of a legacy FRESH-height checkpoint must still work: %v", err)
 	}
 	checkPerHeightRow(t, "legacy-fresh-height-resume", want,
-		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
+		readPerHeightRow(t, cfg.PerHeightOut, perHeightH))
 }

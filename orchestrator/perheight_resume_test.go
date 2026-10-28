@@ -1,7 +1,7 @@
 package orchestrator
 
-// zero_harvest_test.go — red-first regression for the Zero Harvest bug
-// (a(40) incident, results/ns_a40/PROVENANCE.md).
+// perheight_resume_test.go — red-first regression for the per-height row
+// lost on resume (a(40) incident, results/ns_a40/PROVENANCE.md).
 //
 // writePerHeight at height completion writes hTri — the per-height
 // contributions accumulated by THIS process's sweep. On any mid-height
@@ -75,7 +75,7 @@ func checkPerHeightRow(t *testing.T, ctx string, want, got map[int]string) {
 	}
 }
 
-const zeroHarvestH = 4 // real-swept at maxn=8 (diagonal k=4 needs maxn>=9)
+const perHeightH = 4 // real-swept at maxn=8 (diagonal k=4 needs maxn>=9)
 
 // refPerHeightRow computes the reference h<H>.out from a clean, uninterrupted
 // run — production-validated per-height output.
@@ -95,27 +95,27 @@ func refPerHeightRow(t *testing.T, H int) map[int]string {
 // re-entering a finished phase. The resumed run finds no work; it must NOT
 // overwrite the good h<H>.out with zeros.
 func TestResumeCompletedHeightPreservesPerHeight(t *testing.T) {
-	want := refPerHeightRow(t, zeroHarvestH)
+	want := refPerHeightRow(t, perHeightH)
 
 	dir := t.TempDir()
-	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	cfg := perHeightCfg(t, dir, perHeightH)
 	if _, err := Run(context.Background(), cfg, nil); err != nil {
 		t.Fatalf("initial run: %v", err)
 	}
 	checkPerHeightRow(t, "pre-resume", want,
-		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
+		readPerHeightRow(t, cfg.PerHeightOut, perHeightH))
 
 	ck, err := ReadCheckpoint(cfg.CheckpointPath)
 	if err != nil {
 		t.Fatalf("read checkpoint: %v", err)
 	}
-	res, err := Run(context.Background(), perHeightCfg(t, dir, zeroHarvestH), ck)
+	res, err := Run(context.Background(), perHeightCfg(t, dir, perHeightH), ck)
 	if err != nil {
 		t.Fatalf("resume of completed height (H=%d col=%d): %v", ck.H, ck.Col, err)
 	}
 	checkTriangleIsRow(t, "completed-height-resume", want, res.Triangle)
 	checkPerHeightRow(t, "post-resume", want,
-		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
+		readPerHeightRow(t, cfg.PerHeightOut, perHeightH))
 }
 
 // TestAllZeroPerHeightRefusalIsFatal — red-first regression: every
@@ -132,14 +132,14 @@ func TestResumeCompletedHeightPreservesPerHeight(t *testing.T) {
 // RED before the fix:
 //
 //	--- FAIL: TestAllZeroPerHeightRefusalIsFatal (0.44s)
-//	    zero_harvest_test.go:155: Run returned nil after refusing to write an
+//	    perheight_resume_test.go:155: Run returned nil after refusing to write an
 //	        all-zero h4.out: the refusal is advisory, the process exits 0 and
 //	        the driver proceeds to combine
 func TestAllZeroPerHeightRefusalIsFatal(t *testing.T) {
-	want := refPerHeightRow(t, zeroHarvestH)
+	want := refPerHeightRow(t, perHeightH)
 
 	dir := t.TempDir()
-	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	cfg := perHeightCfg(t, dir, perHeightH)
 	if _, err := Run(context.Background(), cfg, nil); err != nil {
 		t.Fatalf("initial run: %v", err)
 	}
@@ -150,12 +150,12 @@ func TestAllZeroPerHeightRefusalIsFatal(t *testing.T) {
 	if len(ck.HTri) != 0 || len(ck.Frontier) != 0 {
 		t.Fatalf("checkpoint htri=%d frontier=%v: not the all-zero-row shape, test is vacuous", len(ck.HTri), ck.Frontier)
 	}
-	if _, err := Run(context.Background(), perHeightCfg(t, dir, zeroHarvestH), ck); err == nil {
-		t.Fatalf("Run returned nil after refusing to write an all-zero h%d.out: the refusal is advisory, the process exits 0 and the driver proceeds to combine", zeroHarvestH)
+	if _, err := Run(context.Background(), perHeightCfg(t, dir, perHeightH), ck); err == nil {
+		t.Fatalf("Run returned nil after refusing to write an all-zero h%d.out: the refusal is advisory, the process exits 0 and the driver proceeds to combine", perHeightH)
 	}
 	// The refusal must still have preserved the good row.
 	checkPerHeightRow(t, "all-zero-refusal", want,
-		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
+		readPerHeightRow(t, cfg.PerHeightOut, perHeightH))
 }
 
 // TestClosedFormPerHeightWriteFailureIsFatal covers the other five
@@ -198,11 +198,11 @@ func checkTriangleIsRow(t *testing.T, ctx string, want map[int]string, got []*bi
 // contributions. (The triangle total was always correct across this resume;
 // only the per-height file under-counted.)
 func TestResumeMidHeightPerHeightRow(t *testing.T) {
-	want := refPerHeightRow(t, zeroHarvestH)
+	want := refPerHeightRow(t, perHeightH)
 
 	dir := t.TempDir()
 	ctx, cancel := context.WithCancel(context.Background())
-	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	cfg := perHeightCfg(t, dir, perHeightH)
 	fired := false
 	cfg.afterColumn = func(H, col int) {
 		// col>=1: at least one column's contributions are checkpoint-only,
@@ -228,11 +228,11 @@ func TestResumeMidHeightPerHeightRow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read checkpoint: %v", err)
 	}
-	res, err := Run(context.Background(), perHeightCfg(t, dir, zeroHarvestH), ck)
+	res, err := Run(context.Background(), perHeightCfg(t, dir, perHeightH), ck)
 	if err != nil {
 		t.Fatalf("resume (H=%d col=%d): %v", ck.H, ck.Col, err)
 	}
 	checkTriangleIsRow(t, "mid-height-resume", want, res.Triangle)
 	checkPerHeightRow(t, "mid-height-resume", want,
-		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
+		readPerHeightRow(t, cfg.PerHeightOut, perHeightH))
 }

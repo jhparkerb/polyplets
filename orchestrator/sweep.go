@@ -291,7 +291,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	// Triangle merges them), so it must NOT be re-added there; it exists so
 	// the completion-time per-height write and the next checkpoint's HTri
 	// carry the height's WHOLE row, not just the post-resume columns (the
-	// Zero Harvest bug, results/ns_a40/PROVENANCE.md).
+	// a(40) incident, results/ns_a40/PROVENANCE.md).
 	var hSeed []*big.Int
 
 	// writeCheckpoint writes a POLYCKPT with the outer triangle + the current
