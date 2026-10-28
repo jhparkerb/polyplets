@@ -107,10 +107,19 @@ inline int spillZstdLevel() {
   return 3;
 }
 
+// Internal spill files (read back sequentially, no index) are zstd-compressed
+// whenever the build has zstd, which relieves the map phase's disk write
+// bandwidth.
+#ifdef POLY_ZSTD
+inline constexpr bool kSpillZstd = true;
+#else
+inline constexpr bool kSpillZstd = false;
+#endif
+
 // Frontier-compression opt-in: block-framed zstd on the indexed map/merge
 // outputs, off unless POLY_FRONTIER_ZSTD is set (scripts/term.sh sets it
-// with FRONTIER_LEVERS=1). Distinct from internal-spill
-// compression, which is always on in a zstd build.
+// with FRONTIER_LEVERS=1). Distinct from internal-spill compression
+// (kSpillZstd).
 inline bool frontierZstd() {
 #ifdef POLY_ZSTD
   const char* e = std::getenv("POLY_FRONTIER_ZSTD");

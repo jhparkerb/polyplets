@@ -106,7 +106,10 @@ inline double peakRssMB() {
 
 // ─── SIGTERM handling: cooperative work-stealing stop ────────────────────────
 // The orchestrator raises SIGTERM to ask a straggler unit to stop early and
-// hand its remainder to idle cores. `g_workerTerminate`
+// hand its remainder to idle cores: the worker stops at the next key
+// boundary, finalizes a valid sorted output over [lo, cursor), reports the
+// cursor as stop_key, and the orchestrator requeues [cursor, hi).
+// `g_workerTerminate`
 // (a `volatile sig_atomic_t`, the only signal-safe flag width) is checked
 // cooperatively inside the hot loop; the SIGTERM handler itself just sets
 // the flag, does not exit -- a clean, successful stop (status 0) is

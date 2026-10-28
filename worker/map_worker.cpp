@@ -91,12 +91,6 @@ static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
   return w.finalize();
 }
 
-// SIGTERM is a request to stop early (worker_util.h): map_shard_file stops
-// at the next key boundary and finalizes a valid sorted output over
-// [lo, cursor), reporting the cursor as stop_key, and the worker exits 0.
-// The orchestrator requeues [cursor, hi). SIGKILL, used for checkpoint and
-// shutdown, discards the partial column for a later --resume.
-
 // One request: parse its flags, do the work, print the accounting line.
 // `tokens` is argv without the program name, or one stdin line in
 // --persistent mode, which saves a fork and exec per work unit (thousands

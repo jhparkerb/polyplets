@@ -303,15 +303,8 @@ std::pair<size_t, size_t> map_shard_file(
     std::string spill_path = cfg.spill_dir + "/spill_" +
                              std::to_string(static_cast<long>(getpid())) +
                              "_" + std::to_string(spill_seq++) + ".bin";
-    // Internal spill: no index (read back sequentially by mergeRunFiles), so it
-    // is zstd-compressed when the build has zstd, which relieves the map
-    // phase's disk write bandwidth.
-    bool spill_compress = false;
-#ifdef POLY_ZSTD
-    spill_compress = true;
-#endif
     RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen,
-                        /*write_index=*/false, /*compress=*/spill_compress);
+                        /*write_index=*/false, /*compress=*/kSpillZstd);
     for (const auto& r : buf) sw.append(r);
     size_t sb = sw.finalize();
     total_spill_bytes += sb;
