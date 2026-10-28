@@ -127,8 +127,8 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
                                                            int nthreads) {
   std::vector<std::uint32_t> row(maxn + 1, 0);
   int S = 64;
-  int shardMult = 16;  // TMA_SHARD_MULT: dest shards per thread (>= for merge balance)
-  if (const char* e = std::getenv("TMA_SHARD_MULT")) shardMult = std::atoi(e);
+  int shardMult = 16;  // EARLY_TM_SHARD_MULT: dest shards per thread (>= for merge balance)
+  if (const char* e = std::getenv("EARLY_TM_SHARD_MULT")) shardMult = std::atoi(e);
   while (S < shardMult * nthreads) S <<= 1;  // shards: power of two, >> nthreads
   std::vector<FlatDB32> dbS;
   dbS.reserve(S);
@@ -141,9 +141,9 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
   { Sig seed; std::memset(seed.b, 0, SIGMAX);
     dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1u % p; }
 
-  // TMA_PROGRESS=1: emit per-column expand throughput (source states processed/s) to
+  // EARLY_TM_PROGRESS=1: emit per-column expand throughput (source states processed/s) to
   // stderr every ~10s. Observability for heavy sweeps; zero cost when unset.
-  const char* progEnv = std::getenv("TMA_PROGRESS");
+  const char* progEnv = std::getenv("EARLY_TM_PROGRESS");
   const bool prog = progEnv && std::atoi(progEnv) > 0;
   std::atomic<u64> g_done{0};
 

@@ -209,7 +209,7 @@ def build(H, start, succ, expand=1):
 
 def build_flagged(H, start, succ, expand=1):
     """Same automaton with the exact-height flags the production engine
-    carries (cpp/tma/signature.h b[H], b[H+1]).  The flags are updated from
+    carries (cpp/early_tm/signature.h b[H], b[H+1]).  The flags are updated from
     the new column mask alone, so (state, ftop, fbot) is a congruence exactly
     when state is -- but they BLOCK merges between states that differ in
     whether row 0 or row H-1 was ever occupied, so this measures what the
@@ -383,7 +383,7 @@ def main():
         # A row r is in N(b) only if b has a cell in {r-1, r, r+1}, and
         # distinct blocks are >= 2 rows apart, so at most TWO blocks' N-sets
         # can cover any row: two nibbles per row encode the whole key in the
-        # H bytes cpp/tma/signature.h already spends on labels.  If this ever
+        # H bytes cpp/early_tm/signature.h already spends on labels.  If this ever
         # fails, the key needs a wider Sig and the drop-in is not a drop-in.
         for st in keys[1:]:
             for r in range(H):

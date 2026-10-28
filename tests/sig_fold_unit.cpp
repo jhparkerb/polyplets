@@ -1,10 +1,10 @@
-// Isolated unit test for the R1 vertical-mirror fold (cpp/tma/signature.h),
+// Isolated unit test for the R1 vertical-mirror fold (cpp/early_tm/signature.h),
 // BEFORE any enumeration is involved.
 //
 // The fold stores only the orbit-canonical signature min(s, reflect(s)) and
 // sums into it, halving live states. That is exact only if reflection is a
 // symmetry of the whole column step, and THAT is a property of ~40 lines of
-// signature/transition code -- not of the polyplet counts. gate_tma check M
+// signature/transition code -- not of the polyplet counts. gate_early_tm check M
 // proved it by enumerating square8 to n=14 twice (391 s of that gate's 429 s,
 // per its own comment); the same statement is settled here exhaustively over
 // the signature space in well under a second.
@@ -57,8 +57,8 @@
 #include <utility>
 #include <vector>
 
-#include "../cpp/tma/signature.h"
-#include "../cpp/tma/transition_square8.h"
+#include "../cpp/early_tm/signature.h"
+#include "../cpp/early_tm/transition_square8.h"
 
 using ReflectFn = Sig (*)(const Sig&, int);
 using FoldFn = void (*)(Sig&, int);

@@ -12,7 +12,7 @@
 //
 // CLI:  gf_modp H N P     -> emits "n  B_H(n) mod P"  for n = 1..N
 //
-// Cross-checked against the exact engines (build/tma --only-height, gf/fixed_height.py):
+// Cross-checked against the exact engines (build/early_tm --only-height, gf/fixed_height.py):
 // reducing their exact B_H(n) mod P must match this for every n.
 
 #include <cstdint>

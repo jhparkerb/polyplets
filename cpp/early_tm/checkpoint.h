@@ -33,7 +33,7 @@
 // Wall-clock cadence + dir for intra-height checkpointing; null = disabled.
 struct CkptCtl {
   std::string dir;
-  double everySeconds = 1800.0;       // TMA_CKPT_SECS (default 30 min)
+  double everySeconds = 1800.0;       // EARLY_TM_CKPT_SECS (default 30 min)
   size_t minStates = (1u << 20);      // don't bother below ~1M live states
 };
 
@@ -67,7 +67,7 @@ inline std::uint32_t crc32_update(std::uint32_t crc, const void* buf, size_t n) 
   return crc;
 }
 
-namespace tmackpt_detail {
+namespace early_tm_ckpt_detail {
 struct Writer {
   std::FILE* f;
   std::uint32_t crc = 0xFFFFFFFFu;
@@ -90,7 +90,7 @@ struct Reader {
   }
   template <class T> void getv(T& v) { get(&v, sizeof v); }
 };
-}  // namespace tmackpt_detail
+}  // namespace early_tm_ckpt_detail
 
 // Atomically write DIR/ckpt: header + nEntries*(Sig + row) + accumulator + crc32.
 // `forEachEntry(emit)` must call emit(const Sig&, const u64* row) once per live
@@ -103,7 +103,7 @@ struct Reader {
 // (restore res.peakHeight = H after Loaded), removing a param here and two locals at each
 // of the ~5 call sites. Format change => bump fmtver; do it separate from a sweep pass.
 template <class EntrySource>
-inline bool tmaCkptSave(const CkptCtl& ctl, const CkptMeta& m, u64 nEntries,
+inline bool earlyTmCkptSave(const CkptCtl& ctl, const CkptMeta& m, u64 nEntries,
                         EntrySource&& forEachEntry, const u64* accum, u64 accumLen,
                         std::int32_t colNext, u64 peakStates,
                         std::int32_t peakHeight) {
@@ -111,7 +111,7 @@ inline bool tmaCkptSave(const CkptCtl& ctl, const CkptMeta& m, u64 nEntries,
   const std::string path = ctl.dir + "/ckpt";
   std::FILE* f = std::fopen(tmp.c_str(), "wb");
   if (!f) return false;
-  tmackpt_detail::Writer w{f};
+  early_tm_ckpt_detail::Writer w{f};
 
   w.put("TMCK", 4);
   std::uint32_t fmtver = 2; w.putv(fmtver);  // 2: added m.fold to the guard
@@ -145,13 +145,13 @@ inline bool tmaCkptSave(const CkptCtl& ctl, const CkptMeta& m, u64 nEntries,
 // wrong counts). No file -> None (caller starts fresh). Loaded -> entries fed to
 // `sink(const Sig&, const u64* row)`, accumulator filled, col/peaks set out.
 template <class Sink>
-inline CkptStatus tmaCkptLoad(const CkptCtl& ctl, const CkptMeta& expect, Sink&& sink,
+inline CkptStatus earlyTmCkptLoad(const CkptCtl& ctl, const CkptMeta& expect, Sink&& sink,
                               u64* accum, u64 accumLen, std::int32_t& colNext,
                               u64& peakStates, std::int32_t& peakHeight) {
   const std::string path = ctl.dir + "/ckpt";
   std::FILE* f = std::fopen(path.c_str(), "rb");
   if (!f) return CkptStatus::None;
-  tmackpt_detail::Reader r{f};
+  early_tm_ckpt_detail::Reader r{f};
 
   char magic[4]; r.get(magic, 4);
   std::uint32_t fmtver; r.getv(fmtver);
@@ -200,13 +200,13 @@ inline bool ckptDue(const CkptCtl& ctl,
   return true;
 }
 
-// Test-only hook: TMA_CKPT_KILL_AT_COL=k makes the process _Exit right AFTER the
+// Test-only hook: EARLY_TM_CKPT_KILL_AT_COL=k makes the process _Exit right AFTER the
 // column-k checkpoint save, simulating a crash with a valid ckpt on disk (the gate
 // kill/resume check). Behind an env var, so it never fires in production.
 inline void ckptTestKill(std::int32_t col) {
-  const char* e = std::getenv("TMA_CKPT_KILL_AT_COL");
+  const char* e = std::getenv("EARLY_TM_CKPT_KILL_AT_COL");
   if (e && std::atoi(e) == col) {
-    std::fprintf(stderr, "TMA_CKPT_KILL_AT_COL=%d hit; exiting post-save\n", col);
+    std::fprintf(stderr, "EARLY_TM_CKPT_KILL_AT_COL=%d hit; exiting post-save\n", col);
     std::_Exit(137);
   }
 }

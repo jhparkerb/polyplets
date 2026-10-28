@@ -13,7 +13,7 @@
 # placeholder values are fine: clangd only needs the macros DEFINED.
 #
 # cpp/ is covered too, with the extra flags its Makefile rules pass: -Icpp (for
-# cpp/obs.h and cpp/tma/*.h, included as "obs.h"/"tma/foo.h") and, for the three
+# cpp/obs.h and cpp/early_tm/*.h, included as "obs.h"/"early_tm/foo.h") and, for the three
 # GMP translation units, the same -DPOLY_GMP plus MacPorts -isystem the Makefile
 # auto-detects. Without those, clangd reported gmpxx.h as missing and cascaded
 # fake "unknown type name 'mpz_class'" through every use.

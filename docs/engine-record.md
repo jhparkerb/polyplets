@@ -275,7 +275,7 @@ From the per-term records, `results/ns_a*/PROVENANCE.md`.
 
 | terms | engine | counter | notes |
 |---|---|---|---|
-| a(19)–a(20) | the earlier `cpp/tma` column engine | — | a(20) on ayr, all heights enumerated (`results/ns_a20/PROVENANCE.md`); a(19) is the first term where two algorithms agree |
+| a(19)–a(20) | the earlier `cpp/early_tm` column engine | — | a(20) on ayr, all heights enumerated (`results/ns_a20/PROVENANCE.md`); a(19) is the first term where two algorithms agree |
 | a(21)–a(22) | new engine, column kernel | u64 | a(21) dalby, 35.8 h, all heights enumerated, ayr `H = 1..17` identical (`results/ns_a21/PROVENANCE.md`); a(22) inside the a(23) run; both confirmed by the Redelmeier program (`results/redelmeier_row22/PROVENANCE.md`) |
 | a(23) | column kernel | u64 | ayr `H = 1..16` + dalby `H = 17..23`; `H = 17, 18` identical across the two instruction sets (`results/ns_a23/PROVENANCE.md`) |
 | a(24)–a(25) | column kernel | u64 | dalby; first closed-form injection at a(24) (`k ≤ 7`), `P_0..P_8` at a(25) |
@@ -1048,7 +1048,7 @@ level `k = 23` with one pair of determining entries and no check value.
 
 ## 7. Counters: fewer, wider, and no modular arithmetic in production
 
-The earlier `cpp/tma` engine (`cpp/tma/sweep8_modp.h`) counted residues
+The earlier `cpp/early_tm` engine (`cpp/early_tm/sweep8_modp.h`) counted residues
 recombined by the Chinese remainder theorem. The production engine that
 computed a(23)–a(41) counts in native 64- or 128-bit words (section 1);
 modular counting survives in the tree only in the coloring recount

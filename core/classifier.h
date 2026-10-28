@@ -1,6 +1,6 @@
 // classifier.h — Completion-side classifier templates.
 //
-// The classifier handles the "closing column" path (cpp/tma/sweep8.h): when a
+// The classifier handles the "closing column" path (cpp/early_tm/sweep8.h): when a
 // state's empty-next-column closure is a valid complete animal, it contributes
 // to the output. Two classifiers:
 //
@@ -36,7 +36,7 @@ struct TriangleRow {
 
 // ─── Triangle classifier ────────────────────────────────────────────────
 
-// Mirrors cpp/tma/sweep8.h:
+// Mirrors cpp/early_tm/sweep8.h:
 //   if comps == 1 && touch_top && touch_bottom:
 //       for n in 1..maxn: row[n] += counts[n]
 struct ClassifyTriangle {

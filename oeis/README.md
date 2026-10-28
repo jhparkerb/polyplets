@@ -45,7 +45,7 @@ staged change against all four before jasonp submits:
 
 ## Provenance legend (for commit messages / %C)
 - **flood** — per-animal 4-connected-background flood fill, exact, n ≤ 14.
-- **engine** — column transfer matrix with Euler/hole accounting (`cpp/tma`),
+- **engine** — column transfer matrix with Euler/hole accounting (`cpp/early_tm`),
   exact; validated byte-identical to the flood (n ≤ 14) and k-sums
   match A006770. Reaches n ≈ 16–18 (exact counts), higher via mod-p for GFs.
 - **cross-ISA** — independently reproduced on x86 (gcc) and ARM (clang).

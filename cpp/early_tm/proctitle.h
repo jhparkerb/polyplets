@@ -1,5 +1,5 @@
 // proctitle -- rewrite the process title so htop/ps shows what the engine is
-// doing at a glance: "tma a(21) H20 c=12/21 ~63%" (term, strip height, column,
+// doing at a glance: "early-tm a(21) H20 c=12/21 ~63%" (term, strip height, column,
 // and within-column shard progress). Deliberately NO resident size -- htop has
 // that as a column already.
 //
@@ -25,7 +25,7 @@
 #endif
 
 // TODO(simplify): this is an engine-agnostic util (argv-overwrite + prctl + a refresh
-// thread) parked under tma/ with a tma-specific format string. It could live beside obs.h
+// thread) parked under early_tm/ with a early_tm-specific format string. It could live beside obs.h
 // with a caller-supplied label so other long opaque runs (e.g. redelmeier) can reuse it.
 namespace proctitle {
 using u64 = std::uint64_t;
@@ -78,10 +78,10 @@ inline std::string format(int N, int H) {
   const u64 sd = g_shardDone.load(std::memory_order_relaxed);
   const u64 st = g_shardTot.load(std::memory_order_relaxed);
   if (st > 0)
-    std::snprintf(buf, sizeof buf, "tma a(%d) H%d c=%d/%d ~%d%%", N, H, col, maxn,
+    std::snprintf(buf, sizeof buf, "early-tm a(%d) H%d c=%d/%d ~%d%%", N, H, col, maxn,
                   static_cast<int>(sd * 100 / st));
   else
-    std::snprintf(buf, sizeof buf, "tma a(%d) H%d c=%d/%d", N, H, col, maxn);
+    std::snprintf(buf, sizeof buf, "early-tm a(%d) H%d c=%d/%d", N, H, col, maxn);
   return buf;
 }
 
@@ -95,7 +95,7 @@ inline std::thread start(int N, int H, int maxn, int ms = 1500) {
   g_stop.store(false, std::memory_order_relaxed);
 #if defined(__linux__)
   char comm[16];
-  std::snprintf(comm, sizeof comm, "tma-a%d-H%d", N, H);  // 15-char `comm`, set once
+  std::snprintf(comm, sizeof comm, "etm-a%d-H%d", N, H);  // 15-char `comm`, set once
   prctl(PR_SET_NAME, comm, 0, 0, 0);
 #endif
   setTitle(format(N, H));  // immediate, before the first sleep

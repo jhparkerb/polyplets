@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Gate for R3 (u32 mod-p plain sweep). CRT of sum_H B_H(n) mod p_i over several
-# ~31-bit primes must equal the exact a(n) from build/tma -- tested both unfolded
+# ~31-bit primes must equal the exact a(n) from build/early_tm -- tested both unfolded
 # and with --fold (the R1xR3 composition). Also reports the per-state memory win.
 import sys
 
@@ -11,7 +11,7 @@ from common import require_binary, run
 # independent of prime size; reach deployment uses ~31-bit primes (fewer needed).
 #
 # Depth: this gate is seven square8 sweeps -- three primes x {plain, --fold},
-# plus the exact build/tma run -- and each further n costs ~4x. What it asserts
+# plus the exact build/early_tm run -- and each further n costs ~4x. What it asserts
 # is an IDENTITY (CRT of the residues == the exact count), which holds at every
 # n, so the push tier runs it at n=11: a(11) = 39,299,408, still four orders
 # above the primes and seven below their product. --deep restores n=12.
@@ -38,15 +38,15 @@ def rows(args):
 
 
 def main():
-    # build/tma_modp_test is a make target (gate-modp depends on it). This used
+    # build/early_tm_modp_test is a make target (gate-modp depends on it). This used
     # to compile it here on every run; fail closed if it is missing rather than
     # rebuilding it behind make's back.
-    if not require_binary("build/tma_modp_test", "build/tma_modp_test"):
+    if not require_binary("build/early_tm_modp_test", "build/early_tm_modp_test"):
         sys.exit(2)
-    exact = rows(["build/tma", "square8", str(N)])
+    exact = rows(["build/early_tm", "square8", str(N)])
     ok = True
     for fold in (False, True):
-        res = [rows(["build/tma_modp_test", str(N), str(p)] + (["--fold"] if fold else []))
+        res = [rows(["build/early_tm_modp_test", str(N), str(p)] + (["--fold"] if fold else []))
                for p in PRIMES]
         bad = [n for n in range(1, N + 1)
                if crt([res[i][n] for i in range(len(PRIMES))], PRIMES) != exact[n]]

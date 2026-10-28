@@ -1,6 +1,6 @@
 // Transfer-matrix driver.
 //
-// CLI:  tma {square4|square8} MAXN [--per-height] [--checkpoint DIR]
+// CLI:  early_tm {square4|square8} MAXN [--per-height] [--checkpoint DIR]
 //   totals: "n count" lines; --per-height: "h n count" lines.
 //   --checkpoint DIR (square8): persist each strip height as it finishes and
 //     resume completed heights on restart -- so a crash mid-run costs one
@@ -8,7 +8,7 @@
 //     With --only-height, this ALSO checkpoints WITHIN that one height at column
 //     boundaries (DIR/ckpt, atomic) and resumes mid-height -- so a kill of an
 //     18 h diagonal job costs one cadence interval, not the whole height. Knobs:
-//     TMA_CKPT_SECS (cadence, default 1800), TMA_CKPT_MIN_STATES (skip below).
+//     EARLY_TM_CKPT_SECS (cadence, default 1800), EARLY_TM_CKPT_MIN_STATES (skip below).
 
 #include <cstdio>
 #include <cstdlib>
@@ -18,12 +18,12 @@
 #include <thread>
 
 #include "obs.h"
-#include "tma/sweep.h"
-#include "tma/sweep8.h"
-#include "tma/sweep8_modp.h"
-#include "tma/sweep8_modp_blocked.h"
-#include "tma/sweep8_holes.h"
-#include "tma/sweep8_perim.h"
+#include "early_tm/sweep.h"
+#include "early_tm/sweep8.h"
+#include "early_tm/sweep8_modp.h"
+#include "early_tm/sweep8_modp_blocked.h"
+#include "early_tm/sweep8_holes.h"
+#include "early_tm/sweep8_perim.h"
 
 namespace fs = std::filesystem;
 
@@ -165,14 +165,14 @@ static void emit(const SweepResults& res, int maxn, bool perHeight) {
   }
 }
 
-// Fill `ctl` from --checkpoint DIR + the TMA_CKPT_* env knobs; returns &ctl when a
+// Fill `ctl` from --checkpoint DIR + the EARLY_TM_CKPT_* env knobs; returns &ctl when a
 // checkpoint dir was given (else nullptr). Dedups the two identical intra-height setups.
 static const CkptCtl* setupCkpt(const std::string& dir, CkptCtl& ctl) {
   if (dir.empty()) return nullptr;
   fs::create_directories(dir);
   ctl.dir = dir;
-  if (const char* e = std::getenv("TMA_CKPT_SECS")) ctl.everySeconds = std::atof(e);
-  if (const char* e = std::getenv("TMA_CKPT_MIN_STATES"))
+  if (const char* e = std::getenv("EARLY_TM_CKPT_SECS")) ctl.everySeconds = std::atof(e);
+  if (const char* e = std::getenv("EARLY_TM_CKPT_MIN_STATES"))
     ctl.minStates = std::strtoull(e, nullptr, 10);
   return &ctl;
 }
@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
       std::fprintf(stderr, "--perimeter is supported for square8 only\n");
       return 2;
     }
-    obs::Reporter rep("tma-perim-N" + std::to_string(maxn), 0, "");
+    obs::Reporter rep("early-tm-perim-N" + std::to_string(maxn), 0, "");
     const int Pmax = 4 * maxn, Pp = Pmax + 1;
     std::vector<u64> dist = sweepSquare8Perim(maxn, Pmax);
     rep.done("result=ok");
@@ -307,7 +307,7 @@ int main(int argc, char** argv) {
       CkptCtl ckctl;  // intra-height resume for this single height
       const CkptCtl* ckptPtr = setupCkpt(checkpointDir, ckctl);
       obs::Reporter rep(
-          "tma-holes-H" + std::to_string(onlyHeight) + "-N" +
+          "early-tm-holes-H" + std::to_string(onlyHeight) + "-N" +
               std::to_string(maxn) + "-k" + std::to_string(kmax),
           0,
           "height=" + std::to_string(onlyHeight) +
@@ -328,7 +328,7 @@ int main(int argc, char** argv) {
       return 0;
     }
     if (perHeight) {
-      obs::Reporter rep("tma-holes-allH-N" + std::to_string(maxn), maxn,
+      obs::Reporter rep("early-tm-holes-allH-N" + std::to_string(maxn), maxn,
                         "threads=" + std::to_string(nthreads));
       for (int H = 1; H <= maxn; ++H) {
         std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
@@ -345,7 +345,7 @@ int main(int argc, char** argv) {
       rep.done("result=ok");
     } else {
       const bool ckpt = !checkpointDir.empty();
-      obs::Reporter rep("tma-holes-N" + std::to_string(maxn),
+      obs::Reporter rep("early-tm-holes-N" + std::to_string(maxn),
                         ckpt ? static_cast<double>(maxn) : 0.0,
                         "threads=" + std::to_string(nthreads) +
                             (ckpt ? std::string(" ckpt=1") : std::string()));
@@ -396,7 +396,7 @@ int main(int argc, char** argv) {
         u64 peak = 0;
         const auto bbw = sweepSquare8HeightWidthModP(
             onlyHeight, maxn, static_cast<std::uint32_t>(modp), peak);
-        obs::Reporter rep("tma-bbox-H" + std::to_string(onlyHeight) + "-N" +
+        obs::Reporter rep("early-tm-bbox-H" + std::to_string(onlyHeight) + "-N" +
                               std::to_string(maxn),
                           maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
                                     std::to_string(modp) + " bbox=1");
@@ -422,7 +422,7 @@ int main(int argc, char** argv) {
         u64 v = 1 % modp;
         const u64 base = 3 % modp;
         for (int e = 0; e < maxn - 1; ++e) v = (v * base) % modp;
-        obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
+        obs::Reporter rep("early-tm-H" + std::to_string(onlyHeight) + "-modp-N" +
                               std::to_string(maxn),
                           0, "height=" + std::to_string(onlyHeight) + " modp=" +
                                  std::to_string(modp) + " closed_form=3^(N-1)");
@@ -443,7 +443,7 @@ int main(int argc, char** argv) {
               : sweepSquare8HeightModP(onlyHeight, maxn,
                                        static_cast<std::uint32_t>(modp), fold, peak,
                                        nthreads);
-      obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
+      obs::Reporter rep("early-tm-H" + std::to_string(onlyHeight) + "-modp-N" +
                             std::to_string(maxn),
                         maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
                                   std::to_string(modp) + " fold=" +
@@ -467,15 +467,15 @@ int main(int argc, char** argv) {
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
     // intra-height checkpoint: --checkpoint DIR resumes this single height's sweep
-    // from the last column boundary (env knobs TMA_CKPT_SECS / TMA_CKPT_MIN_STATES).
+    // from the last column boundary (env knobs EARLY_TM_CKPT_SECS / EARLY_TM_CKPT_MIN_STATES).
     CkptCtl ckctl;
     const CkptCtl* ckptPtr = setupCkpt(checkpointDir, ckctl);
-    obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-N" +
+    obs::Reporter rep("early-tm-H" + std::to_string(onlyHeight) + "-N" +
                           std::to_string(maxn),
                       maxn, "height=" + std::to_string(onlyHeight) + " threads=" +
                           std::to_string(nthreads) +
                           (ckptPtr ? std::string(" ckpt=1") : std::string()));
-    // htop process title: "tma a(N) H<h> c=<col>/<maxn> ~<pct>%", refreshed ~1.5s
+    // htop process title: "early-tm a(N) H<h> c=<col>/<maxn> ~<pct>%", refreshed ~1.5s
     std::thread titleThread = proctitle::start(maxn, onlyHeight, maxn);
     res.byHeight[onlyHeight] = heightRow(
         onlyHeight, maxn, nthreads, res, [&](int col, u64 live) {
@@ -506,7 +506,7 @@ int main(int argc, char** argv) {
     SweepResults res;
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
-    obs::Reporter rep("tma-ckpt-N" + std::to_string(maxn), maxn,
+    obs::Reporter rep("early-tm-ckpt-N" + std::to_string(maxn), maxn,
                       "threads=" + std::to_string(nthreads));
     for (int H = 1; H <= maxn; ++H) {
       Counts row;
@@ -531,7 +531,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  obs::Reporter rep("tma-N" + std::to_string(maxn), maxn,
+  obs::Reporter rep("early-tm-N" + std::to_string(maxn), maxn,
                     "threads=" + std::to_string(nthreads));
   SweepResults res = (lattice == "square4") ? sweepSquare4(maxn)
                                             : sweepSquare8(maxn, nthreads);

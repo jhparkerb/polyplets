@@ -28,7 +28,7 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 - Terms 1,4,20,109,622,...,16503616943998 for n=1..18.
 - Source: `oeis/draft-A0-holefree.txt` + `oeis/b-draft-A0-holefree.txt` (master).
   Backing data is column k=0 of the hole triangle (`oeis/b-draft-hole-triangle.txt`).
-- Provenance: column transfer matrix (`cpp/tma`), byte-identical to per-animal
+- Provenance: column transfer matrix (`cpp/early_tm`), byte-identical to per-animal
   background flood (n<=14); row sums == A006770; n=15..18 cross-ISA confirmed
   (clang/ARM vs gcc/x86). Largest CONFIRMED n = 18.
 - Novelty: Superseeker CLEAR (2026-06-19), full T001-T115 transform battery.

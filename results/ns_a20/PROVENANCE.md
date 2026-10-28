@@ -2,7 +2,7 @@
 
 a(20) = 1025573519362016
 
-Computed on ayr with the earlier column engine (`cpp/tma`, seek-index
+Computed on ayr with the earlier column engine (`cpp/early_tm`, seek-index
 variant), 30 cores, 420 columns over 20 heights; harvested 2026-06-28 at
 commit `f7f6366`. Every height was enumerated.
 

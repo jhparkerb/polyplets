@@ -637,7 +637,7 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
                                       " states=" + std::to_string(ncur));
     // TODO(2026-08-24, /simplify): this checkpoints the FULL frontier at every
     // column boundary, with no cadence control -- the sibling engine gates its
-    // saves on elapsed time (cpp/tma/sweep8.h, ckptDue / TMA_CKPT_SECS). At
+    // saves on elapsed time (cpp/early_tm/sweep8.h, ckptDue / EARLY_TM_CKPT_SECS). At
     // H=19 the frontier saturates by column 1, so every one of the ~41 columns
     // writes a near-peak state dump to buy ~1 column of recompute. Unmeasured
     // here, and it changes resume granularity, so it is jasonp's call rather

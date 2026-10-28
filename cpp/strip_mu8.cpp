@@ -1,5 +1,5 @@
 // strip_mu8.cpp — strip growth constants mu_H via power iteration on the
-// VALIDATED tma square-8 king transition, using the viable-mask enumerator to
+// VALIDATED early_tm square-8 king transition, using the viable-mask enumerator to
 // skip the 2^H brute force that caps strip_mu at H~13.
 //
 // mu_H = 1/x*, x* = radius of convergence of the height-H strip = the x where
@@ -21,8 +21,8 @@
 #include <unordered_map>
 #include <chrono>
 
-#include "tma/signature.h"
-#include "tma/transition_square8.h"
+#include "early_tm/signature.h"
+#include "early_tm/transition_square8.h"
 
 struct SigHash {
   size_t operator()(const Sig& s) const {

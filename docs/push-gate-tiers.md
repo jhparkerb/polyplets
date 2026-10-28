@@ -24,7 +24,7 @@ derived is read from a stored value on the push and re-derived in the deep tier.
   predicate are mirror-invariant, the column step commutes with reflection, and
   the engine's whole per-state keep-set corresponds under it for every size
   budget. Three mutant folds are controls that must fail. 0.89 s.
-- `gate-tma` check M runs at n=12 on the push, enough for the part a unit test
+- `gate-early-tm` check M runs at n=12 on the push, enough for the part a unit test
   cannot reach, that the sweep applies the fold correctly. The full check (M
   and N at 391 s of the gate's 429 s) is deep-tier.
 - `gate-cluster-weights` reads stored DP values for the level-6 holdout, and runs
@@ -49,7 +49,7 @@ derived is read from a stored value on the push and re-derived in the deep tier.
   Deep tier: W=13, `perimeter_min square4 999 6 --only 13 13 0` at 198.55 s,
   with the control re-running the identical command (199.56 s) against a
   different radius.
-- `build/tma_modp_test` is a make target rather than a `c++ -O3` shelled out
+- `build/early_tm_modp_test` is a make target rather than a `c++ -O3` shelled out
   by `gate_modp.py` on every run.
 
 Deep-tier costs of the gates that take `--deep`:
@@ -58,7 +58,7 @@ Deep-tier costs of the gates that take `--deep`:
 |---|---|---|
 | `gate-cluster-weights` | 536.5 s | 1.5 s |
 | `gate-perimeter-min` | 418.4 s | 16.8 s |
-| `gate-tma` | 325.3 s | 21 s |
+| `gate-early-tm` | 325.3 s | 21 s |
 | `gate-depth1-kernel` | 173.4 s | 12 s |
 | `gate-redelmeier` | 138.1 s | |
 | `gate-free-counts` | 85.8 s | |
@@ -98,7 +98,7 @@ The costliest individual checks on the laptop:
 |---|---|---|
 | `grid n=12 runs under 10 minutes` | 22.7 s | `gate-king-grid` |
 | `90-degree rotation vs oracle, n<=8` | 21.2 s | `gate-sym` |
-| `N smoke square8 H12 N14 dense baseline` | 16.0 s | `gate-tma` |
+| `N smoke square8 H12 N14 dense baseline` | 16.0 s | `gate-early-tm` |
 | `mdir n=12 runs under 10 minutes` | 10.1 s | `gate-multidirected` |
 
 ## Input gating, opt-in

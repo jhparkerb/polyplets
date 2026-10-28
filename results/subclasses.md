@@ -2084,7 +2084,7 @@ therefore not built. The structural fact beneath it, zero rook edges iff
 A001168, is the `bishopConn` check in the same program and the identity
 `C(n,n) = A001168` above.
 
-2000 uniform-random `n = 12` polyplets from `build/tma_sample` (seed 42),
+2000 uniform-random `n = 12` polyplets from `build/early_tm_sample` (seed 42),
 king-adjacent pairs counted by type and stratified by rook-edge count:
 
 | rook edges | specimens |
@@ -2152,7 +2152,7 @@ From the same 2000-specimen sample, plus exact facts from the enumerations
 A hole is a bounded 4-component of the complement (the convention fixed in
 `results/closed-doors.md`, under the matching-pair convention). `A_k(n)` counts
 polyplets with `k` holes; the exact table to `n = 18` is
-`results/holes_n18.txt`, produced by `tma_holes square8 18 --holes` on ayr (x86,
+`results/holes_n18.txt`, produced by `early_tm_holes square8 18 --holes` on ayr (x86,
 44 h single core, commit `8e41a63`), reproduced identically on dalby
 (`results/holes_n18.dalby.txt`), single-engine at `n = 18` and cross-checked
 against `redelmeier --holes` at small `n` by `tests/gate_holes.py` and
@@ -2225,7 +2225,7 @@ provisional. All 95 entries with `n ≤ 18` agree exactly with
 
 Nothing changes qualitatively. Cost of more terms, from the per-height logs
 `results/holes_perheight/n{16,17,18,19}/h*.log`
-(`tma_holes … --holes --per-height`, 8 threads; `n = 19` cost 201
+(`early_tm_holes … --holes --per-height`, 8 threads; `n = 19` cost 201
 CPU-hours):
 
 | n | Σ per-height wall | worst single height (critical path) | ratio vs n−1 |

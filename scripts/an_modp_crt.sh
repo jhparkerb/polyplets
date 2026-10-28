@@ -51,7 +51,7 @@ rm -f "$DIR"/rows_p*_H*.txt "$DIR"/hb_p*_H*.log   # fresh -- stale files would m
 fail=0; launched=0
 for p in $PRIMES; do
   for H in $(seq 1 "$N"); do
-    build/tma square8 "$N" --only-height "$H" --modp "$p" $FOLD $BLOCKED $THREADS \
+    build/early_tm square8 "$N" --only-height "$H" --modp "$p" $FOLD $BLOCKED $THREADS \
       > "$DIR/rows_p${p}_H${H}.txt" 2> "$DIR/hb_p${p}_H${H}.log" &
     launched=$((launched + 1))
     if [ "$launched" -ge "$JOBS" ]; then wait -n || fail=1; launched=$((launched - 1)); fi

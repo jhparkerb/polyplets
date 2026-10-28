@@ -138,7 +138,7 @@ literature's or OEIS's where one exists.
 
 | paper | repository, code, notes | literature / OEIS |
 |---|---|---|
-| polyplet, king polyplet | polyplet; king animal; `square8` (the lattice name in `redelmeier` and `tma`) | polyplet, polyking, pseudo-polyomino; A006770 "polyominoes which need only touch at corners" |
+| polyplet, king polyplet | polyplet; king animal; `square8` (the lattice name in `redelmeier` and `early_tm`) | polyplet, polyking, pseudo-polyomino; A006770 "polyominoes which need only touch at corners" |
 | height H of the bounding box | H; a "column" of the sweep is one height | — |
 | T(n,H) | the triangle, `results/triangle.txt`; per-height rows `h<H>.out` | staged as the T(n,H) triangle, `oeis/draft-Tnh-triangle.txt` |
 | diagonals of the triangle, H > n/2 | level k = n − H; the diagonal law; in-onset means n ≥ 2k+1 | — |
@@ -150,6 +150,6 @@ literature's or OEIS's where one exists.
 | Burnside congruences | the subgroup census, a(n) mod 4, `results/symmetry-classes.md` | Burnside's lemma; D4 orbit sizes |
 | double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); see `results/confidence.md` | — |
 | joiner, domino, split | the doubled row; the pair weight 25 = 16 + 9 (`docs/proofs/T-n-nm1.md`, `results/diagonal-formula.md`) | — |
-| holes | hole count k; the Euler-characteristic coordinate (`cpp/tma/euler.h`); flood fill (`redelmeier --holes`) | the A(n,k) hole triangle, staged |
+| holes | hole count k; the Euler-characteristic coordinate (`cpp/early_tm/euler.h`); flood fill (`redelmeier --holes`) | the A(n,k) hole triangle, staged |
 | one-sided, free, bilateral, asymmetric, non-polyominoes | the companions; the symmetry corpus `results/sym_counts.txt` | A030233, A030222, A030234, A030235, A194596 |
 | growth rate λ | λ; a(40)^{1/40} as a lower bound; the differential-approximant estimate; the certified bracket | Klarner's constant, the growth constant |

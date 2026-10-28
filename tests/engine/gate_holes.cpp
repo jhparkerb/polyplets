@@ -1,5 +1,5 @@
 // gate_holes.cpp — per-(n,H,holes) distribution byte-identical to
-// build/tma_holes square8 N --holes --per-height (old engine).
+// build/early_tm_holes square8 N --holes --per-height (old engine).
 //
 // Usage:
 //   gate_holes [--maxn N]

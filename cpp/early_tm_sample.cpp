@@ -1,7 +1,7 @@
 // Uniform random sampler / specimen emitter for fixed polyplets (A006770).
 //
 // Draws K animals of n cells uniformly at random from all a(n) of them, using
-// the transfer-matrix completion DP (cpp/tma/sample8.h). Each specimen is then
+// the transfer-matrix completion DP (cpp/early_tm/sample8.h). Each specimen is then
 // re-checked by an INDEPENDENT verifier (a plain king-BFS + bounding-box test
 // that shares no code with the counting engine), so a clean run is evidence the
 // engine's accepted states are all genuine, distinct n-cell polyplets. The
@@ -9,7 +9,7 @@
 // byHeight[H][n] / a(n) -- a consistency check between counter and sampler.
 //
 // Usage:
-//   tma_sample N [--samples K] [--seed S] [--out FILE]
+//   early_tm_sample N [--samples K] [--seed S] [--out FILE]
 //                [--only-height H] [--byheight DIR]
 //   --only-height H : sample only height H (uniform WITHIN that height)
 //   --byheight DIR  : read byHeight[H][n] from DIR/h{H}.{txt,out} ("n count"
@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
-#include "tma/sample8.h"
+#include "early_tm/sample8.h"
 
 using Cells = std::vector<std::pair<int, int>>;
 

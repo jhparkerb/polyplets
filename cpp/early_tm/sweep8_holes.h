@@ -140,7 +140,7 @@ inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
   bool resumed = false;
   if (ckpt) {  // resume mid-height; re-route each saved entry to its shard
     std::int32_t cn = 0, ph = 0; u64 pk = 0;
-    const CkptStatus st = tmaCkptLoad(
+    const CkptStatus st = earlyTmCkptLoad(
         *ckpt, meta,
         [&](const Sig& sig, const u64* r) {
           std::memcpy(dbS[FlatDB::hashSig(sig) & (S - 1)].slot(sig), r,
@@ -170,7 +170,7 @@ inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
     for (int s = 0; s < S; ++s) total += dbS[s].cnt;
     if (total == 0) break;
     if (ckpt && col > 0 && total >= ckpt->minStates && ckptDue(*ckpt, lastSave))
-      if (tmaCkptSave(*ckpt, meta, total,
+      if (earlyTmCkptSave(*ckpt, meta, total,
                       [&](auto&& emit) {
                         for (int s = 0; s < S; ++s) dbS[s].for_each(emit);
                       },
@@ -265,7 +265,7 @@ inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
   bool resumed = false;
   if (ckpt) {
     std::int32_t cn = 0, ph = 0; u64 pk = 0;
-    const CkptStatus st = tmaCkptLoad(
+    const CkptStatus st = earlyTmCkptLoad(
         *ckpt, meta,
         [&](const Sig& sig, const u64* r) {
           std::memcpy(db.slot(sig), r, stride * sizeof(u64));
@@ -289,7 +289,7 @@ inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
   auto lastSave = std::chrono::steady_clock::now();
   for (int col = startCol; col <= maxn && !db.empty(); ++col) {
     if (ckpt && col > 0 && db.cnt >= ckpt->minStates && ckptDue(*ckpt, lastSave))
-      if (tmaCkptSave(*ckpt, meta, db.cnt,
+      if (earlyTmCkptSave(*ckpt, meta, db.cnt,
                       [&](auto&& emit) { db.for_each(emit); }, result.data(),
                       static_cast<u64>(stride), col, 0, 0))
         ckptTestKill(col);

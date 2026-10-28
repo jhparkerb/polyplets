@@ -46,7 +46,7 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
   bool resumed = false;
   if (ckpt) {  // resume mid-height from a column-boundary checkpoint, if present
     std::int32_t cn = 0, ph = 0; u64 pk = 0;
-    const CkptStatus st = tmaCkptLoad(
+    const CkptStatus st = earlyTmCkptLoad(
         *ckpt, meta,
         [&](const Sig& sig, const u64* r) {
           std::memcpy(db.slot(sig), r, static_cast<size_t>(maxn + 1) * sizeof(u64));
@@ -77,7 +77,7 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
     }
     if (onColumn) onColumn(col, db.size());  // liveness/ETA hook (no-op if unset)
     if (ckpt && col > 0 && db.size() >= ckpt->minStates && ckptDue(*ckpt, lastSave))
-      if (tmaCkptSave(*ckpt, meta, db.size(),
+      if (earlyTmCkptSave(*ckpt, meta, db.size(),
                       [&](auto&& emit) { db.for_each(emit); }, row.data(),
                       static_cast<u64>(maxn + 1), col, res.peakStates,
                       res.peakHeight))
@@ -126,7 +126,7 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
 // Why batched: a single end-of-column merge let loc hold the WHOLE next column duplicated
 // ~indeg-times (one partial copy per contributing thread) -> ~30x the column -> OOM on the
 // heavy a(21) heights. Batching caps loc to ~1/nBatches of that; peak ~ dbS + nextDB +
-// loc_batch ~ 2x the column, INDEPENDENT of thread count (TMA_MERGE_BATCHES, default 16).
+// loc_batch ~ 2x the column, INDEPENDENT of thread count (EARLY_TM_MERGE_BATCHES, default 16).
 // Counts only ACCUMULATE (commutative+associative), so the result is bit-identical to the
 // serial sweepSquare8Height regardless of sharding/threading/batching -- gate case M checks it.
 inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
@@ -136,16 +136,16 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    const CkptCtl* ckpt = nullptr, bool fold = false) {
   Counts row(maxn + 1, 0);
   int S = 64;
-  int shardMult = 16;  // TMA_SHARD_MULT: dest shards per thread (>= for merge balance)
-  if (const char* e = std::getenv("TMA_SHARD_MULT")) shardMult = std::atoi(e);
+  int shardMult = 16;  // EARLY_TM_SHARD_MULT: dest shards per thread (>= for merge balance)
+  if (const char* e = std::getenv("EARLY_TM_SHARD_MULT")) shardMult = std::atoi(e);
   while (S < shardMult * nthreads) S <<= 1;  // shards: power of two, >> nthreads
   // dbS = current column (source); nextDB = the single accumulating next column (NO per-thread
   // duplication). loc[t] = thread t's private expand scratch, flushed into nextDB once per
   // BATCH, so it only ever holds ~1/nBatches of the column's duplicated outputs -- this is what
   // bounds RAM (a single end-of-column merge let loc hold ~indeg x the column => OOM on heavy
   // heights). Peak ~ dbS + nextDB + loc_batch ~ 2x the column, independent of thread count.
-  int nBatches = 16;  // TMA_MERGE_BATCHES: more batches -> lower peak loc RAM, same total work
-  if (const char* e = std::getenv("TMA_MERGE_BATCHES")) { int v = std::atoi(e); if (v > 0) nBatches = v; }
+  int nBatches = 16;  // EARLY_TM_MERGE_BATCHES: more batches -> lower peak loc RAM, same total work
+  if (const char* e = std::getenv("EARLY_TM_MERGE_BATCHES")) { int v = std::atoi(e); if (v > 0) nBatches = v; }
   if (nBatches > S) nBatches = S;
   std::vector<FlatDB> dbS, nextDB;
   dbS.reserve(S); nextDB.reserve(S);
@@ -166,7 +166,7 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
   bool resumed = false;
   if (ckpt) {  // resume: re-route each saved entry to its shard via hashSig
     std::int32_t cn = 0, ph = 0; u64 pk = 0;
-    const CkptStatus st = tmaCkptLoad(
+    const CkptStatus st = earlyTmCkptLoad(
         *ckpt, meta,
         [&](const Sig& sig, const u64* r) {
           std::memcpy(dbS[FlatDB::hashSig(sig) & (S - 1)].slot(sig), r,
@@ -193,14 +193,14 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
   auto lastSave = std::chrono::steady_clock::now();
   proctitle::setShardTotal(static_cast<u64>(S));  // within-column progress denominator
 
-  // TMA_PROGRESS=1: log per-column expand throughput (states processed/s, % of the column,
+  // EARLY_TM_PROGRESS=1: log per-column expand throughput (states processed/s, % of the column,
   // per-column ETA) to stderr -> h$H.log, for reading the wall of a multi-day run. Interval
-  // TMA_PROGRESS_SECS (default 150s); a fresh monitor runs per column, so fast early columns
+  // EARLY_TM_PROGRESS_SECS (default 150s); a fresh monitor runs per column, so fast early columns
   // emit nothing and only the heavy columns pulse. Zero cost when unset.
-  const char* progEnv = std::getenv("TMA_PROGRESS");
+  const char* progEnv = std::getenv("EARLY_TM_PROGRESS");
   const bool prog = progEnv && std::atoi(progEnv) > 0;
   int progSecs = 150;
-  if (const char* e = std::getenv("TMA_PROGRESS_SECS")) { int v = std::atoi(e); if (v > 0) progSecs = v; }
+  if (const char* e = std::getenv("EARLY_TM_PROGRESS_SECS")) { int v = std::atoi(e); if (v > 0) progSecs = v; }
   std::atomic<u64> g_done{0};
 
   for (int col = startCol; col <= maxn; ++col) {
@@ -212,7 +212,7 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     proctitle::setCol(col);              // process-title: column index
     proctitle::resetShards();            // process-title: within-column bar restarts at 0
     if (ckpt && col > 0 && total >= ckpt->minStates && ckptDue(*ckpt, lastSave))
-      if (tmaCkptSave(*ckpt, meta, total,
+      if (earlyTmCkptSave(*ckpt, meta, total,
                       [&](auto&& emit) {
                         for (int s = 0; s < S; ++s) dbS[s].for_each(emit);
                       },

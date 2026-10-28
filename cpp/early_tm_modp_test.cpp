@@ -1,14 +1,14 @@
 // R3 small-scale test harness: plain a(n) via the u32 mod-p sweep, summed over
 // strip heights. Prints "n  a(n) mod P" for n=1..N and peak_states to stderr.
-// USAGE: tma_modp_test N P [--fold]
+// USAGE: early_tm_modp_test N P [--fold]
 // The gate (tests/gate_modp.py) runs this for several primes and CRTs the columns
-// back to the exact a(n) from build/tma.
+// back to the exact a(n) from build/early_tm.
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <vector>
 
-#include "tma/sweep8_modp.h"
+#include "early_tm/sweep8_modp.h"
 
 int main(int argc, char** argv) {
   if (argc < 3) {

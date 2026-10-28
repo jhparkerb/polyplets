@@ -1,4 +1,4 @@
-// Isolated unit test for cpp/tma/euler.h (#28 hole accounting), BEFORE wiring
+// Isolated unit test for cpp/early_tm/euler.h (#28 hole accounting), BEFORE wiring
 // it into the engine. Two things are proven, against an independent flood-fill
 // oracle that shares no logic with the bit-quad helper:
 //
@@ -19,7 +19,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include "../cpp/tma/euler.h"
+#include "../cpp/early_tm/euler.h"
 
 using Grid = std::vector<std::vector<int>>;  // [row][col], 0/1
 

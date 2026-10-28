@@ -82,13 +82,13 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-naive gate-redelmeier gate-sig-fold gate-tma gate-free-counts gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-column-convex gate-subclass-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
+GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-naive gate-redelmeier gate-sig-fold gate-early-tm gate-free-counts gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-column-convex gate-subclass-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
 # The gate suite runs the gates concurrently: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
-# paths nobody else touches (gate_tma.py: runs/ckpt/gate_holes + runs/ckpt/gate_ih;
+# paths nobody else touches (gate_early_tm.py: runs/ckpt/gate_holes + runs/ckpt/gate_ih;
 # gate_dir4_perim_alg.py: build/dir4_perim_null199.txt). Measured on a 10-core
 # laptop: 624 s serial -> 467 s at -j10. Parallelism is scoped to
 # this target via a sub-make rather than MAKEFLAGS, deliberately: the ns-gates
@@ -165,7 +165,7 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/redelmeier \
   build/redelmeier_asan build/perimeter_defect build/perimeter_min build/prec_guess \
   build/cluster_weights build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
   build/strip_mu_kink build/symcount_fast build/symtm \
-  build/tma build/tma_asan build/tma_holes build/tma_modp_test \
+  build/early_tm build/early_tm_asan build/early_tm_holes build/early_tm_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker build/ns/combine \
   build/strip_tm build/coloring_recount build/dmirror_spine \
   $(if $(GMP_LDFLAGS),build/convex_area_tm build/convex_perim_tm build/column_convex_tm)
@@ -222,8 +222,8 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 # they read by name. tests/gate_makefile_wiring.py checks the import side of
 # that mechanically -- every repo-local module these scripts import,
 # transitively, has to be listed.
-DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/redelmeier \
-                tests/gate_tma.py tests/common.py \
+DEPS_gate-early-tm = build/early_tm build/early_tm_asan build/early_tm_holes build/redelmeier \
+                tests/gate_early_tm.py tests/common.py \
                 $(FIXTURES) results/holes_n14.txt
 # Every declared gate that reads any fixture takes the whole directory. The
 # module side of a dependency list is computed (check_gate_imports); the data
@@ -277,7 +277,7 @@ DEPS_gate-coloring-crt = scripts/coloring_crt.py \
                 results/coloring-recount/rows/C18.out \
                 $(wildcard results/coloring-recount/residues41/*) \
                 results/coloring-recount/rows41/C19.out
-DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py tests/common.py
+DEPS_gate-modp = build/early_tm build/early_tm_modp_test tests/gate_modp.py tests/common.py
 DEPS_gate-perimeter-min = build/perimeter_min build/redelmeier \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
                 results/siteperim_square8_n14.txt results/siteperim_square4_n20.txt \
@@ -480,15 +480,15 @@ gate-depth5:
 	python3 experiments/depth5_gate.py
 
 # Gate MODP: the R3 u32 mod-p sweep.  CRT of sum_H B_H(n) mod p_i over three
-# primes must equal the exact a(n) from build/tma, both unfolded and under
+# primes must equal the exact a(n) from build/early_tm, both unfolded and under
 # --fold (the R1xR3 composition).  ~31 s.
-gate-modp: build/tma build/tma_modp_test
+gate-modp: build/early_tm build/early_tm_modp_test
 	python3 tests/gate_modp.py $(GATE_DEEP)
 
 # The mod-p test engine. As a make target (rather than a subprocess c++ call
 # inside tests/gate_modp.py) it is built once and then skipped, and its rebuild
 # is triggered by its own source and the headers it includes.
-build/tma_modp_test: cpp/tma_modp_test.cpp cpp/tma/*.h | build
+build/early_tm_modp_test: cpp/early_tm_modp_test.cpp cpp/early_tm/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread $< -o $@
 
 # Gate COLORING-CRT: scripts/coloring_crt.py reconstructs C_18 from the banked
@@ -610,7 +610,7 @@ gate-naive:
 	python3 tests/gate_naive.py
 
 # Gate DRIVER: reach driver/combine reject crashed/raced/corrupt sweeps (no silent zeros)
-gate-driver: build/tma
+gate-driver: build/early_tm
 	python3 tests/gate_driver_robust.py
 
 # Gate REDELMEIER: C++ Redelmeier engine vs oracle + fixtures (+ split, + sanitizers)
@@ -735,7 +735,7 @@ build/redelmeier_asan: cpp/redelmeier.cpp | build
 gate-euler: build/euler_unit
 	./build/euler_unit
 
-build/euler_unit: tests/euler_unit.cpp cpp/tma/euler.h | build
+build/euler_unit: tests/euler_unit.cpp cpp/early_tm/euler.h | build
 	$(CXX) $(CXXFLAGS) -O2 $< -o $@
 
 # Gate SIG-FOLD: the R1 vertical-mirror fold, settled at the SIGNATURE level
@@ -745,7 +745,7 @@ build/euler_unit: tests/euler_unit.cpp cpp/tma/euler.h | build
 # every canonical signature at H<=6 (not merely the reachable ones) in well
 # under a second, with three mutant folds as RED controls.
 #
-# It replaces the expensive half of gate-tma check M, which proved the same
+# It replaces the expensive half of gate-early-tm check M, which proved the same
 # statement by enumerating square8 to n=14 twice -- 391 s of that gate's 429 s
 # by its own measurement.  It also restores a check that had gone missing:
 # signature.h cites experiments/r1_sym_fold_check.py as the fold's validation
@@ -754,34 +754,34 @@ gate-sig-fold: build/sig_fold_unit
 	./build/sig_fold_unit --selftest
 	./build/sig_fold_unit $(GATE_DEEP)
 
-build/sig_fold_unit: tests/sig_fold_unit.cpp cpp/tma/signature.h cpp/tma/transition_square8.h | build
+build/sig_fold_unit: tests/sig_fold_unit.cpp cpp/early_tm/signature.h cpp/early_tm/transition_square8.h | build
 	$(CXX) $(CXXFLAGS) -O2 $< -o $@
 
-# Gate TMA: transfer-matrix engine vs fixtures + Redelmeier height marginals
-gate-tma: build/tma build/tma_asan build/tma_holes build/redelmeier
-	python3 tests/gate_tma.py $(GATE_DEEP)
+# Gate EARLY-TM: transfer-matrix engine vs fixtures + Redelmeier height marginals
+gate-early-tm: build/early_tm build/early_tm_asan build/early_tm_holes build/redelmeier
+	python3 tests/gate_early_tm.py $(GATE_DEEP)
 
 
-build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
-	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
+build/early_tm: cpp/early_tm_main.cpp cpp/early_tm/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/early_tm_main.cpp -o $@
 
-# Holes + mod-p engine: SAME source as build/tma (the --holes / --modp paths live
-# in tma_main.cpp). Kept as a separate named binary because the exact hole-count
-# runs invoke build/tma_holes by name.
-build/tma_holes: cpp/tma_main.cpp cpp/tma/*.h | build
-	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
+# Holes + mod-p engine: SAME source as build/early_tm (the --holes / --modp paths live
+# in early_tm_main.cpp). Kept as a separate named binary because the exact hole-count
+# runs invoke build/early_tm_holes by name.
+build/early_tm_holes: cpp/early_tm_main.cpp cpp/early_tm/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/early_tm_main.cpp -o $@
 
-build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
+build/early_tm_asan: cpp/early_tm_main.cpp cpp/early_tm/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
-	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
+	    -fno-omit-frame-pointer -pthread cpp/early_tm_main.cpp -o $@
 
-build/tma_tsan: cpp/tma_main.cpp cpp/tma/*.h | build
+build/early_tm_tsan: cpp/early_tm_main.cpp cpp/early_tm/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=thread \
-	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
+	    -fno-omit-frame-pointer -pthread cpp/early_tm_main.cpp -o $@
 
 # Uniform random polyplet sampler / specimen emitter (transfer-matrix completion DP)
-build/tma_sample: cpp/tma_sample.cpp cpp/tma/*.h | build
-	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_sample.cpp -o $@
+build/early_tm_sample: cpp/early_tm_sample.cpp cpp/early_tm/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/early_tm_sample.cpp -o $@
 
 build/symcount_fast: cpp/sym/symcount_fast.cpp cpp/argparse.h | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
@@ -965,7 +965,7 @@ gate-free-counts:
 
 # ─── Next-system (ns-*) targets ──────────────────────────────────────────────
 # All new-system code lives under core/ worker/ orchestrator/ verify/ tests/engine/.
-# Oracle (build/tma, build/redelmeier) stays in cpp/; both coexist.
+# Oracle (build/early_tm, build/redelmeier) stays in cpp/; both coexist.
 
 NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
           -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
@@ -1196,7 +1196,7 @@ build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # ASan/UBSan builds of the ACTUAL production workers (map_worker/merge_worker,
-# both kernels) — see gate-tma/gate-redelmeier for the same pattern on the oracle
+# both kernels) — see gate-early-tm/gate-redelmeier for the same pattern on the oracle
 # engines. Separate build dir so --workers-dir can point orchestrate at these
 # without disturbing the -O3 production binaries.
 build/ns_asan:
@@ -1213,7 +1213,7 @@ build/ns_asan/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns_asa
 # ASan/UBSan gate: the real map_worker/merge_worker (both column and kink
 # kernels) under sanitizers, small n, --compare against fixtures. This is what
 # makes the paper's "engines are ASan/UBSan clean" claim actually cover the
-# production pipeline, not just the legacy oracle binaries (build/tma_asan,
+# production pipeline, not just the legacy oracle binaries (build/early_tm_asan,
 # build/redelmeier_asan).
 ns-gate-asan: build/ns_asan/map_worker build/ns_asan/merge_worker build/ns/orchestrate
 	rm -rf /tmp/ns_asan_column && mkdir -p /tmp/ns_asan_column/spill
@@ -1282,8 +1282,8 @@ ns-gate-u128: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	    --run-dir /tmp/ns_m3_u128 --spill-dir /tmp/ns_m3_u128/spill \
 	    --checkpoint /tmp/ns_m3_u128/POLYCKPT --checkpoint-every 0 --compare
 
-# Gate: holes distribution byte-identical to tma_holes oracle for n<=12
-ns-gate-holes: build/ns/gate_holes build/tma_holes
+# Gate: holes distribution byte-identical to early_tm_holes oracle for n<=12
+ns-gate-holes: build/ns/gate_holes build/early_tm_holes
 	python3 tests/gate_holes.py 12
 
 # Gate: the verifier passes on published dataset; catches deliberate corruption.

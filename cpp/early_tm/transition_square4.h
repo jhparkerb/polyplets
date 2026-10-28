@@ -3,7 +3,7 @@
 // Validation instrument only -- square-4 has the richest external truth
 // (A001168 known to n=70), so this plug-in proves the generic engine
 // (T1/T3/T4) before any novel transition rules exist. Per the plan, all
-// lattice-specific knowledge in the TMA lives in files like this one.
+// lattice-specific knowledge in the early engine lives in files like this one.
 //
 // Boundary convention during the sweep of cell (col, r), 0 <= r < H:
 //   sig[0..r)   cells of the NEW column (col)

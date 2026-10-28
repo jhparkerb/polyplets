@@ -86,9 +86,9 @@ EXCUSED_SCRIPTS = {
 SED_EXPR = re.compile(r"named=\$\$\(sed -n '(.*?)' \$\(GATELOG\)")
 
 RED_LINE_CASES = [
-    ("make: *** [gate-tma] Error 1", "gate-tma"),
-    ("make[1]: *** [Makefile:2: gate-tma] Error 1", "gate-tma"),
-    ("make: *** [timed-gate-tma] Error 1", "gate-tma"),
+    ("make: *** [gate-early-tm] Error 1", "gate-early-tm"),
+    ("make[1]: *** [Makefile:2: gate-early-tm] Error 1", "gate-early-tm"),
+    ("make: *** [timed-gate-early-tm] Error 1", "gate-early-tm"),
     ("make[1]: *** [Makefile:126: timed-gate-cluster-weights] Error 1",
      "gate-cluster-weights"),
     # a red PREREQUISITE names no gate, and must not invent one
@@ -562,7 +562,7 @@ def selftest():
     print("  [RED 10] a declared gate that omits its own script is caught")
 
     # RED 11: a declared gate that omits a module its script imports.
-    probe = "DEPS_gate-tma = tests/gate_tma.py\n"
+    probe = "DEPS_gate-early-tm = tests/gate_early_tm.py\n"
     bad = check_gate_imports(probe)
     assert any("tests/common.py" in b for b in bad), bad
     print("  [RED 11] a declared gate that omits an imported module is caught")

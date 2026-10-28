@@ -4,8 +4,8 @@
 // that nothing reaches past this seam into core internals.
 //
 // Exposes:
-//   The transition math, derived from the older column engine in cpp/tma/
-//   (euler.h is byte-identical to cpp/tma/euler.h; signature.h and
+//   The transition math, derived from the older column engine in cpp/early_tm/
+//   (euler.h is byte-identical to cpp/early_tm/euler.h; signature.h and
 //   transition.h add sigCmp, a SIGMAX override and mask-width templates):
 //     Sig, canonicalizeSig, foldSig, reflectSig, completionLowerBound  [signature.h]
 //     stepColumnSquare8, forEachViableMask                              [transition.h]

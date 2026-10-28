@@ -3,7 +3,7 @@
 
 Usage: holefree_growth.py [TABLE]     (default results/holes_n18.txt)
 
-Reads a "n holes count" table (tma_holes square8 --holes; banked exact n<=18).
+Reads a "n holes count" table (early_tm_holes square8 --holes; banked exact n<=18).
 Extracts A_k(n) (k holes) and a(n)=sum_k, estimates growth constants by
 Domb-Sykes, Richardson, and a 3-parameter log-linear fit
 (log f = logC + n logL + theta log n), and shows that the hole-free fraction

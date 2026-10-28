@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""gate_holes.py — T5.4 gate: new-system holes distribution vs tma_holes oracle.
+"""gate_holes.py — T5.4 gate: new-system holes distribution vs early_tm_holes oracle.
 
-Runs build/ns/gate_holes --maxn N and build/tma_holes square8 N --holes
+Runs build/ns/gate_holes --maxn N and build/early_tm_holes square8 N --holes
 --per-height, then checks byte-identical (H, n, k, count) tuples.
 """
 
@@ -12,8 +12,8 @@ MAXN = int(sys.argv[1]) if len(sys.argv) > 1 else 12
 
 
 def run_oracle(maxn):
-    """Run tma_holes and return sorted list of (H, n, k, count) tuples."""
-    cmd = ["./build/tma_holes", "square8", str(maxn), "--holes", "--per-height"]
+    """Run early_tm_holes and return sorted list of (H, n, k, count) tuples."""
+    cmd = ["./build/early_tm_holes", "square8", str(maxn), "--holes", "--per-height"]
     result = subprocess.run(cmd, capture_output=True, text=True, check=True)
     rows = []
     for line in result.stdout.splitlines():
