@@ -79,13 +79,14 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 		if !ok {
 			continue
 		}
+		var perr error
 		switch k {
 		case "height":
-			hdr.Height, _ = strconv.Atoi(v)
+			hdr.Height, perr = strconv.Atoi(v)
 		case "maxn":
-			hdr.Maxn, _ = strconv.Atoi(v)
+			hdr.Maxn, perr = strconv.Atoi(v)
 		case "records":
-			hdr.Records, _ = strconv.ParseUint(strings.TrimSpace(v), 10, 64)
+			hdr.Records, perr = strconv.ParseUint(strings.TrimSpace(v), 10, 64)
 		case "counter":
 			hdr.Counter = strings.TrimSpace(v)
 		case "keylo":
@@ -95,7 +96,10 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 		case "rev":
 			hdr.Rev = v
 		case "compression":
-			hdr.Compression, _ = strconv.Atoi(strings.TrimSpace(v))
+			hdr.Compression, perr = strconv.Atoi(strings.TrimSpace(v))
+		}
+		if perr != nil {
+			return PolyrunHeader{}, 0, fmt.Errorf("%s: header line %q: %w", path, line, perr)
 		}
 	}
 	return hdr, offset, nil

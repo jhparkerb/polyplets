@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"os"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -377,5 +378,57 @@ func TestSampleKeysCompressedBodyFailsClosed(t *testing.T) {
 	}
 	if len(cuts) != 0 {
 		t.Fatalf("want 0 cuts from a 1-entry idx, got %v", cuts)
+	}
+}
+
+// TestParseHeaderRejectsMalformedNumbers: a header number that does not parse
+// is an error rather than 0.
+func TestParseHeaderRejectsMalformedNumbers(t *testing.T) {
+	path := t.TempDir() + "/seed.bin"
+	if err := WriteSeedPolyrun(path, "test", 3, 8); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := ParseHeader(path); err != nil {
+		t.Fatalf("control: intact header: %v", err)
+	}
+	good, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct{ old, new string }{
+		{"height 3\n", "height x\n"},
+		{"maxn 8\n", "maxn 8x\n"},
+		{"records 000000000000000001\n", "records 00000000000000000x\n"},
+		{"byteorder 1\n", "byteorder 1\ncompression z\n"},
+	} {
+		s := strings.Replace(string(good), c.old, c.new, 1)
+		if s == string(good) {
+			t.Fatalf("seed header has no %q", c.old)
+		}
+		if err := os.WriteFile(path, []byte(s), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := ParseHeader(path); err == nil {
+			t.Errorf("ParseHeader accepted %q", strings.TrimSpace(c.new))
+		}
+	}
+}
+
+// TestParseWorkerOutputRequiresRecords: the done line's records count decides
+// whether a unit's output is kept, so a missing or unparseable one is an
+// error; read as 0, the output would be deleted as empty.
+func TestParseWorkerOutputRequiresRecords(t *testing.T) {
+	const rest = " cpu_s=0.1 wall_s=0.1 peak_rss_mb=1.0 spill_bytes=0 stop_key="
+	if r, err := ParseWorkerOutput([]string{"event=done records=5" + rest}); err != nil || r.OutRecords != 5 {
+		t.Fatalf("control: got records=%d err=%v, want 5, nil", r.OutRecords, err)
+	}
+	for _, line := range []string{
+		"event=done" + rest,
+		"event=done records=5x" + rest,
+		"event=done records=5 cpu_s=fast wall_s=0.1 peak_rss_mb=1.0 spill_bytes=0 stop_key=",
+	} {
+		if _, err := ParseWorkerOutput([]string{line}); err == nil {
+			t.Errorf("ParseWorkerOutput accepted %q", line)
+		}
 	}
 }

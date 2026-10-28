@@ -73,31 +73,46 @@ func ParseWorkerOutput(lines []string) (WorkerResult, error) {
 			continue
 		}
 		if strings.HasPrefix(line, "event=done") {
-			parseEventDone(line, &r)
+			if err := parseEventDone(line, &r); err != nil {
+				return WorkerResult{}, err
+			}
 		}
 	}
 	return r, nil
 }
 
-func parseEventDone(line string, r *WorkerResult) {
+// parseEventDone reads the done line's key=value fields. Every number must
+// parse, and records must be present: a unit whose records reads 0 has its
+// output deleted as empty.
+func parseEventDone(line string, r *WorkerResult) error {
+	sawRecords := false
 	for _, field := range strings.Fields(line) {
 		k, v, ok := strings.Cut(field, "=")
 		if !ok {
 			continue
 		}
+		var err error
 		switch k {
 		case "cpu_s":
-			r.Acct.CPUS, _ = strconv.ParseFloat(v, 64)
+			r.Acct.CPUS, err = strconv.ParseFloat(v, 64)
 		case "wall_s":
-			r.Acct.WallS, _ = strconv.ParseFloat(v, 64)
+			r.Acct.WallS, err = strconv.ParseFloat(v, 64)
 		case "peak_rss_mb":
-			r.Acct.RSSMax, _ = strconv.ParseFloat(v, 64)
+			r.Acct.RSSMax, err = strconv.ParseFloat(v, 64)
 		case "records":
-			r.OutRecords, _ = strconv.ParseUint(v, 10, 64)
+			r.OutRecords, err = strconv.ParseUint(v, 10, 64)
+			sawRecords = true
 		case "spill_bytes":
-			r.SpillBytes, _ = strconv.ParseUint(v, 10, 64)
+			r.SpillBytes, err = strconv.ParseUint(v, 10, 64)
 		case "stop_key":
 			r.StopKey = v
 		}
+		if err != nil {
+			return fmt.Errorf("malformed done line %q: %w", line, err)
+		}
 	}
+	if !sawRecords {
+		return fmt.Errorf("done line has no records count: %q", line)
+	}
+	return nil
 }

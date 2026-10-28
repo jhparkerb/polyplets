@@ -140,3 +140,53 @@ func TestValuesPastU64AreExact(t *testing.T) {
 		t.Fatalf("readBigUvarint = %v (err %v), want 2^70+5 = 1180591620717411303429", v, err)
 	}
 }
+
+// TestMalformedNumbersFail: a header or manifest number that does not parse
+// is an error. Read as 0, a bad records field turned the record-count check
+// off.
+func TestMalformedNumbersFail(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "r.bin")
+	writePolyrun(t, path)
+	if _, _, err := parsePolyrunHeader(path); err != nil {
+		t.Fatalf("control: intact header: %v", err)
+	}
+	good, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct{ old, new string }{
+		{"height 3\n", "height x\n"},
+		{"maxn 8\n", "maxn 8x\n"},
+		{"records 000000000000000001\n", "records 00000000000000000x\n"},
+		{"byteorder 1\n", "byteorder 1\ncompression z\n"},
+	} {
+		if err := os.WriteFile(path, []byte(strings.Replace(string(good), c.old, c.new, 1)), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, err := parsePolyrunHeader(path); err == nil {
+			t.Errorf("parsePolyrunHeader accepted %q", strings.TrimSpace(c.new))
+		}
+	}
+
+	mpath := filepath.Join(dir, "a8.txt")
+	okManifest := "n=8\nfile path=r.bin records=1 crc=00000000000000ff\n"
+	if err := os.WriteFile(mpath, []byte(okManifest), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ParseManifest(mpath); err != nil {
+		t.Fatalf("control: intact manifest: %v", err)
+	}
+	for _, bad := range []string{
+		"n=8x\nfile path=r.bin records=1 crc=00000000000000ff\n",
+		"n=8\nfile path=r.bin records=one crc=00000000000000ff\n",
+		"n=8\nfile path=r.bin records=1 crc=zz\n",
+	} {
+		if err := os.WriteFile(mpath, []byte(bad), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := ParseManifest(mpath); err == nil {
+			t.Errorf("ParseManifest accepted %q", bad)
+		}
+	}
+}
