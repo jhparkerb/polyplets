@@ -10,7 +10,7 @@ down and evaluates them, so the ratio becomes an explicit convergent
 expression rather than an extrapolated decimal.
 
 THE DERIVATION (all of it checked numerically below).  Column heights h, area
-marked by x.  From cpp/middle_kingdom_tm.cpp's PROFILE engine, the transfer
+marked by x.  From cpp/column_convex_tm.cpp's PROFILE engine, the transfer
 weight (h -> h') carries x^(h') and the four phase blocks have kernels
 
     (0,0) internal       U (h,h')  = h' - h + 1        (h' >= h)
@@ -58,7 +58,7 @@ RED-first controls, all run by default:
   RED    dropping the factor 1/2 must NOT reproduce r
 
 Usage: python3 experiments/amplitude_feed_vectors.py [--dps 400] [--hmax 900]
-         [--measured results/mk_hvdir4asc_terms_n700.txt,
+         [--measured results/subclass_hvdir4asc_terms_n700.txt,
                      results/convex_area_terms_n700_king.txt]
 Target machine: gympie (laptop).  MEASURED: dps 400 / hmax 900 in about 6 s,
 under 100 MB.  Nothing to resume; SIGINT is enough.
@@ -177,7 +177,7 @@ def contract(w, phi, hmax):
 def evaluate(dps, hmax):
     """(mu, r, r_nohalf, r_cap3, min phi) at working precision dps.
 
-    The one entry point tests/gate_middle_kingdom.py uses, so the gate runs
+    The one entry point tests/gate_column_convex.py uses, so the gate runs
     the same arithmetic as the write-up rather than a copy of it.
     """
     mp.dps = dps
@@ -194,7 +194,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--dps', type=int, default=400)
     ap.add_argument('--hmax', type=int, default=900)
-    ap.add_argument('--measured', default='results/mk_hvdir4asc_terms_n700.txt,'
+    ap.add_argument('--measured', default='results/subclass_hvdir4asc_terms_n700.txt,'
                                           'results/convex_area_terms_n700_king.txt')
     ap.add_argument('--show', type=int, default=200)
     ap.add_argument('--emit', default=None,

@@ -19,8 +19,8 @@
 #   time, nothing written until the process exits normally.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-OUT="results/mk_siteperim_n14.txt"
-TIMELOG="results/mk_siteperim_n14.time.txt"
+OUT="results/subclass_siteperim_n14.txt"
+TIMELOG="results/subclass_siteperim_n14.time.txt"
 /usr/bin/time -l build/directed_cone_anchor grid 14 8 \
   > "$OUT" 2> "$TIMELOG.tmp"
 # obs.h's start/heartbeat/done stream and /usr/bin/time -l's summary are both

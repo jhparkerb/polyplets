@@ -19,7 +19,7 @@
 # an exit code that is not a verdict.
 
 G=build/prec_guess
-DIR4=results/mk_dir4_perim_terms_s200.txt
+DIR4=results/subclass_dir4_perim_terms_s200.txt
 HV=results/convex_perim_terms_s200.txt
 NULL=build/dir4_perim_null199.txt
 SRC=results/convex_area_terms_n700_king.txt   # the null control's real source

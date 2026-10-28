@@ -29,7 +29,7 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KING_TERMS = os.path.join(ROOT, "results", "mk_stair_terms_n700.txt")
+KING_TERMS = os.path.join(ROOT, "results", "subclass_stair_terms_n700.txt")
 A006958 = [1, 2, 4, 9, 20, 46, 105, 242, 557, 1285, 2964, 6842, 15793, 36463]
 BENDER = 2.30914   # convex polyominoes by area, Bender 1974
 

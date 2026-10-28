@@ -82,7 +82,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
+GATE_TARGETS = gate-coloring-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-below-onset-fit-congruence gate-below-onset-fit-pairs gate-kink-oracle gate-cluster-weights gate-depth1-kernel gate-depth-defects gate-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-column-convex gate-subclass-dir4-perim gate-dir4-perim-alg gate-compile-db gate-reference gate-coloring-recount
 # Every gate is phony: the list above is the one place a gate is named.
 .PHONY: $(GATE_TARGETS)
 
@@ -168,7 +168,7 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   build/ns/orchestrate build/ns/map_worker build/ns/merge_worker build/ns/combine \
   build/strip_tm build/coloring_recount build/dmirror_spine \
-  $(if $(GMP_LDFLAGS),build/convex_area_tm build/convex_perim_tm build/middle_kingdom_tm)
+  $(if $(GMP_LDFLAGS),build/convex_area_tm build/convex_perim_tm build/column_convex_tm)
 
 # --- input gating -----------------------------------------------------------
 # A gate that re-runs when nothing it reads has changed is pure waiting. A gate
@@ -867,16 +867,16 @@ build/convex_perim_tm: cpp/convex_perim_tm.cpp cpp/argparse.h cpp/obs.h | build
 # Column transfer matrix for the column-convex cells of the directedness grid
 # (results/subclasses.md): directedness on a column-convex animal is a
 # condition on the bottom profile alone.
-build/middle_kingdom_tm: cpp/middle_kingdom_tm.cpp cpp/argparse.h cpp/obs.h | build
+build/column_convex_tm: cpp/column_convex_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 endif
 
-# Gate MIDDLE-KINGDOM: the column transfer matrix for every column-convex
+# Gate COLUMN-CONVEX: the column transfer matrix for every column-convex
 # grid cell vs the brute-force 16-cell table, the A187077/A007052/
 # convex-polyplet positive controls, and the loosened-predicate controls that
 # must fail. Needs GMP; skipped without it.
-gate-middle-kingdom: $(if $(GMP_LDFLAGS),build/middle_kingdom_tm)
-	python3 tests/gate_middle_kingdom.py
+gate-column-convex: $(if $(GMP_LDFLAGS),build/column_convex_tm)
+	python3 tests/gate_column_convex.py
 
 # P-recurrence / algebraic-relation exclusion mod p (no GMP: the series terms
 # are reduced mod p on the way in).
@@ -934,7 +934,7 @@ lean:
 gate-convex-dfinite: build/prec_guess $(if $(GMP_LDFLAGS),build/convex_area_tm)
 	python3 tests/gate_convex_dfinite.py
 
-# Gate MK-DIR4-PERIM: the dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
+# Gate SUBCLASS-DIR4-PERIM: the dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
 # filtered to half-plane-4-cone-directed, Proposition 2 of
 # results/subclasses.md translated onto the row-built transfer matrix) vs
 # directed_cone_anchor's "gridperim" brute force, the control that must fail
@@ -944,8 +944,8 @@ gate-convex-dfinite: build/prec_guess $(if $(GMP_LDFLAGS),build/convex_area_tm)
 # convex_perim_tm run, so without GMP it would verify nothing.  The script
 # therefore always runs, records the absent binary as a skipped check and
 # fails on it, waivable with POLY_ALLOW_DEGRADED_GATES=1.
-gate-mk-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/directed_cone_anchor
-	python3 tests/gate_mk_dir4_perim.py
+gate-subclass-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/directed_cone_anchor
+	python3 tests/gate_subclass_dir4_perim.py
 
 # Gate DIR4-PERIM-ALG: the (dir4, HV-convex)-by-semiperimeter generating
 # function is algebraic of

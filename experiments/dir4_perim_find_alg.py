@@ -3,7 +3,7 @@
 
 build/prec_guess's `alg` mode works mod p and prints only a rank. It reports
 nullity 1 in the box (K, L) = (4, 22) for
-results/mk_dir4_perim_terms_s200.txt, so the annihilating relation
+results/subclass_dir4_perim_terms_s200.txt, so the annihilating relation
 
     sum_{j=0..4} q_j(t) F(t)^j = 0,   deg q_j <= 22,   F = sum_{s>=2} a(s) t^s
 
@@ -25,7 +25,7 @@ from math import gcd
 from seriestools import read_terms
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT = os.path.join(ROOT, "results", "mk_dir4_perim_terms_s200.txt")
+DEFAULT = os.path.join(ROOT, "results", "subclass_dir4_perim_terms_s200.txt")
 
 
 def powers(a, M, K):

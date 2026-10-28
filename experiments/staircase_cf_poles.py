@@ -37,7 +37,7 @@ from mpmath import mp, mpf, nstr, polyroots
 
 from seriestools import read_terms
 
-STAIR = 'results/mk_stair_terms_n700.txt'
+STAIR = 'results/subclass_stair_terms_n700.txt'
 # measured by experiments/prony_spectrum.py on the 700-term staircase series
 # (order 10, dps 1500); trusted digit counts are in
 # results/subdominant_identification.log.

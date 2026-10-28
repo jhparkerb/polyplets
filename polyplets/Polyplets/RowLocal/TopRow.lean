@@ -76,7 +76,7 @@ lemma shift_mem {a b : ℤ} {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} (hc : c �
 
 lemma shift_shift (a b a' b' : ℤ) (S : Finset (ℤ × ℤ)) :
     shift a b (shift a' b' S) = shift (a + a') (b + b') S := by
-  rw [shift, shift, translate_translate, shift, Prod.mk_add_mk, add_comm a' a, add_comm b' b]
+  rw [shift, shift, translate_translate, shift, Prod.subclass_add_mk, add_comm a' a, add_comm b' b]
 
 @[simp] lemma shift_zero (S : Finset (ℤ × ℤ)) : shift 0 0 S = S := translate_zero S
 

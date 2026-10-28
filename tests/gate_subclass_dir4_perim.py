@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate MK-DIR4-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md, removed) Phase 2a
+"""Gate SUBCLASS-DIR4-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md, removed) Phase 2a
 acceptance.
 
 cpp/convex_perim_tm.cpp's new dir4 mode filters HV-convex king animals BY
@@ -63,10 +63,10 @@ def main():
         return 1
     if not os.path.exists(TM):
         # convex_perim_tm needs GMP, which the Makefile treats as optional
-        # (see gate-middle-kingdom/gate-convex-dfinite for the same pattern).
+        # (see gate-column-convex/gate-convex-dfinite for the same pattern).
         gate.skip(f"{TM} absent (no GMP build) -- the WHOLE gate; "
                   f"nothing below ran and nothing was verified")
-        return gate.verdict("MK-DIR4-PERIM")
+        return gate.verdict("SUBCLASS-DIR4-PERIM")
 
     accept_n = 12   # floor(7/2)*ceil(7/2) = 12: full coverage through s=7
     full_smax = 7   # inclusive
@@ -134,7 +134,7 @@ def main():
     print(f"brute (n<={accept_n}) hv:   {[hv_brute.get(s) for s in range(2, accept_n+2)]}")
     print(f"brute (n<={accept_n}) dir4: {[dir4_brute.get(s) for s in range(2, accept_n+2)]}")
 
-    return gate.verdict("MK-DIR4-PERIM")
+    return gate.verdict("SUBCLASS-DIR4-PERIM")
 
 
 if __name__ == "__main__":

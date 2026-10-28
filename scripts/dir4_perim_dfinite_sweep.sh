@@ -3,7 +3,7 @@
 # perimeter tame" D-finiteness lever robust to the dir4 restriction?
 #
 # Runs build/prec_guess over the (dir4, HV-convex)-by-semiperimeter series
-# (results/mk_dir4_perim_terms_s200.txt, 199 terms, Phase 2a) in every
+# (results/subclass_dir4_perim_terms_s200.txt, 199 terms, Phase 2a) in every
 # maximal box 199 terms can decide, in both `prec` (P-recurrence) and `alg`
 # (algebraic) mode, alongside the four control arms of
 # tests/gate_convex_dfinite.py plus a same-box, same-length power arm.

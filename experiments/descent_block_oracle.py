@@ -29,7 +29,7 @@ must agree with each other):
   climb   let the h' = h+1 climb carry weight 2
 
 Usage: python3 experiments/descent_block_oracle.py [--nmax 700]
-                [--check results/mk_dir4_descblock_n700.txt] [--out FILE]
+                [--check results/subclass_dir4_descblock_n700.txt] [--out FILE]
 Target machine: gympie (laptop), single core.  MEASURED: --nmax 700 in ~20 s,
 < 250 MB.  Kill = SIGINT; there is nothing to resume.
 """
@@ -114,7 +114,7 @@ def _walk_hv(nmax, dir4):
     """HV-convex animals by area, tallied by which middle phases they visit.
 
     Enumerates explicit column-interval sequences [b, t] up to translation and
-    carries the two unimodality phase bits exactly as build/middle_kingdom_tm
+    carries the two unimodality phase bits exactly as build/column_convex_tm
     does: pb = 1 once b has risen (then d >= 0 forever), pt = 1 once t has
     fallen (then d <= s forever).  dir4=True adds the 4-cone floor (the bottom
     drops at most one row per step right); dir4=False leaves it unrestricted.
@@ -152,7 +152,7 @@ def _walk_hv(nmax, dir4):
 def brute_hvdir4(nmax):
     """Brute force over (dir4, HV-convex) animals, split by phase path.
 
-    Independent oracle for build/middle_kingdom_tm's hvdir4 / hvdir4asc /
+    Independent oracle for build/column_convex_tm's hvdir4 / hvdir4asc /
     hvdir4ascbad modes.  Returns (all, asc, ascbad) where `asc` drops every
     animal whose phase path ever visits (0,1) and `ascbad` -- the RED control
     -- drops (1,0) instead.

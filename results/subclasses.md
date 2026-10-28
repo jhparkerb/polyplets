@@ -129,7 +129,7 @@ animal generated (`build/directed_cone_anchor grid 14 8`,
 A006770). Run 2026-08-05 on gympie, 8 threads: the sixteen-class run took
 302.8 s wall, 2064.9 s cpu, peak RSS 1.9 MB; the twenty-class run with the
 `mdir` row added took 512.1 s wall, 3672.6 s cpu, 1.9 MB, and left the sixteen
-original columns unchanged. Data: `results/mk_grid20_n14.txt`. Gate:
+original columns unchanged. Data: `results/subclass_grid20_n14.txt`. Gate:
 `make gate-king-grid` (`tests/gate_king_grid.py`), which also checks the eight
 equalities that must hold and the four that must not.
 
@@ -315,14 +315,14 @@ territory (compositions, partitions, an existing entry).
 
 ### The four classes that do not collapse
 
-`cpp/middle_kingdom_tm.cpp` (`build/middle_kingdom_tm`) counts bottom profiles
+`cpp/column_convex_tm.cpp` (`build/column_convex_tm`) counts bottom profiles
 directly, with state (column height, unimodality phases), or (column height,
 height above the running minimum, phase) for `ctrlB`; modes `cc ccmono ccdir5
 ccdir4 ccctrlb hv hvdir4 hvmono stair hvdir4asc` and the controls `ccdir4bad
 ccctrlbbad hvdir4ascbad`. It reproduces the brute-force table for all six
 column-convex classes through `n = 14`, and its `hv` mode reproduces all 700
 terms of the independent row transfer matrix `build/convex_area_tm` (`make
-gate-middle-kingdom`, `tests/gate_middle_kingdom.py`).
+gate-column-convex`, `tests/gate_column_convex.py`).
 
 | class | first terms | µ | generating function |
 |---|---|---|---|
@@ -334,7 +334,7 @@ gate-middle-kingdom`, `tests/gate_middle_kingdom.py`).
 
 **(dir5, column-convex).** 1, 4, 17, 71, 289, 1149, 4481, 17209, 65281,
 245169, 913153, 3377505, 12418561, 45428161; 700 terms in
-`results/mk_ccdir5_terms_n700.txt`. Valley-unimodal profiles split into a
+`results/subclass_ccdir5_terms_n700.txt`. Valley-unimodal profiles split into a
 nonincreasing run and a nondecreasing one. Each run's transfer operator has
 rank 1 (`d ≤ 0` admits `h(j+1)+1` placements, `d ≥ 0` admits `h(j)+1`), and
 both runs have the same ratio `p(x) = (2x−x²)/(1−x)²`, so the two geometric
@@ -351,7 +351,7 @@ square lattice.
 
 **(dir4, column-convex) = A018902.** 1, 4, 17, 73, 314, 1351, 5813, 25012,
 107621, 463069, 1992482, 8573203, 36888569, 158723236
-(`results/mk_ccdir4_terms_n700.txt`). Proposition 2's condition `d ≥ −1`
+(`results/subclass_ccdir4_terms_n700.txt`). Proposition 2's condition `d ≥ −1`
 makes the placement count `h(j) + 2`, independent of the new column's height,
 so the transfer operator has rank 1 and
 
@@ -378,7 +378,7 @@ comment, not submitted:
 
 **(ctrlB, column-convex).** 1, 4, 18, 79, 339, 1423, 5872, 23909, 96336,
 384934, 1527712, 6029421, 23686066, 92685759; 250 terms in
-`results/mk_ccctrlb_terms_n250.txt`. "Every local minimum of `b` at the global
+`results/subclass_ccctrlb_terms_n250.txt`. "Every local minimum of `b` at the global
 minimum" is not a local rule on the profile steps, so the transfer matrix
 carries the height above the running minimum and has `O(n²)` states. Cost:
 `n = 150` in 5.3 s and 194 MB, `n = 250` in 66.3 s and 938 MB, fixing
@@ -406,7 +406,7 @@ functions.
 
 **(dir4, HV-convex).** 1, 4, 15, 53, 177, 567, 1767, 5417, 16465, 49897,
 151288, 459836, 1402387, 4292477; 700 terms in
-`results/mk_hvdir4_terms_n700.txt`. HV-convexity is `b` valley-unimodal and
+`results/subclass_hvdir4_terms_n700.txt`. HV-convexity is `b` valley-unimodal and
 `t` peak-unimodal; Proposition 2 adds `d ≥ −1`, which bites only on the
 descending part of `b`.
 
@@ -815,7 +815,7 @@ tops nondecreasing) are the skew Young diagrams with no empty rows or columns
 shape; "no empty rows" forces `bottom_{i+1} ≤ top_i + 1`, which is exactly
 king contact, and conversely. 8 terms verified against the entry; the animal
 side is brute-forced to `n = 14` (1, 3, 9, 28, 87, 272, 850, 2659, 8318,
-26025, 81427, 254777, 797175, 2494307, `results/mk_grid20_n14.txt`). Draft
+26025, 81427, 254777, 797175, 2494307, `results/subclass_grid20_n14.txt`). Draft
 OEIS comment, not submitted:
 
 > a(n) is also the number of staircase polyplets with n cells: king-lattice
@@ -1228,8 +1228,8 @@ Brute force: `build/directed_cone_anchor gridperim 14 8` tallies the
 `HV ∧ dir4` animals by `W + H`, reusing the grid mode's predicates; an
 area-`≤ N` enumeration settles `s` completely only while
 `⌊s/2⌋⌈s/2⌉ ≤ N`, so `N = 14` settles `s ≤ 7` and is a lower bound beyond.
-Run: 74.4 s wall, 1.9 MB (`results/mk_dir4_perim_brute_n14.log`,
-`results/mk_dir4_perim_brute_n14.txt`).
+Run: 74.4 s wall, 1.9 MB (`results/subclass_dir4_perim_brute_n14.log`,
+`results/subclass_dir4_perim_brute_n14.txt`).
 
 | s | brute hv | brute dir4 | TM hv | TM dir4 | complete? |
 |---|---|---|---|---|---|
@@ -1245,9 +1245,9 @@ Run: 74.4 s wall, 1.9 MB (`results/mk_dir4_perim_brute_n14.log`,
 `dir4(s) ≤ hv(s)` at every `s` in `2..200`, with equality only at
 `s = 2, 3, 4`; `dir4(200)/hv(200) = 0.01019`. `build/convex_perim_tm 11 0 hv`
 still reproduces A005436's first ten terms. No OEIS match on
-`1,2,9,34,137,553,2237,9038,36435,146511`. Gate: `make gate-mk-dir4-perim`
-(`tests/gate_mk_dir4_perim.py`). Series: 199 terms in
-`results/mk_dir4_perim_terms_s200.txt`, from `build/convex_perim_tm 200 1 dir4`.
+`1,2,9,34,137,553,2237,9038,36435,146511`. Gate: `make gate-subclass-dir4-perim`
+(`tests/gate_subclass_dir4_perim.py`). Series: 199 terms in
+`results/subclass_dir4_perim_terms_s200.txt`, from `build/convex_perim_tm 200 1 dir4`.
 
 | run | wall_s | peak_rss_mb |
 |---|---|---|
@@ -1358,7 +1358,7 @@ the entry carries no asymptotic.
 
 ### The operator comparison
 
-`cpp/middle_kingdom_tm.cpp`'s profile engine carries state `(h, pb, pt)`, the
+`cpp/column_convex_tm.cpp`'s profile engine carries state `(h, pb, pt)`, the
 last column's height and the two unimodality phases, and steps by
 `d = b(j+1) − b(j)` with `s := h − h'` marking where the top turns (`d > s`
 iff `t` rises). Modes `hv` and `hvdir4` differ in one line: the floor on `d`
@@ -1495,7 +1495,7 @@ A006958 and A225114 as positive controls). What the proposition adds is the
 king case, where neither class is solved, and the statement for every
 intermediate class. Staircase ⊆ (dir4, HV-convex) is Proposition 2.
 
-Brute force against `results/mk_grid20_n14.txt`:
+Brute force against `results/subclass_grid20_n14.txt`:
 
 | n | staircase `M` | (dir4, HV) | HV-convex `A` |
 |---|---|---|---|
@@ -1506,7 +1506,7 @@ Brute force against `results/mk_grid20_n14.txt`:
 
 `M(n) ≤ D(n) ≤ A(n)` at every `n ≤ 14`, and the bound (*) holds at every
 `n ≤ 14` (`experiments/monotone_block_growth.py`; at `n = 14`,
-`8389720 ≤ 3848993100`). `make gate-middle-kingdom` checks the `stair` mode
+`8389720 ≤ 3848993100`). `make gate-column-convex` checks the `stair` mode
 against the grid's staircase column, the termwise chain
 `stair ≤ hvmono ≤ hvdir4 ≤ hv`, and a control: dropping the tops condition
 from `stair` gives `ccmono` = A007052 = 1, 3, 10, 34, …, which must not equal
@@ -1516,8 +1516,8 @@ A225114 = 1, 3, 9, 28, ….
 
 Modes `stair` (`d ≥ 0` and `d ≥ s`) and `hvmono` (`d ≥ 0`, `t`
 peak-unimodal), 700 terms each in 0.87 s / 50 MB and 1.28 s / 58 MB
-(`scripts/mk_stair_growth.sh`; series `results/mk_stair_terms_n700.txt`,
-`results/mk_hvmono_terms_n700.txt`; log `results/mk_stair_growth.log`). All
+(`scripts/subclass_stair_growth.sh`; series `results/subclass_stair_terms_n700.txt`,
+`results/subclass_hvmono_terms_n700.txt`; log `results/subclass_stair_growth.log`). All
 four series through `experiments/convex_growth.py` at 500 digits of working
 precision:
 
@@ -1589,9 +1589,9 @@ whether an animal's phase path ever visits `(0,1)`:
 
     D(n)  =  D_asc(n)  +  D_desc(n).
 
-`build/middle_kingdom_tm hvdir4asc` deletes the `(0,1)` state
-(`results/mk_hvdir4asc_terms_n700.txt`, log `results/mk_hvdir4asc_n700.log`),
-and `D_desc = hvdir4 − hvdir4asc` (`results/mk_hvdir4desc_terms_n700.txt`,
+`build/column_convex_tm hvdir4asc` deletes the `(0,1)` state
+(`results/subclass_hvdir4asc_terms_n700.txt`, log `results/subclass_hvdir4asc_n700.log`),
+and `D_desc = hvdir4 − hvdir4asc` (`results/subclass_hvdir4desc_terms_n700.txt`,
 derived, `n = 2..700`). Oracle for both: `experiments/descent_block_oracle.py
 --phases 14`, agreeing with the engine on every `n ≤ 14` and with the block DP
 on all 700 terms.
@@ -1853,7 +1853,7 @@ arithmetic; taking the Aitken-against-Aitken agreement (253) as the weaker
 side's count gives 251 trusted digits with a 2-digit guard, and Table B's
 stricter rule gives 185. Negative controls, in
 `experiments/amplitude_feed_vectors.py` and checked by
-`make gate-middle-kingdom`: dropping the factor 1/2 agrees with the
+`make gate-column-convex`: dropping the factor 1/2 agrees with the
 measurement to 0 digits; truncating the `(0,0)` block at `min(3, ·)` agrees to
 1; the `φ` recurrence at `x = 1/3.13` fails its eigen-equation at `1e−2`
 where `x_c` gives `1e−528`.
@@ -1891,7 +1891,7 @@ degree and "algebraic over `Q(µ)`" cannot be settled either way; the identity
 
 Cost of routes not taken: extending the split series to `n ≈ 1050` (for 300
 trusted digits by Table B's rule, `0.3179 n`) is 10.6 s for
-`middle_kingdom_tm hvdir4asc 1100` but about 50 minutes for the partner
+`column_convex_tm hvdir4asc 1100` but about 50 minutes for the partner
 `convex_area_tm`, which scales as `N⁴`; PSLQ cost, not precision, now bounds
 the boxes (degree 22 at 185 digits took 41 s, degree 45 took 1669 s, degree 30
 at 251 digits took 303 s; a degree-120 box extrapolates to hours). Neither
@@ -1926,7 +1926,7 @@ The boxes are small because 40 terms is short; a finite-box exclusion is not
 a non-D-finiteness proof (`results/closed-doors.md`).
 
 **B. (dir4, HV-convex) against unrestricted HV-convex** (700-term series,
-`results/mk_hvdir4_terms_n700.txt`, `results/convex_area_terms_n700_king.txt`):
+`results/subclass_hvdir4_terms_n700.txt`, `results/convex_area_terms_n700_king.txt`):
 
 ```
 amplitude ratio a_dir4(n)/a_HV(n), 54 trusted digits (n=600 vs n=700, minus 2 guard):
@@ -2543,19 +2543,19 @@ Rensburg and Madras, J. Phys. A 30 (1997) 8035–8066, wanted in
 All laptop-scale unless marked. Grid and column transfer matrices:
 
 ```
-make build/directed_cone_anchor build/middle_kingdom_tm build/convex_area_tm build/convex_perim_tm build/prec_guess
-make gate-king-grid gate-multidirected gate-middle-kingdom gate-convex-dfinite gate-mk-dir4-perim gate-dir4-perim-alg
-build/directed_cone_anchor grid 14 8 > results/mk_grid20_n14.txt           # 512 s wall / 3673 s cpu, 8 threads
-build/directed_cone_anchor gridperim 14 8 > results/mk_dir4_perim_brute_n14.txt   # 74 s
+make build/directed_cone_anchor build/column_convex_tm build/convex_area_tm build/convex_perim_tm build/prec_guess
+make gate-king-grid gate-multidirected gate-column-convex gate-convex-dfinite gate-subclass-dir4-perim gate-dir4-perim-alg
+build/directed_cone_anchor grid 14 8 > results/subclass_grid20_n14.txt           # 512 s wall / 3673 s cpu, 8 threads
+build/directed_cone_anchor gridperim 14 8 > results/subclass_dir4_perim_brute_n14.txt   # 74 s
 build/directed_cone_anchor mdir 14 8                                        # 162 s
 python3 experiments/directed_cone_anchor.py --dir5 15 --cone5 17 --ctrl 14 --threads 8   # ~14 min
 python3 experiments/directed_cone_anchor.py --brute 9 --dir5 11 --cone5 12 --ctrl 11 --threads 8
 python3 experiments/multidirected_king.py 200 --out results/multidirected_terms_n200.txt
 python3 experiments/multidirected_king.py 12 --crosstab 8
-build/middle_kingdom_tm ccdir5 700 > results/mk_ccdir5_terms_n700.txt      # 2.9 s
-build/middle_kingdom_tm ccctrlb 250 > results/mk_ccctrlb_terms_n250.txt    # 66 s, 938 MB
-build/middle_kingdom_tm hvdir4asc 700 > results/mk_hvdir4asc_terms_n700.txt
-scripts/mk_stair_growth.sh                                                 # stair, hvmono, ~15 s
+build/column_convex_tm ccdir5 700 > results/subclass_ccdir5_terms_n700.txt      # 2.9 s
+build/column_convex_tm ccctrlb 250 > results/subclass_ccctrlb_terms_n250.txt    # 66 s, 938 MB
+build/column_convex_tm hvdir4asc 700 > results/subclass_hvdir4asc_terms_n700.txt
+scripts/subclass_stair_growth.sh                                                 # stair, hvmono, ~15 s
 python3 experiments/oeis_lookup.py 1,4,17,71,289,1149,4481,17209,65281
 ```
 
@@ -2566,10 +2566,10 @@ build/convex_area_tm 700 1 > /dev/null   # king, ~8 min
 build/convex_area_tm 700 0 > /dev/null   # control, ~7 min
 build/prec_guess prec results/convex_area_terms_n700_king.txt 24 24
 build/prec_guess alg  results/convex_area_terms_n700_king.txt 24 24
-build/prec_guess prec results/mk_stair_terms_n700.txt 24 24
-build/prec_guess alg  results/mk_stair_terms_n700.txt 20 20
+build/prec_guess prec results/subclass_stair_terms_n700.txt 24 24
+build/prec_guess alg  results/subclass_stair_terms_n700.txt 20 20
 python3 experiments/convex_growth.py results/convex_area_terms_n700_king.txt --prec 500 --algdeg 20 --maxcoeff 100000000
-python3 experiments/convex_growth.py results/mk_hvdir4_terms_n700.txt --prec 500 --algdeg 20 --maxcoeff 100000000
+python3 experiments/convex_growth.py results/subclass_hvdir4_terms_n700.txt --prec 500 --algdeg 20 --maxcoeff 100000000
 python3 experiments/convex_heights.py
 python3 experiments/convex_kernel_zeros.py
 ```
@@ -2578,7 +2578,7 @@ Convex by semiperimeter:
 
 ```
 build/convex_perim_tm 200 1 > results/convex_perim_terms_s200.txt          # 1246 s
-build/convex_perim_tm 200 1 dir4 > results/mk_dir4_perim_terms_s200.txt    # 1073 s
+build/convex_perim_tm 200 1 dir4 > results/subclass_dir4_perim_terms_s200.txt    # 1073 s
 scripts/dir4_perim_dfinite_sweep.sh; scripts/dir4_perim_dfinite_nullcontrol.sh
 scripts/dir4_perim_boundary_scan.sh; scripts/dir4_perim_minimal_box.sh; scripts/dir4_perim_nullity_grid.sh
 python3 experiments/dir4_perim_find_alg.py 4 22
@@ -2593,15 +2593,15 @@ each):
 python3 experiments/staircase_supermul.py
 python3 experiments/monotone_block_growth.py --nmax 400
 python3 experiments/square_staircase_area.py
-python3 experiments/dir4_descent_block.py --nmax 700 --out results/mk_dir4_descblock_n700.txt \
-        --compare results/mk_hvdir4_terms_n700.txt --prec 400
-python3 experiments/descent_block_oracle.py --nmax 700 --brute 13 --check results/mk_dir4_descblock_n700.txt
+python3 experiments/dir4_descent_block.py --nmax 700 --out results/subclass_dir4_descblock_n700.txt \
+        --compare results/subclass_hvdir4_terms_n700.txt --prec 400
+python3 experiments/descent_block_oracle.py --nmax 700 --brute 13 --check results/subclass_dir4_descblock_n700.txt
 python3 experiments/descent_block_oracle.py --phases 14
 python3 experiments/descent_block_oracle.py --mirror 14
 python3 experiments/subdominant_identification.py --order 10 --dps 1500
 python3 experiments/staircase_cf_poles.py --depth 24 --terms 40
-python3 experiments/ratio_amplitude.py results/mk_hvdir4asc_terms_n700.txt results/convex_area_terms_n700_king.txt --prec 700 --drop 100
-python3 experiments/ratio_amplitude.py results/mk_hvdir4_terms_n700.txt results/convex_area_terms_n700_king.txt --prec 700 --drop 100
+python3 experiments/ratio_amplitude.py results/subclass_hvdir4asc_terms_n700.txt results/convex_area_terms_n700_king.txt --prec 700 --drop 100
+python3 experiments/ratio_amplitude.py results/subclass_hvdir4_terms_n700.txt results/convex_area_terms_n700_king.txt --prec 700 --drop 100
 python3 experiments/amplitude_feed_vectors.py --dps 500 --hmax 1200 --emit results/amplitude_ratio_constants.txt
 scripts/amplitude_pslq_sweep.sh 185 results/amplitude_pslq_185.log
 scripts/amplitude_pslq_sweep.sh 251 results/amplitude_pslq_251.log 2:1e40,3:1e30,5:1e20,10:1e11,20:1e5,30:1e4 5:6:1e2,4:5:1e4,3:4:1e6,2:4:1e8
@@ -2623,10 +2623,10 @@ python3 experiments/move_graph_connectivity.py
 
 Series and data:
 `results/mk_{cc,ccdir5,ccdir4,hvdir4,hvdir4asc,hvdir4desc,stair,hvmono}_terms_n700.txt`,
-`results/mk_ccctrlb_terms_n250.txt`, `results/mk_dir4_descblock_n700.txt`,
-`results/mk_grid20_n14.txt`, `results/multidirected_terms_n200.txt`,
+`results/subclass_ccctrlb_terms_n250.txt`, `results/subclass_dir4_descblock_n700.txt`,
+`results/subclass_grid20_n14.txt`, `results/multidirected_terms_n200.txt`,
 `results/convex_area_terms_n{500,700_king,700_poly}.txt`,
-`results/convex_perim_terms_s200.txt`, `results/mk_dir4_perim_terms_s200.txt`,
+`results/convex_perim_terms_s200.txt`, `results/subclass_dir4_perim_terms_s200.txt`,
 `results/a005436_perim_s100.txt`, `results/maxhole.txt`,
 `results/holes_n{14,18,19}.txt`, the `results/b*_upload.txt` files above,
 `results/convex_height_denominators.json`, and the logs named in the text.

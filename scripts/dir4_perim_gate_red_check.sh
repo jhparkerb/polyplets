@@ -44,7 +44,7 @@ rm -f "$NULL"
 case_red "source missing, no cut file" "null control source missing"
 
 # the stale-copy trap: a previously cut control is present, source is not.
-head -199 results/mk_dir4_perim_terms_s200.txt > "$NULL"
+head -199 results/subclass_dir4_perim_terms_s200.txt > "$NULL"
 case_red "source missing, stale cut present" "null control source missing"
 rm -f "$NULL"
 

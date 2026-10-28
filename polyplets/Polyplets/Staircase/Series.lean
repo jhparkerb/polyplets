@@ -18,7 +18,7 @@ underlying functions.
 * `convPow a ℓ` — the `ℓ`-fold convolution power of `a` (`convPow a 0 = eps`).
 
 Every algebraic fact about them is read off Mathlib's `PowerSeries ℚ` through
-the bridge `mk_conv : mk (conv a b) = mk a * mk b` (and `mk_eps`, `mk_convPow`):
+the bridge `subclass_conv : mk (conv a b) = mk a * mk b` (and `subclass_eps`, `subclass_convPow`):
 commutativity, associativity (`sum_conv_collapse`, the reindexing the staircase
 uses), the unit laws, and that an inverse lifts to powers (`conv_convPow_inv`).
 Only the truncation lemmas (`conv_congr_le`, `convPow_congr_le`,
@@ -55,32 +55,32 @@ lemma conv_eq_coeff (a b : ℕ → ℚ) (m : ℕ) : conv a b m = coeff m (mk a *
   simp only [conv, coeff_mk]
 
 /-- `mk` turns convolution into multiplication. -/
-lemma mk_conv (a b : ℕ → ℚ) : mk (conv a b) = mk a * mk b :=
+lemma subclass_conv (a b : ℕ → ℚ) : mk (conv a b) = mk a * mk b :=
   PowerSeries.ext fun m => by rw [coeff_mk, conv_eq_coeff]
 
 /-- `mk` turns the unit into `1`. -/
-lemma mk_eps : mk eps = (1 : ℚ⟦X⟧) :=
+lemma subclass_eps : mk eps = (1 : ℚ⟦X⟧) :=
   PowerSeries.ext fun m => by rw [coeff_mk, coeff_one, eps]
 
 /-- `mk` turns convolution powers into powers. -/
-lemma mk_convPow (a : ℕ → ℚ) (ℓ : ℕ) : mk (convPow a ℓ) = mk a ^ ℓ := by
+lemma subclass_convPow (a : ℕ → ℚ) (ℓ : ℕ) : mk (convPow a ℓ) = mk a ^ ℓ := by
   induction ℓ with
-  | zero => simp only [convPow, mk_eps, pow_zero]
-  | succ ℓ ih => simp only [convPow, mk_conv, ih, pow_succ']
+  | zero => simp only [convPow, subclass_eps, pow_zero]
+  | succ ℓ ih => simp only [convPow, subclass_conv, ih, pow_succ']
 
 /-- Two sequences with the same power series are equal. -/
-lemma eq_of_mk_eq {a b : ℕ → ℚ} (h : mk a = mk b) : a = b :=
+lemma eq_of_subclass_eq {a b : ℕ → ℚ} (h : mk a = mk b) : a = b :=
   funext fun m => by rw [← coeff_mk m a, h, coeff_mk]
 
 /-! ## The ring laws, read off the power series -/
 
 /-- Convolution is commutative. -/
 lemma conv_comm (a b : ℕ → ℚ) : conv a b = conv b a :=
-  eq_of_mk_eq (by rw [mk_conv, mk_conv, mul_comm])
+  eq_of_subclass_eq (by rw [subclass_conv, subclass_conv, mul_comm])
 
 /-- Convolution is associative. -/
 lemma conv_assoc (a b c : ℕ → ℚ) : conv (conv a b) c = conv a (conv b c) :=
-  eq_of_mk_eq (by rw [mk_conv, mk_conv, mk_conv, mk_conv, mul_assoc])
+  eq_of_subclass_eq (by rw [subclass_conv, subclass_conv, subclass_conv, subclass_conv, mul_assoc])
 
 /-- **`sum_conv_collapse`** — the reindexing of the staircase: folding a nested
 convolution sum along the diagonal `s = i + t` turns the inner
@@ -95,7 +95,7 @@ lemma sum_conv_collapse (a b f : ℕ → ℚ) (k : ℕ) :
 
 /-- `eps` is a right unit for `conv`. -/
 lemma conv_eps (a : ℕ → ℚ) : conv a eps = a :=
-  eq_of_mk_eq (by rw [mk_conv, mk_eps, mul_one])
+  eq_of_subclass_eq (by rw [subclass_conv, subclass_eps, mul_one])
 
 /-- `eps` is a left unit for `conv`. -/
 lemma eps_conv (a : ℕ → ℚ) : conv eps a = a := by
@@ -105,8 +105,8 @@ lemma eps_conv (a : ℕ → ℚ) : conv eps a = a := by
 `conv (convPow a ℓ) (convPow b ℓ) = eps`. -/
 lemma conv_convPow_inv {a b : ℕ → ℚ} (h : conv a b = eps) (ℓ : ℕ) :
     conv (convPow a ℓ) (convPow b ℓ) = eps := by
-  have hab : mk a * mk b = 1 := by rw [← mk_conv, h, mk_eps]
-  exact eq_of_mk_eq (by rw [mk_conv, mk_convPow, mk_convPow, ← mul_pow, hab, one_pow, mk_eps])
+  have hab : mk a * mk b = 1 := by rw [← subclass_conv, h, subclass_eps]
+  exact eq_of_subclass_eq (by rw [subclass_conv, subclass_convPow, subclass_convPow, ← mul_pow, hab, one_pow, subclass_eps])
 
 /-! ## Truncation: a convolution coefficient reads only low indices -/
 

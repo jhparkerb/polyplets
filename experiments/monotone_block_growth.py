@@ -25,8 +25,8 @@ be ATTAINED (RED control -- one fewer and the bound would be false).
 
 Also checks the factorization inequality
     A(n) <= 2 (n+1)^2 sum_{i+j+l=n} P(i) M(j) P(l)
-on the range where A (HV-convex, results/mk_grid20_n14.txt) and M (staircase,
-build/middle_kingdom_tm stair) are both on disk.
+on the range where A (HV-convex, results/subclass_grid20_n14.txt) and M (staircase,
+build/column_convex_tm stair) are both on disk.
 
 RED control: the same DP with the offset count wrong (h_j - h_{j+1} + 2) must
 diverge from the brute force. Both are checked against a direct enumeration

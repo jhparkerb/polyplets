@@ -4,14 +4,14 @@
 # SUBMITTED to OEIS -- staged pending jasonp's decision to submit.
 # a(1)-a(700). No OEIS match on the 9-term prefix or the full series
 # (experiments/oeis_lookup.py, 2026-08-05).
-# Method: cpp/middle_kingdom_tm.cpp mode ccdir5, a column-bottom-profile
+# Method: cpp/column_convex_tm.cpp mode ccdir5, a column-bottom-profile
 # transfer matrix (docs/middle-kingdom-plan.md Phase 3). Proposition 1
 # (results/middle-kingdom-phase3.md) proves the class is exactly the
 # column-convex animals whose bottom profile is valley-unimodal (nonincreasing
 # then nondecreasing); validated against an independent brute-force
 # Redelmeier DFS to n=14 (make gate-king-grid) and against
 # build/convex_area_tm's independent row TM via the hv mode overlap
-# (make gate-middle-kingdom). Rational GF, DOUBLE pole:
+# (make gate-column-convex). Rational GF, DOUBLE pole:
 # F(x) = x(1-5x+9x^2-6x^3+2x^4) / [(1-x)(1-4x+2x^2)^2],
 # a(n) = 9a(n-1) - 28a(n-2) + 36a(n-3) - 20a(n-4) + 4a(n-5) for n>5,
 # a(n) ~ C n (2+sqrt(2))^n, C=0.10370... (measured stable to n=700). The

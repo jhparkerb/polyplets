@@ -80,9 +80,9 @@ lemma mem_translate_mk {e d : ℤ} {q : ℤ × ℤ} {S : Finset (ℤ × ℤ)} :
 
 /-- **Translation is undone by the opposite translation.** Stated with the
 cancellation as hypotheses so that it applies without any `-0`/`0` mismatch. -/
-lemma translate_mk_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
+lemma translate_subclass_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
     (S : Finset (ℤ × ℤ)) : translate (e', d') (translate (e, d) S) = S := by
-  rw [translate_translate, Prod.mk_add_mk, he, hd]
+  rw [translate_translate, Prod.subclass_add_mk, he, hd]
   exact translate_zero S
 
 /-! ## `a n ≥ 1`: the bar witness
@@ -490,7 +490,7 @@ theorem leftPart_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   rw [leftPart, cutAt_concat hA hB, hcast, leftOf_concat hA hB,
     baseY_shift hA (liftA_nonneg A B)]
-  exact translate_mk_cancel (by ring) (by ring) A
+  exact translate_subclass_cancel (by ring) (by ring) A
 
 /-- `rightPart` inverts `concat` on the right. -/
 theorem rightPart_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
@@ -500,7 +500,7 @@ theorem rightPart_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyple
     have := Int.natCast_nonneg (maxX A); omega
   rw [rightPart, cutAt_concat hA hB, hcast, rightOf_concat hA hB,
     baseX_shift hB hw, baseY_shift hB (liftB_nonneg A B)]
-  exact translate_mk_cancel (by ring) (by ring) B
+  exact translate_subclass_cancel (by ring) (by ring) B
 
 /-- **Klarner supermultiplicativity.** `concat` injects pairs of polyplets
 of sizes `m` and `n` into the polyplets of size `m + n`;

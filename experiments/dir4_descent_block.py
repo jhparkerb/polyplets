@@ -138,7 +138,7 @@ def main():
 
     if args.compare:
         from mpmath import mp, mpf, nstr
-        out = args.out or 'results/mk_dir4_descblock_n700.txt'
+        out = args.out or 'results/subclass_dir4_descblock_n700.txt'
         mu_o, mu2_o = subdominant(args.compare, args.prec)
         mu_b, _ = subdominant(out, args.prec)
         mp.dps = args.prec

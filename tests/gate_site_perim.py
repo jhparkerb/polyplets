@@ -2,8 +2,8 @@
 """Gate SITE-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md, removed) Phase 4a acceptance.
 
 build/directed_cone_anchor's "grid" mode already does one Redelmeier pass over
-ALL fixed king animals of every size <= N (Phase 0 of the middle-kingdom
-plan). Phase 4a rides that pass with a per-n MIN-REDUCE of the site
+ALL fixed king animals of every size <= N (Phase 0 of
+docs/middle-kingdom-plan.md (deleted)). Phase 4a rides that pass with a per-n MIN-REDUCE of the site
 perimeter -- the number of distinct EMPTY cells adjacent to the animal -- and
 appends it as two trailing columns after the existing 20 directedness x
 convexity counts: minSPKing then minSPRook.

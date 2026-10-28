@@ -1,4 +1,4 @@
-// middle_kingdom_tm.cpp -- column transfer matrix for the column-convex cells
+// column_convex_tm.cpp -- column transfer matrix for the column-convex cells
 // of the results/subclasses.md Phase 3 grid, by area.
 //
 // A column-convex king animal is a sequence of nonempty column intervals
@@ -55,7 +55,7 @@
 //            be aggregated. O(N^5)-ish in time and O(N^3) in state, so it runs
 //            out of laptop somewhere past n = 400, not past n = 700.
 //
-// Usage:  build/middle_kingdom_tm MODE N
+// Usage:  build/column_convex_tm MODE N
 // stdout: "n a(n)" per line, n = 1..N (the format prec_guess and
 //         experiments/convex_growth.py read).
 // stderr: obs.h start/heartbeat/done.
@@ -63,7 +63,7 @@
 //   1.5-2.9 s and <= 65 MB; GROUND n=150 in 5.3 s / 194 MB and n=250 in 66.3 s
 //   / 938 MB, which fixes its scaling at O(n^4.95) time, O(n^3.2) memory.
 //   No checkpointing: runs are seconds to minutes; kill = plain SIGINT.
-// Oracle: tests/gate_middle_kingdom.py against Phase 0's brute-force table.
+// Oracle: tests/gate_column_convex.py against Phase 0's brute-force table.
 #include <algorithm>
 #include <climits>
 #include <cstdio>
@@ -147,7 +147,7 @@ std::vector<mpz_class> runProfile(Mode mode, int N, obs::Reporter& rep) {
           // Six elements in three already-ordered runs ({lo, hi+1}, {0, 1},
           // {s, s+1}), in the Theta(N^3) inner loop: insertion beats
           // std::sort's general machinery by ~19% of total runtime, measured
-          // on `middle_kingdom_tm hv 700`.
+          // on `column_convex_tm hv 700`.
           for (int i = 1; i < 6; ++i) {
             const int x = cut[i];
             int j = i - 1;
@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
 
   const int N = (int)argparse::ArgInt(argv[2], "N", 1, 4000);
 
-  obs::Reporter rep("middle_kingdom_tm", 0,
+  obs::Reporter rep("column_convex_tm", 0,
                     "mode=" + ms + " n=" + std::to_string(N));
   const bool ground = mode == Mode::CCCtrlB || mode == Mode::CCCtrlBBad;
   std::vector<mpz_class> total =

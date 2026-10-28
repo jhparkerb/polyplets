@@ -36,7 +36,7 @@ get a check that `make` runs.
 `scripts/` (including `term.sh` and the assembly scripts, which are run to
 produce the reference outputs but not rewritten), `experiments/`, the Lean in
 `polyplets/`, the other programs in `cpp/` (`tma`, `strip_mu*`, perimeter,
-severance, convex, middle-kingdom and the rest), the paper verifiers, and the
+the cluster-weight and depth programs, convex, column-convex and the rest), the paper verifiers, and the
 documents, except where a document names a file, flag or function that the
 rewrite renames or removes.
 

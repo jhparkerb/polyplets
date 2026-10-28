@@ -4,13 +4,13 @@
 # n. NOT YET SUBMITTED to OEIS -- staged pending jasonp's decision to submit.
 # a(1)-a(700). No OEIS match on the 9-term prefix or the full series
 # (experiments/oeis_lookup.py, 2026-08-05).
-# Method: cpp/middle_kingdom_tm.cpp mode hvdir4, a column-bottom/top-profile
+# Method: cpp/column_convex_tm.cpp mode hvdir4, a column-bottom/top-profile
 # transfer matrix (docs/middle-kingdom-plan.md Phase 3). Proposition 2 +
 # Corollary 4 (results/middle-kingdom-phase3.md) prove the class is the
 # HV-convex animals whose bottom profile never drops by more than one row
 # column to column; validated against an independent brute-force Redelmeier
 # DFS to n=14 (make gate-king-grid) and against build/convex_area_tm's row
-# TM (make gate-middle-kingdom). mu =
+# TM (make gate-column-convex). mu =
 # 3.128943269730886252277447995387754160532091221904 -- agrees with the
 # UNRESTRICTED HV-convex-by-area constant in every one of 49 significant
 # digits measured (same dominant singularity; only the amplitude changes,

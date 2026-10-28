@@ -19,9 +19,9 @@ of it, and the Fekete step:
 * `M_tendsto` — `µ = lim M(n)^{1/n}` exists;
 * `M_le_mu_pow` — `M n ≤ µⁿ` for every `n`, the limit-is-supremum half;
 * `mu_gt_of_M_700` — `3.1234 < µ`, **conditional** on the computed
-  `M 700` of `results/mk_stair_terms_n700.txt`.
+  `M 700` of `results/subclass_stair_terms_n700.txt`.
 
-The last two are the point. `make gate-middle-kingdom` checks
+The last two are the point. `make gate-column-convex` checks
 supermultiplicativity on 700 computed terms; `M_supermul` makes it a theorem for
 all `i` and `j`, and Fekete then converts *any* computed term into a rigorous
 floor under `µ` rather than an extrapolation toward it.
@@ -260,8 +260,8 @@ theorem mu_le : mu ≤ 4 := stairFekete.growth_le
 /-! ## The conditional lower bound from the computed term
 
 `M_le_mu_pow` turns any computed term into a floor. The largest one this project
-has computed is `M 700`, from `cpp/middle_kingdom_tm.cpp` in `stair` mode
-(`results/mk_stair_terms_n700.txt`, log `results/mk_stair_n700.log`). It enters
+has computed is `M 700`, from `cpp/column_convex_tm.cpp` in `stair` mode
+(`results/subclass_stair_terms_n700.txt`, log `results/subclass_stair_n700.log`). It enters
 as an explicit hypothesis, in the `lambda_gt_of_a_40` style, so the
 computation stays outside the kernel and visible in the statement. -/
 

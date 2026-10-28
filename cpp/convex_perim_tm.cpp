@@ -20,7 +20,7 @@
 //
 // results/subclasses.md Phase 2a adds a dir4-filtered mode.
 // results/subclasses.md's Proposition 2 (proved on the COLUMN-built
-// transfer matrix, cpp/middle_kingdom_tm.cpp) says a column-convex king animal
+// transfer matrix, cpp/column_convex_tm.cpp) says a column-convex king animal
 // is half-plane-4-cone directed iff the column-bottom profile b(j) never
 // drops by more than one row: b(j+1) >= b(j) - 1. This DP is ROW-built
 // instead (bottom row first), so the translation was re-derived from Lemma A
@@ -46,7 +46,7 @@
 //   Verified two ways before trusting it: worked by hand against a small
 //   family of l-sequences (flat-then-drop always produces a >=2 gap in b;
 //   drop-by-k>1 in one step never does), then against
-//   `build/directed_cone_anchor gridperim` brute force (tests/gate_mk_dir4_perim.py).
+//   `build/directed_cone_anchor gridperim` brute force (tests/gate_subclass_dir4_perim.py).
 //   dir4bad is the RED control the plan asked for by name ("e.g. non-strict
 //   decrease"): the un-strengthened `lp > l` rule, i.e. verbatim the
 //   unrestricted-HV transition mislabeled as dir4 -- must NOT reproduce the

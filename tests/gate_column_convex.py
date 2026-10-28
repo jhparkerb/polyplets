@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Gate MIDDLE-KINGDOM: the column-convex directedness grid (results/subclasses.md).
+"""Gate COLUMN-CONVEX: the column-convex directedness grid (results/subclasses.md).
 
-build/middle_kingdom_tm is a COLUMN transfer matrix for the column-convex
+build/column_convex_tm is a COLUMN transfer matrix for the column-convex
 cells of the Phase 3 grid. Phase 3's finding is that on a column-convex king
 animal every directedness predicate in the grid reduces to a condition on the
 bottom profile b(j) alone (results/subclasses.md):
@@ -45,19 +45,19 @@ import sys
 
 from common import ROOT, Gate, prec_guess, read_terms_file, run
 
-BIN = os.path.join(ROOT, "build", "middle_kingdom_tm")
+BIN = os.path.join(ROOT, "build", "column_convex_tm")
 KING_TERMS = os.path.join(ROOT, "results", "convex_area_terms_n700_king.txt")
-# middle_kingdom_tm needs GMP, which the Makefile treats as optional. The
+# column_convex_tm needs GMP, which the Makefile treats as optional. The
 # series it produced are in the tree either way, so on a box without GMP this
 # gate falls back to them and skips only the checks that need a fresh run
 # (the RED controls and the two modes with no banked file), exactly as
 # tests/gate_convex_dfinite.py does for convex_area_tm.
 TERMS_FILE = {
-    "cc": os.path.join(ROOT, "results", "mk_cc_terms_n700.txt"),
-    "ccdir5": os.path.join(ROOT, "results", "mk_ccdir5_terms_n700.txt"),
-    "ccdir4": os.path.join(ROOT, "results", "mk_ccdir4_terms_n700.txt"),
-    "ccctrlb": os.path.join(ROOT, "results", "mk_ccctrlb_terms_n250.txt"),
-    "hvdir4": os.path.join(ROOT, "results", "mk_hvdir4_terms_n700.txt"),
+    "cc": os.path.join(ROOT, "results", "subclass_cc_terms_n700.txt"),
+    "ccdir5": os.path.join(ROOT, "results", "subclass_ccdir5_terms_n700.txt"),
+    "ccdir4": os.path.join(ROOT, "results", "subclass_ccdir4_terms_n700.txt"),
+    "ccctrlb": os.path.join(ROOT, "results", "subclass_ccctrlb_terms_n250.txt"),
+    "hvdir4": os.path.join(ROOT, "results", "subclass_hvdir4_terms_n700.txt"),
 }
 HAVE_BIN = os.path.exists(BIN)
 
@@ -77,7 +77,7 @@ GRID = {
            2677214, 8389720],
     "hvdir4": [1, 4, 15, 53, 177, 567, 1767, 5417, 16465, 49897, 151288,
                459836, 1402387, 4292477],
-    # staircase column of results/mk_grid20_n14.txt = A225114 (skew shapes with
+    # staircase column of results/subclass_grid20_n14.txt = A225114 (skew shapes with
     # no empty row or column, results/subclasses.md). It is the LOWER rung
     # of the growth sandwich in results/subclasses.md, so the transfer
     # matrix has to reproduce it before that proof's numerics mean anything.
@@ -363,7 +363,7 @@ def main():
                    "RED truncating the (0,0) block at 3 instead of 2 MUST NOT "
                    "reproduce Table B")
 
-    return gate.verdict("MIDDLE-KINGDOM")
+    return gate.verdict("COLUMN-CONVEX")
 
 
 if __name__ == "__main__":

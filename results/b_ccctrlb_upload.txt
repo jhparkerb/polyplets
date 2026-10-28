@@ -8,7 +8,7 @@
 # cell count n. NOT YET SUBMITTED to OEIS -- staged pending jasonp's
 # decision to submit. a(1)-a(250). No OEIS match on the 9-term prefix or
 # the full series (experiments/oeis_lookup.py, 2026-08-05).
-# Method: cpp/middle_kingdom_tm.cpp mode ccctrlb, a transfer matrix carrying
+# Method: cpp/column_convex_tm.cpp mode ccctrlb, a transfer matrix carrying
 # height-above-running-minimum as state (O(n^2) states; Proposition 3 of
 # results/middle-kingdom-phase3.md is not a local rule on profile steps, so
 # unlike the other three column-convex cells the state cannot be collapsed

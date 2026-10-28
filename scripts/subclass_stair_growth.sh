@@ -9,17 +9,17 @@
 # results/subclasses.md predicts all four constants are equal; this is
 # what would falsify it.
 #
-# Command:        scripts/mk_stair_growth.sh
+# Command:        scripts/subclass_stair_growth.sh
 # Target machine: gympie (laptop), 1 core.
 # Predicted cost: ~3 s and <= 70 MB per series -- same PROFILE engine and the
 #                 same n = 700 as the `hv` / `hvdir4` runs measured at 1.5-2.9 s
-#                 and <= 65 MB in cpp/middle_kingdom_tm.cpp's header.
+#                 and <= 65 MB in cpp/column_convex_tm.cpp's header.
 # Resume/kill:    no checkpointing needed at seconds of runtime; plain SIGINT.
 set -e
 cd "$(dirname "$0")/.."
 
 for mode in stair hvmono; do
-  /usr/bin/time -l build/middle_kingdom_tm "$mode" 700 \
+  /usr/bin/time -l build/column_convex_tm "$mode" 700 \
       > "results/mk_${mode}_terms_n700.txt" 2> "results/mk_${mode}_n700.log"
   echo "== $mode: $(grep -c . results/mk_${mode}_terms_n700.txt) terms"
   grep -E 'real|maximum resident' "results/mk_${mode}_n700.log" || true

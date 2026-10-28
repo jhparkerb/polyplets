@@ -12,7 +12,7 @@ plain curl-style User-Agent gets through, so one is set here.
 
 Usage:
   python3 experiments/oeis_lookup.py 1,4,17,73,314,1351 [more,term,lists ...]
-  python3 experiments/oeis_lookup.py --file results/mk_ccdir4_terms_n700.txt
+  python3 experiments/oeis_lookup.py --file results/subclass_ccdir4_terms_n700.txt
     (--file takes the first --count terms, default 10, of an "n value" file)
 
 stdout: one block per query -- the A-numbers, names, and the stored terms of

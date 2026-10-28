@@ -7,7 +7,7 @@ the mirror image of gate_convex_dfinite.py's: it must pin the relation that
 was found, and it must keep a negative control alongside every positive arm so
 that a guesser which said CANDIDATE to everything would fail here.
 
-  positive     build/prec_guess alg on results/mk_dir4_perim_terms_s200.txt in
+  positive     build/prec_guess alg on results/subclass_dir4_perim_terms_s200.txt in
                the box (4,22): nullity exactly 1, and the nullspace fitted on
                the first 119 rows must annihilate all 81 later ones.
   negative     the same series at (4,21) and (3,48): EXCLUDED. The relation is
@@ -43,7 +43,7 @@ from common import ROOT, Gate, prec_guess
 from gate_convex_dfinite import KING14
 
 GUESS = os.path.join(ROOT, "build", "prec_guess")
-DIR4 = os.path.join(ROOT, "results", "mk_dir4_perim_terms_s200.txt")
+DIR4 = os.path.join(ROOT, "results", "subclass_dir4_perim_terms_s200.txt")
 HV = os.path.join(ROOT, "results", "convex_perim_terms_s200.txt")
 AREA700 = os.path.join(ROOT, "results", "convex_area_terms_n700_king.txt")
 NULL199 = os.path.join(ROOT, "build", "dir4_perim_null199.txt")

@@ -42,7 +42,7 @@ from decimal import Decimal, getcontext
 from functools import lru_cache
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TERMS = os.path.join(ROOT, "results", "mk_stair_terms_n700.txt")
+TERMS = os.path.join(ROOT, "results", "subclass_stair_terms_n700.txt")
 
 
 def animals(n):

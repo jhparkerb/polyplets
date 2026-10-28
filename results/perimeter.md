@@ -36,8 +36,8 @@ cross-checked there against Mertens, J. Stat. Phys. 58 (1990) 1095–1108, Table
 IVB; the rook variant is a control that must differ. Measured by
 `build/directed_cone_anchor grid 14 8` (`cpp/directed_cone_anchor.cpp`;
 2026-08-05, git 54440c2): columns 22 and 23 of
-`results/mk_siteperim_n14.txt`, whose other columns equal
-`results/mk_grid20_n14.txt` and `fixtures/b006770.txt` through `n = 14`.
+`results/subclass_siteperim_n14.txt`, whose other columns equal
+`results/subclass_grid20_n14.txt` and `fixtures/b006770.txt` through `n = 14`.
 `tests/gate_site_perim.py` (`make gate-site-perim`) cross-checks the king
 minima for `n = 1..9` against `build/g2 square8 --siteperim`, a different
 search, and requires the rook column to differ at every `n`.
@@ -716,4 +716,4 @@ Data: `results/perimdefect_square8_n70_k5.txt`,
 `results/siteperim_square4_n20.txt`, `results/siteperim_square8_n14.txt`,
 `results/siteperim_tri6_n12.txt`, `results/bbox_square4_n21.txt`; the
 `results/perimmin_*.txt` censuses and hull probes;
-`results/mk_siteperim_n14.txt`.
+`results/subclass_siteperim_n14.txt`.

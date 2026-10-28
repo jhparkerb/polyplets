@@ -31,13 +31,13 @@ from prony_spectrum import prony, nearest_agree, selftest  # noqa: E402
 from seriestools import read_terms, agree_digits  # noqa: E402
 
 SERIES = {
-    'dir4':  'results/mk_hvdir4_terms_n700.txt',
-    'dir4asc': 'results/mk_hvdir4asc_terms_n700.txt',
-    'dir4desc': 'results/mk_hvdir4desc_terms_n700.txt',
-    'stair': 'results/mk_stair_terms_n700.txt',
+    'dir4':  'results/subclass_hvdir4_terms_n700.txt',
+    'dir4asc': 'results/subclass_hvdir4asc_terms_n700.txt',
+    'dir4desc': 'results/subclass_hvdir4desc_terms_n700.txt',
+    'stair': 'results/subclass_stair_terms_n700.txt',
     'hv':    'results/convex_area_terms_n700_king.txt',
-    'hvmono': 'results/mk_hvmono_terms_n700.txt',
-    'block': 'results/mk_dir4_descblock_n700.txt',
+    'hvmono': 'results/subclass_hvmono_terms_n700.txt',
+    'block': 'results/subclass_dir4_descblock_n700.txt',
 }
 
 

@@ -3,7 +3,7 @@
 
 results/subclasses.md Phase 2b asks for
 experiments/convex_perimeter.py's find_prec on the Phase 2a series
-(results/mk_dir4_perim_terms_s200.txt, 199 terms).  find_prec works over Q
+(results/subclass_dir4_perim_terms_s200.txt, 199 terms).  find_prec works over Q
 with Fractions, so a solution it returns is exact, not modular -- and it
 returns one ONLY if the fit, trained on the first (unknowns + 4) rows,
 annihilates every remaining row.  That is the Phase 1b holdout discipline
@@ -25,7 +25,7 @@ from convex_perimeter import find_prec  # noqa: E402
 from dir4_perim_find_alg import primitive  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT = os.path.join(ROOT, "results", "mk_dir4_perim_terms_s200.txt")
+DEFAULT = os.path.join(ROOT, "results", "subclass_dir4_perim_terms_s200.txt")
 
 
 def main():

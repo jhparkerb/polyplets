@@ -563,7 +563,7 @@ lemma cells_anchor {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
         by_contra hc
         have h1 : (minY m * 16 + minX m + j) % 16 = j % 16 + minX m - 16 := by omega
         omega
-      simp only [decode, Prod.mk_sub_mk, Prod.mk.injEq]
+      simp only [decode, Prod.subclass_sub_mk, Prod.mk.injEq]
       constructor
       · rw [show (minY m * 16 + minX m + j) % 16 = j % 16 + minX m by omega]
         push_cast
@@ -576,7 +576,7 @@ lemma cells_anchor {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
     have hmy := minY_le hm hb
     refine ⟨i - (minY m * 16 + minX m), by omega, ?_, ?_⟩
     · rwa [show minY m * 16 + minX m + (i - (minY m * 16 + minX m)) = i by omega]
-    · simp only [decode, Prod.mk_sub_mk, Prod.mk.injEq]
+    · simp only [decode, Prod.subclass_sub_mk, Prod.mk.injEq]
       constructor
       · rw [show (i - (minY m * 16 + minX m)) % 16 = i % 16 - minX m by omega]
         push_cast [hmx]
@@ -596,7 +596,7 @@ lemma cells_shiftLeft_17 {m : ℕ}
   · rintro ⟨j, hj, ⟨hj17, hb⟩, rfl⟩
     obtain ⟨hx, hy⟩ := h _ hb
     refine ⟨j - 17, by omega, hb, ?_⟩
-    simp only [decode, Prod.mk_sub_mk, Prod.mk.injEq]
+    simp only [decode, Prod.subclass_sub_mk, Prod.mk.injEq]
     constructor
     · rw [show (j - 17) % 16 = j % 16 - 1 by omega]
       push_cast [show 1 ≤ j % 16 by omega]
@@ -609,7 +609,7 @@ lemma cells_shiftLeft_17 {m : ℕ}
     refine ⟨i + 17, by omega, ⟨by omega, by rwa [Nat.add_sub_cancel]⟩, ?_⟩
     have hq : q = decode i + (1, 1) := by rw [he]; simp
     subst hq
-    simp only [decode, Prod.mk_add_mk, Prod.mk.injEq]
+    simp only [decode, Prod.subclass_add_mk, Prod.mk.injEq]
     rw [show (i + 17) % 16 = i % 16 + 1 by omega, show (i + 17) / 16 = i / 16 + 1 by omega]
     push_cast
     exact ⟨rfl, rfl⟩
@@ -1419,11 +1419,11 @@ lemma ncard_config {N h : ℕ} {R : Finset (ℤ × ℤ) → Prop}
       rw [rowSize_translate_x]; exact hr0₂
     have := eq_of_rowSize_one hrs hm₁ hm₂ (by simp) (by simp)
     have hax : (corner S₁).1 = (corner S₂).1 := by
-      simp only [Prod.mk_add_mk, Prod.mk.injEq] at this
+      simp only [Prod.subclass_add_mk, Prod.mk.injEq] at this
       omega
     have h1 := congrArg (translate ((corner S₂).1, 0)) heq
-    rwa [hax, translate_translate, translate_translate, Prod.mk_add_mk, neg_add_cancel, add_zero,
-      Prod.mk_zero_zero, translate_zero, translate_zero] at h1
+    rwa [hax, translate_translate, translate_translate, Prod.subclass_add_mk, neg_add_cancel, add_zero,
+      Prod.subclass_zero_zero, translate_zero, translate_zero] at h1
   · rintro S' ⟨hS', hh, hr0, hRS'⟩
     have hcan := (height_eq_iff hS').mp hh
     obtain ⟨q, hq, hqy⟩ : ∃ q ∈ S', q.2 = 0 := by
