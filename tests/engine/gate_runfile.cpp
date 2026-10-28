@@ -650,6 +650,44 @@ static void testOversizeKeyLenRefused() {
   std::remove("/tmp/gate_runfile_keylen_out.bin.idx");
 }
 
+// A count that wraps the counter word, or a combined window past the byte
+// range of lo/len, must stop the program: either would otherwise be a wrong
+// number with no other sign. The checks are explicit (core/run.h addCount),
+// so they hold under -DNDEBUG too; the control combines two in-range records
+// and must exit normally.
+static RunRecord<u64> recordAt(int lo, int len, u64 v) {
+  RunRecord<u64> r;
+  std::memset(r.sig.b, 0, SIGMAX);
+  r.H = 3; r.keyLen = 5; r.lo = static_cast<uint8_t>(lo); r.len = static_cast<uint8_t>(len);
+  r.counts.assign(len, v);
+  return r;
+}
+static void combineInRange() {
+  RunRecord<u64> a = recordAt(0, 2, 5), b = recordAt(1, 2, 7);
+  a.combine(b);
+  if (a.counts[1] != 12 || a.len != 3) _exit(4);
+}
+static void combineWraps() {
+  RunRecord<u64> a = recordAt(0, 1, ~u64{0}), b = recordAt(0, 1, 1);
+  a.combine(b);
+}
+static void combineWrapsLeftExtension() {
+  RunRecord<u64> a = recordAt(1, 1, ~u64{0}), b = recordAt(0, 2, 1);
+  a.combine(b);
+}
+static void combineWindowPastByteRange() {
+  RunRecord<u64> a = recordAt(0, 200, 1), b = recordAt(200, 100, 1);
+  a.combine(b);
+}
+static void testCombineOverflowAborts() {
+  assert(runInChild(combineInRange) == 0 && "control: an in-range combine must succeed");
+  assert(runInChild(combineWraps) != 0 && "a wrapped count must stop the program");
+  assert(runInChild(combineWrapsLeftExtension) != 0 &&
+         "a wrapped count on the left-extension path must stop the program");
+  assert(runInChild(combineWindowPastByteRange) != 0 &&
+         "a combined window past 256 must stop the program");
+}
+
 // Pooled zstd contexts must have BOUNDED retention: a persistent worker that
 // once ran a 640-input merge must not hold 640 idle contexts forever (80
 // workers x 640 x ~200KB was a standing ~10-20GB term in the a(40) OOM).
@@ -714,6 +752,7 @@ int main() {
   testFinalizeFailureDoesNotPublish();
   testMergeUnparseableBoundAborts();
   testOversizeKeyLenRefused();
+  testCombineOverflowAborts();  // the children print their abort messages
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }

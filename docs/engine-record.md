@@ -74,8 +74,8 @@ stored as a window `(lo, len, counts[])`; two records with the same key combine
 by elementwise addition, growing the window in place (`core/run.h`). The
 combine is commutative and associative, which makes the merged result
 independent of shard cuts and run order (`core/mapreduce.h`). Every addition is
-guarded: `slot < prev` after an add means a word overflowed and the run aborts.
-The guard is live only because `NSFLAGS` carries no `-DNDEBUG` (section 8).
+guarded: `slot < prev` after an add means a word overflowed and the run aborts
+(`addCount`, an explicit check that does not depend on build flags).
 
 **Counter width.** Two compile-time tags: `u64`, exact to a(25); `u128`, exact
 to about a(48). The orchestrator refuses to start with an undersized counter
@@ -699,7 +699,7 @@ The estimate charges `maxn` count words where the real window is about
 two transients: the `buf` vector doubling (up to 2× live objects, 3× during the
 copy) and millions of tiny `counts` mallocs.
 
-Dynamic profile, `-DPOLY_PROFILE` phase timers in `core/profile.h`, `maxn = 16`
+Dynamic profile, phase timers (since removed from the source), `maxn = 16`
 and 18, the laptop, `--ram 2 GB`, weighted over the 20 hottest `H = 12` columns:
 
 | phase | share |
@@ -1116,9 +1116,8 @@ reduction.
 
 The `u128` ceiling: `orchestrator/runref.go` refuses `u128` above `maxn` 48
 on the final row sum alone, while intermediate multi-component counts exceed
-the row sum; silent wrap is prevented only by the `assert(slot >= prev)`
-guards in `core/run.h`, live because `NSFLAGS` has no `-DNDEBUG`. Any run at
-`Nmax ≥ 45` should
+the row sum; silent wrap is prevented only by the overflow check in
+`core/run.h`'s `addCount`. Any run at `Nmax ≥ 45` should
 first measure the largest per-state count in an existing run.
 
 ## 8. What the checks cover
@@ -1394,8 +1393,7 @@ at about 126,000 cpu-s (`results/a41/h20_cost_profile.tsv`). a(41) is heights
 - IPC, cache-miss and branch-mispredict rates of the transfer-matrix workload
   were never captured (section 3.8).
 - The disk-layer residuals of section 8: a body checksum that only prints, an
-  unchecked last zstd frame, no manifest or `verify` pass on a(40) and a(41),
-  and overflow guards that depend on `NSFLAGS` carrying no `-DNDEBUG`.
+  unchecked last zstd frame, and no manifest or `verify` pass on a(40) and a(41).
 
 ## Reproduce
 

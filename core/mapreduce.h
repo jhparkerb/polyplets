@@ -28,101 +28,95 @@
 #include "core/transition.h"
 #include "core/run.h"
 #include "core/classifier.h"
-#include "core/profile.h"
 
 // Configuration for one shard map pass.
 struct ShardCfg {
   int H;       // height of this sweep
   int maxn;    // maximum cell count (budget)
-  bool fold;   // apply R1 vertical-mirror fold
-  size_t ram_budget_bytes = 0;  // 0 = no spill (M0 in-RAM mode)
+  bool fold;   // fold each state with its vertical mirror (foldSig)
+  size_t ram_budget_bytes = 0;  // 0 = no spill
   std::string spill_dir;
   int keyLen = 0;  // 0 = use H+2 (triangle); H+3 for holes path
 };
 
-// ─── map_shard ────────────────────────────────────────────────────────────────
+// ─── successors ───────────────────────────────────────────────────────────────
 //
-// For each source state in `src`:
-//   1. Check the completion predicate; if met, call Classifier::complete.
-//   2. Enumerate all viable successor masks (forEachViableMask).
-//   3. Apply stepColumnSquare8 for each mask -> successor sig + contribution.
-//   4. Admissibility prune (completionLowerBound).
-//   5. Optionally fold the successor sig (R1 symmetry).
-//   6. Collect the (successor_sig, ranged_contribution) record.
-// After processing all source states: sort + deduplicate -> one sorted Run.
+// For one source record, the column transition shared by map_shard and
+// map_shard_file:
+//   1. Enumerate all viable successor masks (forEachViableMask).
+//   2. Apply stepColumnSquare8 for each mask -> successor sig.
+//   3. Admissibility prune (completionLowerBound).
+//   4. Optionally fold the successor sig with its vertical mirror.
+//   5. On the holes path, carry the hole count in key byte b[H+2].
+//   6. Shift the ranged count-vec by the cells placed, clipped to maxn.
+// emit(RunRecord<W>&&) receives each successor; `mr` is the allocator for
+// its counts (nullptr: the default).
+template <class W, class Emit>
+inline void forEachSuccessor(const RunRecord<W>& rec, const ShardCfg& cfg,
+                             int keyLen, int ms, std::pmr::memory_resource* mr,
+                             Emit&& emit) {
+  const int H = cfg.H, maxn = cfg.maxn;
+  const bool holes = (keyLen == H + 3);
+  uint32_t oldOcc = 0;  // occupancy of the current boundary column (holes only)
+  if (holes)
+    for (int r = 0; r < H; ++r)
+      if (rec.sig.b[r] != 0) oldOcc |= (1u << r);
 
-template <class W, class Classifier, class Output>
-Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified) {
-  const int H      = cfg.H;
-  const int maxn   = cfg.maxn;
-  const int kLen   = (cfg.keyLen != 0) ? cfg.keyLen : H + 2;
-  const bool holes = (kLen == H + 3);
-  Run<W> buf;
-  buf.reserve(src.size()); // at least one successor per source; skips early doublings
+  forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
+    Sig out_sig;
+    if (stepColumnSquare8(rec.sig, H, mask, out_sig) != Outcome::Alive) return;
 
-  // TODO(perf): the inner lambda allocates succ.counts per successor (millions
-  // at scale) and the trailing sortRun re-sorts data the sorted frontier already
-  // partly orders. Hoist a reusable scratch record and replace sort+dedup with a
-  // structure-aware k-way merge once the spill engine makes this the bottleneck.
-  for (const auto& rec : src) {
-    // minimum cells already placed
-    const int ms = rec.minSize();
-    if (ms < 0) continue;  // empty count-vec (degenerate, skip)
+    const int cells = __builtin_popcount(mask);
+    if (ms + cells + completionLowerBound(out_sig.b, H) > maxn) return;
 
-    // completion test: single component touching both top and bottom
-    Classifier::complete(rec.sig, H, rec, out_classified);
+    if (cfg.fold) foldSig(out_sig, H);
 
-    // occupancy bitmask of the current boundary column (for holes accounting)
-    uint32_t oldOcc = 0;
+    RunRecord<W> succ(mr ? mr : std::pmr::get_default_resource());
+    succ.sig    = out_sig;
+    succ.H      = H;
+    succ.keyLen = keyLen;
+
     if (holes) {
-      for (int r = 0; r < H; ++r)
-        if (rec.sig.b[r] != 0) oldOcc |= (1u << r);
+      // holes so far = components - (4*Euler)/4 of the closed image, so the
+      // change is the change in components minus the Euler delta.
+      const int delta4 = closedEulerDelta4(oldOcc, static_cast<uint32_t>(mask), H,
+                                           Conn::FG8);
+      int comps_old = 0, comps_new = 0;
+      for (int r = 0; r < H; ++r) {
+        if (rec.sig.b[r] > comps_old) comps_old = rec.sig.b[r];
+        if (out_sig.b[r] > comps_new) comps_new = out_sig.b[r];
+      }
+      const int dHoles = (comps_new - comps_old) - delta4 / 4;
+      succ.sig.b[H + 2] = static_cast<uint8_t>(
+          static_cast<int>(rec.sig.b[H + 2]) + dHoles);
     }
 
-    // enumerate viable masks and map each one
-    forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
-      Sig out_sig;
-      if (stepColumnSquare8(rec.sig, H, mask, out_sig) != Outcome::Alive) return;
+    const int new_lo = static_cast<int>(rec.lo) + cells;
+    if (new_lo > maxn) return;  // entire window out of budget
+    succ.lo  = static_cast<uint8_t>(new_lo);
+    const int new_len = std::min<int>(rec.len, maxn - new_lo + 1);
+    succ.len = static_cast<uint8_t>(new_len);
+    succ.counts.assign(rec.counts.begin(), rec.counts.begin() + new_len);
+    emit(std::move(succ));
+  });
+}
 
-      const int cells = __builtin_popcount(mask);
-      if (ms + cells + completionLowerBound(out_sig.b, H) > maxn) return;
-
-      if (cfg.fold) foldSig(out_sig, H);
-
-      // build the successor RunRecord: shift the ranged count-vec by `cells`
-      RunRecord<W> succ;
-      succ.sig    = out_sig;
-      succ.H      = H;
-      succ.keyLen = kLen;
-
-      // holes path: accumulate Euler delta into sig.b[H+2]
-      if (holes) {
-        const int delta4 = closedEulerDelta4(oldOcc, static_cast<uint32_t>(mask), H,
-                                             Conn::FG8);
-        // comps delta = comps_new - comps_old
-        int comps_old = 0, comps_new = 0;
-        for (int r = 0; r < H; ++r) {
-          if (rec.sig.b[r] > comps_old)   comps_old = rec.sig.b[r];
-          if (out_sig.b[r] > comps_new)   comps_new = out_sig.b[r];
-        }
-        // dHoles = (comps_new - comps_old) - delta4/4
-        const int dHoles = (comps_new - comps_old) - delta4 / 4;
-        succ.sig.b[H + 2] = static_cast<uint8_t>(
-            static_cast<int>(rec.sig.b[H + 2]) + dHoles);
-      }
-
-      // new lo = rec.lo + cells; clip window to stay within [0..maxn]
-      const int new_lo = static_cast<int>(rec.lo) + cells;
-      if (new_lo > maxn) return; // entire window out of budget
-      succ.lo  = static_cast<uint8_t>(new_lo);
-      // clip: only keep entries with index <= maxn
-      const int new_len = std::min<int>(rec.len, maxn - new_lo + 1);
-      succ.len = static_cast<uint8_t>(new_len);
-      succ.counts.assign(rec.counts.begin(), rec.counts.begin() + new_len);
-      buf.push_back(std::move(succ));
-    });
+// ─── map_shard ────────────────────────────────────────────────────────────────
+//
+// In RAM: for each source state, classify it if it completes an animal, then
+// collect its successors; sort + deduplicate -> one sorted Run.
+template <class W, class Classifier, class Output>
+Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified) {
+  const int kLen = (cfg.keyLen != 0) ? cfg.keyLen : cfg.H + 2;
+  Run<W> buf;
+  buf.reserve(src.size()); // at least one successor per source; skips early doublings
+  for (const auto& rec : src) {
+    const int ms = rec.minSize();
+    if (ms < 0) continue;  // empty count-vec (degenerate, skip)
+    Classifier::complete(rec.sig, cfg.H, rec, out_classified);
+    forEachSuccessor<W>(rec, cfg, kLen, ms, nullptr,
+                        [&](RunRecord<W>&& succ) { buf.push_back(std::move(succ)); });
   }
-
   sortRun(buf);
   deduplicateRun(buf);
   return buf;
@@ -195,26 +189,14 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
 // sorted POLYRUN output file.  Returns {total_spill_bytes, output_record_count}.
 
 // Progress-pulse stride: how many source keys between opportunities to report
-// progress / check the work-stealing stop flag (mapPhase's `processed` and
-// `stealEligible` are fed ONLY from these pulses, via the orchestrator parsing
-// "event=progress" lines — see orchestrator/telemetry.go unitProgress). MUST
-// stay well below realistic per-unit key counts or a unit's processed count
-// never leaves 0 for its entire life, making it permanently ineligible for
-// stealing regardless of how slow it runs (docs/engine-record.md, the
-// overlap+steal coexistence investigation). Was 1<<14=16384, ABOVE typical
-// per-unit counts at both test scale (~12K, maxn20) and a24/a25 production
-// scale (H16 ~18K, only ~1.1x the old stride) — i.e. it almost never fired.
-// Microbenchmarked (scripts/, not committed): the bitmask check + occasional
-// wallSeconds() poll cost the same (~0.7-0.85 ns/record, noise-level) from
-// stride 2^14 down to 2^6 — the cost concern that motivated the old large
-// value was unfounded. 1<<10=1024 is ~16x finer, giving ~10-18 pulse
-// opportunities across a realistic unit's life at both scales (each still
-// gated by the worker's own 2s print throttle, worker/map_worker.cpp).
+// progress / check the work-stealing stop flag (the orchestrator's `processed`
+// and stealEligible are fed only from these pulses; orchestrator/telemetry.go
+// unitProgress). It must stay well below realistic per-unit key counts (~12K
+// at test scale, ~18K at H16 in production), or a unit's processed count
+// never leaves 0 and it can never be stolen. The check costs the same
+// (~0.8 ns/record, measured) at any stride from 2^14 down to 2^6.
 static constexpr unsigned kProgressStrideMask = (1u << 10) - 1;
-// Compile-time tripwire: a future "just bump it for fewer interrupts" edit
-// must not silently regress past realistic per-unit record counts (~12K test
-// scale, ~18K a24/a25 production scale) and go blind again. 4096 leaves >=2
-// pulse opportunities even at the smallest scale measured.
+// 4096 leaves >= 2 pulse opportunities even at the smallest scale measured.
 static_assert(kProgressStrideMask + 1 <= 4096,
               "progress-pulse stride too coarse: see kProgressStrideMask comment");
 
@@ -241,8 +223,6 @@ std::pair<size_t, size_t> map_shard_file(
 
   const int H      = cfg.H;
   const int maxn   = cfg.maxn;
-  const bool holes = (cfg.keyLen == H + 3);
-
   // Key-bound parsing.
   const int keyLen = (cfg.keyLen != 0) ? cfg.keyLen : H + 2;
   requireKeyLenFits(keyLen, "map_shard_file");
@@ -307,57 +287,28 @@ std::pair<size_t, size_t> map_shard_file(
   // bulk-freeing beats N individual frees, same asymmetry as the malloc side.
   std::pmr::monotonic_buffer_resource succArena(succArenaHint(cfg.ram_budget_bytes));
 
-#ifdef POLY_PROFILE
-  // Coarse phase wall-time + counters (Track B). Times the get-next-source-record
-  // path (read+heap+combine), the map body (classify+enumerate+step+build), the
-  // spills, and the final merge separately. Plus the decisive Finding-1/2 numbers:
-  // model buf_bytes vs the ACTUAL resident buf footprint at the largest spill.
-  double prof_read_s = 0, prof_map_s = 0, prof_spill_s = 0, prof_merge_s = 0;
-  uint64_t prof_src = 0, prof_masks = 0, prof_succ = 0;
-  size_t prof_max_model = 0, prof_max_actual = 0, prof_max_size = 0, prof_max_cap = 0;
-  const double prof_t0 = prof::now();
-#endif
 
   // Per-record RESIDENT-RAM estimate for the spill trigger. Must reflect the
   // actual std::vector<RunRecord> footprint, not wire size: the object itself
   // (Sig + fields + the vector control block) + the heap-allocated counts vector
-  // (<= maxn words) + allocator overhead. The old estimate charged only H+4 +
-  // maxn*W (wire size), undercounting the ~96-byte object, so the buffer overshot
-  // --ram before do_spill() fired (Budget Blind: an OOM lever at scale).
+  // (<= maxn words) + allocator overhead. Charging wire size alone undercounts
+  // the ~96-byte object and lets the buffer overshoot --ram before do_spill().
   const size_t record_est = sizeof(RunRecord<W>) +
                             static_cast<size_t>(maxn) * sizeof(W) + 32;
 
   auto do_spill = [&]() {
     if (buf.empty()) return;
-#ifdef POLY_PROFILE
-    // Measure the real resident footprint of buf right before it drains: the
-    // backing-array capacity (geometric-doubling slack, Finding 2a) + every
-    // counts allocation's capacity. Compare to buf_bytes (the record_est model).
-    {
-      size_t actual = buf.capacity() * sizeof(RunRecord<W>);
-      for (const auto& r : buf) actual += r.counts.capacity() * sizeof(W);
-      if (actual > prof_max_actual) {
-        prof_max_actual = actual;
-        prof_max_model  = buf_bytes;
-        prof_max_size   = buf.size();
-        prof_max_cap    = buf.capacity();
-      }
-    }
-    const double _ts = prof::now();
-#endif
     sortRun(buf);
     deduplicateRun(buf);
     std::string spill_path = cfg.spill_dir + "/spill_" +
                              std::to_string(static_cast<long>(getpid())) +
                              "_" + std::to_string(spill_seq++) + ".bin";
     // Internal spill: no index (read back sequentially by mergeRunFiles), so it
-    // is eligible for zstd streaming compression — dissolves the map-phase disk
-    // write-bandwidth throttle. POLY_NO_SPILL_ZSTD forces the plain path for an
-    // A/B byte-compare (mirrors POLY_NO_SEEK / POLY_NO_FASTPATH); a build without
-    // POLY_ZSTD always writes plain.
+    // is zstd-compressed when the build has zstd, which relieves the map
+    // phase's disk write bandwidth.
     bool spill_compress = false;
 #ifdef POLY_ZSTD
-    spill_compress = !std::getenv("POLY_NO_SPILL_ZSTD");
+    spill_compress = true;
 #endif
     RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen,
                         /*write_index=*/false, /*compress=*/spill_compress);
@@ -368,17 +319,11 @@ std::pair<size_t, size_t> map_shard_file(
     buf.clear();
     buf_bytes = 0;
     succArena.release();  // bulk-free this epoch's succ.counts allocations
-#ifdef POLY_PROFILE
-    prof_spill_s += prof::now() - _ts;
-#endif
   };
 
   // Stream records from heap, apply map logic.
   size_t processed = 0;
   while (!heap.empty()) {
-#ifdef POLY_PROFILE
-    const double _tr = prof::now();
-#endif
     // Periodic progress pulse (every kProgressStrideMask+1 source keys); the
     // callback throttles by wall time and emits event=progress.  Cheap: a mask
     // test per iteration (measured noise-level cost regardless of stride; see
@@ -438,67 +383,12 @@ std::pair<size_t, size_t> map_shard_file(
     const int ms = rec.minSize();
     if (ms < 0) continue;
 
-#ifdef POLY_PROFILE
-    prof_read_s += prof::now() - _tr;
-    ++prof_src;
-    const double _tm = prof::now();
-#endif
     Classifier::complete(rec.sig, H, rec, out_classified);
-
-    // occupancy bitmask of the current boundary column (for holes accounting)
-    uint32_t oldOcc = 0;
-    if (holes) {
-      for (int r = 0; r < H; ++r)
-        if (rec.sig.b[r] != 0) oldOcc |= (1u << r);
-    }
-
-    forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
-#ifdef POLY_PROFILE
-      ++prof_masks;
-#endif
-      Sig out_sig;
-      if (stepColumnSquare8(rec.sig, H, mask, out_sig) != Outcome::Alive) return;
-
-      const int cells = __builtin_popcount(mask);
-      if (ms + cells + completionLowerBound(out_sig.b, H) > maxn) return;
-
-      if (cfg.fold) foldSig(out_sig, H);
-
-      RunRecord<W> succ(&succArena);  // arena-backed counts
-      succ.sig    = out_sig;
-      succ.H      = H;
-      succ.keyLen = keyLen;
-
-      // holes path: accumulate Euler delta into sig.b[H+2]
-      if (holes) {
-        const int delta4 = closedEulerDelta4(oldOcc, static_cast<uint32_t>(mask), H,
-                                             Conn::FG8);
-        int comps_old = 0, comps_new = 0;
-        for (int r = 0; r < H; ++r) {
-          if (rec.sig.b[r] > comps_old)  comps_old = rec.sig.b[r];
-          if (out_sig.b[r] > comps_new)  comps_new = out_sig.b[r];
-        }
-        const int dHoles = (comps_new - comps_old) - delta4 / 4;
-        succ.sig.b[H + 2] = static_cast<uint8_t>(
-            static_cast<int>(rec.sig.b[H + 2]) + dHoles);
-      }
-
-      const int new_lo = static_cast<int>(rec.lo) + cells;
-      if (new_lo > maxn) return;
-      succ.lo  = static_cast<uint8_t>(new_lo);
-      const int new_len = std::min<int>(rec.len, maxn - new_lo + 1);
-      succ.len = static_cast<uint8_t>(new_len);
-      succ.counts.assign(rec.counts.begin(), rec.counts.begin() + new_len);
+    forEachSuccessor<W>(rec, cfg, keyLen, ms, &succArena, [&](RunRecord<W>&& succ) {
       buf.push_back(std::move(succ));
       buf_bytes += record_est;
-#ifdef POLY_PROFILE
-      ++prof_succ;
-#endif
     });
 
-#ifdef POLY_PROFILE
-    prof_map_s += prof::now() - _tm;
-#endif
     if (cfg.ram_budget_bytes > 0 && buf_bytes > cfg.ram_budget_bytes)
       do_spill();
   }
@@ -510,13 +400,9 @@ std::pair<size_t, size_t> map_shard_file(
   // On the spill-bound engine most columns never spill mid-stream, so this
   // halves their output I/O. Byte-identical: do_spill already sorts+dedups, and
   // mergeRunFiles over one already-deduped run just copies it out with maxn=0
-  // in the header -- exactly what this direct write produces. POLY_NO_FASTPATH
-  // forces the old path for A/B byte-compare (mirrors POLY_NO_SEEK).
-#ifdef POLY_PROFILE
-  const double _tmg = prof::now();
-#endif
+  // in the header -- exactly what this direct write produces.
   size_t out_recs;
-  if (spill_files.empty() && !std::getenv("POLY_NO_FASTPATH")) {
+  if (spill_files.empty()) {
     sortRun(buf);
     deduplicateRun(buf);
     RunFileWriter<W> ow(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true,
@@ -531,21 +417,6 @@ std::pair<size_t, size_t> map_shard_file(
     (void)out_bytes;
     out_recs = merged;
   }
-#ifdef POLY_PROFILE
-  prof_merge_s += prof::now() - _tmg;
-  {
-    char line[512];
-    std::snprintf(line, sizeof(line),
-      "mapphase H=%d maxn=%d src=%llu masks=%llu succ=%llu spills=%d out_recs=%zu "
-      "read_s=%.4f map_s=%.4f spill_s=%.4f merge_s=%.4f total_s=%.4f peak_rss_mb=%.1f "
-      "model_bytes=%zu actual_bytes=%zu buf_size=%zu buf_cap=%zu",
-      H, maxn, (unsigned long long)prof_src, (unsigned long long)prof_masks,
-      (unsigned long long)prof_succ, spill_seq, out_recs,
-      prof_read_s, prof_map_s, prof_spill_s, prof_merge_s, prof::now() - prof_t0,
-      prof::peakRssMB(), prof_max_model, prof_max_actual, prof_max_size, prof_max_cap);
-    prof::emit(line);
-  }
-#endif
 
   // Delete temp spill files.
   for (const auto& sf : spill_files)

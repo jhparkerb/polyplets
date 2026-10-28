@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "core/run.h"
-#include "core/profile.h"
 
 #ifdef POLY_ZSTD
 #include <zstd.h>
@@ -109,10 +108,9 @@ inline int spillZstdLevel() {
 }
 
 // Frontier-compression opt-in: block-framed zstd on the indexed map/merge
-// outputs. OFF by default until validated at scale (the a(39) plan:
-// POLY_FRONTIER_ZSTD=1 in the run environment; flip the default only after a
-// full production run chain-validates). Distinct from internal-spill
-// compression, which is on by default and covered by POLY_NO_SPILL_ZSTD.
+// outputs, off unless POLY_FRONTIER_ZSTD is set (scripts/term.sh sets it
+// with FRONTIER_LEVERS=1). Distinct from internal-spill
+// compression, which is always on in a zstd build.
 inline bool frontierZstd() {
 #ifdef POLY_ZSTD
   const char* e = std::getenv("POLY_FRONTIER_ZSTD");
@@ -152,9 +150,9 @@ inline int frontierZstdLevel() {
 // round's acquires and the rest pay ZSTD_createDStream's multi-MB workspace
 // allocation (the very cost the pool exists to avoid), while raising it
 // multiplies idle retention across every worker. Unlike every neighboring
-// lever (POLY_FRONTIER_ZSTD*, POLY_SPILL_ZSTD_LEVEL, POLY_NO_SEEK) it had NO
-// knob, so the trade could not be moved without a rebuild. POLY_ZSTD_CTX_POOL
-// overrides it; default 64, unchanged. Parsed once per process, like the rest.
+// lever (POLY_FRONTIER_ZSTD*, POLY_SPILL_ZSTD_LEVEL) it can be moved without
+// a rebuild: POLY_ZSTD_CTX_POOL overrides it, default 64, parsed once per
+// process like the rest.
 inline constexpr size_t kZstdCtxPoolCapDefault = 64;
 inline size_t zstdCtxPoolCap() {
   static const size_t v = [] {
@@ -250,7 +248,7 @@ inline bool hexToBytes(const std::string& hex, uint8_t* b, int n) {
   return true;
 }
 
-// FAIL-CLOSED key-bound parse (E4 "Load-Bearing Label"). Every range filter in
+// FAIL-CLOSED key-bound parse. Every range filter in
 // the engine was written as `has_lo = !lo_hex.empty() && hexToBytes(...)`, so a
 // bound that FAILED to parse (wrong length for this keyLen, a non-hex byte)
 // silently disabled the filter. Two distinct wrong answers follow:
@@ -428,7 +426,7 @@ class RunFileWriter {
     if (compress_) compressFinish();
 #endif
     flushWBuf();
-    // FAIL-CLOSED (E1): every leg of finalize is checked, because the ONLY
+    // FAIL-CLOSED: every leg of finalize is checked, because the ONLY
     // reason the writer streams to a .tmp and renames is so a file that could
     // not be finished is never published. Pre-fix the fseek legs merely warned
     // and the CRC fwrite / fclose were unchecked, so a writer that ran out of
@@ -513,7 +511,7 @@ class RunFileWriter {
   // fail-closed open guard exists for. Runs near a disk-headroom gate (H21+)
   // and /dev/shm-routed map outputs make this a real, reachable state, so any
   // failed write aborts loudly instead.
-  // FAIL-CLOSED (E1): drop the unfinished .tmp (so no later run can mistake it
+  // FAIL-CLOSED: drop the unfinished .tmp (so no later run can mistake it
   // for salvage) and abort WITHOUT renaming. Never publish.
   [[noreturn]] void failWriter(const char* what) {
     std::fprintf(stderr,
@@ -546,7 +544,7 @@ class RunFileWriter {
       while (in.pos < in.size) {
         ZSTD_outBuffer out{obuf_.data(), obuf_.size(), 0};
         size_t r = ZSTD_compressStream2(cctx_, &out, &in, ZSTD_e_continue);
-        // FAIL-CLOSED (E1): returning here dropped this record's bytes into a
+        // FAIL-CLOSED: returning here dropped this record's bytes into a
         // body that still gets published and counted — a silent undercount.
         if (ZSTD_isError(r)) {
           std::fprintf(stderr, "RunFileWriter: zstd compress: %s\n",
@@ -593,7 +591,7 @@ class RunFileWriter {
     do {
       ZSTD_outBuffer out{obuf_.data(), obuf_.size(), 0};
       rem = ZSTD_compressStream2(cctx_, &out, &in, ZSTD_e_end);
-      // FAIL-CLOSED (E1): breaking left the frame unterminated (no checksum
+      // FAIL-CLOSED: breaking left the frame unterminated (no checksum
       // epilogue) in a file that would still be published.
       if (ZSTD_isError(rem)) {
         std::fprintf(stderr, "RunFileWriter: zstd flush: %s\n",
@@ -618,8 +616,8 @@ class RunFileWriter {
 
   // Open the <path>.idx.tmp sidecar and write its header with a PLACEHOLDER count
   // (backpatched in finalize). Entries are then streamed in append() — there is no
-  // in-RAM index buffer (Index Hoard: records/64 × 80B held to finalize was an OOM
-  // lever at scale). Format unchanged: [u32 magic][u16 ver][u8 bo][u32 keyLen]
+  // in-RAM index buffer (records/64 × 80B held to finalize ran out of memory
+  // at scale). Format unchanged: [u32 magic][u16 ver][u8 bo][u32 keyLen]
   // [u64 count]{ key[keyLen] u64 offset u64 recidx }*, native byte order.
   void openIndexSidecar() {
     idx_fp_ = std::fopen((path_ + ".idx.tmp").c_str(), "wb");
@@ -703,8 +701,8 @@ class RunFileReader {
 
   // The ONLY legitimate false from next() is "the header's record count has
   // been reached" (checked first). Everything else — a body that ran out, a
-  // zstd decode or frame-checksum failure — is corruption, and E1 ("Short
-  // Shrift") is what happens if it merely returns false: every caller
+  // zstd decode or frame-checksum failure — is corruption, and if it merely
+  // returned false, every caller
   // (mergeRunFiles' heap refill, map_shard_file, map_shard_stage_file) reads
   // false as "input exhausted", so a truncated or bit-rotted shard silently
   // contributes fewer records than its own header claims. Measured on the
@@ -865,7 +863,7 @@ class RunFileReader {
   size_t zout_fill_ = kFirstFillBytes;  // adaptive decompressed-output size
 #endif
 
-  // FAIL-CLOSED short/corrupt body (E1): the body could not supply a record the
+  // FAIL-CLOSED short/corrupt body: the body could not supply a record the
   // header promised. There is nowhere legitimate to go from here — the caller
   // cannot distinguish this from a clean end (that is the whole bug), and a
   // partial input is exactly the silent-undercount shape the fail-closed
@@ -996,7 +994,7 @@ class RunFileReader {
       }
       ZSTD_outBuffer out{scratch, sizeof(scratch), 0};
       zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
-      // FAIL-CLOSED (E1): for compressed files the frame checksum IS the
+      // FAIL-CLOSED: for compressed files the frame checksum IS the
       // integrity check (they carry no FNV trailer), so a failure here must
       // abort — warning and returning would leave the checksum decorative.
       if (ZSTD_isError(zhint_)) {
@@ -1150,7 +1148,7 @@ std::pair<size_t, size_t> mergeRunFiles(
   // each rescan ~total/2 records (the ~M/2 amplification, measured 160x at
   // mult=4); with it, each reads only its [klo,khi) slice. No-op if a run has no
   // index (falls back to scan), so it stays correct on un-indexed inputs.
-  if (has_lo && !std::getenv("POLY_NO_SEEK"))   // toggle off to A/B the old scan path
+  if (has_lo)
     for (auto& r : readers) r->seekToKey(lo_sig);
 
   struct Cursor {
@@ -1173,17 +1171,8 @@ std::pair<size_t, size_t> mergeRunFiles(
   RunFileWriter<W> writer(out_path, H, 0, lo_hex, hi_hex, rev, keyLen,
                           /*write_index=*/true, /*compress=*/frontierZstd());
 
-#ifdef POLY_PROFILE
-  // Split the merge into read+heap (memcmp), combine, and write (FNV+fwrite).
-  double prof_read_s = 0, prof_combine_s = 0, prof_write_s = 0;
-  uint64_t prof_combines = 0;
-  const double prof_t0 = prof::now();
-#endif
   size_t written = 0;
   while (!heap.empty()) {
-#ifdef POLY_PROFILE
-    const double _tr = prof::now();
-#endif
     Cursor top = heap.top();
     heap.pop();
 
@@ -1215,10 +1204,6 @@ std::pair<size_t, size_t> mergeRunFiles(
       on_progress(written);
     }
 
-#ifdef POLY_PROFILE
-    prof_read_s += prof::now() - _tr;
-    const double _tc = prof::now();
-#endif
     while (!heap.empty()) {
       if (sigCmp(top.rec.sig.b, heap.top().rec.sig.b, keyLen) != 0) break;
       Cursor eq = heap.top();
@@ -1228,35 +1213,12 @@ std::pair<size_t, size_t> mergeRunFiles(
       nc.idx = eq.idx;
       if (readers[eq.idx]->next(nc.rec))
         heap.push(std::move(nc));
-#ifdef POLY_PROFILE
-      ++prof_combines;
-#endif
     }
 
-#ifdef POLY_PROFILE
-    prof_combine_s += prof::now() - _tc;
-    const double _tw = prof::now();
-#endif
     writer.append(top.rec);
     ++written;
-#ifdef POLY_PROFILE
-    prof_write_s += prof::now() - _tw;
-#endif
   }
 
   size_t body_bytes = writer.finalize();
-#ifdef POLY_PROFILE
-  {
-    char line[512];
-    std::snprintf(line, sizeof(line),
-      "mergephase site=%s H=%d K=%zu out_recs=%zu combines=%llu "
-      "read_s=%.4f combine_s=%.4f write_s=%.4f total_s=%.4f peak_rss_mb=%.1f",
-      prof::site(), H, in_paths.size(), writer.records(),
-      (unsigned long long)prof_combines,
-      prof_read_s, prof_combine_s, prof_write_s, prof::now() - prof_t0,
-      prof::peakRssMB());
-    prof::emit(line);
-  }
-#endif
   return {body_bytes, writer.records()};
 }

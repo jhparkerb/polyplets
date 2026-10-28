@@ -1,18 +1,18 @@
 // run.h — sorted-run record format and I/O.
 //
 // A sorted run is a sequence of RunRecords in ascending memcmp(sig) order.
-// Each record:
-//   [ sig: (H+2) bytes | lo: u8 | len: u8 | counts[len]: len * W bytes LE ]
-//   KEY = sig bytes (fixed per height-sweep, memcmp-sortable, endian-neutral)
-//   VALUE = ranged count-vec: counts[lo .. lo+len) are the nonzero entries;
+// Each record, serialized:
+//   [ sig: keyLen bytes | lo: u8 | len: u8 | counts[len]: LEB128 varints ]
+//   KEY = sig bytes, keyLen = H+2 (triangle), H+3 (holes) or H+4 (kink stage);
+//         fixed per height-sweep, memcmp-sortable, endian-neutral
+//   VALUE = ranged count-vec: counts[lo .. lo+len) cover the nonzero entries;
 //           entries outside the window are implicitly 0.
 //
-// W = sizeof(CountWord): 8 for u64, 16 for u128.
-// The window width is ~0.56*n (measured), so len typically << maxn+1.
+// The counter word W is u64 or u128 in memory. The window width is ~0.56*n
+// (measured), so len is typically well under maxn+1.
 //
-// RunWriter: append records to a byte buffer (or file stream).
-// RunReader: iterate records from a byte buffer in sorted key order.
-// combine():  merge two same-key records by range-union + pointwise add.
+// combine() merges two same-key records by range-union + pointwise add, and
+// stops the program if any count wraps (addCount below).
 
 #pragma once
 
@@ -31,12 +31,9 @@
 // Sig and is copied through SIGMAX-sized stack arrays (mergeRunFiles' lo_sig/
 // hi_sig, map_shard_file, map_shard_stage_file, map_worker's range filter,
 // seekToKey's probe buffer), and deserializeRecord zero-pads the tail with
-// memset(sig.b + keyLen, 0, SIGMAX - keyLen) -- which UNDERFLOWS to a huge
-// size_t the moment keyLen > SIGMAX. Nothing checked it. The reachable case is
-// the kink kernel, whose key is H+4 wide: at H >= 29 (SIGMAX=32) every one of
-// those buffers overflows. Far past the a(40) close (H<=21), but it is a
-// stack smash with no diagnostic, so it fails closed at the moment a keyLen is
-// first used instead.
+// memset(sig.b + keyLen, 0, SIGMAX - keyLen), which underflows to a huge
+// size_t once keyLen > SIGMAX. The kink kernel's H+4 key reaches that at
+// H >= 29, so every keyLen is checked here when first used.
 inline void requireKeyLenFits(int keyLen, const char* who) {
   if (keyLen <= 0 || keyLen > SIGMAX) {
     std::fprintf(stderr,
@@ -51,15 +48,27 @@ inline void requireKeyLenFits(int keyLen, const char* who) {
 using u64  = std::uint64_t;
 using u128 = unsigned __int128;
 
+// slot += add, stopping the program if the sum wraps: a count past the
+// counter word's range means --counter is too narrow, and a wrapped count
+// would be a wrong number with no other sign. An explicit check, not an
+// assert, so it holds whatever the build flags.
+template <class W>
+inline void addCount(W& slot, W add) {
+  const W prev = slot;
+  slot += add;
+  if (slot < prev) {
+    std::fprintf(stderr, "count overflow in combine: need a wider --counter\n");
+    std::abort();
+  }
+}
+
 // A single sorted-run record, held in host memory.
 // Templated on the word width W (u64 or u128).
 template <class W>
 struct RunRecord {
   Sig    sig;          // canonical signature (keyLen bytes used, rest zero)
-  // H, keyLen: bounded <=SIGMAX-2 (<=38 even at the keyLen=H+4 kink-stage
-  // width), so uint8_t is exact, not lossy -- was `int`, wasting 6 bytes/record
-  // (measured: sizeof(RunRecord)=72->64) purely on alignment padding a value
-  // that never exceeds 38. See results/hotpath-optim.md (deleted).
+  // H and keyLen never exceed SIGMAX, so uint8_t holds them exactly and keeps
+  // sizeof(RunRecord) at 64 rather than 72.
   uint8_t H;            // height (needed to interpret sig and lo/len)
   uint8_t keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
   uint8_t lo;         // first nonzero index in counts[]
@@ -67,11 +76,9 @@ struct RunRecord {
   // pmr::vector, not std::vector: lets the map hot loop (mapreduce.h,
   // kink.h) construct successor records against a monotonic_buffer_resource
   // arena scoped to one spill epoch, instead of one malloc/free per
-  // successor (measured: 415.8M allocations in a34's swept portion,
-  // ~14% of map cycles). Default-constructed (no
-  // allocator argument) it behaves EXACTLY like std::vector -- uses the
-  // global default_resource, same semantics, same cost, zero change for
-  // every other call site (deserializeRecord, seedRecord, tests, ...).
+  // successor (measured: 415.8M allocations in a34's swept portion, ~14% of
+  // map cycles). Default-constructed (no allocator argument) it behaves
+  // exactly like std::vector, using the global default_resource.
   // Only map_shard_file/map_shard_stage_file opt into the arena, via the
   // allocator-aware constructor below.
   std::pmr::vector<W> counts; // counts[lo .. lo+len), dense over the window
@@ -95,26 +102,21 @@ struct RunRecord {
     const int new_lo  = std::min<int>(lo, o.lo);
     const int new_end = std::max<int>(lo + len, o.lo + o.len);
     const int new_len = new_end - new_lo;
-    assert(new_end <= 256 && "count-vec window exceeded byte range");
+    if (new_end > 256) {  // lo and len are bytes; a wider window would truncate
+      std::fprintf(stderr, "combine: count-vec window ends at %d, past 256\n", new_end);
+      std::abort();
+    }
 
     // Grow-in-place when this record already starts at or before o (new_lo == lo):
     // no left-shift is needed, so we extend our OWN counts buffer at the high end
-    // (a no-op when o is fully within our window) and add o in. This avoids the
-    // fresh allocate-copy-free that dominated merge CPU (combine was ~58% of merge
-    // wall and alloc-bound — docs/engine-record.md A5 / the run.h:51 lever). When
-    // the same record accumulates many collisions (the k-way merge / dedup pattern)
-    // the buffer grows once and every subsequent in-window combine is zero-alloc.
-    // Silent Carry: guard each add against unsigned wrap; slot < prev means a u64
-    // count exceeded 2^64 and the --counter is too narrow — fail loud.
+    // (a no-op when o is fully within our window) and add o in, avoiding a fresh
+    // allocate-copy-free (measured as most of merge CPU). When the same record
+    // accumulates many collisions (the k-way merge / dedup pattern) the buffer
+    // grows once and every later in-window combine allocates nothing.
     if (new_lo == lo) {
       if (new_len > len) counts.resize(new_len, W{0});  // append zeros; lower entries keep index
       const int off = static_cast<int>(o.lo) - lo;
-      for (int i = 0; i < o.len; ++i) {
-        W& slot = counts[off + i];
-        W prev = slot;
-        slot += o.counts[i];
-        assert(slot >= prev && "count overflow in combine (need wider --counter)");
-      }
+      for (int i = 0; i < o.len; ++i) addCount(counts[off + i], o.counts[i]);
       len = static_cast<uint8_t>(new_len);
       return;
     }
@@ -125,18 +127,8 @@ struct RunRecord {
     // rare left-extension path in the same epoch's pool instead of falling
     // back to the global allocator underneath a pmr-typed field.
     std::pmr::vector<W> merged(new_len, W{0}, counts.get_allocator());
-    for (int i = 0; i < len; ++i) {
-      W& slot = merged[(lo + i) - new_lo];
-      W prev = slot;
-      slot += counts[i];
-      assert(slot >= prev && "count overflow in combine (need wider --counter)");
-    }
-    for (int i = 0; i < o.len; ++i) {
-      W& slot = merged[(o.lo + i) - new_lo];
-      W prev = slot;
-      slot += o.counts[i];
-      assert(slot >= prev && "count overflow in combine (need wider --counter)");
-    }
+    for (int i = 0; i < len; ++i) addCount(merged[(lo + i) - new_lo], counts[i]);
+    for (int i = 0; i < o.len; ++i) addCount(merged[(o.lo + i) - new_lo], o.counts[i]);
     lo = static_cast<uint8_t>(new_lo);
     len = static_cast<uint8_t>(new_len);
     counts = std::move(merged);
@@ -188,8 +180,7 @@ inline bool decodeVarint(const uint8_t* data, size_t size, size_t* pos, W* out) 
     // shifts past it -- undefined behavior, and on hardware that merely masks
     // the shift count, a plausible WRONG count instead of a rejected record.
     // Treated as a failed decode, which every caller already handles
-    // (end-of-run for deserializeRecord; a fail-closed abort in
-    // RunFileReader::next, E1).
+    // (end-of-run for deserializeRecord; an abort in RunFileReader::next).
     if (shift >= 8 * sizeof(W)) return false;
     byte = data[(*pos)++];
     result |= (static_cast<W>(byte & 0x7f) << shift);
@@ -253,10 +244,9 @@ inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
   // is always the group minimum, so every combine sees o.lo >= lo and the
   // expensive path can never fire for this call site (benchmarked:
   // collision rate x window width compounds combine() cost). mergeRunFiles'
-  // cross-file k-way merge doesn't get the
-  // full benefit (per-file order still depends on which file a record came
-  // from) but each file's OWN prior sortRun already carries this tiebreak,
-  // so it's a pure win with no downside there either.
+  // cross-file k-way merge gets less of the benefit, since order across
+  // files depends on which file a record came from, but each file's own
+  // sortRun already carries the tiebreak.
   return a.lo < b.lo;
 }
 

@@ -280,7 +280,7 @@ std::pair<size_t, size_t> map_shard_stage_file(
                              "_" + std::to_string(spill_seq++) + ".bin";
     bool spill_compress = false;
 #ifdef POLY_ZSTD
-    spill_compress = !std::getenv("POLY_NO_SPILL_ZSTD");
+    spill_compress = true;
 #endif
     RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen,
                         /*write_index=*/false, /*compress=*/spill_compress);
@@ -360,7 +360,7 @@ std::pair<size_t, size_t> map_shard_stage_file(
   }
 
   size_t out_recs;
-  if (spill_files.empty() && !std::getenv("POLY_NO_FASTPATH")) {
+  if (spill_files.empty()) {
     sortRun(buf);
     deduplicateRun(buf);
     RunFileWriter<W> ow(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true,
