@@ -646,13 +646,14 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
 
   FILE* f = fopen(outfile, "w");
   if (!f) { perror(outfile); std::exit(1); }
+  bool ok = true;
   for (int n = 1; n <= Nmax; n++) {
     u64 q0 = (fcur[2 * n] + p - fprev[2 * n]) % p;
     u64 q1 = (fcur[2 * n + 1] + p - fprev[2 * n + 1]) % p;
     if (q0) { fprintf(stderr, "FATAL q0_nonzero_modp H=%d n=%d\n", H, n); std::exit(2); }
-    fprintf(f, "%d %llu\n", n, (unsigned long long)q1);
+    ok = fprintf(f, "%d %llu\n", n, (unsigned long long)q1) > 0 && ok;
   }
-  fclose(f);
+  if (fclose(f) != 0 || !ok) { perror(outfile); std::exit(1); }
 }
 
 // ================================== main ====================================

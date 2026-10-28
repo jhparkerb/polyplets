@@ -212,6 +212,8 @@ int main(int argc, char** argv) {
     std::printf("  C_%d computed in %.1fs (states cached: %zu)\n", H, s, e.trans.size());
     std::ofstream f(out);
     for (int n = 0; n <= Nmax; ++n) f << n << " " << i128str(C[n]) << "\n";
+    f.close();
+    if (!f) { std::fprintf(stderr, "cannot write %s\n", out.c_str()); return 1; }
     std::printf("  wrote C_%d(0..%d); head:", H, Nmax);
     for (int n = H; n <= std::min(H + 3, Nmax); ++n) std::printf(" %s", i128str(C[n]).c_str());
     std::printf("\n");
