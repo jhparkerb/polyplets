@@ -1,4 +1,4 @@
-// T0.2 gate: trusted math (signature + transition) copied into core/ correctly.
+// Gate: the transition math (signature + transition) in core/.
 // Tests: canonicalize idempotent, reflect is involution, fold(fold(x))==fold(x),
 // completionLowerBound never over-estimates (verified by checking against the
 // exhaustively-computed oracle -- but here we just verify structural properties

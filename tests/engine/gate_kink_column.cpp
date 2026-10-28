@@ -1,11 +1,10 @@
-// Design 14 Phase 2.2 gate: kinkSeedStage0 + kinkFinalizeColumn
-// (core/kink_column.h) -- the column-boundary steps Phase 1's map_shard_stage
-// deliberately left out.
+// Gate: kinkSeedStage0 + kinkFinalizeColumn (core/kink_column.h), the
+// column-boundary steps of the kink kernel.
 //
 // Two independent properties, checked end-to-end (seed -> H stage
 // transitions via the already-gated map_shard_stage -> finalize) against a
-// ground-truth column step built directly from experiments/kink_tm/kink_tm.cpp's
-// kinkSweep() column-loop logic (classify at seed, no classify at finalize;
+// ground-truth column step following the kink sweep's column loop (classify
+// at seed, no classify at finalize;
 // stranding-check the outgoing carry; canonicalize; admissibility-prune;
 // fold; dedup) -- but reimplemented HERE independently (not by calling
 // kinkSeedStage0/kinkFinalizeColumn) so this is a real ground-truth check,

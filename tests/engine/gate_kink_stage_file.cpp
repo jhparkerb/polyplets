@@ -1,6 +1,5 @@
-// Design 14 Phase 2.3 gate: map_shard_stage_file (core/kink.h) -- the
-// file-backed, spilling twin of Phase 1's already-gated in-RAM
-// map_shard_stage.
+// Gate: map_shard_stage_file (core/kink.h), the file-backed, spilling twin
+// of the in-RAM map_shard_stage.
 //
 // This is a mechanical adaptation (K-way heap over RunFileReader, spill past
 // a RAM budget, final merge) with no new algorithmic content -- the risk
@@ -17,8 +16,8 @@
 // SIGTERM stop-key round-tripping is NOT covered here -- that mechanism is
 // driven by real process signals to a subprocess (see
 // ns-gate-resume-boundaries's TestKillResumeAllBoundaries for the column
-// kernel's analogous coverage) and gets its kink-kernel counterpart once
-// map_worker's --kernel kink CLI wiring lands (Phase 2.4).
+// kernel's analogous coverage); the kink-kernel counterpart is
+// gate_kink_worker_cli.cpp.
 
 #include <cassert>
 #include <cstdio>

@@ -221,7 +221,7 @@ static void testMergeReaderOpenFailureAborts() {
   std::remove("/tmp/gate_runfile_merge_out.bin");
 }
 
-// RED-FIRST (Bottleneck: Merge Range Straggler, merge work-stealing):
+// RED-FIRST (merge work-stealing):
 // mergeRunFiles' stop/resume contract is "output covers [lo, stop_key);
 // re-merge with lo_hex=stop_key covers the rest" -- forcing a stop with
 // terminate pre-set to 1 (fires at the first progress stride, written=1024)
@@ -434,7 +434,7 @@ static void testHeaderRejectsUnknownCompression() {
 #endif
 }
 
-// ─── E1 "Short Shrift": the reader must not report a short body as EOF ───────
+// ─── The reader must not report a short body as EOF ─────────────────────────
 //
 // RunFileReader::next() used to return false identically for (i) the legitimate
 // end of records, (ii) a body that ran out early, and (iii) a zstd decode /
@@ -521,7 +521,7 @@ static void testReaderCorruptCompressedAborts() {
 #endif
 }
 
-// ─── E1b "Short Shrift" (writer half): finalize() must fail closed ───────────
+// ─── Writer half: finalize() must fail closed ───────────────────────────────
 //
 // finalize() published unconditionally: the count backpatch's fseek only warned
 // on failure, and the CRC-trailer fwrite and the fclose were unchecked — so a
@@ -575,7 +575,7 @@ static void testFinalizeFailureDoesNotPublish() {
   std::remove((kFsizePath + ".idx.tmp").c_str());
 }
 
-// ─── E4 "Load-Bearing Label": an unparseable key bound must not be ignored ───
+// ─── An unparseable key bound must not be ignored ───────────────────────────
 //
 // The range filters were written as `has_lo = !lo_hex.empty() &&
 // hexToBytes(...)`, so a bound that FAILED to parse (wrong length for this
@@ -601,7 +601,7 @@ static void testMergeUnparseableBoundAborts() {
   std::remove("/tmp/gate_runfile_badbound_out.bin.idx");
 }
 
-// ─── V5: a keyLen wider than SIGMAX must be refused, not overflowed ─────────
+// ─── A keyLen wider than SIGMAX must be refused, not overflowed ─────────────
 //
 // Every key in the engine lives in a fixed SIGMAX-byte Sig and is copied
 // through SIGMAX-sized STACK arrays (mergeRunFiles' lo_sig/hi_sig,
@@ -637,11 +637,11 @@ static void mergeWithOversizeKeyLen() {
 }
 static void testOversizeKeyLenRefused() {
   assert(runInChild(writerWithOversizeKeyLen) > 0 &&
-         "V5: RunFileWriter must refuse a keyLen wider than SIGMAX");
+         "RunFileWriter must refuse a keyLen wider than SIGMAX");
   assert(runInChild(readerWithOversizeKeyLen) > 0 &&
-         "V5: RunFileReader must refuse a keyLen wider than SIGMAX");
+         "RunFileReader must refuse a keyLen wider than SIGMAX");
   assert(runInChild(mergeWithOversizeKeyLen) > 0 &&
-         "V5: mergeRunFiles must refuse a keyLen wider than SIGMAX");
+         "mergeRunFiles must refuse a keyLen wider than SIGMAX");
   std::remove("/tmp/gate_runfile_keylen.bin");
   std::remove("/tmp/gate_runfile_keylen.bin.idx");
   std::remove("/tmp/gate_runfile_keylen_in.bin");
@@ -707,7 +707,7 @@ static void testZstdPoolRetentionBounded() {
 #endif
 }
 
-// E6 "Pool Underwater": the idle-retention cap is now an env knob
+// The zstd context pool's idle-retention cap is an env knob
 // (POLY_ZSTD_CTX_POOL), parsed ONCE per process like the other POLY_* levers.
 // That "once" is why this runs first and in a forked child: the parsed value is
 // a function-local static, so a fork after any zstd use would inherit the
@@ -743,7 +743,7 @@ int main() {
   testBlockCompressedRoundTripAndSeek();
   testMergeWithBlockCompressedInputs();
   testHeaderRejectsUnknownCompression();
-  // E1 "Short Shrift": short/corrupt bodies must abort, not read short. The
+  // Short/corrupt bodies must abort, not read short. The
   // forked children print their own diagnostics — that noise is the behavior
   // under test.
   testReaderTruncatedBodyAborts();

@@ -1177,7 +1177,7 @@ build/ns/gate_spill_zstd_noz: tests/engine/gate_spill_zstd_noz.cpp $(NS_HEADERS)
 ns-gate-arch:
 	go test ./verify/arch/... -count=1
 
-# Regression gate (AC-0): driver0 reproduces T(n,H) byte-identical to oracle, n≤14
+# Regression gate: driver0 reproduces T(n,H) byte-identical to oracle, n≤14
 ns-gate-regression: build/ns/driver0
 	./build/ns/driver0 --maxn 14
 
@@ -1273,7 +1273,7 @@ ns-gate-split: build/ns/orchestrate build/ns/combine build/ns/map_worker build/n
 ns-gate-resume-boundaries: build/ns/map_worker build/ns/merge_worker
 	go test ./orchestrator/ -run 'TestKillResumeAllBoundaries|TestKinkResumeMidColumn' -v
 
-# T3.1 gate (AC-3 prerequisite): u128 counter produces byte-identical totals to u64 for n<=14.
+# Gate: the u128 counter produces byte-identical totals to u64 for n<=14.
 # Runs the full orchestrator with --counter u128 and compares against known a(n) fixtures.
 ns-gate-u128: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	rm -rf /tmp/ns_m3_u128 && mkdir -p /tmp/ns_m3_u128/spill
@@ -1281,11 +1281,11 @@ ns-gate-u128: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	    --run-dir /tmp/ns_m3_u128 --spill-dir /tmp/ns_m3_u128/spill \
 	    --checkpoint /tmp/ns_m3_u128/POLYCKPT --checkpoint-every 0 --compare
 
-# T5.4 gate: holes distribution byte-identical to tma_holes oracle for n<=12
+# Gate: holes distribution byte-identical to tma_holes oracle for n<=12
 ns-gate-holes: build/ns/gate_holes build/tma_holes
 	python3 tests/gate_holes.py 12
 
-# T5.3 gate (AC-5): verifier passes on published dataset; catches deliberate corruption.
+# Gate: the verifier passes on published dataset; catches deliberate corruption.
 ns-gate-verify: build/ns/verify build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	python3 tests/gate_verify.py
 
@@ -1315,7 +1315,7 @@ install: $(addprefix build/ns/,$(NS_INSTALL_BINS))
 build/ns/gate_holes: tests/engine/gate_holes.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
-# AC-1 long-run gate (manual invocation; hours to days depending on maxn and box):
+# Long-run check (manual invocation; hours to days depending on maxn and box):
 #   ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare
 ns-gate-resume:
 	@echo "AC-1 gate (long): ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /tmp/ns_ac1 --compare"

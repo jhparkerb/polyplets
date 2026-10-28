@@ -1,4 +1,4 @@
-// gate_holes.cpp — T5.4 gate: per-(n,H,holes) distribution byte-identical to
+// gate_holes.cpp — per-(n,H,holes) distribution byte-identical to
 // build/tma_holes square8 N --holes --per-height (old engine).
 //
 // Usage:

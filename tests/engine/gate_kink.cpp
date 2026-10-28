@@ -1,6 +1,5 @@
-// Design 14 Phase 1 gate: map_shard_stage (core/kink.h) ported correctly from
-// the kink-carry probe's per-stage transition (kinkStageTransition, shared
-// with experiments/kink_tm/kink_tm.cpp -- see that file's kinkSweep()).
+// Gate: map_shard_stage (core/kink.h) and its per-stage transition
+// kinkStageTransition.
 //
 // map_shard_stage adapts kinkStageTransition from single dense per-state
 // count vectors to the production ranged RunRecord<W> windowed format (the

@@ -1,4 +1,4 @@
-// driver1.cpp — AC-1 serial end-to-end driver with NVMe spill (T1.3).
+// driver1.cpp — serial end-to-end driver with disk spill.
 //
 // Runs one height-sweep at a time (H=1..maxn) using file-backed frontier runs.
 // The entire frontier is written to disk between columns; map_shard_file spills
@@ -9,10 +9,10 @@
 //
 // Defaults: maxn=14, ram=134217728 (128 MB), spill=/tmp/ns_driver1_PID, compare=true
 //
-// AC-1 gate: ./driver1 --maxn 14 --ram 1048576 --spill /tmp/ns_m1_gate --compare
+// Spill check: ./driver1 --maxn 14 --ram 1048576 --spill /tmp/ns_m1_gate --compare
 //   (ram=1 MB forces many spills even at n=14, exercises the spill path)
 //
-// Full AC-1 run (long — hours to days):
+// Full run (long — hours to days):
 //   ./driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare
 
 #include <algorithm>

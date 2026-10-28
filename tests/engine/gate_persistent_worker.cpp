@@ -1,4 +1,4 @@
-// Bottleneck #5 gate: map_worker's --persistent mode, driven as a real
+// Gate: map_worker's --persistent mode, driven as a real
 // subprocess. RED before the feature: --persistent is an unrecognized flag,
 // so the process exits 1 immediately (map_worker's "unknown arg" path).
 //

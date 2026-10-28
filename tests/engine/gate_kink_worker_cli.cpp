@@ -1,4 +1,4 @@
-// Design 14 Phase 2.4 gate: map_worker's --kernel kink CLI wiring, driven as
+// Gate: map_worker's --kernel kink CLI wiring, driven as
 // a real subprocess (the actual compiled binary, not the functions it
 // calls directly) -- this is the cheapest point to catch a wiring bug
 // (arg parsing, --stage dispatch, --kernel validation) since it costs
@@ -13,8 +13,7 @@
 // and asserts the two resulting H+2-keyed frontier files decode (via
 // RunFileReader, so this test doesn't need its own record decoder) to the
 // EXACT same set of records. No orchestrator involved -- the seed/stage
-// chaining is driven directly by this test, matching the plan's "CLI-level
-// integration test" gate for Phase 2.4.
+// chaining is driven directly by this test.
 
 #include <cstdio>
 #include <cstdlib>

@@ -1,4 +1,4 @@
-// driver0.cpp — AC-0 in-RAM driver for map_shard + mergeRuns (T0.5).
+// driver0.cpp — in-RAM driver for map_shard + mergeRuns.
 //
 // Runs one height-sweep at a time (H=1..maxn) using the in-RAM libenum core;
 // accumulates the triangle T(n,H); compares Σ_H T(n,H) to known a(n) values.
