@@ -27,10 +27,10 @@ func bnd(t *testing.T, lo, hi string) keyBounds {
 func TestPruneByBounds(t *testing.T) {
 	paths := []string{"r0", "r1", "r2", "r3"}
 	bounds := []keyBounds{
-		bnd(t, "", "0a0a"),         // r0: (-inf, 0a0a)
-		bnd(t, "0a0a", "1414"),     // r1: [0a0a, 1414)
-		bnd(t, "1414", "1e1e"),     // r2: [1414, 1e1e)
-		bnd(t, "1e1e", ""),         // r3: [1e1e, +inf)
+		bnd(t, "", "0a0a"),     // r0: (-inf, 0a0a)
+		bnd(t, "0a0a", "1414"), // r1: [0a0a, 1414)
+		bnd(t, "1414", "1e1e"), // r2: [1414, 1e1e)
+		bnd(t, "1e1e", ""),     // r3: [1e1e, +inf)
 	}
 	cases := []struct {
 		lo, hi string

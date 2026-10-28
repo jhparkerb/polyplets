@@ -410,8 +410,9 @@ func SplitRangeByIndex(frontier []string, H, keyLen int, loHex, hiHex string, nu
 // (lo, hi) — strictly greater than lo (a cut equal to lo would leave an empty
 // first piece) and, if hi is set, strictly less than hi.
 // Sidecar format MUST match core/runfile.h writeIndexSidecar:
-//   magic(u32 'PLYI') ver(u16) bo(u8) keyLen(u32) count(u64), little-endian,
-//   then count × { key[keyLen] u64 offset u64 recidx }.
+//
+//	magic(u32 'PLYI') ver(u16) bo(u8) keyLen(u32) count(u64), little-endian,
+//	then count × { key[keyLen] u64 offset u64 recidx }.
 const (
 	idxMagic       = 0x49594C50 // 'PLYI', little-endian
 	idxVersion     = 1

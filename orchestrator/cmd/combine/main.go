@@ -8,12 +8,14 @@
 // engine's h<H>.out, which use the same format.
 //
 // Usage:
-//   combine --in dirA[,dirB,...] --maxn 21 [--compare] [--require-cover] [--out triangle.txt]
+//
+//	combine --in dirA[,dirB,...] --maxn 21 [--compare] [--require-cover] [--out triangle.txt]
 //
 // Diff mode compares two --per-height-out directory sets CELL BY CELL (every T(n,H), not just the summed a(n) total the mode
 // above checks), e.g. a --kernel kink run against a --kernel column run at
 // the same maxn:
-//   combine --in dirA[,...] --diff-b dirB[,...] --maxn 20
+//
+//	combine --in dirA[,...] --diff-b dirB[,...] --maxn 20
 package main
 
 import (
@@ -268,6 +270,7 @@ func heightFromName(path string) (int, bool) {
 //   - every count zero          => empty/zeroed shard (each height has T(H,H)>0);
 //   - a nonzero n>maxn row       => --maxn is smaller than the data, which would
 //     silently drop the high-n rows.
+//
 // Without these, a damaged shard sums to a confidently-printed, too-low a(n).
 func addRow(path string, maxn int, triangle []*big.Int) error {
 	data, err := os.ReadFile(path)

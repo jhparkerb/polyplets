@@ -45,14 +45,14 @@ type ColumnCost struct {
 // telemetry accumulates ColumnCosts, emits structured progress, writes the cost
 // profile, and (if a reference profile is loaded) reports a live ETA.
 type telemetry struct {
-	t0       time.Time
-	cores    int
-	maxn     int
-	outPath  string
-	mu       sync.Mutex       // guards observe() state when heights run concurrently (overlap mode)
-	cumWall  float64          // running Σ WallS over observed columns
-	clock    func() time.Time // injectable for tests; defaults to time.Now
-	hbEvery  time.Duration    // heartbeat cadence (POLY_HEARTBEAT_SECS, default 30s)
+	t0      time.Time
+	cores   int
+	maxn    int
+	outPath string
+	mu      sync.Mutex       // guards observe() state when heights run concurrently (overlap mode)
+	cumWall float64          // running Σ WallS over observed columns
+	clock   func() time.Time // injectable for tests; defaults to time.Now
+	hbEvery time.Duration    // heartbeat cadence (POLY_HEARTBEAT_SECS, default 30s)
 
 	// processed is the live count of input records consumed across the running
 	// map units of the current column, fed by worker event=progress lines.

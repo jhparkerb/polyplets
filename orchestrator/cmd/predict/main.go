@@ -8,7 +8,8 @@
 // a(19) and checking the error before trusting the a(21) number.
 //
 // Usage:
-//   predict --profile P19.tsv --to 20 [--ratio R | --profile2 P18.tsv] [--out P20ref.tsv]
+//
+//	predict --profile P19.tsv --to 20 [--ratio R | --profile2 P18.tsv] [--out P20ref.tsv]
 //
 // Limitation: the synthesized --out profile keeps the source n0's (H,col) set,
 // so it omits target-n's new heights/columns (tail cells, small cost). The

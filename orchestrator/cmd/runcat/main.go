@@ -1,16 +1,18 @@
 // main.go — runcat: render a POLYRUN binary file to human-readable text.
 //
 // Usage:
-//   runcat <file.bin> [<file.bin> ...]
+//
+//	runcat <file.bin> [<file.bin> ...]
 //
 // Output per file:
-//   # POLYRUN run: path/to/file.bin
-//   # height=H maxn=N counter=u64 classifier=triangle records=M rev=REV
-//   # keylo=HEX keyhi=HEX
-//   # CRC: OK   (or MISMATCH: computed=X stored=Y)
-//   sig=HEX lo=LO len=LEN counts=[C0,C1,...]
-//   ...
-//   # total: M records
+//
+//	# POLYRUN run: path/to/file.bin
+//	# height=H maxn=N counter=u64 classifier=triangle records=M rev=REV
+//	# keylo=HEX keyhi=HEX
+//	# CRC: OK   (or MISMATCH: computed=X stored=Y)
+//	sig=HEX lo=LO len=LEN counts=[C0,C1,...]
+//	...
+//	# total: M records
 package main
 
 import (

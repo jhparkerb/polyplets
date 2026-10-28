@@ -17,8 +17,8 @@ func writePolyrun(t *testing.T, path string) {
 	keyLen := H + 2
 	// body = sig[keyLen] + lo(1) + len(1) + counts(1 * 8 bytes LE)
 	body := make([]byte, keyLen+2+8)
-	body[keyLen] = 0             // lo
-	body[keyLen+1] = 1           // len
+	body[keyLen] = 0   // lo
+	body[keyLen+1] = 1 // len
 	binary.LittleEndian.PutUint64(body[keyLen+2:], 1)
 
 	var buf []byte

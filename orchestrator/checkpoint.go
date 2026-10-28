@@ -1,13 +1,14 @@
 // checkpoint.go — POLYCKPT write and read.
 //
 // POLYCKPT format (docs/formats.md; version history there too):
-//   POLYCKPT 2
-//   H <h>
-//   col <c>
-//   frontier <path> [<path>...]
-//   acct cpu_s=<SUM> wall_s=<SUM> rss_max_mb=<MAX>
-//   tri <n> <value>    (accumulated triangle, sparse)
-//   htri <n> <value>   (current height's partial row alone, sparse)
+//
+//	POLYCKPT 2
+//	H <h>
+//	col <c>
+//	frontier <path> [<path>...]
+//	acct cpu_s=<SUM> wall_s=<SUM> rss_max_mb=<MAX>
+//	tri <n> <value>    (accumulated triangle, sparse)
+//	htri <n> <value>   (current height's partial row alone, sparse)
 //
 // The bulk of the checkpoint IS the frontier run files already on disk; the
 // POLYCKPT just names them.  Resume reloads the frontier, re-dispatches any
@@ -62,9 +63,9 @@ type Checkpoint struct {
 	// pre-fix checkpoints (nil): the triangle still resumes correctly, only
 	// the per-height row can't be reconstructed (writePerHeight's all-zero
 	// guard then refuses the worst case).
-	HTri []*big.Int
-	Acct Acct
-	Written  time.Time
+	HTri    []*big.Int
+	Acct    Acct
+	Written time.Time
 	// Run config stamped at write time so resume can hard-fail on a mismatched
 	// CLI (a different --maxn/--counter/--fold silently corrupts the triangle).
 	Maxn    int

@@ -1,7 +1,8 @@
 // main.go — verify CLI entry point.
 //
 // Usage:
-//   verify --n N [--data-dir DIR] [--workers-dir DIR] [--no-spotcheck] [--verbose]
+//
+//	verify --n N [--data-dir DIR] [--workers-dir DIR] [--no-spotcheck] [--verbose]
 //
 // Exits 0 if all checks pass, 1 if any fail.
 // Prints one line per check: "PASS row-sum n=21" or "FAIL crc path/to/run.bin".

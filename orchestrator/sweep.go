@@ -1,11 +1,11 @@
 // sweep.go — column-sweep orchestrator: parallel map+merge per column, checkpoint.
 //
 // One height at a time (H=1..maxn).  Within a height-sweep each column is:
-//   1. Partition source key-space → map units (one unit per worker).
-//   2. Run map_worker per unit in parallel (pool of ≤ cores goroutines).
-//   3. Sample output key-space → merge ranges (one per worker).
-//   4. Run merge_worker per range in parallel.
-//   5. GC consumed runs.  Write checkpoint.  Repeat.
+//  1. Partition source key-space → map units (one unit per worker).
+//  2. Run map_worker per unit in parallel (pool of ≤ cores goroutines).
+//  3. Sample output key-space → merge ranges (one per worker).
+//  4. Run merge_worker per range in parallel.
+//  5. GC consumed runs.  Write checkpoint.  Repeat.
 package orchestrator
 
 import (
@@ -25,7 +25,7 @@ import (
 type SweepConfig struct {
 	Maxn            int
 	Fold            bool
-	Kernel          string // "kink" (production) or "column" (reference oracle); empty = "column"
+	Kernel          string        // "kink" (production) or "column" (reference oracle); empty = "column"
 	Cores           int           // max concurrent workers
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
@@ -783,11 +783,11 @@ func sweepHeight(
 		colAcct.Add(mergeAcct)
 		tel.observe(ColumnCost{
 			H: H, Col: col,
-			FrontierIn:  frontierIn,
-			FrontierOut: totalRecs,
-			WallS:       colWall,
-			CPUS:        colAcct.CPUS,
-			RSSMax:      colAcct.RSSMax,
+			FrontierIn:   frontierIn,
+			FrontierOut:  totalRecs,
+			WallS:        colWall,
+			CPUS:         colAcct.CPUS,
+			RSSMax:       colAcct.RSSMax,
 			MapWallS:     mapWall,
 			MapCPUS:      mapAcct.CPUS,
 			MergeWallS:   mergeWall,
@@ -1506,7 +1506,7 @@ func mapPhase(
 				outPath := filepath.Join(mapDir, outName)
 				a := MapArgs{
 					InPaths: pruneByBounds(frontier, inBounds, u.lo, u.hi, keyLen),
-					H: H, Maxn: cfg.Maxn, Fold: cfg.Fold,
+					H:       H, Maxn: cfg.Maxn, Fold: cfg.Fold,
 					RAM: cfg.RAM, SpillDir: cfg.SpillDir, OutPath: outPath,
 					Counter: cfg.CounterWidth, LoHex: u.lo, HiHex: u.hi, Rev: cfg.Rev,
 					Kernel: kernel, Stage: stage,
@@ -1927,8 +1927,10 @@ func topHeightClosedForm(maxn int) *big.Int {
 
 // lowHeightRow returns the closed-form T(n,H) row for the trivial low strips
 // H==1 and H==2, indexed by n (0 outside 1..maxn / below H):
-//   T(n,1) = 1               (a single row of n cells)
-//   T(n,2): T(2,2)=3, T(3,2)=10, T(n,2)=2·T(n-1,2)+T(n-2,2)+4  (n>=4)
+//
+//	T(n,1) = 1               (a single row of n cells)
+//	T(n,2): T(2,2)=3, T(3,2)=10, T(n,2)=2·T(n-1,2)+T(n-2,2)+4  (n>=4)
+//
 // Returns nil for any other H. Both are verified exact against the a(20)
 // triangle (results/ns_a20/Tnh_triangle.txt).
 func lowHeightRow(H, maxn int) []*big.Int {

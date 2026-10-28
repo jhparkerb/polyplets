@@ -1,17 +1,20 @@
 // main.go — orchestrate CLI entry point.
 //
 // Usage:
-//   orchestrate [--maxn N] [--fold] [--cores N] [--ram BYTES]
-//               [--run-dir DIR] [--spill-dir DIR] [--checkpoint PATH]
-//               [--checkpoint-every SECS] [--resume] [--compare]
-//               [--workers-dir DIR]
+//
+//	orchestrate [--maxn N] [--fold] [--cores N] [--ram BYTES]
+//	            [--run-dir DIR] [--spill-dir DIR] [--checkpoint PATH]
+//	            [--checkpoint-every SECS] [--resume] [--compare]
+//	            [--workers-dir DIR]
 //
 // Parallel == serial check:
-//   orchestrate --maxn 16 --compare
+//
+//	orchestrate --maxn 16 --compare
 //
 // Kill+resume check:
-//   orchestrate --maxn 16 --compare   # kill with SIGTERM mid-run
-//   orchestrate --maxn 16 --resume --compare  # resumes from checkpoint
+//
+//	orchestrate --maxn 16 --compare   # kill with SIGTERM mid-run
+//	orchestrate --maxn 16 --resume --compare  # resumes from checkpoint
 package main
 
 import (

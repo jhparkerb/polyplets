@@ -13,7 +13,7 @@ import (
 // path, and production runs for confirming a result at scale.
 func BenchmarkSampleIndexKeys(b *testing.B) {
 	dir := b.TempDir()
-	keyLen := 20 // realistic kink stage width, H~16-18
+	keyLen := 20       // realistic kink stage width, H~16-18
 	const nKeys = 6400 // realistic per-column .idx size (one entry/64 records)
 	keys := make([][]byte, nKeys)
 	for i := range keys {

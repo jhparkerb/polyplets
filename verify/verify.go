@@ -360,10 +360,10 @@ func ReadResiduesFile(path string) ([]Residue, error) {
 
 // CheckResult holds one verification result.
 type CheckResult struct {
-	Pass    bool
-	Check   string // short tag, e.g. "crc", "row-sum", "growth"
-	Detail  string // human-readable detail
-	IsWarn  bool   // WARN rather than FAIL
+	Pass   bool
+	Check  string // short tag, e.g. "crc", "row-sum", "growth"
+	Detail string // human-readable detail
+	IsWarn bool   // WARN rather than FAIL
 }
 
 func pass(check, detail string) CheckResult {

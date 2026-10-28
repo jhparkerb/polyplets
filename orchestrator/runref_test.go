@@ -96,8 +96,8 @@ func TestBalancedCutsRecordEqual(t *testing.T) {
 	// more .idx entries than numCuts -- the skew a per-file-fixed-count sampler
 	// mishandled ("a file holding 590M records gets the SAME numCuts samples as
 	// one holding 64K"). BalancedCutsMulti must balance it regardless.
-	const recsA = 6_400   // small file: 100 idx entries
-	const recsB = 57_600  // fat file: 900 idx entries -- the straggler
+	const recsA = 6_400  // small file: 100 idx entries
+	const recsB = 57_600 // fat file: 900 idx entries -- the straggler
 	total := recsA + recsB
 	const numCuts = 9 // -> 10 buckets
 

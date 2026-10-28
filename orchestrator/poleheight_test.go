@@ -22,9 +22,9 @@ func TestPoleHeightFormula(t *testing.T) {
 		wantDiag   *big.Int // T(maxn-1, maxn-1) = 3^(maxn-2)
 		wantSubdia *big.Int // T(maxn, maxn-1) = (25*maxn-45)*3^(maxn-4)
 	}{
-		{4, big.NewInt(9), big.NewInt(55)},                       // T(3,3)=9,    T(4,3)=55
-		{5, big.NewInt(27), big.NewInt(240)},                     // T(4,4)=27,   T(5,4)=240
-		{8, big.NewInt(729), big.NewInt(12555)},                  // T(7,7)=729,  T(8,7)=12555
+		{4, big.NewInt(9), big.NewInt(55)},      // T(3,3)=9,    T(4,3)=55
+		{5, big.NewInt(27), big.NewInt(240)},    // T(4,4)=27,   T(5,4)=240
+		{8, big.NewInt(729), big.NewInt(12555)}, // T(7,7)=729,  T(8,7)=12555
 		{21, pow3(19), big.NewInt(61987278240)}, // T(20,20)=3^19, T(21,20)=61,987,278,240
 	}
 	for _, c := range cases {

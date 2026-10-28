@@ -22,9 +22,9 @@ func TestDiagonalP11Formula(t *testing.T) {
 	}{
 		// held-out real points (results/ns_a25/swept_rows.txt), fed neither the
 		// a11,b11 fit nor the shared-symbol solve.
-		{23, "38826609174639928"},    // T(23,12)
-		{24, "210692983396251014"},   // T(24,13)
-		{25, "1104184694723970106"},  // T(25,14)
+		{23, "38826609174639928"},   // T(23,12)
+		{24, "210692983396251014"},  // T(24,13)
+		{25, "1104184694723970106"}, // T(25,14)
 		// the two fitting points, from the fresh a26 / a27 sweeps.
 		{26, "5614506356004078534"},  // T(26,15), results/ns_a26
 		{27, "27798973373501478242"}, // T(27,16), results/ns_a27 (> 2^64)
