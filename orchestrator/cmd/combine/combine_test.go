@@ -100,6 +100,29 @@ func TestCombineRejectsOverflowRow(t *testing.T) {
 	}
 }
 
+// TestCombineRejectsDuplicateRow: a shard listing the same n twice would have
+// both lines summed into a(n), a silent overcount.
+func TestCombineRejectsDuplicateRow(t *testing.T) {
+	dir := t.TempDir()
+	writeRawShard(t, dir, 2, [][2]int{{1, 0}, {2, 1}, {3, 1}, {3, 1}, {4, 1}})
+	if _, _, err := runCombine([]string{dir}, 4, false); err == nil {
+		t.Fatalf("combine summed a duplicated n=3 row instead of refusing")
+	}
+}
+
+// TestCombineRejectsHeightOutsideRange: an h0.out (or any H outside 1..maxn)
+// is not a height of this triangle, and summing it would corrupt a(n).
+func TestCombineRejectsHeightOutsideRange(t *testing.T) {
+	dir := t.TempDir()
+	for H := 1; H <= 4; H++ {
+		writeShard(t, dir, H, 4)
+	}
+	writeRawShard(t, dir, 0, [][2]int{{1, 1}, {2, 1}, {3, 1}, {4, 1}})
+	if _, _, err := runCombine([]string{dir}, 4, true); err == nil {
+		t.Fatalf("combine summed h0.out into the triangle instead of refusing")
+	}
+}
+
 // TestCombineAcceptsValidShards guards against over-strict checks: a full,
 // non-empty, in-range set of shards must combine without error.
 func TestCombineAcceptsValidShards(t *testing.T) {

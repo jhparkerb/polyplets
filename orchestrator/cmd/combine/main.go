@@ -11,9 +11,9 @@
 //
 //	combine --in dirA[,dirB,...] --maxn 21 [--compare] [--require-cover] [--out triangle.txt]
 //
-// Diff mode compares two --per-height-out directory sets CELL BY CELL (every T(n,H), not just the summed a(n) total the mode
-// above checks), e.g. a --kernel kink run against a --kernel column run at
-// the same maxn:
+// Diff mode compares two --per-height-out directory sets CELL BY CELL (every
+// T(n,H), not just the summed a(n) total the mode above checks), e.g. a
+// --kernel kink run against a --kernel column run at the same maxn:
 //
 //	combine --in dirA[,...] --diff-b dirB[,...] --maxn 20
 package main
@@ -147,6 +147,9 @@ func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int
 		return nil, nil, err
 	}
 	for H, p := range heightFiles {
+		if H < 1 || H > maxn {
+			return nil, nil, fmt.Errorf("%s: height %d is outside 1..%d", p, H, maxn)
+		}
 		if e := addRow(p, maxn, triangle); e != nil {
 			return nil, nil, fmt.Errorf("%s: %w", p, e)
 		}
@@ -264,10 +267,11 @@ func heightFromName(path string) (int, bool) {
 }
 
 // addRow adds one h<H>.out file's "n value" rows into the triangle, refusing a
-// shard that is truncated, all-zero, or carries data past maxn:
+// shard that is truncated, all-zero, repeats a row, or carries data past maxn:
 //   - missing the n==maxn row  => truncated/corrupt (shards are written n=1..maxn
 //     atomically, so a short file is a partial rsync or disk corruption);
 //   - every count zero          => empty/zeroed shard (each height has T(H,H)>0);
+//   - the same n twice          => both would be summed, an overcount;
 //   - a nonzero n>maxn row       => --maxn is smaller than the data, which would
 //     silently drop the high-n rows.
 //
@@ -280,6 +284,7 @@ func addRow(path string, maxn int, triangle []*big.Int) error {
 	sawMaxn := false
 	nonzero := false
 	overflowN := 0
+	seen := map[int]bool{}
 	for _, line := range strings.Split(string(data), "\n") {
 		f := strings.Fields(line)
 		if len(f) < 2 {
@@ -290,6 +295,10 @@ func addRow(path string, maxn int, triangle []*big.Int) error {
 		if e1 != nil || !ok || n < 1 {
 			return fmt.Errorf("%s: malformed row %q", filepath.Base(path), line)
 		}
+		if seen[n] {
+			return fmt.Errorf("%s: row n=%d appears twice", filepath.Base(path), n)
+		}
+		seen[n] = true
 		if n > maxn {
 			if v.Sign() != 0 && n > overflowN {
 				overflowN = n
@@ -316,16 +325,20 @@ func addRow(path string, maxn int, triangle []*big.Int) error {
 	return nil
 }
 
+// writeTriangle writes "n a(n)" lines, reporting any write or close error so
+// a full disk cannot leave a short file behind a zero exit status.
 func writeTriangle(path string, maxn int, triangle []*big.Int) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	for n := 1; n <= maxn; n++ {
-		fmt.Fprintf(f, "%d %d\n", n, triangle[n])
+		if _, err := fmt.Fprintf(f, "%d %d\n", n, triangle[n]); err != nil {
+			f.Close()
+			return err
+		}
 	}
-	return nil
+	return f.Close()
 }
 
 func compareKnown(maxn int, triangle []*big.Int) int {
