@@ -26,7 +26,6 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-	"syscall"
 )
 
 // workerProc is one persistent worker process (either role): its stdin
@@ -53,15 +52,11 @@ func startPersistentWorker(ctx context.Context, binary string) (*workerProc, err
 	if err := cmd.Start(); err != nil {
 		return nil, fmt.Errorf("spawn persistent %s: %w", binary, err)
 	}
-	sc := bufio.NewScanner(stdout)
-	sc.Buffer(make([]byte, 0, 64*1024), 16*1024*1024) // triangle rows can be wide
-	return &workerProc{cmd: cmd, stdin: stdin, scan: sc, stderr: &stderrBuf}, nil
+	return &workerProc{cmd: cmd, stdin: stdin, scan: newLongLineScanner(stdout), stderr: &stderrBuf}, nil
 }
 
-// runRequest sends one request line and reads until (and including) the
-// event=done line, mirroring runWorker's per-invocation scanning contract
-// exactly (event=progress lines feed onProgress and are dropped, everything
-// else -- tri rows, event=done -- is collected for ParseWorkerOutput).
+// runRequest sends one request line and reads its output through the
+// event=done line with readWorkerOutput, as runWorker does.
 // stop, if non-nil, SIGTERMs the process for a cooperative early stop
 // (work-stealing), as on the one-shot path. The watcher ends with this
 // request; should its signal still land during a later request on the same
@@ -78,34 +73,9 @@ func (w *workerProc) runRequest(requestLine string, onProgress func(uint64), sto
 		return WorkerResult{}, fmt.Errorf("write request newline: %w", err)
 	}
 
-	done := make(chan struct{})
-	if stop != nil {
-		go func() {
-			select {
-			case <-stop:
-				_ = w.cmd.Process.Signal(syscall.SIGTERM)
-			case <-done:
-			}
-		}()
-	}
-
-	var lines []string
-	sawDone := false
-	for w.scan.Scan() {
-		line := w.scan.Text()
-		if onProgress != nil && strings.HasPrefix(line, "event=progress") {
-			if n, ok := parseProcessed(line); ok {
-				onProgress(n)
-			}
-			continue
-		}
-		lines = append(lines, line)
-		if strings.HasPrefix(line, "event=done") {
-			sawDone = true
-			break
-		}
-	}
-	close(done)
+	release := watchStop(stop, w.cmd.Process)
+	lines, sawDone := readWorkerOutput(w.scan, onProgress)
+	release()
 
 	if !sawDone {
 		if err := w.scan.Err(); err != nil {

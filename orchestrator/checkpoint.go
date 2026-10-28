@@ -167,10 +167,9 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 	defer f.Close()
 
 	ck := &Checkpoint{Col: -1, Version: 1}
-	sc := bufio.NewScanner(f)
 	// The frontier line names every frontier file, which can pass the
 	// scanner's default 64 KB line limit.
-	sc.Buffer(make([]byte, 0, 64*1024), 16*1024*1024)
+	sc := newLongLineScanner(f)
 	sawHeader, sawEnd := false, false
 	nTri, nHTri := 0, 0
 	for sc.Scan() {

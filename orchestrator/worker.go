@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -160,46 +161,14 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 		return WorkerResult{}, fmt.Errorf("spawn %s: %w", filepath.Base(binary), err)
 	}
 
-	// Work-stealing: forward a stop request to the worker as SIGTERM, which it
-	// catches as a cooperative early stop (exit 0 with a cursor).  The watcher
-	// exits when the process does (done is closed after Wait), so it never leaks.
-	done := make(chan struct{})
-	if stop != nil {
-		go func() {
-			select {
-			case <-stop:
-				_ = cmd.Process.Signal(syscall.SIGTERM)
-			case <-done:
-			}
-		}()
-	}
-
-	// Stream stdout live: event=progress lines feed onProgress and are NOT
-	// retained; everything else (tri rows, event=done) is collected for parsing.
-	var lines []string
-	sawDone := false
-	sc := bufio.NewScanner(stdout)
-	sc.Buffer(make([]byte, 0, 64*1024), 16*1024*1024) // as the persistent pool
-	for sc.Scan() {
-		line := sc.Text()
-		if onProgress != nil && strings.HasPrefix(line, "event=progress") {
-			if n, ok := parseProcessed(line); ok {
-				onProgress(n)
-			}
-			continue
-		}
-		if strings.HasPrefix(line, "event=done") {
-			sawDone = true
-		}
-		lines = append(lines, line)
-	}
+	release := watchStop(stop, cmd.Process)
+	sc := newLongLineScanner(stdout)
+	lines, sawDone := readWorkerOutput(sc, onProgress)
 	scanErr := sc.Err()
-	if scanErr != nil {
-		_, _ = io.Copy(io.Discard, stdout) // let the worker finish writing, so Wait returns
-	}
+	_, _ = io.Copy(io.Discard, stdout) // let the worker finish writing, so Wait returns
 
 	err = cmd.Wait()
-	close(done) // release the stop watcher
+	release()
 	if err != nil {
 		if diag := strings.TrimSpace(stderrBuf.String()); diag != "" {
 			return WorkerResult{}, fmt.Errorf("%s: %w: %s", filepath.Base(binary), err, diag)
@@ -208,7 +177,7 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 	}
 	// An unread tail or a missing done line means the output is incomplete:
 	// parsed anyway, its OutRecords would read 0 and the unit's output would
-	// be deleted as empty. Same contract as workerProc.runRequest.
+	// be deleted as empty.
 	if scanErr != nil {
 		return WorkerResult{}, fmt.Errorf("%s: reading stdout: %w", filepath.Base(binary), scanErr)
 	}
@@ -221,6 +190,55 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 		return WorkerResult{}, fmt.Errorf("%s: %w", filepath.Base(binary), perr)
 	}
 	return result, nil
+}
+
+// watchStop forwards a work-stealing stop request to the worker as SIGTERM,
+// which it treats as a cooperative early stop (exit 0 with a cursor). The
+// returned release ends the watcher; call it once the request is over.
+func watchStop(stop <-chan struct{}, p *os.Process) (release func()) {
+	done := make(chan struct{})
+	if stop != nil {
+		go func() {
+			select {
+			case <-stop:
+				_ = p.Signal(syscall.SIGTERM)
+			case <-done:
+			}
+		}()
+	}
+	return func() { close(done) }
+}
+
+// newLongLineScanner is a line scanner that allows lines up to 16 MB: a
+// worker's tri rows and a checkpoint's frontier line can be wide.
+func newLongLineScanner(r io.Reader) *bufio.Scanner {
+	sc := bufio.NewScanner(r)
+	sc.Buffer(nil, 16<<20)
+	return sc
+}
+
+// readWorkerOutput reads one request's worth of worker stdout, up to and
+// including the event=done line or to the end of the stream. event=progress
+// lines feed onProgress (may be nil) and are dropped; everything else (tri
+// rows, event=done) is returned for ParseWorkerOutput. sawDone reports
+// whether the done line arrived; without it the output is incomplete.
+func readWorkerOutput(sc *bufio.Scanner, onProgress func(uint64)) (lines []string, sawDone bool) {
+	for sc.Scan() {
+		line := sc.Text()
+		if strings.HasPrefix(line, "event=progress") {
+			if onProgress != nil {
+				if n, ok := parseProcessed(line); ok {
+					onProgress(n)
+				}
+			}
+			continue
+		}
+		lines = append(lines, line)
+		if strings.HasPrefix(line, "event=done") {
+			return lines, true
+		}
+	}
+	return lines, false
 }
 
 // parseProcessed extracts the cumulative processed count from an event=progress
