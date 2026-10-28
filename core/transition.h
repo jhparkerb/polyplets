@@ -1,4 +1,4 @@
-// T2 plug-in #2: square-8 (polyplet) column transition -- THE novel core.
+// The square-8 (polyplet) column transition.
 //
 // King adjacency (edge OR corner) makes the cell-at-a-time boundary need the
 // diagonal NW cell that the sweep has already overwritten. We sidestep that by
@@ -42,8 +42,8 @@ inline void unite(int* p, int a, int b) {
 template <class M = unsigned>
 inline Outcome stepColumnSquare8(const Sig& old, int H, M mask, Sig& out) {
   // union-find slots: new-column row r -> r ; old label L -> H + L. Indices
-  // stay < 2*SIGMAX (H <= 30, labels <= H), so stack arrays -- no per-call heap
-  // allocation, which dominated the hot path when these were std::vector.
+  // stay < 2*SIGMAX (labels <= H), so stack arrays -- no per-call heap
+  // allocation, which dominates the hot path otherwise.
   int p[2 * SIGMAX];
   for (int i = 0; i < 2 * SIGMAX; ++i) p[i] = i;
   for (int r = 0; r < H; ++r) {
