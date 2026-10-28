@@ -30,7 +30,7 @@ import (
 //
 //	1 — pre-c789bfb: no `htri` lines, so a mid-height resume cannot
 //	    reconstruct the height's whole per-height row.
-//	2 — carries `htri` (the Zero Harvest fix).
+//	2 — carries `htri`, the current height's partial row.
 //
 // The version is stamped explicitly because absence of `htri` is NOT a usable
 // discriminator: the row is sparse-encoded, so a legitimately all-zero partial
@@ -57,7 +57,7 @@ type Checkpoint struct {
 	// within-H share already merged into Triangle above). Resume seeds the
 	// height's sweep with it so the completion-time per-height write
 	// (h<H>.out) is whole — without it, a resumed height's per-height row
-	// carries only the post-resume columns (the Zero Harvest bug,
+	// carries only the post-resume columns (the a(40) incident in
 	// results/ns_a40/PROVENANCE.md: resuming an already-COMPLETED height has
 	// no columns left and wrote all zeros over the good file). Absent from
 	// pre-fix checkpoints (nil): the triangle still resumes correctly, only
@@ -72,8 +72,8 @@ type Checkpoint struct {
 	Counter string // normalized "u64"/"u128"
 	Fold    bool
 	Kernel  string // normalized "column"/"kink"
-	// MaxDiagK is --max-diag-k as resolved at write time: it decides per height whether a strip is INJECTED from its
-	// closed form or REALLY SWEPT, so a resume under a different cap computes
+	// MaxDiagK is --max-diag-k as resolved at write time: it decides per
+	// height whether a strip is INJECTED from its closed form or REALLY SWEPT, so a resume under a different cap computes
 	// a different set of cells than the run it continues — and can manufacture
 	// self-confirming holdout evidence. Meaningful only when MaxDiagKSet;
 	// checkpoints written before this field existed leave it false.
@@ -133,8 +133,7 @@ func (ck *Checkpoint) Write(path string) error {
 			nTri++
 		}
 	}
-	// Sparse current-height partial row (see HTri). Additive line type:
-	// ReadCheckpoint ignores unknown keys, so old readers skip it.
+	// Sparse current-height partial row (see HTri).
 	nHTri := 0
 	for n, v := range ck.HTri {
 		if v != nil && v.Sign() != 0 {
@@ -169,6 +168,9 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 
 	ck := &Checkpoint{Col: -1, Version: 1}
 	sc := bufio.NewScanner(f)
+	// The frontier line names every frontier file, which can pass the
+	// scanner's default 64 KB line limit.
+	sc.Buffer(make([]byte, 0, 64*1024), 16*1024*1024)
 	sawHeader, sawEnd := false, false
 	nTri, nHTri := 0, 0
 	for sc.Scan() {
@@ -188,34 +190,46 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 			continue
 		}
 		k, v, _ := strings.Cut(line, " ")
+		bad := func() (*Checkpoint, error) {
+			return nil, fmt.Errorf("%s: malformed %s line %q", path, k, line)
+		}
+		var err error
 		switch k {
 		case "H":
-			ck.H, _ = strconv.Atoi(v)
+			if ck.H, err = strconv.Atoi(v); err != nil {
+				return bad()
+			}
 		case "col":
-			ck.Col, _ = strconv.Atoi(v)
+			if ck.Col, err = strconv.Atoi(v); err != nil {
+				return bad()
+			}
 		case "config":
-			parseConfig(v, ck)
+			if err := parseConfig(v, ck); err != nil {
+				return nil, fmt.Errorf("%s: config line %q: %w", path, line, err)
+			}
 		case "frontier":
 			if v != "" {
 				ck.Frontier = strings.Fields(v)
 			}
 		case "done":
 			for _, f := range strings.Fields(v) {
-				if H, err := strconv.Atoi(f); err == nil {
-					ck.Done = append(ck.Done, H)
+				H, err := strconv.Atoi(f)
+				if err != nil {
+					return bad()
 				}
+				ck.Done = append(ck.Done, H)
 			}
 		case "acct":
 			parseAcct(v, &ck.Acct)
 		case "tri":
 			parts := strings.Fields(v)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
+				return bad()
 			}
 			n, err1 := strconv.Atoi(parts[0])
 			val, ok := new(big.Int).SetString(parts[1], 10)
 			if err1 != nil || !ok || n < 0 {
-				return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
+				return bad()
 			}
 			for n >= len(ck.Triangle) {
 				ck.Triangle = append(ck.Triangle, new(big.Int))
@@ -225,12 +239,12 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		case "htri":
 			parts := strings.Fields(v)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf("%s: malformed htri line %q", path, line)
+				return bad()
 			}
 			n, err1 := strconv.Atoi(parts[0])
 			val, ok := new(big.Int).SetString(parts[1], 10)
 			if err1 != nil || !ok || n < 0 {
-				return nil, fmt.Errorf("%s: malformed htri line %q", path, line)
+				return bad()
 			}
 			for n >= len(ck.HTri) {
 				ck.HTri = append(ck.HTri, new(big.Int))
@@ -240,12 +254,12 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		case "end":
 			parts := strings.Fields(v)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf("%s: malformed end line %q", path, line)
+				return bad()
 			}
 			wantTri, e1 := strconv.Atoi(parts[0])
 			wantHTri, e2 := strconv.Atoi(parts[1])
 			if e1 != nil || e2 != nil {
-				return nil, fmt.Errorf("%s: malformed end line %q", path, line)
+				return bad()
 			}
 			if wantTri != nTri || wantHTri != nHTri {
 				return nil, fmt.Errorf("%s: checkpoint is incomplete — read %d tri and %d htri lines, terminator says %d and %d (truncated or corrupt)", path, nTri, nHTri, wantTri, wantHTri)
@@ -260,8 +274,8 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		return nil, err
 	}
 	// The terminator is a version-2 line, so version-1 files are read without
-	// it (they never had one, and the version and --max-diag-k checks already restrict what a version-1
-	// checkpoint may be resumed into). Every file this build writes must have
+	// it (they never had one, and the version and --max-diag-k checks already
+	// restrict what a version-1 checkpoint may be resumed into). Every file this build writes must have
 	// it: no terminator = the file is a prefix, not a checkpoint.
 	if !sawEnd && ck.Version >= 2 {
 		return nil, fmt.Errorf("%s: POLYCKPT v%d has no `end` terminator — the file is truncated or was never finished", path, ck.Version)
@@ -269,31 +283,36 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 	return ck, nil
 }
 
-func parseConfig(s string, ck *Checkpoint) {
+// parseConfig reads the config line's key=value fields; a value that does
+// not parse is an error. Unknown keys are skipped.
+func parseConfig(s string, ck *Checkpoint) error {
 	for _, field := range strings.Fields(s) {
 		k, v, ok := strings.Cut(field, "=")
 		if !ok {
 			continue
 		}
+		var err error
 		switch k {
 		case "maxn":
-			ck.Maxn, _ = strconv.Atoi(v)
+			ck.Maxn, err = strconv.Atoi(v)
 		case "counter":
 			ck.Counter = v
 		case "fold":
-			ck.Fold = v == "true"
+			ck.Fold, err = strconv.ParseBool(v)
 		case "kernel":
 			ck.Kernel = v
 		case "maxdiagk":
-			if n, err := strconv.Atoi(v); err == nil {
-				ck.MaxDiagK, ck.MaxDiagKSet = n, true
-			}
+			ck.MaxDiagK, err = strconv.Atoi(v)
+			ck.MaxDiagKSet = true
 		case "overlap":
-			if n, err := strconv.Atoi(v); err == nil {
-				ck.Overlap, ck.OverlapSet = n, true
-			}
+			ck.Overlap, err = strconv.Atoi(v)
+			ck.OverlapSet = true
+		}
+		if err != nil {
+			return fmt.Errorf("%s: %w", field, err)
 		}
 	}
+	return nil
 }
 
 func parseAcct(s string, a *Acct) {

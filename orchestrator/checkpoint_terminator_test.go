@@ -15,9 +15,11 @@ package orchestrator
 //	        under-counted
 
 import (
+	"fmt"
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -87,5 +89,57 @@ func TestReadCheckpointRoundTrip(t *testing.T) {
 	}
 	if n := countNonZero(got.HTri); n != countNonZero(want.HTri) {
 		t.Errorf("htri entries = %d, want %d", n, countNonZero(want.HTri))
+	}
+}
+
+// TestReadCheckpointRejectsMalformedFields: a numeric field that does not
+// parse is an error, not a silent zero (an unreadable H would resume height 0).
+func TestReadCheckpointRejectsMalformedFields(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "POLYCKPT")
+	sampleCheckpoint(t, path)
+	full, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read back: %v", err)
+	}
+	for _, c := range []struct{ old, new string }{
+		{"\nH 4\n", "\nH four\n"},
+		{"\ncol 2\n", "\ncol 2x\n"},
+		{" maxn=8 ", " maxn=eight "},
+		{" fold=true ", " fold=yes "},
+		{" maxdiagk=-1 ", " maxdiagk=none "},
+		{" overlap=1\n", " overlap=one\n"},
+		{"\nfrontier ", "\ndone 3 x\nfrontier "},
+	} {
+		s := string(full)
+		if !strings.Contains(s, c.old) {
+			t.Fatalf("sample checkpoint has no %q", c.old)
+		}
+		if err := os.WriteFile(path, []byte(strings.Replace(s, c.old, c.new, 1)), 0o666); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := ReadCheckpoint(path); err == nil {
+			t.Errorf("ReadCheckpoint accepted %q", strings.TrimSpace(c.new))
+		}
+	}
+}
+
+// TestReadCheckpointLongFrontier: the frontier line names every frontier
+// file, so it can run well past bufio.Scanner's default 64 KB line limit.
+func TestReadCheckpointLongFrontier(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "POLYCKPT")
+	ck := sampleCheckpoint(t, path)
+	ck.Frontier = nil
+	for i := 0; i < 4000; i++ {
+		ck.Frontier = append(ck.Frontier, fmt.Sprintf("/runs/a_long_run_directory_name/map_h20_c7_kstage3_u%05d.bin", i))
+	}
+	if err := ck.Write(path); err != nil {
+		t.Fatal(err)
+	}
+	got, err := ReadCheckpoint(path)
+	if err != nil {
+		t.Fatalf("ReadCheckpoint with %d frontier files: %v", len(ck.Frontier), err)
+	}
+	if len(got.Frontier) != len(ck.Frontier) {
+		t.Fatalf("frontier files = %d, want %d", len(got.Frontier), len(ck.Frontier))
 	}
 }
