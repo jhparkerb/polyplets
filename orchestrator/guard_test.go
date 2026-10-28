@@ -98,8 +98,8 @@ func TestRAMAdvisory(t *testing.T) {
 }
 
 // TestResultWidthGuard proves the orchestrator refuses a maxn beyond the
-// widest counter's (u128) exact range. Post-BUGS-OF-SHAME-A2 the Go result
-// pipeline itself is big.Int (unbounded); this guard now mirrors
+// widest counter's (u128) exact range. The Go result pipeline itself is
+// big.Int (unbounded); this guard mirrors
 // CheckCounterWidth's u128 ceiling rather than an independent Go-side limit.
 func TestResultWidthGuard(t *testing.T) {
 	if err := CheckResultWidth(25); err != nil {

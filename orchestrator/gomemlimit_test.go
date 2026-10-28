@@ -2,8 +2,8 @@ package orchestrator
 
 // gomemlimit_test.go — red-first regression: cmd/orchestrate set GOGC=1000 with no
 // memory limit, so the heap could grow to ~11x live before a collection —
-// the mechanism behind head #4's 4.4 GB-and-climbing RSS in
-// docs/engine-record.md (the audit found no leak).
+// the mechanism behind an orchestrator RSS of 4.4 GB and climbing in
+// docs/engine-record.md (no leak was found).
 //
 // debug.SetMemoryLimit(-1) reads the current limit without changing it, so
 // the applied bound is directly observable.

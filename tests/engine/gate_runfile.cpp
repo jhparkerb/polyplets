@@ -1,6 +1,7 @@
 // gate_runfile: on-disk RunFileWriter/RunFileReader format gates.
-// Covers the BUGS-OF-SHAME runfile.h pass: atomic publish (B4), per-stride
-// sub-CRC on seeked reads (B3), and header/.idx magic+byteorder (D6).
+// Covers atomic publish, the per-stride checksum on seeked reads, the
+// header and .idx magic and byte order, and the abort paths for overflow and
+// a body checksum mismatch.
 
 #include <cassert>
 #include <cstdint>

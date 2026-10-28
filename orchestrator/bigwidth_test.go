@@ -1,10 +1,9 @@
 package orchestrator
 
-// bigwidth_test.go — proves the Go-side result pipeline (BUGS-OF-SHAME A2)
-// holds values exceeding 2^64-1 exactly, instead of the old uint64 path's
-// silent drop (accounting.go's ParseUint(_,64) `if err == nil` skip) or
-// silent wraparound (triangle[n] += v as uint64 addition). 3^45 alone
-// already exceeds 2^64 (~1.8e19), well within reach of a26+.
+// bigwidth_test.go — proves the Go-side result pipeline holds values
+// exceeding 2^64-1 exactly, where an earlier uint64 path dropped a value
+// that did not parse as u64 or wrapped on addition. 3^45 alone already
+// exceeds 2^64 (~1.8e19), well within reach of a26+.
 
 import (
 	"math/big"

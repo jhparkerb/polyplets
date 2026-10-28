@@ -159,9 +159,8 @@ func TestFirstNonMonotoneCatchesWrap(t *testing.T) {
 	}
 }
 
-// TestCombineWidth proves a cell value exceeding 2^64-1 (BUGS-OF-SHAME A2)
-// combines to its exact big.Int sum rather than silently wrapping, dropping,
-// or erroring. 3^45 alone already exceeds 2^64 (~1.8e19); the value is split
+// TestCombineWidth proves a cell value exceeding 2^64-1 combines to its
+// exact big.Int sum rather than silently wrapping, dropping, or erroring. 3^45 alone already exceeds 2^64 (~1.8e19); the value is split
 // across two shards (heights 1 and 2, both contributing to n=2=maxn) so
 // addRow's accumulation itself is exercised twice on the same triangle cell,
 // not just the parse of a single wide literal.

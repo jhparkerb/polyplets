@@ -2,8 +2,7 @@ package orchestrator
 
 // lowheight_test.go — the trivial low strips H==1 and H==2 have closed forms
 // (T(n,1)=1; T(n,2): 3, 10, then 2·T(n-1,2)+T(n-2,2)+4) and must be contributed
-// WITHOUT a per-column worker sweep — the same waste class as the H==maxn top
-// strip (BUGS-OF-SHAME C2).
+// WITHOUT a per-column worker sweep, like the H==maxn top strip.
 
 import (
 	"context"
