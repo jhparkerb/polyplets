@@ -22,7 +22,7 @@ from symcount import SYMMETRY_TYPES, count_symmetry_type  # noqa: E402
 from g1_naive import count_symmetry  # noqa: E402
 
 # How far the brute oracle (generates every animal) reaches. Building it was
-# 21.2 s on gympie, the second most expensive check in the suite, at ~4x per n.
+# 21.2 s on a laptop, at ~4x per n.
 ORACLE_MAXN = 8 if "--deep" in sys.argv else 7
 # Python symmetric counts at ~3x per further n, and gate-subgroup computes the
 # same table again in its own process. Push tier stops at 10; --deep restores 11.
@@ -94,9 +94,8 @@ def main():
             ref = {n: v for n, v in sym[name].items() if v}
             gate.check(cpp == ref, f"C++ {name:20s} == Python, n<={MAXN}")
     else:
-        # gate.skip() fails the verdict unless POLY_ALLOW_DEGRADED_GATES=1.  A
-        # printed note left the gate GREEN with the C++ counter unchecked
-        # (AUDIT-2026-09-02, gate hygiene).
+        # gate.skip() fails the verdict unless POLY_ALLOW_DEGRADED_GATES=1, so
+        # the gate cannot pass with the C++ counter unchecked.
         gate.skip(f"C++ symcount_fast == Python, n<={MAXN}: {FAST_BIN} absent")
 
     return gate.verdict("symmetric/free")

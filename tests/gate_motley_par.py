@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed gate for cpp/motley_par.cpp, the parallel Motley engine.
+"""Fail-closed gate for cpp/motley_par.cpp, the parallel coloring recount.
 
 The engine is only worth having if it is the SAME engine.  Three things are
 checked, and the first is the one that matters:

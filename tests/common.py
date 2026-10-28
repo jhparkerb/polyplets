@@ -142,15 +142,11 @@ def free_and_one_sided(fixed, r90, r180, hmirror, dmirror):
     return free_num // 8, one_num // 4
 
 
-# A gate that could not run part of itself is DEGRADED, and until 2026-08-22 a
-# degraded gate was indistinguishable from a green one.  `docs/engine-record.md`
-# finding F3: tests/gate_middle_kingdom.py has three `skip` paths -- no GMP
-# build, no build/prec_guess, no mpmath -- and two of them skip RED CONTROLS,
-# so on a box missing any of the three the gate printed GREEN having never
-# established that its own checks can fail.  `make gates` then reported a full
-# green suite.
+# A gate that could not run part of itself is DEGRADED, and a degraded gate
+# must not look like a green one: a check that skips its RED controls on a box
+# missing a dependency has never established that it can fail.
 #
-# The rule now: a skipped check is a FAILURE by default, and waiving it is an
+# So a skipped check is a FAILURE by default, and waiving it is an
 # explicit act.  Set POLY_ALLOW_DEGRADED_GATES=1 to downgrade skips to a loud
 # warning -- for the deliberate case of a box that genuinely lacks an optional
 # dependency and where somebody has decided that is acceptable for that run.

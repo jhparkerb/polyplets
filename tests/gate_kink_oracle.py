@@ -2,13 +2,10 @@
 """Gate KINK-ORACLE: the production kink kernel against an external oracle with
 NO closed-form injection, and against the column kernel height by height.
 
-The kink-carry kernel produced a(30)..a(40) and a(41)'s swept half.  Its
-in-make oracle coverage before 2026-09-05 was the maxn-14 sweeps of
-ns-gate-asan / ns-gate-parallel, where the wired diagonal closed forms inject
-every height H >= 8, so the kernel itself was exercised at H <= 7 only
-(AUDIT-2026-09-02, "a(23)..a(35)"); its production validation was the a(29)
-cell-diff against the column kernel (scripts/kink_validate.sh) and the Motley
-agreement, neither in `make`.  This gate is the automated version.
+The kink-carry kernel produced a(30)..a(40) and a(41)'s swept half.  The
+other in-make sweeps (ns-gate-asan, ns-gate-parallel) run at maxn 14, where
+the wired diagonal closed forms inject every height H >= 8, so they exercise
+the kernel at H <= 7 only.  This gate sweeps every height.
 
 Two runs of build/ns/orchestrate, started together, with --max-diag-k 0, which
 disables every wired diagonal (orchestrator/maxdiagk_test.go,
@@ -19,8 +16,7 @@ TestMaxDiagKZeroDisablesInjection), so every height is a real sweep:
            EXTERNALLY published a(1)..a(18) of fixtures/b006770.txt
            (Redelmeier, Mertens, Tremblay-Vernay -- nothing of ours).  This is
            the kink kernel reproducing the whole known sequence with every
-           height enumerated.  Measured 2026-09-05 on gympie: 68 s at 8 cores,
-           90 MB.
+           height enumerated.  Measured on an 8-core laptop: 68 s, 90 MB.
   TWIN     --kernel column at --maxn 16, all-real, against the kink rows at
            n <= 16 of the ORACLE sweep (T(n,H) does not depend on maxn): the
            two per-height sets must be identical, every height, every n.  The

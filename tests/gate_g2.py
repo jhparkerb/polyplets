@@ -118,9 +118,8 @@ def main():
     a006770 = read_bfile("b006770.txt")
     E_DEPTH = 11
 
-    # An all() over an empty loop is True: until 2026-09-05 an engine that
-    # printed nothing passed both this check and F below (AUDIT-2026-09-02,
-    # gate hygiene).  Every row 1..E_DEPTH must be present.
+    # An all() over an empty loop is True, so an engine that printed nothing
+    # would pass this check and F below.  Every row 1..E_DEPTH must be present.
     rb_rows = {}
     for line in run(G2, "square8", E_DEPTH, "--rook-bishop").strip().splitlines():
         n, tot, rook, bish = (int(x) for x in line.split())
@@ -168,8 +167,8 @@ def main():
     #        A006724 (simply-connected fixed polyominoes) and the with-holes count
     #        must equal A389193 (fixed polyominoes with holes). This pins the flood
     #        logic and the 4-connected-hole definition to OEIS's own convention.
-    # Three g2 --holes runs at n=11 were 114 s of this gate's 138 s (dalby,
-    # 2026-08-24, cProfile) -- the flood-fill hole census is the whole cost of
+    # Three g2 --holes runs at n=11 were 114 s of this gate's 138 s
+    # (measured) -- the flood-fill hole census is the whole cost of
     # the gate. What checks H assert are IDENTITIES (the hole partition sums to
     # the total; hole-free and holey match A006724/A389193), and n=9 already
     # exercises them with holey animals at three sizes -- A389193 is 0 below

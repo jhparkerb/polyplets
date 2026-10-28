@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate: symmetric transfer-matrix counter (symtm) vs the explicit
 orbit-graph Redelmeier (symcount_fast) -- a cross-ALGORITHM check per
-symmetry type (Hall of Mirrors thread).
+symmetry type.
 
 symtm builds symmetric animals from ~n/2 free cells via the production
 column transition, so it reaches n~34; symcount_fast is the independently
@@ -17,9 +17,8 @@ import sys
 from common import ROOT, Gate
 
 # Six sequential runs (three types x two binaries) and, by this file's own
-# note, ~2.9x per further n: hmirror@18 ~4 s, @20 33 s. Measured 68 s on gympie
-# under `make gates -j10`, the largest single contributor to the push -- and
-# only 18.9 s serial on dalby, which is why the dalby ranking never showed it.
+# note, ~2.9x per further n: hmirror@18 ~4 s, @20 33 s. At 18 it measured
+# 68 s on a laptop under `make gates -j10`, the largest single check.
 # What the gate asserts is that two independent algorithms agree at every n;
 # a cross-algorithm divergence does not wait until n=16 to appear. --deep
 # restores n=18.
