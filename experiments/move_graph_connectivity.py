@@ -49,7 +49,7 @@ def unpack(b):
 
 
 def grow(maxn):
-    """All fixed king animals of exactly maxn cells, as packed keys."""
+    """All fixed polyplets of exactly maxn cells, as packed keys."""
     cur = {pack([(0, 0)])}
     for _ in range(2, maxn + 1):
         nxt = set()
@@ -165,7 +165,7 @@ def draw(key, indent=""):
 def main():
     maxn = int(sys.argv[1]) if len(sys.argv) > 1 else 8
     print("Idea 8: connectivity of the single-cell-move graph on fixed "
-          "king animals\n")
+          "polyplets\n")
     for n in range(1, maxn + 1):
         analyze(n)
     return 0

@@ -11,12 +11,12 @@ interpolated.  This script checks the derivation that replaces the measurement:
       k_king(A) = k_square(B) + c(B) + h(B)
 
   with c the cycle rank of B's adjacency graph and h its number of holes.  A
-  king animal with no orthogonal edge is exactly a same-parity animal, so
+  polyplet with no orthogonal edge is exactly a same-parity animal, so
 
       A_king(n, k) = sum_c P(n, k-c, c)  +  M(n, k)
 
   where P(n, j, c) is the square census graded by cycle rank -- the c column of
-  results/perimdefect_square4_n78_k6.txt -- and M(n, k) counts the king animals
+  results/perimdefect_square4_n78_k6.txt -- and M(n, k) counts the polyplets
   that do carry an orthogonal edge.  That last step needs h = 0, which holds for
   k <= 3: the cheapest polyomino with a hole is 3x3 less its center and one
   corner, with k_square = 4, c = 0, h = 1, so a hole costs k_king = 5.  Past

@@ -1,4 +1,4 @@
-// convex_area_tm.cpp -- HV-convex king animals (convex polyplets) by area,
+// convex_area_tm.cpp -- HV-convex polyplets (convex polyplets) by area,
 // row transfer matrix, C++/GMP port of experiments/convex_tm.py.
 //
 // results/subclasses.md Phase 1a: the Python DP (already collapsed from

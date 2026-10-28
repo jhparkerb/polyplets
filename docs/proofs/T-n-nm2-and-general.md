@@ -1,6 +1,6 @@
 # Proof: T(n, n−2), and the general height-diagonal structure
 
-Companion to `T-n-nm1.md`. T(n,H) = fixed king-animals (polyplets) of n cells,
+Companion to `T-n-nm1.md`. T(n,H) = fixed polyplets (polyplets) of n cells,
 bounding-box height exactly H. Here: the second sub-diagonal H = n−2, and the
 general T(n, n−k).
 
@@ -9,7 +9,7 @@ general T(n, n−k).
 $$T(n,n{-}2)=\tfrac12\,(625\,n^{2}-2459\,n+1134)\cdot 3^{\,n-7},\qquad n\ge 5$$
 
 (n=4 boundary: T(4,2)=27.) Verified against exhaustive enumeration of all
-fixed king-animals for n=4…8 and against all 16 triangle values n=5…20.
+fixed polyplets for n=4…8 and against all 16 triangle values n=5…20.
 
 ### Decomposition (excess = 2 cells over the n−2 rows)
 

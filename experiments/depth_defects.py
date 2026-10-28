@@ -101,7 +101,7 @@ surplus k = l + e.  As there:
 i.e. q_end (count of q touching every pending component) versus bare_end (the
 stack is already one component).
 
-Span cap: a connected king animal's column projection is an interval, so a
+Span cap: a connected polyplet's column projection is an interval, so a
 c-cell animal spans at most c-1 columns; every row of a cluster of l rows and
 excess e (plus p and q) therefore spans at most 2l+e+1.  Capping row spans
 there is exact, not an approximation.

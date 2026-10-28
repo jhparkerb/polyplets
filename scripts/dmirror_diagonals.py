@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """P_k hunt for the dmirror strip triangle (Hall of Mirrors / Shrink Ray
-follow-on): d(S, S+k) -- diagonal-symmetric king-animals with S+k cells and
+follow-on): d(S, S+k) -- diagonal-symmetric polyplets with S+k cells and
 bbox exactly SxS -- is QUASI-polynomial in S for fixed k, period 2 (an
 off-diagonal cell and its mirror land together, so the defect combinatorics
 split by S parity; measured: k=0 is the constant 2 = main + anti diagonal,

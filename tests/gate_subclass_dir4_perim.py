@@ -2,7 +2,7 @@
 """Gate SUBCLASS-DIR4-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md, removed) Phase 2a
 acceptance.
 
-cpp/convex_perim_tm.cpp's new dir4 mode filters HV-convex king animals BY
+cpp/convex_perim_tm.cpp's new dir4 mode filters HV-convex polyplets BY
 SEMIPERIMETER down to the half-plane-4-cone-directed subset (Proposition 2 of
 results/subclasses.md, translated onto this row-built transfer
 matrix -- see the header comment there for the derivation). This gate is the

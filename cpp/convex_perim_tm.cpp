@@ -1,4 +1,4 @@
-// convex_perim_tm.cpp -- HV-convex king animals (convex polyplets) by
+// convex_perim_tm.cpp -- HV-convex polyplets (convex polyplets) by
 // SEMIPERIMETER, exact-box row transfer matrix, C++/GMP port of
 // experiments/convex_perimeter.py's count_by_box/perim_series.
 //
@@ -20,7 +20,7 @@
 //
 // results/subclasses.md Phase 2a adds a dir4-filtered mode.
 // results/subclasses.md's Proposition 2 (proved on the COLUMN-built
-// transfer matrix, cpp/column_convex_tm.cpp) says a column-convex king animal
+// transfer matrix, cpp/column_convex_tm.cpp) says a column-convex polyplet
 // is half-plane-4-cone directed iff the column-bottom profile b(j) never
 // drops by more than one row: b(j+1) >= b(j) - 1. This DP is ROW-built
 // instead (bottom row first), so the translation was re-derived from Lemma A

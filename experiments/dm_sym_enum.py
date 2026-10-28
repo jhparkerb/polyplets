@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Brute-force enumerator of diagonal-mirror-symmetric king animals.
+"""Brute-force enumerator of diagonal-mirror-symmetric polyplets.
 
 Grows connected sets by symmetric orbits {(x,y),(y,x)}, canonicalizes by
 diagonal translation, classifies by (S, n) with box exactly SxS. Validated
@@ -16,7 +16,7 @@ def neighbors(c):
 
 
 def enumerate_sym(nmax):
-    """All diagonal-mirror-symmetric king animals with <= nmax cells,
+    """All diagonal-mirror-symmetric polyplets with <= nmax cells,
     up to diagonal translation."""
     def canon(cells):
         m = min(min(x for x, _ in cells), min(y for _, y in cells))

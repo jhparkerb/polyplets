@@ -14,7 +14,7 @@ candidate.
 
 ## Convex polyplet
 
-An **HV-convex** king animal: every row is a single contiguous run of cells
+An **HV-convex** polyplet: every row is a single contiguous run of cells
 and every column is a single contiguous run, no notches, no gaps.
 
 ## Method

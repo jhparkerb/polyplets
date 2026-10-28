@@ -1,7 +1,7 @@
 // column_convex_tm.cpp -- column transfer matrix for the column-convex cells
 // of the results/subclasses.md Phase 3 grid, by area.
 //
-// A column-convex king animal is a sequence of nonempty column intervals
+// A column-convex polyplet is a sequence of nonempty column intervals
 // [b(j), t(j)], j = 1..k, with t(j) = b(j) + h(j) - 1, consecutive columns
 // king-adjacent:  b(j+1) <= t(j) + 1  and  b(j) <= t(j+1) + 1, i.e.
 //   d := b(j+1) - b(j)  in  [-h(j+1), h(j)]        (h(j) + h(j+1) + 1 choices).

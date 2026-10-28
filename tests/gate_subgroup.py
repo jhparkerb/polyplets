@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate: subgroup-invariant polyplet counts, and the a(n) mod 4 congruence.
 
-D4 acts on fixed (translation-class) king animals; orbit sizes divide 8, so
+D4 acts on fixed (translation-class) polyplets; orbit sizes divide 8, so
 a(n) = n1 + 2 n2 + 4 n4 + 8 n8 with n_k = #orbits of size k.  Writing I(H) for
 the number of fixed animals invariant under a subgroup H <= D4:
 

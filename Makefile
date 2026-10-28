@@ -634,7 +634,7 @@ build/perimeter_defect: cpp/perimeter_defect.cpp cpp/obs.h | build
 
 # Minimum-perimeter (isoperimetric-end) enumerator. Complementation, not
 # growth: the min-side defect is not monotone under cell addition, so
-# Exhaustive minimal-site-perimeter census for king animals: eps(n), |M_n|,
+# Exhaustive minimal-site-perimeter census for polyplets: eps(n), |M_n|,
 # and the (|B|, c=|P|-|B|) split, n<=25. Written for the Barequet--Ben-Shachar
 # constant-isomer premise check; their Premise 2 fails here (c=9 at
 # inflation-chain roots, 8 elsewhere) and |M_n|=|M_{n+eps}| holds 9/9.
@@ -802,7 +802,7 @@ gate-sym: build/symcount_fast
 gate-subgroup: build/symcount_fast build/symtm
 	python3 tests/gate_subgroup.py $(GATE_DEEP)
 
-# Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form.
+# Cone anchor: directed polyplets by enumerate+filter vs Bacher's closed form.
 # Also the 16-cell directedness grid mode ("grid"/"gridbad") and the
 # multi-directed filter ("mdir"/"mdirbad"); both in results/subclasses.md.
 # -Icpp for obs.h.
@@ -934,7 +934,7 @@ lean:
 gate-convex-dfinite: build/prec_guess $(if $(GMP_LDFLAGS),build/convex_area_tm)
 	python3 tests/gate_convex_dfinite.py
 
-# Gate SUBCLASS-DIR4-PERIM: the dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
+# Gate SUBCLASS-DIR4-PERIM: the dir4 mode of convex_perim_tm (HV-convex polyplets by semiperimeter,
 # filtered to half-plane-4-cone-directed, Proposition 2 of
 # results/subclasses.md translated onto the row-built transfer matrix) vs
 # directed_cone_anchor's "gridperim" brute force, the control that must fail

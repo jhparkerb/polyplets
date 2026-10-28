@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """H2: fixed-height convex-polyplet area GFs + psi analysis.
 
-Height-resolved HV-convex king animals by area via the phase-automaton row
+Height-resolved HV-convex polyplets by area via the phase-automaton row
 DP (multiplicity formulas; validated against brute force n<=8 and the
 convex-mirage row sums). BM recovery with holdouts gives exact rational
 GFs, denominator orders 1, 3, 7, 14, 25, 36, 53 (H = 1..7), stored in

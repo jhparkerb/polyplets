@@ -24,7 +24,7 @@ HV=results/convex_perim_terms_s200.txt
 NULL=build/dir4_perim_null199.txt
 SRC=results/convex_area_terms_n700_king.txt   # the null control's real source
 
-# The first 14 terms of HV-convex king animals by area
+# The first 14 terms of HV-convex polyplets by area
 # (results/subclasses.md reference table). Same constant as
 # tests/gate_dir4_perim_alg.py's KING14.
 KING14=1,4,16,61,221,766,2566,8390,26982,85834,271174,853111,2677214,8389720

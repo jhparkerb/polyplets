@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate DIR4-PERIM-ALG: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md, removed) Phase 2b.
 
-The claim guarded here is a POSITIVE one -- (dir4, HV-convex) king animals by
+The claim guarded here is a POSITIVE one -- (dir4, HV-convex) polyplets by
 semiperimeter have an algebraic generating function -- so the gate's job is
 the mirror image of gate_convex_dfinite.py's: it must pin the relation that
 was found, and it must keep a negative control alongside every positive arm so

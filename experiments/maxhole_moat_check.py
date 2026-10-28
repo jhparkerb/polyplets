@@ -15,7 +15,7 @@ The 5-step argument (results/subclasses.md):
   5. per king step |du|+|dv| <= 2 in diagonal coords; closed + spanning
      -> |sigma| >= ((2(ha+1)+2(hm+1))/2 = ha+hm+2; sigma simple -> n >= ha+hm+2.
 
-This script executes steps 1-3 literally on random single-hole king animals and
+This script executes steps 1-3 literally on random single-hole polyplets and
 checks 4-5 (plus tightness stats). Run: python3 -m experiments.maxhole_moat_check
 """
 import random

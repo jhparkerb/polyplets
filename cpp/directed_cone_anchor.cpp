@@ -1,6 +1,6 @@
 // directed_cone_anchor.cpp -- the "Cone anchor" validation hook of
-// results/subclasses.md: filter the fixed king-animal (polyplet)
-// enumeration down to DIRECTED king animals and check it against Bacher's
+// results/subclasses.md: filter the fixed polyplet (polyplet)
+// enumeration down to DIRECTED polyplets and check it against Bacher's
 // closed form D(t) = (1/4)((1+t)/sqrt(1-6t+t^2) - 1)  [OEIS A047781].
 //
 // Purpose: an independent CLOSED-FORM anchor for the enumerate+filter pipeline.
@@ -36,7 +36,7 @@
 //         leaving only "every cell reachable from some local-minimum source".
 //         A strict superset; must NOT reproduce the mdir counts.
 //   grid  results/subclasses.md Phase 0: a single Redelmeier pass over
-//         ALL fixed king animals (unfiltered growth, like dir5/dir4/dir5nb),
+//         ALL fixed polyplets (unfiltered growth, like dir5/dir4/dir5nb),
 //         tallying all 20 (directedness x convexity) cells at once instead of
 //         one filter. Directedness: none, dir5, dir4, ctrlB (= dir5nb's
 //         predicate -- a class of its own, incomparable with mdir's, NOT a
@@ -59,7 +59,7 @@
 //         exact counts.
 //
 // Phase 4a of results/subclasses.md: grid/gridbad's pass
-// already generates every fixed king animal of every size <= N, so a per-n
+// already generates every fixed polyplet of every size <= N, so a per-n
 // MIN-REDUCE of the site perimeter rides for free (no new search). Site
 // perimeter = the number of distinct EMPTY cells adjacent to the animal.
 // Convention pinned from cpp/redelmeier.cpp's `--siteperim` (its own
@@ -83,7 +83,7 @@
 //          directedness x convexity counts as before, dir-major then
 //          conv-minor ([none,dir5,dir4,ctrlB,mdir] x
 //          [none,col-convex,HV-convex,staircase]), then the two site-perimeter
-//          minima over ALL n-cell king animals -- unrestricted by
+//          minima over ALL n-cell polyplets -- unrestricted by
 //          directedness or convexity, i.e. the population c[none,none] counts),
 //         "s hv hvdir4" per line (gridperim: s = W+H, 2..N+1; hv = count of
 //          HV-convex animals of that box, hvdir4 = the dir4-filtered subset).
@@ -154,7 +154,7 @@ struct Ctx {
   // {none, column-convex, HV-convex, staircase} -- the plan's grid, with the
   // multi-directed row Phase 3 added.
   std::vector<uint64_t> cnt[5][4];
-  // Phase 4a: per-n minimum site perimeter over ALL n-cell king animals
+  // Phase 4a: per-n minimum site perimeter over ALL n-cell polyplets
   // (unrestricted -- the same population as cnt[0][0]). King is the pinned
   // convention; Rook is the RED control. Sentinel UINT64_MAX means "no
   // animal of this size seen by this shard yet".

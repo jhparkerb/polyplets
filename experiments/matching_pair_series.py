@@ -13,7 +13,7 @@ The relation, in the convention pinned by matching-pair-convention.md:
 
 with K_a(x) the mean number of a-clusters per site at occupation density x,
 
-    K_8(p)   = sum over FIXED king animals   p^n (1-p)^{t_8}
+    K_8(p)   = sum over FIXED polyplets   p^n (1-p)^{t_8}
     K_4(1-p) = sum over FIXED rook animals   (1-p)^n p^{t_4}
 
 t_a is the a-site-perimeter -- the count of distinct empty a-adjacent cells --
@@ -124,7 +124,7 @@ def p_pow(k, N):
 
 
 def K8_series(g, N):
-    """sum p^n (1-p)^t  over king animals, to order N."""
+    """sum p^n (1-p)^t  over polyplets, to order N."""
     acc = [Fraction(0)] * (N + 1)
     for (n, t), c in g.items():
         if n > N:

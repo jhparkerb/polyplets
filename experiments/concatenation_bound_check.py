@@ -10,7 +10,7 @@ given a quasi-multiplicativity relation:
                 mu = lim Z(n)^(1/n) exists, then
                 mu <= ( c1 * (2n)^c2 * Z(n) )^(1/n)   for every n.
 
-We hold a(1..40) exactly for fixed king animals (A006770), so the question is
+We hold a(1..40) exactly for fixed polyplets (A006770), so the question is
 arithmetic: what would such a relation deliver, and how large may the slack
 factor F = c1*(2n)^c2 be before the bound stops beating the banked certificate
 lambda <= 9.3154?  A companion lower question: below which F is the relation
@@ -117,7 +117,7 @@ def main():
 
 
 def comb(k, arm=1):
-    """King animal: a vertical spine at x=0 with k+1 teeth to the right,
+    """Polyplet: a vertical spine at x=0 with k+1 teeth to the right,
     teeth two rows apart (the minimum that keeps them king-independent)."""
     cells = {(0, y) for y in range(3 * k + 1)}
     for i in range(k + 1):
@@ -159,7 +159,7 @@ def shattering():
     print("\n== 6. why the split argument does not port: measured shattering ==")
     print("   BBO's Theorem 8 needs the lex split of an (m+n)-cell member to land")
     print("   in O(1) pieces per side (convexity gives <= 2, one of them a stick).")
-    print("   For king animals a comb shatters:")
+    print("   For polyplets a comb shatters:")
     print("     n   cells  worst #components over all split ranks")
     for k in (2, 4, 6, 8, 12, 16):
         cells = comb(k)

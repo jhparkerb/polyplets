@@ -12,7 +12,7 @@ import Polyplets.Sequence
 
 `Sequence.lean` names the sequence `a n` but says nothing about its size. This
 file supplies the paper's crude decision-tree bound (§3): a deterministic
-exploration reconstructs any `n`-cell king animal from at most `5n` yes/no
+exploration reconstructs any `n`-cell polyplet from at most `5n` yes/no
 membership decisions, exactly `n` of which are "yes", so
 
 * `a_le_choose` : `a n ≤ Nat.choose (5 * n) n`,

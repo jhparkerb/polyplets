@@ -15,7 +15,7 @@ Counting by exact box via the phase-automaton row DP:
 
 So the Convex Mirage refines to: BY AREA non-D-finite (both families,
 docs/proofs/convex-mirage.md); BY PERIMETER D-finite (both families) --
-convexity is a perimeter lever for king animals exactly as for polyominoes.
+convexity is a perimeter lever for polyplets exactly as for polyominoes.
 """
 import sys
 from collections import defaultdict

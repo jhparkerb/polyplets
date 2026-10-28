@@ -30,7 +30,7 @@
 // largest cell is ~1e26, six orders under the 3.4e38 ceiling; the check is
 // there so that a future K cannot silently wrap.
 //
-// Span cap: a connected king animal's column projection is an interval, so a
+// Span cap: a connected polyplet's column projection is an interval, so a
 // c-cell animal spans at most c-1 columns; a cluster of l rows and excess e,
 // plus the p below and q above, has 2l+e+2 cells and therefore every row of it
 // spans at most 2l+e+1 <= 2K+EMAX+1. Capping row spans there is exact.

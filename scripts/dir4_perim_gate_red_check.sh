@@ -1,7 +1,7 @@
 #!/bin/bash
 # RED demonstration for gate-dir4-perim-alg's null control.
 #
-# The gate's null control (199 terms of the HV-convex king animals BY AREA
+# The gate's null control (199 terms of the HV-convex polyplets BY AREA
 # series) used to be a derived file sitting untracked in results/. It is now
 # re-cut into build/ from results/convex_area_terms_n700_king.txt on every run.
 # This script proves the gate STOPS -- loudly, nonzero -- when that real source

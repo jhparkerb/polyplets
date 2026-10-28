@@ -355,7 +355,7 @@ static bool glueOdd(const Sig& s, int H, u64 m) {
 
 // Row-pair coverage, the prune that makes r180's tall strips cheap. The
 // finished animal needs
-// EVERY bbox row nonempty (an empty row disconnects a king animal), and the
+// EVERY bbox row nonempty (an empty row disconnects a polyplet), and the
 // right half covers row r iff the left covers H-1-r — so the left must
 // eventually put a cell in every pair {i, H-1-i}. Which pairs past columns
 // covered is not in the boundary sig, so each state carries a cov bitmask

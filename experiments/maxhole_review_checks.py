@@ -6,7 +6,7 @@ Purpose: replace the unreproducible random-sample statistics that the
 with deterministic,
 exhaustive counts, and bank the review's independent verifications:
 
-  1. Enumerate ALL fixed king animals n = 2..9 (growth method; counts must
+  1. Enumerate ALL fixed polyplets n = 2..9 (growth method; counts must
      reproduce A006770: 4, 20, 110, 638, 3832, 23592, 147941, 940982).
   2. Over the single-hole ones (enclosed cells one 4-connected region):
      - MoatBound (II'):  n >= ha + hm + 2       (expect 0 violations)

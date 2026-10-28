@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """p2_symtri_probe.py -- Proposer 2 structure probes on the SYMMETRY-REFINED
-triangle I(n,H) = I_H(D2ax) = number of fixed king animals of height exactly H
+triangle I(n,H) = I_H(D2ax) = number of fixed polyplets of height exactly H
 invariant under the full height-preserving Klein group {e, h, v, r180}.
 
 Banked source: results/subgroup_d2ax_byheight.txt (n H count, n <= 40),

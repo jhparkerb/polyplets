@@ -1,6 +1,6 @@
 // Does inflation preserve perimeter-minimality on the king lattice?
 // (Lemma 2 of Barequet & Ben-Shachar 2022, tested against eps(n)=2*ceil(2*sqrt(n))+4 = A235382.)
-// For every minimal-perimeter king animal Q with |Q| <= NMAX, form I(Q) = Q + 3x3 ball,
+// For every minimal-perimeter polyplet Q with |Q| <= NMAX, form I(Q) = Q + 3x3 ball,
 // and compare |P(I(Q))| with eps(|I(Q)|).  Also check injectivity of I on each M_n.
 #include <cstdio>
 #include <cstdint>

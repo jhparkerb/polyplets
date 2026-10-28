@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extremal king-animal statistics that the repo has never computed.
+"""Extremal polyplet statistics that the repo has never computed.
 
 `results/closed-doors.md` idea 7 lists, after the minimum-site-perimeter
 bullet it closed: "Max diameter, min diameter at fixed n; max articulation
@@ -11,7 +11,7 @@ Cheap by construction: the oracle scale is where these live, the reduction is
 one pass per animal, and the point is to get integer sequences that can be
 grepped against OEIS before anyone calls them new.
 
-Computed per n, over all FIXED king animals:
+Computed per n, over all FIXED polyplets:
   min/max graph diameter   (king adjacency, longest shortest-path)
   max articulation points  (cut vertices of the king adjacency graph)
   max hole count           (bounded 4-components of the complement --
@@ -183,7 +183,7 @@ def main():
     args = ap.parse_args()
 
     print("=" * 70)
-    print("Extremal king-animal statistics, n = 1..%d" % args.nmax)
+    print("Extremal polyplet statistics, n = 1..%d" % args.nmax)
     print("=" * 70)
     print(f"{'n':>3} {'animals':>10} {'minDiam':>8} {'maxDiam':>8} "
           f"{'maxArtic':>9} {'maxHoles':>9}")

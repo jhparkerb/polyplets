@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Orbit-counting congruence probe for fixed polyplets (A006770).
 
-D4 acts on fixed (translation-class) king animals.  Orbit sizes divide 8,
+D4 acts on fixed (translation-class) polyplets.  Orbit sizes divide 8,
 so  a(n) = n1 + 2 n2 + 4 n4 + 8 n8  with n_k = #orbits of size k.
 Hence  a(n) = n1 (mod 2),  a(n) = n1 + 2 n2 (mod 4), etc.
 

@@ -1,6 +1,6 @@
 # Subclasses of polyplets: directed, convex, stratified
 
-A polyplet (king animal) is a finite set of cells of `Z²` connected under king
+A polyplet (polyplet) is a finite set of cells of `Z²` connected under king
 moves, counted up to translation; `a(n)` = A006770 is the number with `n`
 cells. This file records what is known about the subclasses obtained by
 restricting the shape: the five directedness predicates crossed with the four
@@ -45,7 +45,7 @@ cone steps that stay inside the animal.
 - `mdir` (multi-directed, Bacher's Definition 2): sources are the local minima
   of `b`, keystones its local maxima; every cell must be cone-reachable from
   some source, and every keystone from a source strictly to its left and one
-  strictly to its right. Stated in full under "Multi-directed king animals".
+  strictly to its right. Stated in full under "Multi-directed polyplets".
 
 **Convexity.**
 
@@ -101,7 +101,7 @@ values as stated.
 
 | sequence | first terms | growth |
 |---|---|---|
-| all king animals A006770 | 1, 4, 20, 110, 638, 3832, 23592, 147941, 940982, 6053180 | 7.110 (est) |
+| all polyplets A006770 | 1, 4, 20, 110, 638, 3832, 23592, 147941, 940982, 6053180 | 7.110 (est) |
 | directed A047781 | 1, 4, 19, 96, 501, 2668, 14407, 78592, 432073, 2390004 | 3+2√2 = 5.82843 |
 | half-plane directed A055834 | 1, 4, 18, 85, 413, 2044 | 27/5 = 5.4 |
 | column-convex A187077 | 1, 4, 18, 83, 385 | 4.64468 (quartic root) |
@@ -123,7 +123,7 @@ Spot value, `python3 experiments/convex_tm.py 128` (about 4 minutes), term
 
 ### The brute-force table, n = 1..14
 
-One Redelmeier pass over all fixed king animals evaluates every class on every
+One Redelmeier pass over all fixed polyplets evaluates every class on every
 animal generated (`build/directed_cone_anchor grid 14 8`,
 `cpp/directed_cone_anchor.cpp`; the enumeration is the one validated against
 A006770). Run 2026-08-05 on gympie, 8 threads: the sixteen-class run took
@@ -248,7 +248,7 @@ enterable
 - (4-cone, rightward only) iff `b(j+1) ≥ b(j) − 1`: the SE step buys exactly
   one row of descent.
 
-**Proposition 1 (dir5).** A column-convex king animal is Bacher-5-cone
+**Proposition 1 (dir5).** A column-convex polyplet is Bacher-5-cone
 directed iff `b` is valley-unimodal (nonincreasing, then nondecreasing).
 Forward: the source is the leftmost cell of the bottom row, which sits on the
 unique local-minimum plateau; propagate right and left by Lemma A. Backward:
@@ -260,12 +260,12 @@ can be reached from inside `P` either, because that row is where the flood
 would have to start. So `P`'s bottom row is unreachable and the animal is not
 directed.
 
-**Proposition 2 (dir4).** A column-convex king animal is half-plane-4-cone
+**Proposition 2 (dir4).** A column-convex polyplet is half-plane-4-cone
 directed iff `b(j+1) ≥ b(j) − 1` for every `j`. The source is the bottom of
 the leftmost column and propagation is rightward only, so Lemma A applies
 column by column with no case analysis.
 
-**Proposition 3 (ctrlB).** A column-convex king animal passes the bottom-row-
+**Proposition 3 (ctrlB).** A column-convex polyplet passes the bottom-row-
 waived predicate iff every local minimum of `b` equals `min b`. The sources
 are the bottoms of the columns attaining `min b`; from those, Lemma A reaches
 exactly the columns joined to a source by a monotone run of `b`, which is every
@@ -285,7 +285,7 @@ no keystone), five collapses follow at once:
     (dir5, HV) = (ctrlB, HV) = (mdir, HV) = (none, HV)      [the convex-polyplet series]
     (dir5, stair) = (dir4, stair) = (ctrlB, stair) = (mdir, stair) = A225114
 
-**Proposition 5 (every column-convex king animal is multi-directed).**
+**Proposition 5 (every column-convex polyplet is multi-directed).**
 Bacher's Definition 2 asks (1) every cell reachable from some source, where
 sources are the local minima of `b`, and (2) every keystone (local maximum of
 `b`) reachable from a source strictly left and one strictly right. For (1),
@@ -310,7 +310,7 @@ through `n = 14`.
 
 In short, convexity subsumes directedness: HV-convexity implies 5-cone
 directedness, staircase implies both cones, column-convexity implies
-multi-directedness. Every classical restriction lands king animals in known
+multi-directedness. Every classical restriction lands polyplets in known
 territory (compositions, partitions, an existing entry).
 
 ### The four classes that do not collapse
@@ -459,12 +459,12 @@ b-files in OEIS format, none submitted:
 | `results/b_ctrlb_unfiltered_upload.txt` | control B unfiltered | 14 (n = 1..14, brute-force bound) |
 
 Draft OEIS comments, none submitted, all quoted in this file: A055834 (4-cone
-directed king animals, conjecture-grade), A007052 (directed column-convex
-polyplets with the Temperley derivation), A225114 (staircase king animals =
+directed polyplets, conjecture-grade), A007052 (directed column-convex
+polyplets with the Temperley derivation), A225114 (staircase polyplets =
 skew shapes with no empty rows or columns, with the bijection), A018902
 (above), and the A187077 correction with its derivation.
 
-## Directed king animals and the two controls
+## Directed polyplets and the two controls
 
 ### Bacher's directed class, A047781
 
@@ -496,7 +496,7 @@ is hard.
 
 ### The enumerate-and-filter check against the closed form
 
-Filtering the fixed king-animal enumeration down to directed animals must
+Filtering the fixed polyplet enumeration down to directed animals must
 reproduce A047781, and A047781 has a closed form, so the reference side is a
 formula available at any `n`. Tools: `cpp/directed_cone_anchor.cpp`
 (`build/directed_cone_anchor`, modes `dir5 cone5 dir4 dir5nb mdir mdirbad grid
@@ -509,7 +509,7 @@ double count.
 
 | route | what it is | reach |
 |---|---|---|
-| filter | Redelmeier untried-set DFS over all fixed king animals, O(cells) BFS directedness test applied to every animal generated | n <= 15 |
+| filter | Redelmeier untried-set DFS over all fixed polyplets, O(cells) BFS directedness test applied to every animal generated | n <= 15 |
 | cone growth | same DFS with the step set restricted to the cone (bottom row may not grow west), no filter; each directed animal generated once | n <= 17 |
 | brute | from-scratch Python: frozenset growth + explicit translation canonicalisation + dict reachability; shares no code with the C++ | n <= 9 |
 | closed form | `D(t) = 1/4 ((1+t)/sqrt(1-6t+t^2) - 1)`, three independent evaluations | n <= 25 |
@@ -520,7 +520,7 @@ recurrence `(n+1)P_{n+1}(3) = 3(2n+1)P_n(3) − n P_{n−1}(3)` with
 `1/(1−6t+t²)`; and the central Delannoy sum `P_n(3) = Σ_k C(n,k) C(n+k,k)`.
 All three agree through `n = 25` and with the 8 published terms.
 
-| n | A006770 (all fixed king animals) | filter -> directed | cone growth | closed form `[t^n] D(t)` |
+| n | A006770 (all fixed polyplets) | filter -> directed | cone growth | closed form `[t^n] D(t)` |
 |---:|---:|---:|---:|---:|
 | 1 | 1 | 1 | 1 | 1 |
 | 2 | 4 | 4 | 4 | 4 |
@@ -617,7 +617,7 @@ of its own, and is not the multi-directed class: the two are incomparable
 (next section). Its unfiltered row of the grid has no transfer matrix and is
 known only to `n = 14` by brute force (`results/b_ctrlb_unfiltered_upload.txt`).
 
-## Multi-directed king animals, A222205
+## Multi-directed polyplets, A222205
 
 ### Bacher's Definition 2
 
@@ -691,7 +691,7 @@ hits nothing at `(3,2)`, `(3,1)` or `(2,1)`, so condition 2 fails.
 | route | what it is | reach |
 |---|---|---|
 | generating function | `M = D/(1−B)` from the Nordic decomposition (Theorem 8), exact integer power series | n = 400 in 30 s; n = 200 in 2.1 s |
-| brute force (C++) | Redelmeier DFS over all fixed king animals, Definition 2 evaluated on each | n = 14, 162.5 s wall / 1290.5 s cpu, 8 threads |
+| brute force (C++) | Redelmeier DFS over all fixed polyplets, Definition 2 evaluated on each | n = 14, 162.5 s wall / 1290.5 s cpu, 8 threads |
 | brute force (Python) | from-scratch frozenset growth, dict reachability, shares no code with either | n = 8 |
 
 ```
@@ -875,7 +875,7 @@ Draft formula line for the same edit:
 
 ## Convex polyplets by area
 
-A convex polyplet is an HV-convex king animal. The row transfer matrix
+A convex polyplet is an HV-convex polyplet. The row transfer matrix
 (state `(left-phase, right-phase, width)`), the first 38 terms and the first
 non-D-finiteness verdict (no P-recurrence of order ≤ 6, degree ≤ 5, with the
 convex-polyomino control failing the same test) are in
@@ -1343,7 +1343,7 @@ fails it. Logs: `results/dir4_perim_dfinite.log`,
 The 49-digit agreement between (dir4, HV-convex) and HV-convex is a theorem,
 and not a bijection: a squeeze that applies to every intermediate class.
 
-**Proposition 6.** Let `A(n)` count HV-convex king animals of area `n`, and
+**Proposition 6.** Let `A(n)` count HV-convex polyplets of area `n`, and
 let `C` be any class with
 
     staircase  ⊆  C  ⊆  HV-convex.
@@ -1389,7 +1389,7 @@ degree ≤ 20 / t-degree ≤ 20 (rank 441 of 441).
 Read an HV-convex animal left to right: it fattens, then shears, then thins.
 The shearing middle is a staircase animal and the two ends are stacks; stacks
 are too few to carry an exponential, and staircase animals glue end to end
-without waste. Throughout, an HV-convex king animal is a column sequence with
+without waste. Throughout, an HV-convex polyplet is a column sequence with
 `b` valley-unimodal and `t` peak-unimodal (Corollary 4), and `M(n)` counts the
 staircase ones.
 
@@ -1897,7 +1897,7 @@ the boxes (degree 22 at 185 digits took 41 s, degree 45 took 1669 s, degree 30
 at 251 digits took 303 s; a degree-120 box extrapolates to hours). Neither
 run.
 
-Novelty: HV-convex king animals are not in OEIS, and no literature source
+Novelty: HV-convex polyplets are not in OEIS, and no literature source
 for them was found under any name; no source found states the squeeze for
 intermediate classes; Propositions 6, 7, 10 and 11 have no counterpart found. A225114's entry, fetched 2026-08-05
 (`experiments/oeis_lookup.py --full id:A225114`), has 24 terms, one comment
@@ -1962,7 +1962,7 @@ per step, increments shrinking only about 6.5% per step where a clean `1/H²`
 correction predicts `(16/17)² = 11.4%`; identical for `λ = 7.111`. The
 treatment (`experiments/strip_fss.py`) is in `results/growth-constant.md`.
 
-A related result lives elsewhere: the minimum site perimeter of king animals
+A related result lives elsewhere: the minimum site perimeter of polyplets
 is A235382, `2⌈2√n⌉ + 4`, found by the grid pass's min-reduce and verified
 rather than derived (`experiments/min_site_perim_closed_form.py`,
 `tests/gate_site_perim.py`, `results/perimeter.md`).
@@ -2011,7 +2011,7 @@ check outside the repository); directedness on top of column-convexity
 rank-1 runs for the 5-cone class, `h + 1` for A007052); bargraphs
 (`2^(n−1)`); bounded height (finite state, rational in `n`,
 `results/fixed_height_gfs.txt`, cost exponential in `H`); convex families by
-perimeter (A005436 algebraic by Delest–Viennot; HV-convex king animals
+perimeter (A005436 algebraic by Delest–Viennot; HV-convex polyplets
 algebraic by semiperimeter, above). What does not: one-dimensional but
 infinite-rank (HV-convex by area, ctrlB, Ferrers, stacks, and staircase, where
 `K = min(h, h') + 1` generates A225114 from `n = 1` and the predicted
@@ -2072,7 +2072,7 @@ corners. `experiments/component_stratification.py`.
   `a(n) = f(A001168)` does not close: corner-gluing is geometrically
   constrained (no overlap, specific adjacency, global connectivity), not free.
 - Not in OEIS (row- and antidiagonal-flattened; columns `c = 2` and `c = 3`);
-  no literature source decomposing king animals by edge-component count was
+  no literature source decomposing polyplets by edge-component count was
   found.
 
 ## Rook and diagonal edges in a typical polyplet
@@ -2169,7 +2169,7 @@ containing at most `εn` translates are exponentially rare. Take `P₁` = the ei
 neighbors of a cell, `P₂` = the cell: hole-free animals contain zero translates.
 His §3.1(f), the spread-out lattice of range `M` in the sup norm, is the king
 lattice at `M = 1`, so it applies directly; his Theorem 2.2 and Corollary 3.6
-also make the ratio limit `a(n+1)/a(n) → λ` a theorem for king animals. The same
+also make the ratio limit `a(n+1)/a(n) → λ` a theorem for polyplets. The same
 argument proves the polyomino statement (`P₁` = four neighbors). Whittington and
 Soteros's 1990 survey
 (`literature/soteros_whittington_1990_rigorous_results_wild_guesses.pdf`, §4)
@@ -2270,7 +2270,7 @@ lattice with the failure of injectivity spelled out.
 `redelmeier --maxhole` for `n ≤ 17` (`results/maxhole.txt`; `M(17) = 28` matched the
 prediction).
 
-**Theorem (all holes).** For every `n`-cell king animal `F`, the total area of
+**Theorem (all holes).** For every `n`-cell polyplet `F`, the total area of
 the enclosed holes is at most `M(n) = ⌊((n−2)²+4)/8⌋` = `round((n−2)²/8)`,
 and the bound is attained for every `n ≥ 4`.
 
@@ -2377,7 +2377,7 @@ king sets, 0/7,599 with 6,744 tight on interior components) and (Σ)
 unproved (`experiments/maxhole_peeling_check.py`). Refuted: the
 union-range core, the per-component sum `Σ(r_u,j + r_v,j + 2) ≤ |S|` (a
 7-cell example), and (A) for general king-connected sets. The merge lemma (a
-`k ≥ 2`-hole animal admits `W ⊆ F`, `|W| = t`, with `F ∖ W` a king animal of
+`k ≥ 2`-hole animal admits `W ⊆ F`, `|W| = t`, with `F ∖ W` a polyplet of
 fewer holes and area `≥ A + t`) fails at the first multi-hole animal, `n = 6`,
 `(0,2) (1,1) (1,3) (2,0) (2,2) (3,1)` with holes `{(1,2)}`, `{(2,1)}` sealed
 across a shared diagonal: no cell can be removed without opening a hole; 6230
@@ -2441,7 +2441,7 @@ been found by the exhaustive runs to `n = 11` if one existed that small.
 
 ### Extremal diameter and articulation points
 
-Exhaustive over all fixed king animals to `n = 9`
+Exhaustive over all fixed polyplets to `n = 9`
 (`experiments/king_extremal.py`, four controls: A006770 reproduced; a 6-cell
 line has diameter 5 and 4 articulation points; a 3×3 block has neither
 articulation points nor holes; the 8-cell ring has one hole). Diameter is the
@@ -2535,7 +2535,7 @@ Rensburg and Madras, J. Phys. A 30 (1997) 8035–8066, wanted in
   `C(n, c)` triangle is the recorded output.
 - Irreducibility of the move chain at general `n`, and its mixing time.
 - Separating invariants: a small attribute set that determines a polyplet.
-- A rigorous numeric gap `λ − λ₀` for hole-free king animals, by the
+- A rigorous numeric gap `λ − λ₀` for hole-free polyplets, by the
   Madras–Soteros–Whittington route.
 
 ## Reproduce

@@ -95,7 +95,7 @@ core (913 s square, 2017 s king); brute force stops at `n = 14` on king.
 ### The king column is the square column re-graded
 
 **Proposition (proved).** Diagonal king steps preserve the parity of `x + y`,
-so a king animal `A` with no orthogonal edge lies on one parity class, and
+so a polyplet `A` with no orthogonal edge lies on one parity class, and
 `(x, y) → (u, v) = ((x + y)/2, (x − y)/2)` carries it bijectively onto a
 polyomino `B` of the same size. With `h` the number of holes of `B`,
 
@@ -128,7 +128,7 @@ what the onsets measure):
 A defect-`k` animal has at most `⌊k/2⌋` orthogonal steps.
 
 **The counts.** `P(n, j, c)` is the square census graded by cycle rank (the `c`
-column of `results/perimdefect_square4_n78_k6.txt`), `M(n, k)` the king animals
+column of `results/perimdefect_square4_n78_k6.txt`), `M(n, k)` the polyplets
 with an orthogonal edge. The cheapest holed polyomino (3×3 less center and a
 corner) has `k_square = 4`, `c = 0`, `h = 1`, so a hole costs `k_king = 5`, and
 
@@ -293,7 +293,7 @@ The division leaves 22 spare zero coefficients;
 
 ### An exact identity relating `n`, `H` and `p` on the king lattice
 
-The minimum defect over king animals of `n` cells and bounding-box height `H`
+The minimum defect over polyplets of `n` cells and bounding-box height `H`
 is exactly
 
     k_min(n, H) = ⌈(n − H)/(H − 1)⌉        H ≥ 2,

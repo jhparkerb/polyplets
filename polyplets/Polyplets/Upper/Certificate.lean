@@ -49,7 +49,7 @@ The two layers:
   kernel; `RatCert.lambda_le` turns `valid = true` plus the (combinatorial,
   *hypothesis*) `SystemHolds` bundle into `lambda ≤ CD / X`.
 
-Nothing here assumes anything about king animals: the combinatorial content
+Nothing here assumes anything about polyplets: the combinatorial content
 enters only through `SystemHolds`, which the concrete instances
 (`Upper/BuiRD2.lean`, `Upper/BuiRD3.lean`) take as their one named hypothesis.
 -/

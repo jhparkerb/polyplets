@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lemma 2 of results/subclasses.md, measured.
 
-An HV-convex king animal factors into three consecutive runs of columns by the
+An HV-convex polyplet factors into three consecutive runs of columns by the
 two unimodality phases: a run in which the bottoms only fall and the tops only
 rise (heights nondecreasing), a middle run in which both boundaries move the
 same way (a staircase animal, or its vertical mirror), and a run in which the

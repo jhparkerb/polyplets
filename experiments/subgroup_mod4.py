@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Assemble a(n) mod 4 (and mod 8 where the inputs reach) from subgroup counts.
 
-D4 acts on fixed king animals; orbit sizes divide 8, so with n_k = #orbits of
+D4 acts on fixed polyplets; orbit sizes divide 8, so with n_k = #orbits of
 size k,  a(n) = n1 + 2 n2 + 4 n4 + 8 n8.  Writing I(H) for the number of fixed
 animals invariant under a subgroup H <= D4 and F(H) for those with stabiliser
 EXACTLY H (so I(H) = sum over K >= H of F(K)):

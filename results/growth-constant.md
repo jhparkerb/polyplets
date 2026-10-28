@@ -1,6 +1,6 @@
 # The growth constant λ of polyplets
 
-A polyplet (king animal) is a finite set of cells of the square lattice,
+A polyplet (polyplet) is a finite set of cells of the square lattice,
 connected through shared edges or corners, counted up to translation; a(n) is
 the number with n cells (OEIS A006770). The growth constant is
 λ = lim a(n)^(1/n). It exists by Fekete's lemma applied to
@@ -56,8 +56,8 @@ The state of rigorous knowledge, with grades:
 
 | bound | value | grade | source |
 |---|---|---|---|
-| directed king animals | λ ≥ 3+2√2 ≈ 5.828 | closed form | Bacher |
-| multi-directed king animals | λ ≥ 6.4752 | numerical | Bacher; extended to 6.475196280297 in `results/subclasses.md` |
+| directed polyplets | λ ≥ 3+2√2 ≈ 5.828 | closed form | Bacher |
+| multi-directed polyplets | λ ≥ 6.4752 | numerical | Bacher; extended to 6.475196280297 in `results/subclasses.md` |
 | Fekete floor from a(40) | λ ≥ a(40)^(1/40) = 6.2208 | proved | the enumerated term |
 | strip ladder, H = 17 | λ ≥ 6.543 | exact rational certificate | this file |
 | estimate | λ ≈ 7.110(1) | measured | this file |
@@ -408,7 +408,7 @@ orthogonal parent and 2 for a diagonal one, so frames have 3 or 5 slots, and
 the diagonal slot graph is always a 5-path with the chord (1,3). A letter is
 the mask of frame slots u newly opens, weight x^opens · y; an n-cell animal
 maps injectively to n letters of total weight x^(n−1) y^n. Over all 171,138
-king animals with n ≤ 8: decode∘encode is the identity, codes are pairwise
+polyplets with n ≤ 8: decode∘encode is the identity, codes are pairwise
 distinct, the weight identity holds, and the alphabet census is exactly
 (1+x)⁵. With h(x) = (1+x)⁵, a(n) ≤ [x^(n−1)] h(x)^n · O(1), so
 λ ≤ min_b h(b)/b = 4·(5/4)⁵ = 3125/256 = 12.20703125 at b = 1/4, certified
@@ -468,7 +468,7 @@ m + n and matches the θ = −1 form to about 2%:
 
 The relation is consistent with every term; it is the proof that is missing.
 Their Theorem 8 splits a convex polyomino at lexicographic rank m and
-convexity bounds the debris to two components per side. For king animals the
+convexity bounds the debris to two components per side. For polyplets the
 same split shatters a comb (spine at x = 0, teeth every third row):
 
 | k | cells | worst number of components |
@@ -495,7 +495,7 @@ band as its left-to-right component shapes and gap lengths, charge each gap
 to the cells bridging it in an adjacent band (at most two gaps per cell, so
 gap entropy is about 4^n), and credit the bridging run's shape against the
 μ_H^g paid for it. `experiments/band_charge_probe.py` with argument 8 (about
-40 s) over all 147,941 fixed king animals at n = 8:
+40 s) over all 147,941 fixed polyplets at n = 8:
 
 | H | distinct codes | collisions | worst class |
 |---|---|---|---|

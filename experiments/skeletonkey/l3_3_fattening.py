@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""L3-3: the fattening bijection from king animals to decorated polyominoes.
+"""L3-3: the fattening bijection from polyplets to decorated polyominoes.
 
 `results/r4/r4-floors.md (deleted)` sec."Routes the floors do not close that have been
 treated as closed" objects that L3-3 was pruned by a rank floor -- "paying a
@@ -9,7 +9,7 @@ its twin, has a second and sound kill, leaving L3-3 as the one open row.
 
 The row (`git show triangle-structure:results/triangle-r3-queue.md (deleted)`, L3-3):
 
-    Object change, not encoding change: bijection from king animals to a
+    Object change, not encoding change: bijection from polyplets to a
     decorated polyomino class on a refined lattice (fatten each cell to a 2x2
     block, fill a marked corner cell at each pinch) -- boundary becomes
     pinch-free and edge-based, so polyomino contour/SAP technology applies
@@ -24,7 +24,7 @@ marking conventions and asks two questions of each:
      diagonally-opposite refined cells are filled? That is the whole premise:
      without it the image is not a polyomino with an edge-based boundary and
      no contour technology applies.
-  2. **Injective?** Do two distinct king animals ever share an image, up to
+  2. **Injective?** Do two distinct polyplets ever share an image, up to
      translation? If they do, the image carries less information than the
      animal and the "bijection" is not one.
 
@@ -58,7 +58,7 @@ def norm(cells):
 
 
 def king_animals(nmax):
-    """Fixed king animals (up to translation) by size, 1 .. nmax."""
+    """Fixed polyplets (up to translation) by size, 1 .. nmax."""
     levels = [{norm({(0, 0)})}]
     for _ in range(2, nmax + 1):
         cur = set()
@@ -112,7 +112,7 @@ def pinches(animal):
 
 
 def image(animal, convention):
-    """The refined-lattice image of a king animal under a filling rule."""
+    """The refined-lattice image of a polyplet under a filling rule."""
     img = set()
     for (x, y) in animal:
         img |= {(2 * x, 2 * y), (2 * x + 1, 2 * y),
@@ -164,7 +164,7 @@ def main():
 
     for n, lv in enumerate(levels, start=1):
         if len(lv) != A006770[n - 1]:
-            sys.exit("GATE FAILED: %d king animals at n=%d, A006770 says %d"
+            sys.exit("GATE FAILED: %d polyplets at n=%d, A006770 says %d"
                      % (len(lv), n, A006770[n - 1]))
     print("# gate ok: animal counts reproduce A006770 through n=%d" % nmax)
     print("# %s" % ", ".join("n=%d:%d" % (n, len(lv))

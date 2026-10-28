@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The defect-gas row model: mechanism of the diagonal cumulant law.
 
-Read a height-H king animal row by row: the k=0 stratum is a drift walk
+Read a height-H polyplet row by row: the k=0 stratum is a drift walk
 (3^(H-1)); a diagonal-k animal is the walk plus k surplus cells organized into
 defect clusters. This script:
 

@@ -1,6 +1,6 @@
 # Arithmetic structure of the height triangle
 
-The height triangle T(n,H) counts fixed king animals of n cells whose
+The height triangle T(n,H) counts fixed polyplets of n cells whose
 bounding box has height H; its values for n ≤ 40 are in `results/triangle.txt`.
 This file holds the triangle's arithmetic: its structure at the prime 3,
 where all of its integer content lives; a parity theorem at the prime 2; the

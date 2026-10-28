@@ -20,11 +20,11 @@ trusted until it matches that table on its overlap.
 
 Positive controls the TM must PASS (the machinery is calibrated by sequences
 that were known before Phase 3):
-  cc      column-convex king animals = A187077
+  cc      column-convex polyplets = A187077
   ccmono  column-convex + bottoms nondecreasing = A007052 (the identity
           results/subclasses.md proves, and Phase 0 Finding 1's
           "fifth convexity variant")
-  hv      HV-convex king animals by area = the novel convex-polyplet series,
+  hv      HV-convex polyplets by area = the novel convex-polyplet series,
           checked against ALL 700 terms of results/convex_area_terms_n700_king.txt,
           which came from an independent ROW transfer matrix (convex_area_tm)
 

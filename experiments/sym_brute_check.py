@@ -7,7 +7,7 @@ out-of-file verification had no committed artifact. This is that artifact:
 a from-scratch enumeration, independent of both the Lean tree and the
 engine pipeline that produced results/sym_counts.txt.
 
-Method: enumerate ALL fixed king animals n = 1..6 by growth (counts must
+Method: enumerate ALL fixed polyplets n = 1..6 by growth (counts must
 reproduce A006770: 1, 4, 20, 110, 638, 3832), then for each of the eight
 D4 point maps count the animals whose canonical form is fixed. Conventions
 match Symmetry.lean and the engine: r90 (x,y)->(-y,x); r180 (x,y)->(-x,-y);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent brute enumeration of convex polyplets (HV-convex king animals).
+"""Independent brute enumeration of convex polyplets (HV-convex polyplets).
 
 Fixed (translation-class) king-connected animals grown cell-by-cell; dedup by
 translation-normalized frozenset. Reports the ALL-polyplet count (must match

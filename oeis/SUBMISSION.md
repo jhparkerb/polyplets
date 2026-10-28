@@ -85,7 +85,7 @@ extensions (§6).
   row sums == A006770 for n <= 40, T(n,n) == 3^(n-1), T(n,1) == 1; diagonal
   closed-form %C/%F added).
 - **B: component triangle C(n,c)** (row sums A006770, both edge columns A001168).
-- **C (optional): HV-convex king animals** (38 terms, non-D-finite by area).
+- **C (optional): HV-convex polyplets** (38 terms, non-D-finite by area).
 
 Novelty for A and B was model-checked only (2026-07-10); a **Superseeker pass is
 still owed** before submission. Do NOT submit the T(n,n-k) anti-diagonals

@@ -2,7 +2,7 @@
 """The square-lattice analogue of Proposition 6.
 
 Proposition 6 (results/subclasses.md) says every class between staircase
-and HV-convex KING animals has growth constant mu = 3.128943269730886...  The
+and HV-convex polyplets has growth constant mu = 3.128943269730886...  The
 novelty question is whether the same statement for ordinary polyominoes is
 already implicit in the solved models. It is: Bender (1974) gives convex
 polyominoes by area the growth constant 2.30914..., and the staircase

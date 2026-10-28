@@ -1,4 +1,4 @@
-// directed_halfplane.cpp -- count half-plane directed king animals:
+// directed_halfplane.cpp -- count half-plane directed polyplets:
 // n-cell subsets of Z^2 containing the origin such that every cell is
 // reachable from the origin by steps (0,1), (1,0), (1,1), (1,-1) without
 // leaving the set. Redelmeier untried-set DFS (each animal generated exactly

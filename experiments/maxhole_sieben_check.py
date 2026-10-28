@@ -2,7 +2,7 @@
 """M(n) is Sieben's minimum-site-perimeter theorem, inverted.
 
 results/subclasses.md gave M(n) = floor(((n-2)^2 + 4)/8) for the maximum
-enclosed empty area of an n-cell king animal, and proved the single-hole case
+enclosed empty area of an n-cell polyplet, and proved the single-hole case
 here from scratch (the (I') parity count, the (II') moat-cycle winding
 argument, and the diagonal-box construction).
 

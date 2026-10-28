@@ -2,7 +2,7 @@
 # Phase 2b null control: are the high-order CANDIDATE boxes in
 # scripts/dir4_perim_dfinite_sweep.sh real, or an artifact of 199 terms?
 #
-# The reference series is HV-convex king animals BY AREA truncated to 199
+# The reference series is HV-convex polyplets BY AREA truncated to 199
 # terms. That series is known non-D-finite -- rigorously EXCLUDED at (20,20)
 # and (24,24) on its full 700 terms (results/subclasses.md, Phase 2a/2b).
 # So any CANDIDATE it returns at 199 terms is, by construction, spurious:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Cone anchor -- directed king animals: enumerate+filter vs Bacher's closed form.
+"""Cone anchor -- directed polyplets: enumerate+filter vs Bacher's closed form.
 
 Purpose: close the "validation hook (feasible, not yet built)" of
-results/subclasses.md. Filter the fixed king-animal (polyplet)
-enumeration down to DIRECTED king animals and check the result against the
+results/subclasses.md. Filter the fixed polyplet (polyplet)
+enumeration down to DIRECTED polyplets and check the result against the
 exact generating function D(t) = 1/4 * ((1+t)/sqrt(1-6t+t^2) - 1) = A047781.
 Write-up: results/subclasses.md.
 
@@ -116,7 +116,7 @@ def _canon(cells: frozenset) -> frozenset:
 
 
 def brute_terms(nmax: int) -> tuple[list[int], list[int]]:
-    """-> (all fixed king animals, directed ones) for n = 1..nmax, from scratch."""
+    """-> (all fixed polyplets, directed ones) for n = 1..nmax, from scratch."""
     total, direct = [], []
     layer = {frozenset({(0, 0)})}
     for n in range(1, nmax + 1):
@@ -244,7 +244,7 @@ def main() -> int:
         _, cd = run("dir5", args.brute, args.threads)
         compare("brute dir5 vs C++ dir5 (implementation cross-check)", bd, cd)
 
-    print("\n== GREEN: enumerate all fixed king animals, filter to 5-step cone ==")
+    print("\n== GREEN: enumerate all fixed polyplets, filter to 5-step cone ==")
     tot5, d5 = run("dir5", args.dir5, args.threads)
     compare("unfiltered total vs A006770 (fixtures/b006770.txt)",
             tot5, load_a006770(args.dir5))

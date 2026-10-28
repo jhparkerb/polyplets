@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Multi-directed king animals: exact terms from Bacher's Nordic-decomposition GF.
+"""Multi-directed polyplets: exact terms from Bacher's Nordic-decomposition GF.
 
 Source: Axel Bacher, "Directed and multi-directed animals in the king's lattice",
 arXiv:1301.1365v3 (literature/bacher_2015_directed_multidirected_king_lattice.pdf).
@@ -13,7 +13,7 @@ The scheme (Theorem 8, Lemma 9, Lemma 11):
     B  = sum_{k>=0} S (1+S)^k * Q R^k / (1 - Q R^k)   (Lemma 11)
     M  = D / (1 - B)                                  (11)
 
-[t^n] M = number of multi-directed king animals of area n, up to translation.
+[t^n] M = number of multi-directed polyplets of area n, up to translation.
 
 Valuations: v(S)=v(R)=v(Q)=1, so the k-th summand of B has valuation k+2 and the
 sum is a well-defined formal power series; only k <= N-2 matters mod t^(N+1).
@@ -351,7 +351,7 @@ def main():
     if args.quiet:
         return 0
 
-    print("multi-directed king animals, Bacher arXiv:1301.1365 Theorem 8")
+    print("multi-directed polyplets, Bacher arXiv:1301.1365 Theorem 8")
     print("N=%d  series built in %.2f s" % (n, elapsed))
     print("checks: S=A001003 ok; D=closed form ok; D=A047781 ok; m(n)>=d(n) ok")
     print()

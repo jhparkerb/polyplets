@@ -25,7 +25,7 @@ for every k.
 
 ## Setup
 
-Read a height-H king animal row by row (every row nonempty). Rows with one
+Read a height-H polyplet row by row (every row nonempty). Rows with one
 cell are **walk rows**; maximal runs of rows with ≥ 2 cells are **clusters**.
 A cluster's type is its stack of row sizes (s_1, …, s_ℓ), s_i ≥ 2; its
 **surplus** is k = Σ(s_i − 1) ≥ ℓ. Weights (all finite — a connected piece

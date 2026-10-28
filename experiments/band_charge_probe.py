@@ -38,7 +38,7 @@ NBRS = NEIGHBORS["square8"]
 
 
 def animals(maxn):
-    """All fixed king animals with exactly maxn cells, as frozensets."""
+    """All fixed polyplets with exactly maxn cells, as frozensets."""
     cur = {frozenset([(0, 0)])}
     for _ in range(2, maxn + 1):
         grown = set()
@@ -114,7 +114,7 @@ def gap_total(cells, H):
 
 def main():
     maxn = int(sys.argv[1]) if len(sys.argv) > 1 else 8
-    print(f"king animals, n = {maxn}")
+    print(f"polyplets, n = {maxn}")
     pool = animals(maxn)
     print(f"  fixed animals: {len(pool)}")
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate MULTIDIRECTED: results/subclasses.md (formerly docs/middle-kingdom-plan.md, removed) Phase 1c acceptance.
 
-Two independent routes to the number m(n) of MULTI-DIRECTED king animals of
+Two independent routes to the number m(n) of MULTI-DIRECTED polyplets of
 area n, in Bacher's sense (arXiv:1301.1365, Definition 2):
 
   series  experiments/multidirected_king.py -- the Nordic-decomposition
@@ -81,7 +81,7 @@ def main():
                "series S = A001003 (little Schroeder half-animals)")
     gate.check(d == mdk.directed_closed_form(nseries),
                "series D from (1)-(3) = closed form (1/4)((1+t)/sqrt(1-6t+t^2)-1)")
-    gate.check(d[1:11] == A047781, "series D = A047781 (directed king animals)")
+    gate.check(d[1:11] == A047781, "series D = A047781 (directed polyplets)")
 
     # --- brute force vs series ---------------------------------------------
     accept_n = 12 if "--deep" in sys.argv else 11   # ~4x per n; --deep restores 12

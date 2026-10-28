@@ -57,7 +57,7 @@ Open, in rough order of how much machinery the statement needs:
   and a census of the cases at n = 5..8.
 - Component stratification C(n,c): C(n,1) = C(n,n) = A001168
   (`results/subclasses.md`).
-- Directed king animals (Bacher) as a closed-form check: filtering the
+- Directed polyplets (Bacher) as a closed-form check: filtering the
   enumeration reproduces A047781 (`results/subclasses.md`).
 - Height of a typical polyplet: mean H/n falls from 0.745 at n = 4 to 0.379
   at n = 40; qualitative only (`results/growth-constant.md`).

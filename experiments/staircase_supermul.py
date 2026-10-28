@@ -11,7 +11,7 @@ join is already injective. This script measures the exact inequality
 
 and the injectivity that proves it.
 
-A staircase king animal (A225114) is a sequence of column intervals with both
+A staircase polyplet (A225114) is a sequence of column intervals with both
 boundaries nondecreasing; up to translation it is a height sequence
 h_1..h_k >= 1 and offsets d_1..d_{k-1} = b_{j+1} - b_j with
 

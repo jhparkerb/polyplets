@@ -3,7 +3,7 @@
 // Every engine in cpp/ used to reach for atoi(), which maps "yes", "five" and
 // "" all to 0 and reports no error. For a research binary that is the worst
 // possible failure mode: `convex_area_tm 8 yes` silently enumerated
-// edge-adjacent polyominoes when king animals were asked for, and
+// edge-adjacent polyominoes when polyplets were asked for, and
 // `prec_guess prec terms five two` printed a confident VERDICT: EXCLUDED for
 // box (0,0) at exit 0. Both look like results.
 //

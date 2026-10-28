@@ -109,7 +109,7 @@ def main():
         gate.check(opt == san, f"D asan      {lattice:8s} n<={depth}  clean + equal")
 
     # E. rook/bishop + perimeter cross-checks (independent structural checks on
-    #    the king-animal generator). Of the generated polyplets, those connected
+    #    the polyplet generator). Of the generated polyplets, those connected
     #    under edge (rook) or corner (bishop) adjacency must each equal A001168
     #    (fixed polyominoes); rook==bishop is the 45-degree color-class
     #    invariant. The (size,perimeter) distribution must sum to A006770, and

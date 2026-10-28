@@ -2,7 +2,7 @@
 """Gate KING-GRID: results/subclasses.md (formerly docs/middle-kingdom-plan.md, removed) Phase 0 acceptance.
 
 build/directed_cone_anchor's "grid" mode does one Redelmeier pass over ALL
-fixed king animals and tallies all 20 (directedness x convexity) cells at
+fixed polyplets and tallies all 20 (directedness x convexity) cells at
 once: directedness in {none, dir5 (Bacher 5-cone), dir4 (half-plane 4-cone),
 ctrlB (dir5nb's bottom-row-waived predicate -- a class of its own, NOT
 multi-directed; see results/subclasses.md), mdir (Bacher's Definition 2,
@@ -23,7 +23,7 @@ Per the plan, Phase 0's acceptance is:
 Phase 3 added the mdir row and, with it, the collapse checks below. Each is a
 PROVED equality (results/subclasses.md): HV-convexity forces the
 bottom profile to be valley-unimodal, which is exactly 5-cone directedness on
-a column-convex animal, and every column-convex king animal is multi-directed.
+a column-convex animal, and every column-convex polyplet is multi-directed.
 The brute force is what those proofs are checked against, so the gate keeps
 both the equalities that must hold AND the four that must NOT
 ((dir4,HV-convex) and the three column-convex cells), which is what stops a

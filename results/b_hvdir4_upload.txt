@@ -16,7 +16,7 @@
 # digits measured (same dominant singularity; only the amplitude changes,
 # C=0.45030318571234118235 vs 0.97445221313500464915). Measured directly,
 # a(n)/a_HV(n) -> 0.46210904920994244004, stable to 20 digits from n=400 to
-# n=700: a fixed ~46.21% of HV-convex king animals are 4-cone directed in
+# n=700: a fixed ~46.21% of HV-convex polyplets are 4-cone directed in
 # the limit. NOT D-finite at order<=24/degree<=24 and NOT algebraic at
 # degree<=20/t-degree<=20 -- the same boxes that clear the unrestricted
 # series (cpp/prec_guess.cpp). Full derivation: results/middle-kingdom-

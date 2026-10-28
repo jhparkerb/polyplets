@@ -10,9 +10,9 @@ sub-lemmas (A-int) and (Sigma) are verified but unproved.
 This probe tested a route the note does not record as tried -- induction on the
 number of holes by removing wall cells:
 
-  MERGE LEMMA (candidate, REFUTED below). Let F be a king animal with k >= 2
+  MERGE LEMMA (candidate, REFUTED below). Let F be a polyplet with k >= 2
   holes and total enclosed area A. Then there is a nonempty W subset F with
-  |W| = t such that F \\ W is a king animal with fewer holes and enclosed area
+  |W| = t such that F \\ W is a polyplet with fewer holes and enclosed area
   >= A + t.
 
 Had it held, the multi-hole bound would follow from the single-hole theorem:
@@ -23,7 +23,7 @@ It fails at the first multi-hole animal there is, and the reason is structural:
 the two smallest multi-hole animals are TIGHT (A = M(n) already at n = 6), so no
 argument that must strictly gain area at each merge can survive the margin.
 
-What the script reports, for every king animal up to n = NMAX:
+What the script reports, for every polyplet up to n = NMAX:
 
   1. the maximum total enclosed area over multi-hole animals, against M(n) --
      i.e. exactly how much room a multi-hole proof has at each n;
@@ -121,7 +121,7 @@ def subsets(items, t):
 
 
 def merge_witness(S, hs, wmax):
-    """W with |W| = t <= wmax, S\\W a king animal, fewer holes, area >= A + t."""
+    """W with |W| = t <= wmax, S\\W a polyplet, fewer holes, area >= A + t."""
     A, k = sum(len(h) for h in hs), len(hs)
     cand = sorted(c for c in S
                   if any((c[0] + dx, c[1] + dy) in h for dx, dy in R4 for h in hs))
