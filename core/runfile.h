@@ -321,7 +321,7 @@ class RunFileWriter {
     // format ("compression 1").
     block_framed_ = compress_ && write_index_;
     zstd_block_records_ = frontierZstdBlockRecords();
-    // Atomic publish (B4): stream to a temp file and rename onto the final path
+    // Atomic publish: stream to a temp file and rename onto the final path
     // in finalize().  A kill mid-write then leaves only a stale .tmp; the real
     // path never holds a placeholder record-count or a short CRC (which a seeked
     // read, skipping the body CRC, would otherwise consume as garbage).
@@ -428,12 +428,10 @@ class RunFileWriter {
     flushWBuf();
     // FAIL-CLOSED: every leg of finalize is checked, because the ONLY
     // reason the writer streams to a .tmp and renames is so a file that could
-    // not be finished is never published. Pre-fix the fseek legs merely warned
-    // and the CRC fwrite / fclose were unchecked, so a writer that ran out of
-    // disk in its last bytes still renamed a plausible file (stale or
-    // placeholder record count, missing CRC trailer) onto the final path — a
-    // silent undercount at the next reader, since the header count is what
-    // next() trusts.
+    // not be finished is never published. A writer that ran out of disk in its
+    // last bytes must not rename a plausible file (stale or placeholder record
+    // count, missing CRC trailer) onto the final path: the header count is
+    // what next() trusts.
     if (std::fseek(fp_, records_offset_, SEEK_SET) != 0)
       failWriter("fseek to the record-count placeholder");
     if (std::fprintf(fp_, "%018zu", record_count_) != 18)
@@ -461,17 +459,20 @@ class RunFileWriter {
     // this run is too small to warrant one.
     if (idx_fp_ && index_count_ > 0) {
       // Backpatch the entry count into the header, then commit the sidecar.
-      if (std::fseek(idx_fp_, kRunIndexCountOffset, SEEK_SET) == 0)
-        std::fwrite(&index_count_, sizeof(index_count_), 1, idx_fp_);
-      std::fclose(idx_fp_);
+      if (std::fseek(idx_fp_, kRunIndexCountOffset, SEEK_SET) != 0 ||
+          std::fwrite(&index_count_, sizeof(index_count_), 1, idx_fp_) != 1)
+        failWriter("index count backpatch");
+      const int idx_rc = std::fclose(idx_fp_);
       idx_fp_ = nullptr;
-      std::rename((path_ + ".idx.tmp").c_str(), (path_ + ".idx").c_str());
+      if (idx_rc != 0) failWriter("index fclose");
+      if (std::rename((path_ + ".idx.tmp").c_str(), (path_ + ".idx").c_str()) != 0)
+        failWriter("index rename");
     } else {
       if (idx_fp_) { std::fclose(idx_fp_); idx_fp_ = nullptr; }
       std::remove((path_ + ".idx.tmp").c_str());
       std::remove((path_ + ".idx").c_str());
     }
-    std::rename(tmp_path_.c_str(), path_.c_str());
+    if (std::rename(tmp_path_.c_str(), path_.c_str()) != 0) failWriter("rename");
     return body_bytes_;
   }
 
