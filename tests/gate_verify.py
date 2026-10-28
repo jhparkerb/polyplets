@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""gate_verify.py — AC-5 gate: independent verifier passes on a real dataset; catches corruption.
+"""gate_verify.py — the run-file verifier accepts intact files and catches a
+corrupt one.
 
 Steps:
-  1. Run build/ns/mkseed to produce valid seed POLYRUN files for H=1..MAXN (these are
-     valid POLYRUN files per the format spec and have a known CRC).
-  2. Write a synthetic manifest referencing those files.
+  1. Write a seed POLYRUN file (one record, docs/formats.md) for each
+     H=1..MAXN, in Python, independently of the Go and C++ writers.
+  2. Write a manifest referencing those files.
   3. Run verify --n MAXN: expect exit 0 (all CRCs match, record counts match).
   4. Flip a byte in one seed file's body.
-  5. Run verify again: expect exit 1 (CRC mismatch detected).
+  5. Run verify again: expect a nonzero exit and a FAIL line.
   6. Clean up.
 
-Using seed files avoids the need to keep full orchestrator run files; a seed is a
-valid POLYRUN with exactly 1 record, so every check that applies to run files applies
-here too.
+A seed is a valid POLYRUN with exactly one record, so every check verify makes
+on a run file applies to it.
 """
 
 import os
@@ -24,8 +24,7 @@ import tempfile
 
 MAXN = 14
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-MKSEED  = os.path.join(ROOT, "build", "ns", "mkseed")
-VERIFY  = os.path.join(ROOT, "build", "ns", "verify")
+VERIFY = os.path.join(ROOT, "build", "ns", "verify")
 
 
 def die(msg):
@@ -49,10 +48,9 @@ def fnv1a64(data: bytes) -> int:
 
 
 def make_seed_polyrun(path: str, H: int, maxn: int) -> None:
-    """Write a seed POLYRUN file for height H (spec §Seed record)."""
+    """Write a seed POLYRUN file for height H: one all-zero key with count 1."""
     rev = "gate_verify"
     key_len = H + 2
-    W = 8  # u64
     header = (
         "POLYRUN 1\n"
         f"height {H}\n"
@@ -67,8 +65,9 @@ def make_seed_polyrun(path: str, H: int, maxn: int) -> None:
         "\n"
     ).encode()
 
-    # One record: sig=(H+2 zero bytes), lo=0, len=1, counts[0]=1 LE u64.
-    body = bytes(key_len) + bytes([0, 1]) + struct.pack("<Q", 1)
+    # One record: sig=(H+2 zero bytes), lo=0, len=1, then the count 1 as a
+    # one-byte LEB128 varint (core/run.h encodeVarint).
+    body = bytes(key_len) + bytes([0, 1, 1])
     crc = fnv1a64(body)
     trailer = struct.pack("<Q", crc)
 

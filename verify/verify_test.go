@@ -190,3 +190,30 @@ func TestMalformedNumbersFail(t *testing.T) {
 		}
 	}
 }
+
+// TestBytesAfterLastRecordFail: bytes between the last record and the
+// checksum trailer are an error even when the checksum covers them.
+func TestBytesAfterLastRecordFail(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "r.bin")
+	writePolyrun(t, path)
+	if _, _, err := SumCountsInFile(path); err != nil {
+		t.Fatalf("control: intact file: %v", err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, bodyOff, err := parsePolyrunHeader(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := append(append([]byte{}, data[bodyOff:len(data)-8]...), 0, 0, 0)
+	padded := append(append([]byte{}, data[:bodyOff]...), body...)
+	padded = binary.LittleEndian.AppendUint64(padded, fnv1a64(body))
+	if err := os.WriteFile(path, padded, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := SumCountsInFile(path); err == nil {
+		t.Fatalf("SumCountsInFile accepted 3 stray bytes before the trailer")
+	}
+}

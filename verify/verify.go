@@ -251,11 +251,8 @@ func SumCountsInFile(path string) (map[int]*big.Int, uint64, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	// FAIL-CLOSED: a compressed body's bytes are not records — decoding them
-	// as varints yields garbage sums with no signal. This independent verifier
-	// deliberately has no zstd path; say so instead of misreading, and say what
-	// DOES cover such a file (runcat is Go too, and there is no C++ dumper —
-	// the old "use the C++ readers (runcat)" referral was circular).
+	// A compressed body's bytes are not records, and this verifier has no
+	// zstd path, so it refuses one rather than misread it.
 	if hdr.Compression != 0 {
 		return nil, 0, fmt.Errorf("%s: compressed body (compression %d): this Go verifier decodes plain bodies only. Integrity of a compressed body rests on the in-band zstd frame checksum, which the C++ readers (core/runfile.h) enforce fail-closed — any decode or checksum failure aborts the reading worker rather than reading short. To check or dump one by hand: tail -c +%d %s | zstd -d", path, hdr.Compression, bodyOff+1, path)
 	}
@@ -300,6 +297,17 @@ func SumCountsInFile(path string) (map[int]*big.Int, uint64, error) {
 			sums[lo+i].Add(sums[lo+i], val)
 		}
 		recCount++
+	}
+	// After the last record comes exactly the 8-byte checksum trailer; other
+	// leftover bytes mean the records were not what the writer meant.
+	if recCount == hdr.Records {
+		rest, err := io.ReadAll(br)
+		if err != nil {
+			return nil, recCount, fmt.Errorf("reading trailer in %s: %w", path, err)
+		}
+		if len(rest) != 8 {
+			return nil, recCount, fmt.Errorf("%s: %d bytes after the last record, want the 8-byte checksum trailer", path, len(rest))
+		}
 	}
 	return sums, recCount, nil
 }
