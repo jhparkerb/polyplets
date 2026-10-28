@@ -46,10 +46,8 @@ type WorkerResult struct {
 // Lines may be "tri H n V" (map_worker) or "event=done key=value...". A
 // malformed "tri" line is a hard error (fail-closed) rather than a silent
 // skip: a worker only ever emits well-formed tri lines, so a bad one means
-// real corruption, not a value to quietly drop (BUGS-OF-SHAME A2 — the old
-// code additionally silent-dropped any value too wide for uint64; big.Int
-// has no width limit, so that specific failure mode no longer exists at all,
-// but a genuinely non-numeric value must still fail loud).
+// real corruption, not a value to quietly drop. Values are big.Int, so no
+// width is too wide.
 func ParseWorkerOutput(lines []string) (WorkerResult, error) {
 	r := WorkerResult{TriContribs: make(map[int]map[int]*big.Int)}
 	for _, line := range lines {

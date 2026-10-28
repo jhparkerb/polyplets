@@ -13,10 +13,9 @@
 // whitespace-tokenized request line per unit of work instead of spawning
 // fresh. A slot is a single concurrency unit: checking it out for a map
 // request and a merge request are mutually exclusive uses of the SAME
-// budget, matching the single Cores-wide `sem` channel the exec-per-unit
-// path used to share between map and merge (overlap-heights runs both
-// concurrently across heights) -- so this preserves the exact same
-// concurrency ceiling, not 2x it.
+// budget, matching the single Cores-wide `sem` channel map and merge share
+// (overlap-heights runs both concurrently across heights), so the
+// concurrency ceiling is Cores, not 2x it.
 package orchestrator
 
 import (

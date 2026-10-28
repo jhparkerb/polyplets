@@ -1,6 +1,8 @@
 // sweep.go — column-sweep orchestrator: parallel map+merge per column, checkpoint.
 //
-// One height at a time (H=1..maxn).  Within a height-sweep each column is:
+// Heights run one at a time, or several at once sharing one worker pool
+// (--overlap-heights, runOverlap). Heights with closed forms are contributed
+// directly. Within a swept height each column is:
 //  1. Partition source key-space → map units (one unit per worker).
 //  2. Run map_worker per unit in parallel (pool of ≤ cores goroutines).
 //  3. Sample output key-space → merge ranges (one per worker).
@@ -406,9 +408,10 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
-		// Pole strip H==maxn-1 is closed-form (C1, proven); contribute it
-		// directly — it is ~24% of run wall. (maxn>=4 keeps H=maxn-1>=3 distinct
-		// from the H=1/H=2 low strips and 3^(maxn-4) non-negative.)
+		// Pole strip H==maxn-1 is closed-form (proved, docs/proofs/T-n-nm1.md);
+		// contribute it directly — sweeping it would be ~24% of run wall.
+		// (maxn>=4 keeps H=maxn-1>=3 distinct from the H=1/H=2 low strips and
+		// 3^(maxn-4) non-negative.)
 		if H == maxn-1 && maxn >= 4 {
 			if err := contributePoleHeight(maxn, triangle, cfg); err != nil {
 				return nil, err
@@ -425,7 +428,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
-		// Trivial low strips H==1 and H==2 also have closed forms (C2);
+		// Trivial low strips H==1 and H==2 also have closed forms;
 		// contribute them directly instead of spawning a worker per column.
 		if H == 1 || H == 2 {
 			if err := contributeLowHeight(H, maxn, triangle, cfg); err != nil {
@@ -899,8 +902,7 @@ func (g *frontierGuard) afterColumn(wroteCheckpoint bool, oldFrontier, newFronti
 // H+4-keyed mid-column stage rounds (the per-cell king-adjacency transfer),
 // and one H+4-keyed "finalize" round (drop the carry with a stranding check,
 // canonicalize/prune/fold, keyLen H+4->H+2) — a barrier at every stage instead
-// of once per column (Phase 0's Option A). Checkpointing is column-level only
-// (the locked-in Phase 2 decision): a crash mid-column re-runs the whole
+// of once per column. Checkpointing is column-level only: a crash mid-column re-runs the whole
 // column's stage sequence from its seed, same as sweepHeight re-runs a whole
 // column's single map+merge round.
 //
@@ -1282,8 +1284,8 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // kernel's H+2 default. stage selects the kink kernel round ("" = column
 // kernel, unchanged behavior; "seed"/"finalize"/an int stage index = kink)
 // and is passed straight through to MapArgs.Kernel/Stage. Work-stealing is
-// additionally gated off for "seed"/"finalize": those rounds run in-RAM
-// (Phase 2 decision) and don't implement the SIGTERM cooperative-stop
+// additionally gated off for "seed"/"finalize": those rounds run in RAM and
+// don't implement the SIGTERM cooperative-stop
 // protocol the mid-column int-stage rounds (map_shard_stage_file) support, so
 // stopping one would kill it outright rather than yield a valid partial
 // output.
@@ -2002,7 +2004,7 @@ func pow3(k int) *big.Int {
 // {maxn-1, maxn}:
 //
 //	T(maxn-1, maxn-1) = 3^(maxn-2)              (the diagonal, = T(H,H))
-//	T(maxn,   maxn-1) = (25*maxn-45)*3^(maxn-4) (C1, proven; docs/proofs/T-n-nm1.md)
+//	T(maxn,   maxn-1) = (25*maxn-45)*3^(maxn-4) (proved, docs/proofs/T-n-nm1.md)
 //
 // Caller guarantees maxn>=4. ns-gate-closedform pins both formulas against the
 // triangle so a derivation error can never reach a result.

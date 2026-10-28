@@ -2,7 +2,7 @@ package orchestrator
 
 // poleheight_test.go — the H=maxn-1 strip (the run's pole) is closed-form:
 //   T(maxn-1,maxn-1) = 3^(maxn-2)            (diagonal top of the strip)
-//   T(maxn,maxn-1)   = (25*maxn-45)*3^(maxn-4)  (C1, PROVEN; see docs/proofs)
+//   T(maxn,maxn-1)   = (25*maxn-45)*3^(maxn-4)  (proved: docs/proofs/T-n-nm1.md)
 // It must be contributed WITHOUT a column sweep — it is ~24% of run wall.
 
 import (

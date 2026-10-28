@@ -3,7 +3,7 @@ package orchestrator
 // heightnm2_test.go — the H=maxn-2 strip is closed-form (k=2, proven; see
 // docs/proofs/T-n-nm2-and-general.md). It carries three cells:
 //   T(maxn-2,maxn-2) = 3^(maxn-3)                         (diagonal)
-//   T(maxn-1,maxn-2) = (25(maxn-1)-45)*3^(maxn-5)         (C1 at n=maxn-1)
+//   T(maxn-1,maxn-2) = (25(maxn-1)-45)*3^(maxn-5)         (the H=n-1 formula at n=maxn-1)
 //   T(maxn,maxn-2)   = (625*maxn^2-2459*maxn+1134)/2 * 3^(maxn-7)
 // and must be contributed WITHOUT a column sweep (valid for maxn>=7).
 

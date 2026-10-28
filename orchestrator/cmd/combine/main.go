@@ -42,7 +42,7 @@ func main() {
 	compare := flag.Bool("compare", false, "compare a(n) to fixtures/b006770.txt")
 	requireCover := flag.Bool("require-cover", requireCoverDefault, "fail unless heights 1..maxn are all present exactly once")
 	out := flag.String("out", "", "write the combined triangle here (n value lines)")
-	diffB := flag.String("diff-b", "", "Phase 2.7 diff mode: compare --in's per-height rows against this comma-separated dir set, cell by cell (every T(n,H)); ignores --compare/--require-cover/--out")
+	diffB := flag.String("diff-b", "", "diff mode: compare --in's per-height rows against this comma-separated dir set, cell by cell (every T(n,H)); ignores --compare/--require-cover/--out")
 	flag.Parse()
 
 	if *inArg == "" || *maxn == 0 {
