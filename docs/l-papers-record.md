@@ -53,8 +53,9 @@ onset and leading coefficient between the two lattices through `k = 6`, the
 coefficient triangle and the minimum end are not in the slides.
 
 The ANALCO 2018 paper with the proofs, "Polycubes with small perimeter
-defect" (Proc. ANALCO 2018, 93–100), was obtained the same day and is in
-`literature/`. Its argument (perimeter as `6n − e − 2|E|`, rationality by
+defect" (Proc. ANALCO 2018, 93–100), was obtained the same day; that copy is
+no longer held, and `literature/` has the journal version (Ann. Comb. 26
+(2022) 997–1020) instead. Its argument (perimeter as `6n − e − 2|E|`, rationality by
 shrinking cuts, finiteness of pattern classes from bounds on excess, L- and
 degree-1 cells, the handshake bound at degree 6) is stated in face-adjacency
 terms throughout; the cut condition in particular fails under king

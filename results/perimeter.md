@@ -74,8 +74,8 @@ Let `t` be the sum over empty adjacent cells of (animal neighbors − 1).
 `2c + t` on the square lattice, `2c + t − 2(n − 1)` on the king lattice. The
 square form does not carry over: a king diagonal stick has `c = 0`, `t = 2(n −
 1)`, `k = 0`. The square form is Asinowski, Barequet and Zheng's `k = e + 2f`
-(`f` circuit rank, `e` total excess;
-`literature/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`).
+(`f` circuit rank, `e` total excess; printed `k = e + 2r` as Proposition 2.1 of
+`literature/asinowski_barequet_zheng_2022_polycubes_small_perimeter_defect.pdf`).
 No count depends on the identity.
 
 **Monotonicity (proved).** Adding a cell raises `pmax` by `deg/2` and changes

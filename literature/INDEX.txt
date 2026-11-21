@@ -2,8 +2,8 @@ Reference-paper archive for the papers in paper/
 (PDFs are gitignored local copies; this index and MISSING.md are tracked.)
 
 Listed here but not held (see MISSING.md): jensen_counting_polyominoes_
-parallel, gray, counting_polyominoes_revisited, tremblay_vernay,
-guttmann_series_appendix. Copies that differ from the published text:
+parallel, gray, guttmann_series_appendix. Copies that differ from the published text:
+  barequet_benshachar_2026_..._corrigendum.pdf  pp. 2-14 are the authors' version of the Algorithmica paper; its Table 3 still prints the uncorrected A(67)
   barequet.pdf         ESA 2015 version (Rote's site), not the CACM 2016 text
   stanley.pdf          Stanley's online EC1 2nd ed., version of 15 July 2011
   nijenhuis.pdf        the whole book, from Wilf's page
@@ -36,8 +36,8 @@ Polyomino/animal enumeration:
   mertens_lautenbacher_1991_parallel.pdf   Mertens & Lautenbacher, Counting lattice animals: a parallel attack, J. Stat. Phys. 66 (1992).
   1106.1078.pdf                            Luther & Mertens, Counting lattice animals in high dimensions, arXiv:1106.1078 (2011).
   cond-mat_0301468.pdf                     Jensen, A parallel algorithm for the enumeration of self-avoiding polygons on the square lattice, arXiv:cond-mat/0301468 (2003).
-  counting_polyominoes_revisited.pdf       Barequet & Ben-Shachar, Counting polyominoes, revisited (TOPP problem 37 line of work).
-  (no local copy)                          Barequet & Ben-Shachar, Counting polyominoes, revisited: corrigendum and addendum, arXiv:2610.10632 (2026). Corrects A(67); the error was found by the mod-4 congruence in results/symmetry-classes.md.
+  (pp. 2-14 of the corrigendum file below)  Barequet & Ben-Shachar, Counting polyominoes, revisited, Algorithmica 88 (2026) 51, doi 10.1007/s00453-026-01392-6; ALENEX 2024, 133-143. Rotated-lattice transfer matrix, A(57)..A(70).
+  barequet_benshachar_2026_counting_polyominoes_revisited_corrigendum.pdf  Barequet & Ben-Shachar, Counting polyominoes, revisited: corrigendum and addendum, arXiv:2610.10632 (2026). Corrects A(67); the error was found by the mod-4 congruence in results/symmetry-classes.md.
   shirakawa_n59.pdf                        Enumeration of polyominoes up to size n=59 (per PDF title).
   barequet_moffie_2007_jensen_complexity.pdf  Barequet & Moffie, On the complexity of Jensen's algorithm for counting fixed polyominoes, J. Discrete Algorithms 5 (2007) 348-355.
   barequet_rote_twisted_cylinders.pdf      Barequet, Moffie, Ribo & Rote, Counting polyominoes on twisted
@@ -66,6 +66,7 @@ Polyomino/animal enumeration:
   jensen_benzenoid_parallel.pdf            Jensen, parallel enumeration of benzenoid hydrocarbons.
   efficient_enumeration_algorithms_2016.pdf  Conway, The design of efficient algorithms for enumeration, arXiv:1610.09806 (2016; v2 2017).
   tremblay_vernay.pdf                      Tremblay & Vernay, On the generation of discrete figures with connectivity constraints, RAIRO-TIA 58 (2024). (Source of A006770's a(18); cited in the OEIS entry.)
+  tremblay_vernay_2022_puma_exhaustive_generation.pdf  Tremblay & Vernay, On the exhaustive generation of discrete figures with connectivity constraints, Pure Math. Appl. 30(1) (2022) 106-112. The GASCom 2022 version of the above; same a(18).
   jensen_guttmann_2000_statistics_lattice_animals_polygons.pdf
                                            Jensen & Guttmann, Statistics of lattice animals (polyominoes)
                                            and polygons, J. Phys. A 33 (2000) L257-L263 (arXiv
@@ -338,3 +339,7 @@ provenance in the session notes and polyplets-2024-2026.bib):
   hammond_2005_exponent_relations.pdf            Hammond, Percolation and lattice animals: exponent relations, and conditions for theta(p_c)=0, arXiv:math/0402048. Companion to the above; one of the two is the ECP 10:45-59 (2005) paper cited by G-P as [17].
   jacobsen_2015_temperley_lieb_thresholds.pdf    Jacobsen, Critical points of Potts and O(N) models from eigenvalue identities in periodic Temperley-Lieb algebras, J. Phys. A 48:454003 (2015); arXiv:1507.03027. Source of p_c(square site) = 0.59274605..., hence the authoritative king threshold 0.40725395... via Sykes-Essam matching.
   koch_kurz_2006_generalized_polyominoes.pdf     Koch & Kurz, Enumeration of generalized polyominoes, arXiv:math/0605144. The only prior general-adjacency enumeration framework cited by Dobbelaere et al.; check whether king adjacency was covered.
+
+Filed 2026-11-21 (State Library of Queensland visit):
+  asinowski_barequet_zheng_2022_polycubes_small_perimeter_defect.pdf  Asinowski, Barequet & Zheng, Polycubes with small perimeter defect, Ann. Comb. 26 (2022) 997-1020, doi 10.1007/s00026-022-00601-7. Journal version of the ANALCO 2018 paper: k = e + 2r (Prop. 2.1; r is the circuit rank) and the rational, cyclotomic-denominator theorem for fixed defect.
+  andrews_1984_generalized_frobenius_partitions_excerpts.pdf  Andrews, Generalized Frobenius partitions, Memoirs AMS 301 (1984), pp. 1, 6-14, 33-37, 39-41 only. Eq. (5.9) is the phi_2 product results/perimeter.md cites.

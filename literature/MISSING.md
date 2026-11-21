@@ -7,16 +7,16 @@ unaffiliated readers; Penn State lends to Pennsylvania residents; pre-1995
 IOP content is a separate archive product, so a current licence does not
 imply it. Remove an entry, and file the PDF, once obtained.
 
+State Library of Queensland, checked on site 2026-11-21 through its catalogue
+and link resolver: it licenses ProQuest (Central, Ebook Central) and EBSCO,
+and nothing from IOP, Springer, Elsevier, IEEE, OUP, AIP or Wiley that reaches
+this list. Reachable there: the Andrews memoir (Ebook Central) and the Annals
+of Combinatorics 26 (2022) version of Asinowski, Barequet & Zheng (ProQuest
+Central). J. Stat. Phys. starts at 1997 and J. Comb. Inf. Syst. Sci. at 2010,
+both too late; print J. Phys. A stops at 1976. Every other entry: no full text.
+
 ## High
 
-- G. E. Andrews, "Generalized Frobenius partitions," Memoirs AMS 301 (1984).
-  ISBN 0821823027. The product form of φ₂ (A053993), which
-  `results/perimeter.md` cites as Andrews eq. (5.9), is quoted from the OEIS
-  entry and has never been read; the product was checked against the cone
-  count to n = 40, so nothing numerical is at risk. The memoir is also where
-  φ_k is defined, so it is the place to learn whether "order ideals of the
-  cone {a ≥ |b|}" is a known reading of φ₂. `ams.org/memo/0301` returns an
-  access page, not the PDF.
 - G. Barequet & B. Magal, "Automatic generation of formulae for polyominoes
   with a fixed perimeter defect," Comput. Geom. 108 (2023) 101919. The
   perimeter-defect member of the same family as the height-defect diagonals,
@@ -109,16 +109,9 @@ imply it. Remove an entry, and file the PDF, once obtained.
   academia.edu copy needs a login.
 - S. B. Gray, "Local properties of binary images in two dimensions," IEEE
   Trans. Computers C-20(5) (1971) 551–561. Paywalled.
-- G. Barequet & G. Ben-Shachar, "Counting polyominoes, revisited,"
-  Algorithmica (2026), doi 10.1007/s00453-026-01392-6; conference version
-  ALENEX 2024, 133–143. Both paywalled; preprint at Research Square, doi
-  10.21203/rs.3.rs-4304962/v1.
-- H. Tremblay & J. Vernay, "On the generation of discrete figures with
-  connectivity constraints," RAIRO-TIA 58 (2024) 16, doi
-  10.1051/ita/2024013. Open access; the site needs a browser.
 - A. Asinowski, G. Barequet & Y. Zheng, "Polycubes with small perimeter
-  defect," ANALCO 2018, SIAM, 93–100. `results/perimeter.md:78` cites it as
-  `asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`.
+  defect," ANALCO 2018, SIAM, 93–100. The Ann. Comb. 26 (2022) journal
+  version is held and is what `results/perimeter.md` now cites.
 - The same authors' Séminaire Lotharingien 79 slides,
   `mat.univie.ac.at/~slc/wpapers/s79vortrag/asinowski.pdf`. Free.
 - A. J. Guttmann, a series-analysis appendix on differential approximants.
@@ -162,9 +155,28 @@ Guttmann & Whittington 1991 and has no primary.
 (Séminaire Lotharingien 79, `mat.univie.ac.at/~slc/wpapers/s79vortrag/`) and
 their ANALCO 2018 paper (neither held) carry the k = e + 2f identity and
 the rational-with-cyclotomic-denominator theorem for fixed defect; L6
-attributes both in place.
+attributes both in place. The journal version, Ann. Comb. 26 (2022)
+997–1020, is held: the identity is its Proposition 2.1, printed k = e + 2r.
+Its Proposition 2.4 (square, k = 3) is the Q₃ of `results/perimeter.md` and
+matches a direct count; its Table 3 denominators for k ≤ 5 are ours. Three of
+its other formulas do not survive `experiments/abz_defect_formula_check.py`:
+Table 1 sums to a constant 4 below Proposition 2.4, Proposition 2.7 prints
+−2091/2 for that constant and C(n−4, 2) where its k = 2 cubic term needs
+C(n−2, 2), and Proposition 2.6 (three dimensions, k = 3) exceeds the count by
+24(n − 4) for 9 ≤ n ≤ 16. Nothing here uses the three-dimensional formulas.
 
 **Concatenation bounds** (Barequet, Ben-Shachar & Osegueda 2021, held): the
 method bounds growth constants, not log-convexity, and a king comb shatters
 under their lexicographic split into about n/4 components, so it does not
 give an upper bound below 9.3154 (`experiments/concatenation_bound_check.py`).
+
+**Andrews' φ₂** (`results/perimeter.md`): Memoirs AMS 301 read on site at
+the State Library of Queensland, 2026-11-21; pp. 1, 6-14, 33-37, 39-41 held
+as `andrews_1984_generalized_frobenius_partitions_excerpts.pdf`. Eq. (5.9)
+is the product as printed here, Table 1 agrees with `andrews_phi2()` through
+n = 20, φ_k is defined on two-rowed arrays only, and Problem 2 (p. 40) asks
+for a combinatorial proof of (5.9), so no cone reading is in it. Section 13
+(pp. 35-37) sets up circle-method integrals and prints one asymptotic,
+(13.6), for the coloured cφ_k only; none for φ_k. The formula quoted from
+Kotesovec is his, and
+the exact series over it is 0.977, 0.989, 0.994 at n = 400, 1600, 6400.
