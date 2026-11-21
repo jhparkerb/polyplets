@@ -1,4 +1,4 @@
-# OEIS submission staging — 4 novel king-lattice (polyplet) sequences
+# OEIS submission staging — 4 king-lattice (polyplet) sequences not in the OEIS
 
 > Batch scope/order and the master checklist live in
 > [`oeis/SUBMISSION.md`](../../oeis/SUBMISSION.md) (this dir = its Wave 2,
@@ -17,8 +17,8 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 
 | # | sequence | dir | terms (confirmed) | offset | keyword | status |
 |---|----------|-----|-------------------|--------|---------|--------|
-| 1 | Hole-free polyplet count | `1-holefree/` | 18 (n=1..18) | 1,2 | nonn,hard | READY — Superseeker-confirmed novel (2026-06-19) |
-| 2 | One-hole polyplet count | `2-onehole/` | 15 (n=4..18) | 4,2 | nonn,hard | READY — Superseeker-confirmed novel (2026-06-19) |
+| 1 | Hole-free polyplet count | `1-holefree/` | 18 (n=1..18) | 1,2 | nonn,hard | READY — not in OEIS (Superseeker 2026-06-19); NOT new: all 18 terms are in Tremblay & Vernay 2022/2024, cited in the draft |
+| 2 | One-hole polyplet count | `2-onehole/` | 15 (n=4..18) | 4,2 | nonn,hard | READY — not in OEIS (Superseeker 2026-06-19) |
 | 3 | Square-bounding-box count | `3-square-bbox/` | 16 (n=1..16) | 1,2 | nonn,hard,more | READY — generated + marginal-verified to n=16 (ayr split run) 2026-06-22; Superseeker novelty check still owed |
 | 4 | Max-distinct-holes count | `4-max-holes/` | 30 (n=1..30) | 1,6 | nonn,easy | READY — proven closed form; A337601 overlap is coincidence (see below) |
 
@@ -31,7 +31,11 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 - Provenance: column transfer matrix (`cpp/early_tm`), byte-identical to per-animal
   background flood (n<=14); row sums == A006770; n=15..18 cross-ISA confirmed
   (clang/ARM vs gcc/x86). Largest CONFIRMED n = 18.
-- Novelty: Superseeker CLEAR (2026-06-19), full T001-T115 transform battery.
+- Not in OEIS: Superseeker CLEAR (2026-06-19), full T001-T115 transform battery.
+- Prior publication: Tremblay & Vernay, Pure Math. Appl. 30(1) (2022) 106-112 and
+  RAIRO-TIA 58 (2024) 16, Table 5, column (8,4), n=1..18, every term equal to ours
+  (`literature/tremblay_vernay.pdf`). Found 2026-11-21. Their method generates the
+  figures one at a time, so it is a second source for the column through n=18.
 
 ### 2. One-hole (`2-onehole/draft.txt`, `b-onehole.txt`)
 - Terms 1,16,166,1456,...,4970078092354 for n=4..18.
@@ -74,6 +78,6 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 
 ## Status summary
 All four sequences are staged with draft + b-file. Sequences 1, 2, 4 are
-submission-ready (Superseeker-confirmed novel). Sequence 3 (square bounding box) is now
+submission-ready (Superseeker-confirmed absent from the OEIS; sequence 1 is in print elsewhere, see its section). Sequence 3 (square bounding box) is now
 generated and marginal-verified through n=14; the one remaining step before submission is
 a Superseeker novelty pass (lookup string in the section above) — jasonp sends it.

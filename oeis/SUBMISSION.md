@@ -66,7 +66,7 @@ extensions (§6).
 | # | sequence | status |
 |---|---|---|
 | 0 | Hole triangle T(n,k) (`oeis/draft-hole-triangle.txt` + b-file) | submit FIRST in this wave: 1 and 2 cite its A-number |
-| 1 | Hole-free count (column k=0), n=1..18 | READY — Superseeker-clear 2026-06-19 |
+| 1 | Hole-free count (column k=0), n=1..18 | READY — Superseeker-clear 2026-06-19; terms already published by Tremblay & Vernay (2022, 2024), cited in the draft |
 | 2 | One-hole count (column k=1), n=4..18 | READY — Superseeker-clear 2026-06-19 |
 | 3 | Square-bounding-box count, n=1..16 | Superseeker pass still OWED (jasonp sends; lookup string in submissions README) |
 | 4 | Max distinct holes, proven closed form, n=1..30 | READY — cross-refs corrected 2026-07-16 (see §5) |

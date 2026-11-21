@@ -7,6 +7,8 @@
 %C Axxxxxx Row sums give A006770. Column k=0 (hole-free polyplets) is A_0 [draft]; column k=1 is A_1 [draft]. The polyomino (edge-connected) analogue of the holed total is A389193.
 %C Axxxxxx Computed exactly by a column transfer matrix carrying the Euler characteristic as a hole index (project thread #28); validated byte-identical to an independent per-animal flood fill for n <= 14, with row sums equal to A006770 (incl. the confirmed A006770(19)); exact through n = 18, with rows n=15..18 independently reproduced on a second CPU architecture (clang/ARM vs gcc/x86, byte-identical). - _Jason H Parker_, Jul 05 2026
 %C Axxxxxx Generating-function structure: the contribution of bounding-box-height-exactly-H, k-hole animals is a rational function G_{H,k}(x); e.g. G_{3,1}(x) = (x^4 + 2*x^5 - 2*x^7 - x^8)/(1 - 8*x + 20*x^2 - 14*x^3 - 8*x^4 + 18*x^5 + 3*x^6 - 16*x^7 + 6*x^8 + 6*x^9 - 3*x^10 - 2*x^11 + x^12). The order of G_{H,k} is c_H*(k+1) with c_H = 6, 20, 68, 185, 537 for H = 3..7. Summed over all heights the columns A_k(x) are not expected to be D-finite (as for A006770).
+%C Axxxxxx Column k=0 through n = 18 is the (8,4)-connected column of Tremblay and Vernay (2024), Table 5; the two agree.
+%H Axxxxxx Hugo Tremblay and Julien Vernay, <a href="https://doi.org/10.1051/ita/2024013">On the generation of discrete figures with connectivity constraints</a>, RAIRO-Theor. Inf. Appl. (2024) Vol. 58, Art. No. 16. See Table 5.
 %H Axxxxxx Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
 %e Axxxxxx Row n=1: {1};
 %e Axxxxxx Row n=2: {4};

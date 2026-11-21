@@ -74,7 +74,9 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
   transform battery — ±constant, scaling, binomial, Euler, Möbius/Stirling,
   differences — plus gfun/Rate/guesss closed-form search). Both came back clean, so
   novelty is closed beyond a plain term-prefix search (the additive/transform
-  "secretly a known sequence" cases are ruled out). Cross-checked independently by
+  "secretly a known sequence" cases are ruled out). Absent from the OEIS is not
+  unpublished: A_0 for n ≤ 18 is the (8,4) column of Tremblay & Vernay (2022, 2024),
+  found 2026-11-21; A_1 is not in their paper. Cross-checked independently by
   our own consecutive-run and first/second-difference oeis.org searches.
 - Triangle T(n,k): covered by the A_0/A_1 column lookups — Superseeker's own advice
   is to look up an array's rows/columns/diagonals, not the flattened array; no
